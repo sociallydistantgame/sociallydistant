@@ -1,0 +1,19 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: d43ce11485ae45928f614a9c59041f3a, type: 3}
+  m_Name: TrixelAudioConfig
+  m_EditorClassIdentifier: 
+  soundEffectPoolSize: 50
+  soundEffectsGroup: {fileID: -7257021110167407072, guid: 6b9098331e3ddac4985e792350244d69, type: 2}
+  musicGroup: {fileID: 4683937425421628523, guid: 6b9098331e3ddac4985e792350244d69, type: 2}
+  ambienceGroup: {fileID: 4683937425421628523, guid: 6b9098331e3ddac4985e792350244d69, type: 2}
+  dialogueGroup: {fileID: 3267067581848305304, guid: 6b9098331e3ddac4985e792350244d69, type: 2}
