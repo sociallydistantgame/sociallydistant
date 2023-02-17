@@ -48,9 +48,9 @@ namespace Utility
 #if UNITY_EDITOR
             EditorApplication.ExitPlaymode();
             return;
-#endif
-
+#else
             Application.Quit(0);
+#endif
         }
         
         public static bool IsLastSibling(this Transform transform)
