@@ -20,6 +20,9 @@ namespace Player
 		private GameObject backdropPrefab = null!;
 
 		[SerializeField]
+		private GameObject desktopPrefab = null!;
+		
+		[SerializeField]
 		private GameObject windowManagerPrefab = null!;
 		
 		private void Awake()
@@ -33,16 +36,16 @@ namespace Player
 
 			GameObject uiRootGameObject = Instantiate(uiRootPrefab);
 			GameObject backdropGameObject = Instantiate(backdropPrefab, uiRootGameObject.transform);
+			GameObject desktopGameObject = Instantiate(desktopPrefab, uiRootGameObject.transform);
 			GameObject windowManagerGameObject = Instantiate(windowManagerPrefab, uiRootGameObject.transform);
 
 			player.UiRoot = uiRootGameObject;
 			
 			backdropGameObject.MustGetComponent(out player.BackdropController);
+			desktopGameObject.MustGetComponent(out player.Desktop);
 			windowManagerGameObject.MustGetComponent(out player.WindowManager);
 
 			this.playerInstanceHolder.Value = player;
-
-			this.playerInstanceHolder.Value.WindowManager.FallbackWorkspace.CreateWindow("Ritchie");
 		}
 
 		private void OnDestroy()

@@ -7,7 +7,7 @@ using Utility;
 
 namespace UI.Windowing
 {
-	public class WindowManager : MonoBehaviour, IWindowManager<UguiWorkspaceDefinition, RectTransform, RectTransform>
+	public class WindowManager : MonoBehaviour, IWindowManager<UguiWorkspaceDefinition, RectTransform>
 	{
 		private UguiWorkspaceDefinition fallbackWorkspace = null!;
 		

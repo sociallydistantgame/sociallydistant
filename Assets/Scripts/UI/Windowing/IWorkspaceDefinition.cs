@@ -2,12 +2,12 @@
 
 namespace UI.Windowing
 {
-	public interface IWorkspaceDefinition<TWindowClient>
+	public interface IWorkspaceDefinition
 	{
 		string Name { get; set; }
 		
-		ObservableList<IWindow<TWindowClient>> WindowList { get; }
+		ObservableList<IWindow> WindowList { get; }
 
-		IWindow<TWindowClient> CreateWindow(string title, TWindowClient? client = default);
+		IWindow CreateWindow(string title);
 	}
 }
