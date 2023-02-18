@@ -26,8 +26,15 @@ namespace UI.Windowing
 				newWindow.SetClient(client);
 
 			this.WindowList.Add(newWindow);
+			newWindow.WindowClosed += HandleWindowClosed;
 
 			return newWindow;
+		}
+
+		private void HandleWindowClosed(IWindow<RectTransform> win)
+		{
+			win.WindowClosed -= HandleWindowClosed;
+			this.WindowList.Remove(win);
 		}
 
 		public UguiWorkspaceDefinition(RectTransform workspaceArea, UguiWindow windowPrefab)
