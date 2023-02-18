@@ -1,5 +1,6 @@
 ﻿#nullable enable
 using UI.Backdrop;
+using UI.Windowing;
 using UnityEngine;
 
 namespace Player
@@ -8,5 +9,6 @@ namespace Player
 	{
 		public GameObject UiRoot;
 		public BackdropController BackdropController;
+		public WindowManager WindowManager;
 	}
 }

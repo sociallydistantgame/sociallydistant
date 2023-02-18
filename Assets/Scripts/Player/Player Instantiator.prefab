@@ -47,3 +47,4 @@ MonoBehaviour:
   playerInstanceHolder: {fileID: 11400000, guid: b143bb84d08c6044bb9b1a69e33c8460, type: 2}
   uiRootPrefab: {fileID: 6404087894138473668, guid: 59522fc76d98843479569295ef34bcef, type: 3}
   backdropPrefab: {fileID: 1876961014414637132, guid: 437971ffa9ad15844ab503f02119cf2b, type: 3}
+  windowManagerPrefab: {fileID: 3873711479734453863, guid: 180479df6586f3f41aa4d32d884cd9e5, type: 3}
