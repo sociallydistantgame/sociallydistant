@@ -4,7 +4,7 @@ using UnityEngine;
 
 namespace UI.Windowing
 {
-	public class UguiWorkspaceDefinition : IWorkspaceDefinition<RectTransform>
+	public class UguiWorkspaceDefinition : IClientWorkspaceDefinition<UguiWindow, RectTransform>
 	{
 		private readonly RectTransform workspaceArea;
 		private readonly UguiWindow windowPrefab;
@@ -13,10 +13,10 @@ namespace UI.Windowing
 		public string Name { get; set; }
 
 		/// <inheritdoc />
-		public ObservableList<IWindow<RectTransform>> WindowList { get; private set; } = new ObservableList<IWindow<RectTransform>>();
+		public ObservableList<IWindow> WindowList { get; private set; } = new ObservableList<IWindow>();
 
 		/// <inheritdoc />
-		public IWindow<RectTransform> CreateWindow(string title, RectTransform client = default)
+		public UguiWindow CreateWindow(string title, RectTransform client)
 		{
 			UguiWindow newWindow = Object.Instantiate(windowPrefab, workspaceArea);
 
@@ -31,7 +31,12 @@ namespace UI.Windowing
 			return newWindow;
 		}
 
-		private void HandleWindowClosed(IWindow<RectTransform> win)
+		public IWindow CreateWindow(string title)
+		{
+			return CreateWindow(title, null);
+		}
+		
+		private void HandleWindowClosed(IWindow win)
 		{
 			win.WindowClosed -= HandleWindowClosed;
 			this.WindowList.Remove(win);

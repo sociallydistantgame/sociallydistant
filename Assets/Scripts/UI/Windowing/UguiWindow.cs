@@ -12,7 +12,7 @@ namespace UI.Windowing
 		MonoBehaviour,
 		ISelectHandler,
 		IDeselectHandler,
-		IWindow<RectTransform>
+		IWindowWithClient<RectTransform>
 	{
 		private WindowState currentWindowState;
 		private LayoutElement layoutElement;
@@ -48,7 +48,7 @@ namespace UI.Windowing
 		public WindowDragService DragService => dragService;
 
 		/// <inheritdoc />
-		public event Action<IWindow<RectTransform>> WindowClosed;
+		public event Action<IWindow> WindowClosed;
 
 		/// <inheritdoc />
 		public string Title
