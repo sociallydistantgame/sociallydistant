@@ -1,6 +1,7 @@
 using System;
 using System.Collections;
 using System.Collections.Generic;
+using Core.Config;
 using UnityEngine;
 using Utility;
 
@@ -13,6 +14,8 @@ namespace Core
 
         private void Awake()
         {
+            Registry.Initialize();
+            
             Debug.Log(@"It's time for the moment you've been waiting for. 
 
 Doo...
