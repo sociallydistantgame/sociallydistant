@@ -136,6 +136,11 @@ namespace UI.Windowing
 				if (!closeBlocker.CheckCanClose())
 					return;
 
+			ForceClose();
+		}
+
+		public void ForceClose()
+		{
 			WindowClosed?.Invoke(this);
 			Destroy(this.gameObject);
 		}

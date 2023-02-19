@@ -16,7 +16,7 @@ namespace Architecture
 		public int Id { get; }
 
 		/// <inheritdoc />
-		public IUser User { get; }
+		public IUser User { get; private set; }
 
 		/// <inheritdoc />
 		public ISystemProcess? Parent { get; }
@@ -45,6 +45,25 @@ namespace Architecture
 				this,
 				User
 			);
+		}
+		
+		/// <inheritdoc />
+		public ISystemProcess ForkAsUser(IUser user)
+		{
+			if (user == User)
+				return Fork();
+			
+			// Prevent users not from the same computer from
+			// executing processes on it.
+			if (user.Computer != User.Computer)
+				throw new InvalidOperationException("An invalid attempt was made to execute a process on one computer by the user of another computer.");
+
+			IUser previousUser = this.User;
+			this.User = user;
+			ISystemProcess forked = Fork();
+
+			this.User = previousUser;
+			return forked;
 		}
 		
 		/// <inheritdoc />

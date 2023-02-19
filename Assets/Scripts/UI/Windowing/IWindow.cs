@@ -24,6 +24,7 @@ namespace UI.Windowing
 		void Restore();
 		void Minimize();
 		void Close();
+		void ForceClose();
 	}
 
 	public interface IWindowCloseBlocker
