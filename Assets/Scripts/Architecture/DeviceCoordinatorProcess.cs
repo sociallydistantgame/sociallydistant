@@ -15,6 +15,9 @@ namespace Architecture
 		/// <inheritdoc />
 		public int Id { get; }
 
+		/// <inheritdoc />"/>
+		public string Name { get; set; }
+		
 		/// <inheritdoc />
 		public IUser User { get; private set; }
 
@@ -27,7 +30,7 @@ namespace Architecture
 		public DeviceCoordinatorProcess(DeviceCoordinator coordinator, IComputer computer)
 		{
 			this.Id = pidGenerator.GetNextValue();
-			
+			Name = "init";
 			this.coordinator = coordinator;
 			
 			// Find a root user, throw if we can't.

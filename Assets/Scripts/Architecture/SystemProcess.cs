@@ -15,6 +15,9 @@ namespace Architecture
 		/// <inheritdoc />
 		public int Id { get; }
 
+		/// <inheritdoc />"/>
+		public string Name { get; set; }
+		
 		/// <inheritdoc />
 		public IUser User { get; private set; }
 
@@ -28,8 +31,9 @@ namespace Architecture
 		{
 			this.pidGenerator = pidGenerator;
 			this.coordinator = coordinator;
-
+			
 			this.Id = pidGenerator.GetNextValue();
+			this.Name = parent.Name;
 			this.User = user;
 			this.Parent = parent;
 

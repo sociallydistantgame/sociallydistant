@@ -7,6 +7,7 @@ namespace OS.Devices
 	public interface ISystemProcess
 	{
 		int Id { get; }
+		string Name { get; set; }
 		IUser User { get; }
 		ISystemProcess? Parent { get;}
 		IEnumerable<ISystemProcess> Children { get; }
