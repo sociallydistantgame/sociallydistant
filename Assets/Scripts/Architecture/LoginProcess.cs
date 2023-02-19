@@ -14,11 +14,15 @@ namespace Architecture
 		private readonly UniqueIntGenerator pidGenerator;
 		
 		/// <inheritdoc />"/>
+		public string Name { get; set; }
+		
+		/// <inheritdoc />"/>
 		public int Id { get; }
 		
 		public LoginProcess(UniqueIntGenerator pidGenerator, DeviceCoordinator coordinator, ISystemProcess parent, IUser loginUser)
 		{
 			Id = pidGenerator.GetNextValue();
+			Name = "syslogin";
 			this.pidGenerator = pidGenerator;
 			
 			this.coordinator = coordinator;

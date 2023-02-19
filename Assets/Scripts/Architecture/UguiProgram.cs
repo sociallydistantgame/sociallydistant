@@ -34,6 +34,9 @@ namespace Architecture
 			RectTransform programRect = Instantiate(this.programGuiPrefab);
 			programGuiPrefab.gameObject.SetActive(true);
 
+			// Set the name of the process
+			process.Name = binaryName;
+			
 			// Set window attributes
 			window.Title = this.WindowTitle;
 			
