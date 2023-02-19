@@ -28,7 +28,7 @@ namespace Architecture
 			if (!killedFirst)
 			{
 				killedFirst = true;
-				window.Close();
+				window.ForceClose();
 			}
 
 			process.Killed -= HandleProcessKilled;

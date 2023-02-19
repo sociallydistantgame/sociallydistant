@@ -14,6 +14,7 @@ namespace OS.Devices
 		event Action<ISystemProcess>? Killed;
 
 		ISystemProcess Fork();
+		ISystemProcess ForkAsUser(IUser user);
 
 		void Kill();
 	}
