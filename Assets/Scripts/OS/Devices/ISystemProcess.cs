@@ -1,4 +1,5 @@
 ﻿#nullable enable
+using System;
 using System.Collections.Generic;
 
 namespace OS.Devices
@@ -10,6 +11,10 @@ namespace OS.Devices
 		ISystemProcess? Parent { get;}
 		IEnumerable<ISystemProcess> Children { get; }
 
+		event Action<ISystemProcess>? Killed;
+
 		ISystemProcess Fork();
+
+		void Kill();
 	}
 }

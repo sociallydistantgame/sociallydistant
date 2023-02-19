@@ -5,6 +5,9 @@ namespace OS.Devices
 	public class LocalComputer : IComputer
 	{
 		/// <inheritdoc />
+		public string Name { get; } = "localhost";
+		
+		/// <inheritdoc />
 		public bool FindUserById(int id, out IUser? user)
 		{
 			throw new System.NotImplementedException();

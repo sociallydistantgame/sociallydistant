@@ -11,6 +11,8 @@ namespace OS.Devices
 		private Dictionary<string, int> usernameMap = new Dictionary<string, int>();
 		private PlayerUser playerUser;
 
+		/// <inheritdoc />
+		public string Name => hostname;
 		public PlayerUser PlayerUser => playerUser;
 		
 		public PlayerComputer(string hostname, string username)

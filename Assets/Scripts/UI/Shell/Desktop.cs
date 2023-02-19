@@ -1,6 +1,7 @@
 ﻿#nullable enable
 
 using System;
+using Architecture;
 using OS.Devices;
 using Player;
 using UI.Windowing;
@@ -25,8 +26,12 @@ namespace UI.Shell
 		[Header("UI")]
 		[SerializeField]
 		private RectTransform workspaceArea = null!;
+
+		[Header("Default Apps")]
+		[SerializeField]
+		private UguiProgram defaultTerminal = null!;
 		
-		public IWorkspaceDefinition CurrentWorkspace => CurrentWorkspace;
+		public IWorkspaceDefinition CurrentWorkspace => currentWorkspace;
 
 		private void Awake()
 		{
@@ -38,13 +43,24 @@ namespace UI.Shell
 			this.loginUser = this.playerHolder.Value.Computer.PlayerUser;
 			this.loginProcess = this.playerHolder.Value.OsInitProcess.CreateLoginProcess(this.loginUser);
 			this.currentWorkspace = playerHolder.Value.WindowManager.DefineWorkspace(this.workspaceArea);
-			this.currentWorkspace.CreateWindow("desktop window");
+
+			this.OpenProgram(this.defaultTerminal, Array.Empty<string>());
 		}
 
 		/// <inheritdoc />
 		public ISystemProcess OpenProgram(IProgram<RectTransform> program, string[] arguments)
 		{
-			throw new NotImplementedException();
+			// Create a process for the window
+			ISystemProcess windowProcess = this.loginProcess.Fork();
+			
+			// Create a new window for the program, on the current workspace.
+			IWindowWithClient<RectTransform>? win = CurrentWorkspace.CreateWindow("Window") as IWindowWithClient<RectTransform>;
+			if (win == null)
+				throw new InvalidOperationException("Cannot launch a program window because the workspace didn't create a valid window.");
+
+			// Spawn the program
+			program.InstantiateIntoWindow(windowProcess, win);
+			return windowProcess;
 		}
 	}
 }
