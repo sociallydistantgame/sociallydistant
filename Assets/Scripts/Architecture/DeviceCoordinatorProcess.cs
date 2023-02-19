@@ -1,6 +1,7 @@
 ﻿#nullable enable
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using Core.Systems;
 using OS.Devices;
 
@@ -56,6 +57,18 @@ namespace Architecture
 			var proc = new LoginProcess(pidGenerator, coordinator, this, user);
 			coordinator.DeclareProcess(proc);
 			return proc;
+		}
+		
+		/// <inheritdoc />
+		public event Action<ISystemProcess>? Killed; 
+
+		/// <inheritdoc />
+		public void Kill()
+		{
+			foreach (ISystemProcess child in Children.ToArray())
+				child.Kill();
+			
+			Killed?.Invoke(this);
 		}
 	}
 }

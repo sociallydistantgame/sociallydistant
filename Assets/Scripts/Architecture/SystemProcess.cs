@@ -1,5 +1,7 @@
 ﻿#nullable enable
+using System;
 using System.Collections.Generic;
+using System.Linq;
 using Core.Systems;
 using OS.Devices;
 
@@ -43,6 +45,18 @@ namespace Architecture
 				this,
 				User
 			);
+		}
+		
+		/// <inheritdoc />
+		public event Action<ISystemProcess>? Killed; 
+
+		/// <inheritdoc />
+		public void Kill()
+		{
+			foreach (ISystemProcess child in Children.ToArray())
+				child.Kill();
+
+			Killed?.Invoke(this);
 		}
 	}
 }

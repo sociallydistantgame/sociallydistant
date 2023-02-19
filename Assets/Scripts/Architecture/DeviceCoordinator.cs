@@ -59,7 +59,19 @@ namespace Architecture
 
 		public void DeclareProcess(ISystemProcess process)
 		{
+			if (processes.Contains(process))
+				return;
+			
 			processes.Add(process);
+			process.Killed += HandleProcessKilled;
+		}
+
+		private void HandleProcessKilled(ISystemProcess process)
+		{
+			processes.Remove(process);
+			process.Killed -= HandleProcessKilled;
+
+			Debug.Log($"Process {process.Id} on {process.User.Computer.Name} ran by user {process.User.UserName}: Killed");
 		}
 	}
 }
