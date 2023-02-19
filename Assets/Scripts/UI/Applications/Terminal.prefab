@@ -151,9 +151,9 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   font: {fileID: 11400000, guid: d0626ae8c7fb25f449d6427b591abfaf, type: 2}
-  fontSize: 12
+  fontSize: 16
   allowAltScreen: 1
-  vtiden: st
+  vtiden: sterm
   tabSpaces: 8
   minLatency: 0
   doubleClickTime: 0
