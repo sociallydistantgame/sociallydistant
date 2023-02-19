@@ -13,7 +13,7 @@ namespace Core.Config
 		private static bool initialized;
 		private static JObject currentRegistry = new JObject();
 
-		public static event Action Updated;
+		public static event Action? Updated;
 		
 		public static string GameDataPath => Application.persistentDataPath;
 		public static string RegistryFilePath => Path.Combine(GameDataPath, "settings.json");

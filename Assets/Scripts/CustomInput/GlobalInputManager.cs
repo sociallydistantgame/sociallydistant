@@ -12,7 +12,7 @@ namespace CustomInput
 {
 	public class GlobalInputManager : MonoBehaviour
 	{
-		private GameControls gameControls;
+		private GameControls gameControls = null!;
 		private readonly List<IInputManager> inputManagers = new List<IInputManager>();
 		
 		[Header("Dependencies")]

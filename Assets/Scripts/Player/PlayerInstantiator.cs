@@ -1,6 +1,8 @@
 ﻿#nullable enable
 
 using System;
+using Architecture;
+using OS.Devices;
 using UnityEngine;
 using Utility;
 
@@ -12,6 +14,9 @@ namespace Player
 		[SerializeField]
 		private PlayerInstanceHolder playerInstanceHolder = null!;
 
+		[SerializeField]
+		private DeviceCoordinator deviceCoordinator = null!;
+		
 		[Header("Prefabs")]
 		[SerializeField]
 		private GameObject uiRootPrefab = null!;
@@ -32,7 +37,11 @@ namespace Player
 
 		private void Start()
 		{
+			var playerComputer = new PlayerComputer("socdist-restitched-fakeenv", "user");
 			var player = new PlayerInstance();
+
+			player.Computer = playerComputer;
+			player.OsInitProcess = deviceCoordinator.SetUpComputer(playerComputer);
 
 			GameObject uiRootGameObject = Instantiate(uiRootPrefab);
 			GameObject backdropGameObject = Instantiate(backdropPrefab, uiRootGameObject.transform);
@@ -52,6 +61,8 @@ namespace Player
 		{
 			PlayerInstance player = playerInstanceHolder.Value;
 
+			deviceCoordinator.ForgetComputer(player.Computer);
+			
 			Destroy(player.WindowManager.gameObject);
 			Destroy(player.BackdropController.gameObject);
 			Destroy(player.UiRoot);

@@ -1,0 +1,15 @@
+﻿#nullable enable
+using System.Collections.Generic;
+
+namespace OS.Devices
+{
+	public interface ISystemProcess
+	{
+		int Id { get; }
+		IUser User { get; }
+		ISystemProcess? Parent { get;}
+		IEnumerable<ISystemProcess> Children { get; }
+
+		ISystemProcess Fork();
+	}
+}
