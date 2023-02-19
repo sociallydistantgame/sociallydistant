@@ -12,4 +12,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 0b8c0d44fdef4e948af2278c2583340e, type: 3}
   m_Name: Terminal
   m_EditorClassIdentifier: 
-  programGuiPrefab: {fileID: 0}
+  binaryName: sterm
+  windowTitle: Terminal
+  programGuiPrefab: {fileID: 536731253686827546, guid: cbfa175b53c5a7d44a0088de659735be, type: 3}
