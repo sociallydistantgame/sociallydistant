@@ -1,6 +1,7 @@
 {
   "dependencies": {
     "com.trixelcreative.audio": "https://github.com/Trixel-Creative/TrixelAudio.git",
+    "com.unity.addressables": "1.19.19",
     "com.unity.collab-proxy": "1.17.2",
     "com.unity.feature.development": "1.0.1",
     "com.unity.ide.rider": "3.0.15",
