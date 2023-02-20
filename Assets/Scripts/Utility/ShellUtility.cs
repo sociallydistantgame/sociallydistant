@@ -241,50 +241,8 @@ namespace Utility
 					yield return EndTextToken();
 			}
 		}
-
-		public static IEnumerable<ShellTokenGroup> GroupTokens(IEnumerable<ShellToken> tokens)
-		{
-			var tokenList = new List<ShellToken>();
-			ShellToken? lastToken = null;
-
-			foreach (ShellToken token in tokens)
-			{
-				if (lastToken != null)
-				{
-					if (token.TokenType != lastToken.TokenType)
-					{
-						yield return new ShellTokenGroup(lastToken.TokenType, tokenList);
-						tokenList.Clear();
-					}
-				}
-				
-				tokenList.Add(token);
-				lastToken = token;
-			}
-
-			if (tokenList.Count > 0)
-			{
-				if (lastToken != null)
-				{
-					yield return new ShellTokenGroup(lastToken.TokenType, tokenList);
-					tokenList.Clear();
-				}
-			}
-		}
 	}
 
-	public class ShellTokenGroup
-	{
-		public ShellTokenType GroupType { get; }
-		public ShellToken[] Tokens { get; }
-
-		public ShellTokenGroup(ShellTokenType type, IEnumerable<ShellToken> tokenSource)
-		{
-			this.GroupType = type;
-			this.Tokens = tokenSource.ToArray();
-		}
-	}
-	
 	public class ShellToken
 	{
 		public ShellTokenType TokenType { get; set; }

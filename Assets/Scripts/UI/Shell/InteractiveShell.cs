@@ -18,12 +18,11 @@ namespace UI.Shell
 	public class InteractiveShell :
 		ITerminalProcessController
 	{
-		private ISystemProcess process;
-		private ITextConsole consoleDevice;
+		private ISystemProcess? process;
+		private ITextConsole? consoleDevice;
 		private bool initialized;
 		private MonoBehaviour unityBehaviour;
 		private ShellState shellState;
-		private string nextCommand;
 		private readonly StringBuilder lineBuilder = new StringBuilder();
 		private readonly List<string> tokenList = new List<string>();
 		private readonly Queue<ShellInstruction> pendingInstructions = new Queue<ShellInstruction>();
@@ -48,6 +47,12 @@ namespace UI.Shell
 		/// <inheritdoc />
 		public void Update()
 		{
+			if (process == null)
+				return;
+			
+			if (consoleDevice == null)
+				return;
+			
 			if (!initialized)
 				return;
 
@@ -308,6 +313,9 @@ namespace UI.Shell
 		
 		private void WritePrompt()
 		{
+			if (consoleDevice == null || process == null)
+				return;
+			
 			consoleDevice.WriteText($"{process.User.UserName}@{process.User.Computer.Name}:/$ ");
 		}
 
@@ -405,7 +413,7 @@ namespace UI.Shell
 			private readonly ShellInstruction pipeIn;
 			private readonly ShellInstruction pipeOut;
 
-			private ISystemProcess shellProcess;
+			private ISystemProcess? shellProcess;
 			private ITextConsole? pipeInConsole;
 			private ITextConsole? pipeOutConsole;
 			private bool hasInputStarted;
@@ -495,6 +503,9 @@ namespace UI.Shell
 			/// <inheritdoc />
 			public override void Update()
 			{
+				if (shellProcess == null)
+					return;
+				
 				if (pipeInConsole == null)
 					return;
 
@@ -526,8 +537,8 @@ namespace UI.Shell
 			private readonly ShellInstruction[] instructions;
 			private int currentInstruction;
 			private bool hasStarted;
-			private ISystemProcess shellProcess;
-			private ITextConsole console;
+			private ISystemProcess? shellProcess;
+			private ITextConsole? console;
 
 			public SequentialInstruction(IEnumerable<ShellInstruction> instructionSource)
 			{
@@ -548,6 +559,12 @@ namespace UI.Shell
 			/// <inheritdoc />
 			public override void Update()
 			{
+				if (shellProcess == null)
+					return;
+
+				if (console == null)
+					return;
+				
 				if (currentInstruction >= instructions.Length)
 					return;
 
@@ -569,9 +586,9 @@ namespace UI.Shell
 		public sealed class SingleInstruction : ShellInstruction
 		{
 			private readonly CommandData command;
-			private ISystemProcess shellProcess;
+			private ISystemProcess? shellProcess;
 			private ISystemProcess? currentCommandProcess;
-			private ITextConsole console;
+			private ITextConsole? console;
 			private bool waiting;
 			private bool isCompleted;
 			
@@ -595,6 +612,12 @@ namespace UI.Shell
 			/// <inheritdoc />
 			public override void Update()
 			{
+				if (console == null)
+					return;
+				
+				if (shellProcess == null)
+					return;
+				
 				if (waiting)
 					return;
 
