@@ -264,10 +264,10 @@ namespace UI.Shell
 		{
 			filePath = string.Empty;
 
-			if (tokenView.Next == null)
+			if (tokenView.EndOfArray)
 				return FileRedirectionType.None;
 
-			FileRedirectionType redirectionType = tokenView.Next.TokenType switch
+			FileRedirectionType redirectionType = tokenView.Current.TokenType switch
 			{
 				ShellTokenType.Append => FileRedirectionType.Append,
 				ShellTokenType.Overwrite => FileRedirectionType.Overwrite,
@@ -292,7 +292,7 @@ namespace UI.Shell
 
 			var sb = new StringBuilder();
 
-			while (tokenView.Current.TokenType == expectedType)
+			while (!tokenView.EndOfArray && tokenView.Current.TokenType == expectedType)
 			{
 				sb.Append(tokenView.Current.Text);
 				sb.Append(" ");
