@@ -17,10 +17,10 @@ namespace UI.Applications.Terminal
 	{
 		private ISystemProcess process = null!;
 		private IWindow window = null!;
-		private ISystemProcess shellProcess;
+		private ISystemProcess? shellProcess;
 		private SimpleTerminalRenderer st = null!;
-		private ITextConsole textConsole;
-		private ITerminalProcessController shell;
+		private ITextConsole? textConsole;
+		private ITerminalProcessController? shell;
 		private bool isWaitingForInput;
 
 		private void Awake()
@@ -54,7 +54,7 @@ namespace UI.Applications.Terminal
 
 		private void Update()
 		{
-			shell.Update();
+			shell?.Update();
 		}
 
 		/// <inheritdoc />
