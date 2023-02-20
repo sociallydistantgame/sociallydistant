@@ -7,8 +7,11 @@
  * CREDIT WHERE CREDIT IS DUE
  * ==========================
  *
- * This code was written for use in Restitched, and  is used in Socially Distant
- * with permission from Trixel Creative. This code was originally written by Raphaël Buquet.
+ * This code was originally written by Raphael Buquet, and
+ * is part of Trixel Creative's core libraries - used in both
+ * their open-source and proprietary projects. This version
+ * is a stripped-down copy with only functionality needed by
+ * Socially Distant.
  *
  */
 
@@ -43,16 +46,6 @@ namespace Utility
             element = result;
         }
 
-        public static void QuitGame()
-        {
-#if UNITY_EDITOR
-            EditorApplication.ExitPlaymode();
-            return;
-#else
-            Application.Quit(0);
-#endif
-        }
-        
         public static bool IsLastSibling(this Transform transform)
         {
             if (transform.parent == null)
@@ -81,7 +74,7 @@ namespace Utility
             MustGetComponent(monoBehaviour.gameObject, out component);
         }
 
-        // This is decidedly NOT Restitched code lol
+        // This...this isn't Trixel code... you can tell because it's horribly inefficient.
         public static void MustGetComponentInParent<T>(this MonoBehaviour monoBehaviour, out T component)
             where T : class
         {
@@ -112,22 +105,7 @@ namespace Utility
         {
             return MustGetComponent<T>(inComponent.gameObject);
         }
-
-        public static T[] GetAssetsOfType<T>() where T : Object
-        {
-            Debug.Log($"Loading all assets of type {typeof(T).FullName}...");
-            return Resources.LoadAll<T>("/");
-//            var guids = AssetDatabase.FindAssets($"t:{typeof(T).Name}");
-//            var refs = new T[guids.Length];
-//
-//            for (var i = 0; i < guids.Length; i++)
-//            {
-//                var path = AssetDatabase.GUIDToAssetPath(guids[i]);
-//                refs[i] = AssetDatabase.LoadAssetAtPath<T>(path);
-//            }
-//            return refs;
-        }
-
+        
         public static void MustGetComponentInChildren<T>([NotNull] this GameObject gameObject,
             [NotNull] out T component, bool includeInactive = false)
         {
@@ -169,7 +147,8 @@ namespace Utility
             return MustGetComponentInChildren<T>(inComponent.gameObject, includeInactive);
         }
         
-        // another helper method based on restitched dev assertions but I wrote this one on my own...
+        // Also not Trixel code here... you can ALSO tell because it's horribly inefficient.
+        // Shares a name though.
         public static void AssertAllFieldsAreSerialized(this MonoBehaviour script, Type scriptType)
         {
             FieldInfo[] fields = scriptType.GetFields(BindingFlags.Instance | BindingFlags.NonPublic);
@@ -197,33 +176,13 @@ namespace Utility
             }
         }
 
-        // Yet another wonderfully helpful utility method from that popular game called Restitched by Trixel Creative
+        // I need to stop writing these on my own and just shamelessly use the versions from TrixelAudio...
         public static void MustFindObjectOfType<T>(out T foundObject) where T : Object
         {
             T found = Object.FindObjectOfType<T>();
             Assert.IsNotNull(found);
 
             foundObject = found;
-        }
-
-        public static Sprite CreateSprite(this Texture2D texture)
-        {
-            return Sprite.Create(texture, new Rect(0, 0, texture.width, texture.height), Vector2.zero);
-        }
-
-        public static IDictionary<TKey, TValue> ToDistinctDictionary<TKey, TValue>(this IEnumerable<TValue> collection, Func<TValue, TKey> predicate)
-        {
-            var dict = new Dictionary<TKey, TValue>();
-
-            foreach (TValue value in collection)
-            {
-                TKey key = predicate(value);
-                
-                if (!dict.ContainsKey(key))
-                    dict.Add(key, value);
-            }
-            
-            return dict;
         }
     }
 }
