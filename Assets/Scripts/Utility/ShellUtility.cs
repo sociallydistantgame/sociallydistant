@@ -1,6 +1,7 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+using Architecture;
 using TMPro;
 
 namespace Utility
@@ -100,20 +101,144 @@ namespace Utility
 			return !(quote || escape);
 		}
 
-		public static IEnumerable<ShellToken> IdentifyTokens(IEnumerable<string> rawTokens)
+		public static IEnumerable<ShellToken> IdentifyTokens(StringBuilder rawInput)
 		{
-			foreach (string rawToken in rawTokens)
+			// Convert the string to a char array so we can create an ArrayView over it.
+			char[] characters = rawInput.ToString().ToCharArray();
+
+			var charView = new ArrayView<char>(characters);
+
+			// token currently being built
+			var tokenBuilder = new StringBuilder();
+			
+			// are we in a quoted string?
+			var inQuote = false;
+			
+			// easy short-hand for ending a text token
+			ShellToken EndTextToken()
 			{
-				yield return rawToken switch
+				var tokenText = tokenBuilder.ToString();
+				tokenBuilder.Length = 0;
+				return new ShellToken(ShellTokenType.Text, tokenText);
+			}
+			
+			// Keep going until we've ended the string
+			while (!charView.EndOfArray)
+			{
+				switch (charView.Current)
 				{
-					"|" => new ShellToken(ShellTokenType.Pipe, rawToken),
-					">" => new ShellToken(ShellTokenType.Overwrite, rawToken),
-					">>" => new ShellToken(ShellTokenType.Append, rawToken),
-					"<" => new ShellToken(ShellTokenType.FileInput, rawToken),
-					"&" => new ShellToken(ShellTokenType.ParallelExecute, rawToken),
-					";" => new ShellToken(ShellTokenType.SequentialExecute, rawToken),
-					_ => new ShellToken(ShellTokenType.Text, rawToken)
-				};
+					// Comment, skip until a carriage return or newline
+					case '#':
+					{
+						if (tokenBuilder.Length > 0)
+							yield return EndTextToken();
+
+						while (charView.Next != '\0' && charView.Next != '\n' && charView.Next != '\r')
+							charView.Advance();
+						
+						break;
+					}
+					
+					// Escape sequence
+					case '\\':
+					{
+						charView.Advance();
+						if (!charView.EndOfArray)
+							tokenBuilder.Append(charView.Current);
+						break;
+					}
+					
+					// White-space when not in a quote
+					case { } when char.IsWhiteSpace(charView.Current) && !inQuote:
+					{
+						if (tokenBuilder.Length > 0)
+							yield return EndTextToken();
+
+						break;
+					}
+
+					// Quote mark
+					case '"':
+					{
+						inQuote = !inQuote;
+						if (tokenBuilder.Length > 0)
+							yield return EndTextToken();
+						break;
+					}
+					
+					// Sequential operator
+					case ';':
+					{
+						if (tokenBuilder.Length > 0)
+							yield return EndTextToken();
+
+						yield return new ShellToken(ShellTokenType.SequentialExecute, charView.Current.ToString());
+						break;
+					}
+					
+					// Parallel operator
+					case '&':
+					{
+						if (tokenBuilder.Length > 0)
+							yield return EndTextToken();
+
+						yield return new ShellToken(ShellTokenType.ParallelExecute, charView.Current.ToString());
+						break;
+					}
+					
+					// Pipe
+					case '|':
+					{
+						if (tokenBuilder.Length > 0)
+							yield return EndTextToken();
+
+						yield return new ShellToken(ShellTokenType.Pipe, charView.Current.ToString());
+						break;
+					}
+					
+					// Append to File
+					case '>' when charView.Next == charView.Current:
+					{
+						if (tokenBuilder.Length > 0)
+							yield return EndTextToken();
+
+						yield return new ShellToken(ShellTokenType.Append, $"{charView.Current}{charView.Next}");
+						charView.Advance();
+						break;
+					}
+					
+					// Overwrite File
+					case '>':
+					{
+						if (tokenBuilder.Length > 0)
+							yield return EndTextToken();
+
+						yield return new ShellToken(ShellTokenType.Overwrite, charView.Current.ToString());
+						break;
+					}
+					
+					// File Input
+					case '<':
+					{
+						if (tokenBuilder.Length > 0)
+							yield return EndTextToken();
+
+						yield return new ShellToken(ShellTokenType.FileInput, charView.Current.ToString());
+						break;
+					}
+
+					// ANYTHING else
+					default:
+					{
+						tokenBuilder.Append(charView.Current);
+						break;
+					}
+				}
+
+				charView.Advance();
+
+				if (charView.EndOfArray && tokenBuilder.Length > 0)
+					yield return EndTextToken();
 			}
 		}
 

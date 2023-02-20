@@ -118,8 +118,14 @@ namespace UI.Shell
 
 		private void ProcessTokens()
 		{
-			// part 1: identify token types
-			IEnumerable<ShellToken>? typedTokens = ShellUtility.IdentifyTokens(tokenList);
+			// The first tokenization pass we do, before executing this function,
+			// only deals with quotes and escape sequences. It also ignores comments,
+			// but it has no concept of the actual syntax of the shell language.
+			//
+			// As such, we must do a more advanced tokenization of the raw input.
+			
+			// So let's do it.
+			IEnumerable<ShellToken>? typedTokens = ShellUtility.IdentifyTokens(this.lineBuilder);
 			
 			// Create a view over this array that we can advance during parsing
 			var view = new ArrayView<ShellToken>(typedTokens.ToArray());
@@ -150,7 +156,7 @@ namespace UI.Shell
 			
 			// This should never execute
 			if (tokenView.Current.TokenType != ShellTokenType.ParallelExecute)
-				throw new InvalidOperationException("Unrecognized symbol in parallel instruction parser");
+				return commandSequence;
 
 			tokenView.Advance();
 			
@@ -250,7 +256,7 @@ namespace UI.Shell
 			if (tokenView.Next == null)
 				return new CommandData(this, name, arguments, FileRedirectionType.None, string.Empty);
 
-			var redirectionType = GetRedirectionTypeAndPath(tokenView, out string filePath);
+			FileRedirectionType redirectionType = GetRedirectionTypeAndPath(tokenView, out string filePath);
 			return new CommandData(this, name, arguments, redirectionType, filePath);
 		}
 
