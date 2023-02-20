@@ -41,6 +41,12 @@ namespace OS.Devices
 			return FindUserById(uid, out user);
 		}
 
+		/// <inheritdoc />
+		public ISystemProcess? ExecuteProgram(ISystemProcess parentProcess, ITextConsole console, string programName, string[] arguments)
+		{
+			return null;
+		}
+
 		private void AddUser(IUser user)
 		{
 			Assert.IsTrue(user.Computer == this, "User does not belong to the player computer.");

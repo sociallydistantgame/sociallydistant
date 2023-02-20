@@ -352,9 +352,12 @@ namespace UI.Shell
 				
 				if (shell.ProcessBuiltIn(shellProcess, console, Name, ArgumentList))
 					return null;
+
+				ISystemProcess? commandProcess = shellProcess.User.Computer.ExecuteProgram(shellProcess, console, Name, ArgumentList);
+				if (commandProcess == null)
+					console.WriteText($"sh: {Name}: command not found");
 				
-				console.WriteText($"sh: {Name}: command not found");
-				return null;
+				return commandProcess;
 			}
 		}
 

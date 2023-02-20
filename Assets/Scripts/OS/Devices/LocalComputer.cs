@@ -18,5 +18,11 @@ namespace OS.Devices
 		{
 			throw new System.NotImplementedException();
 		}
+
+		/// <inheritdoc />
+		public ISystemProcess? ExecuteProgram(ISystemProcess parentProcess, ITextConsole console, string programName, string[] arguments)
+		{
+			return null;
+		}
 	}
 }
