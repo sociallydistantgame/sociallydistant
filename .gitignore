@@ -58,3 +58,5 @@ sysinfo.txt
 # Crashlytics generated file
 crashlytics-build.properties
 
+# Ignore the Career Mode portion of the project, since it's a separate and optional repository.
+[Cc]areer/
