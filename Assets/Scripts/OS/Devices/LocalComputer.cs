@@ -1,5 +1,8 @@
 ﻿#nullable enable
 
+using System;
+using OS.FileSystems;
+
 namespace OS.Devices
 {
 	public class LocalComputer : IComputer
@@ -23,6 +26,12 @@ namespace OS.Devices
 		public ISystemProcess? ExecuteProgram(ISystemProcess parentProcess, ITextConsole console, string programName, string[] arguments)
 		{
 			return null;
+		}
+
+		/// <inheritdoc />
+		public VirtualFileSystem GetFileSystem(IUser user)
+		{
+			throw new NotImplementedException();
 		}
 	}
 }
