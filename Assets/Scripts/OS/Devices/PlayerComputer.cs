@@ -1,5 +1,6 @@
 ﻿#nullable enable
 using System.Collections.Generic;
+using System.Diagnostics;
 using OS.FileSystems;
 using UnityEngine.Assertions;
 
@@ -26,6 +27,8 @@ namespace OS.Devices
 			this.playerUser = new PlayerUser(this, username);
 			this.AddUser(this.playerUser);
 			this.playerFileSystem = new PlayerFileSystem(this);
+			
+			
 		}
 		
 		/// <inheritdoc />
@@ -47,7 +50,9 @@ namespace OS.Devices
 		/// <inheritdoc />
 		public ISystemProcess? ExecuteProgram(ISystemProcess parentProcess, ITextConsole console, string programName, string[] arguments)
 		{
-			return null;
+			// Perhaps we should remove this in favour of calling the VFS method directly?
+			return GetFileSystem(parentProcess.User)
+				.Execute(parentProcess, programName, console, arguments);
 		}
 
 		/// <inheritdoc />

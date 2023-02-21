@@ -3,6 +3,7 @@
 using System;
 using Architecture;
 using OS.Devices;
+using OS.FileSystems;
 using UnityEngine;
 using Utility;
 
@@ -16,6 +17,10 @@ namespace Player
 
 		[SerializeField]
 		private DeviceCoordinator deviceCoordinator = null!;
+
+		[Header("File System Table")]
+		[SerializeField]
+		private FileSystemTableAsset fstab = null!;
 		
 		[Header("Prefabs")]
 		[SerializeField]
@@ -40,6 +45,8 @@ namespace Player
 			var playerComputer = new PlayerComputer("socdist-restitched-fakeenv", "user");
 			var player = new PlayerInstance();
 
+			FileSystemTable.MountFileSystemsToComputer(playerComputer, fstab);
+			
 			player.Computer = playerComputer;
 			player.OsInitProcess = deviceCoordinator.SetUpComputer(playerComputer);
 

@@ -189,7 +189,7 @@ namespace OS.FileSystems
 			return stream;
 		}
 
-		public ISystemProcess Execute(ISystemProcess parentProcess, string path)
+		public ISystemProcess Execute(ISystemProcess parentProcess, string path, ITextConsole console, string[] arguments)
 		{
 			string[] parts = PathUtility.Split(path);
 			IFileEntry? file = FindFileEntry(parts, parentProcess.User);
@@ -198,7 +198,7 @@ namespace OS.FileSystems
 				throw new FileNotFoundException();
 
 			ISystemProcess fork = parentProcess.Fork();
-			if (!file.TryExecute(fork))
+			if (!file.TryExecute(fork, console, arguments))
 			{
 				fork.Kill();
 				throw new InvalidOperationException("Permission denied");
