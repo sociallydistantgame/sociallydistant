@@ -1,5 +1,6 @@
 ﻿#nullable enable
 
+using System;
 using System.Collections.Generic;
 using System.Linq;
 
@@ -9,6 +10,7 @@ namespace OS.FileSystems.Immutable
 	{
 		private readonly IFileSystem filesystem;
 		private readonly List<ImmutableDirectoryTree> children = new List<ImmutableDirectoryTree>();
+		private readonly List<Unity.Plastic.Newtonsoft.Json.Serialization.Func<IDirectoryEntry, IFileEntry>> fileRequest = new List<Unity.Plastic.Newtonsoft.Json.Serialization.Func<IDirectoryEntry, IFileEntry>>();
 
 		public string Name { get; set; } = string.Empty;
 
@@ -17,6 +19,11 @@ namespace OS.FileSystems.Immutable
 			this.filesystem = fs;
 		}
 
+		public void AddFileRequest(Unity.Plastic.Newtonsoft.Json.Serialization.Func<IDirectoryEntry, IFileEntry> creationFunction)
+		{
+			this.fileRequest.Add(creationFunction);
+		}
+		
 		public ImmutableDirectoryTree AddDirectory(string name)
 		{
 			ImmutableDirectoryTree? existing = children.FirstOrDefault(x => x.Name == name);
@@ -43,8 +50,19 @@ namespace OS.FileSystems.Immutable
 
 			entry.SetSubEntries(subEntryList);
 
-			// TODO: File support
-			entry.SetFileList(Enumerable.Empty<IFileEntry>());
+			var fileEntries = new List<IFileEntry>();
+			foreach (Unity.Plastic.Newtonsoft.Json.Serialization.Func<IDirectoryEntry, IFileEntry>? creationFunction in fileRequest)
+			{
+				// Call the creation function to create the file entry
+				IFileEntry fileEntry = creationFunction(entry);
+				
+				// Check the file is a parent of the entry!!!
+				if (fileEntry.Parent != entry)
+					throw new InvalidOperationException("A file entry was created for an immutable directory's file list, but the file isn't a child of the directory!");
+				fileEntries.Add(fileEntry);
+			}
+			
+			entry.SetFileList(fileEntries);
 
 			return entry;
 		}

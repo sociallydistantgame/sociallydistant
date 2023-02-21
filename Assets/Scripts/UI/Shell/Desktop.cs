@@ -44,14 +44,14 @@ namespace UI.Shell
 			this.loginProcess = this.playerHolder.Value.OsInitProcess.CreateLoginProcess(this.loginUser);
 			this.currentWorkspace = playerHolder.Value.WindowManager.DefineWorkspace(this.workspaceArea);
 
-			this.OpenProgram(this.defaultTerminal, Array.Empty<string>());
+			this.OpenProgram(this.defaultTerminal, Array.Empty<string>(), null, null);
 		}
 
 		/// <inheritdoc />
-		public ISystemProcess OpenProgram(IProgram<RectTransform> program, string[] arguments)
+		public ISystemProcess OpenProgram(IProgram<RectTransform> program, string[] arguments, ISystemProcess? parentProcess, ITextConsole? console)
 		{
-			// Create a process for the window
-			ISystemProcess windowProcess = this.loginProcess.Fork();
+			// Create a process for the window, if we weren't supplied with one.
+			ISystemProcess windowProcess = parentProcess ?? this.loginProcess.Fork();
 			
 			// Create a new window for the program, on the current workspace.
 			IWindowWithClient<RectTransform>? win = CurrentWorkspace.CreateWindow("Window") as IWindowWithClient<RectTransform>;

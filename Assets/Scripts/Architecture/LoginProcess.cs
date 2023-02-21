@@ -12,18 +12,24 @@ namespace Architecture
 		private DeviceCoordinator coordinator;
 		private IUser loginUser;
 		private readonly UniqueIntGenerator pidGenerator;
-		
+		private bool isAlive = true;
 		/// <inheritdoc />"/>
 		public string Name { get; set; }
+
+		/// <inheritdoc />"/>
+		public bool IsAlive => isAlive;
 		
 		/// <inheritdoc />"/>
 		public int Id { get; }
+		
+		public string WorkingDirectory { get; set; }
 		
 		public LoginProcess(UniqueIntGenerator pidGenerator, DeviceCoordinator coordinator, ISystemProcess parent, IUser loginUser)
 		{
 			Id = pidGenerator.GetNextValue();
 			Name = "syslogin";
 			this.pidGenerator = pidGenerator;
+			this.WorkingDirectory = parent.WorkingDirectory;
 			
 			this.coordinator = coordinator;
 			this.loginUser = loginUser;
@@ -82,6 +88,7 @@ namespace Architecture
 			foreach (ISystemProcess child in Children.ToArray())
 				child.Kill();
 
+			isAlive = false;
 			Killed?.Invoke(this);
 		}
 	}

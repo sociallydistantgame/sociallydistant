@@ -11,7 +11,14 @@ namespace Architecture
 	{
 		private readonly DeviceCoordinator coordinator;
 		private readonly UniqueIntGenerator pidGenerator = new UniqueIntGenerator();
+		private bool isAlive = true;
 
+		/// <inheritdoc />
+		public bool IsAlive => isAlive;
+		
+		/// <inheritdoc />
+		public string WorkingDirectory { get; set; } = "/";
+		
 		/// <inheritdoc />
 		public int Id { get; }
 
@@ -89,7 +96,8 @@ namespace Architecture
 		{
 			foreach (ISystemProcess child in Children.ToArray())
 				child.Kill();
-			
+
+			isAlive = false;
 			Killed?.Invoke(this);
 		}
 	}
