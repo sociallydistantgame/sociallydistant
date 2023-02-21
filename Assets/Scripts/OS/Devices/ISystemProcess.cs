@@ -11,6 +11,8 @@ namespace OS.Devices
 		IUser User { get; }
 		ISystemProcess? Parent { get;}
 		IEnumerable<ISystemProcess> Children { get; }
+		string WorkingDirectory { get; set; }
+		bool IsAlive { get; }
 
 		event Action<ISystemProcess>? Killed;
 

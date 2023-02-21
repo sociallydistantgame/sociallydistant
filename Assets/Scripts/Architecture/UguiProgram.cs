@@ -9,7 +9,8 @@ namespace Architecture
 	[CreateAssetMenu(menuName = "ScriptableObject/Assets/Program")]
 	public class UguiProgram :
 		ScriptableObject,
-		IProgram<RectTransform>
+		IProgram<RectTransform>,
+		INamedAsset
 	{
 		[SerializeField]
 		private string binaryName = string.Empty;
@@ -20,6 +21,9 @@ namespace Architecture
 		[SerializeField]
 		private RectTransform programGuiPrefab = null!;
 
+		/// <inheritdoc />
+		public string Name => binaryName;
+		
 		/// <inheritdoc />
 		public string BinaryName => this.binaryName;
 		

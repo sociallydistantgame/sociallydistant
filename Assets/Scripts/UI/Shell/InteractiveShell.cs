@@ -175,6 +175,25 @@ namespace UI.Shell
 		{
 			switch (name)
 			{
+				case "cd":
+				{
+					if (arguments.Length == 0)
+						process.WorkingDirectory = "/";
+					else
+					{
+						string path = arguments[0];
+						if (path != ".")
+						{
+							if (path == "..")
+								process.WorkingDirectory = PathUtility.GetDirectoryName(process.WorkingDirectory);
+							else
+								process.WorkingDirectory = PathUtility.Combine(process.WorkingDirectory, path);
+						}
+
+					}
+					
+					break;
+				}
 				case "clear":
 					console.ClearScreen();
 					break;
@@ -316,7 +335,7 @@ namespace UI.Shell
 			if (consoleDevice == null || process == null)
 				return;
 			
-			consoleDevice.WriteText($"{process.User.UserName}@{process.User.Computer.Name}:/$ ");
+			consoleDevice.WriteText($"{process.User.UserName}@{process.User.Computer.Name}:{process.WorkingDirectory}$ ");
 		}
 
 		private enum ShellState
@@ -364,6 +383,11 @@ namespace UI.Shell
 				ISystemProcess? commandProcess = shellProcess.User.Computer.ExecuteProgram(shellProcess, console, Name, ArgumentList);
 				if (commandProcess == null)
 					console.WriteText($"sh: {Name}: command not found");
+				
+				// special case for commands that kill the process IMMEDIATELY
+				// on the same frame this was called
+				if (commandProcess != null && !commandProcess.IsAlive)
+					return null;
 				
 				return commandProcess;
 			}

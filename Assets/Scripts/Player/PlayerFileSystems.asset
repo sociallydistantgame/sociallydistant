@@ -12,4 +12,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 95443f5f5aa241f3a30bb7c07ba79528, type: 3}
   m_Name: PlayerFileSystems
   m_EditorClassIdentifier: 
-  entries: []
+  entries:
+  - path: /usr/bin
+    fileSystemAsset: {fileID: 11400000, guid: 381071cc8ecea2f438297c0ca0d4ab62, type: 2}
+  - path: /bin
+    fileSystemAsset: {fileID: 11400000, guid: 636046208431e244688835b0094f864c, type: 2}
