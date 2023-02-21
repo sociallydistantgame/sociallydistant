@@ -1,6 +1,7 @@
 ﻿#nullable enable
 
 using System;
+using System.Collections.Generic;
 using Architecture;
 using OS.Devices;
 using OS.FileSystems;
@@ -34,6 +35,10 @@ namespace Player
 		
 		[SerializeField]
 		private GameObject windowManagerPrefab = null!;
+
+		[Header("Environment")]
+		[SerializeField]
+		private EnvironmentVariablesAsset environmentVariables = null!;
 		
 		private void Awake()
 		{
@@ -50,6 +55,12 @@ namespace Player
 			player.Computer = playerComputer;
 			player.OsInitProcess = deviceCoordinator.SetUpComputer(playerComputer);
 
+			// Copy environment vars to the init process
+			foreach (KeyValuePair<string, string> pair in this.environmentVariables)
+			{
+				player.OsInitProcess.Environment[pair.Key] = pair.Value;
+			}
+			
 			GameObject uiRootGameObject = Instantiate(uiRootPrefab);
 			GameObject backdropGameObject = Instantiate(backdropPrefab, uiRootGameObject.transform);
 			GameObject desktopGameObject = Instantiate(desktopPrefab, uiRootGameObject.transform);

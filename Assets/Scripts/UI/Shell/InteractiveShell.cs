@@ -9,6 +9,7 @@ using Architecture;
 using Codice.Client.Common;
 using Newtonsoft.Json.Serialization;
 using OS.Devices;
+using OS.FileSystems;
 using PlasticPipe.PlasticProtocol.Client;
 using UnityEngine;
 using Utility;
@@ -372,6 +373,37 @@ namespace UI.Shell
 				this.RedirectionType = redirectionType;
 				this.FilePath = path;
 			}
+
+			private ISystemProcess? FindProgram(ISystemProcess shellProcess, ITextConsole console, string name, string[] args)
+			{
+				// if the program name starts with a /, use the absolute path.
+				if (name.StartsWith("/"))
+					return shellProcess.User.Computer.ExecuteProgram(shellProcess, console, name, args);
+				
+				// if the name starts with "./", try the current directory instead
+				if (name.StartsWith("./"))
+				{
+					string filename = name.Substring(2);
+					string fullPath = PathUtility.Combine(shellProcess.WorkingDirectory, filename);
+					return shellProcess.User.Computer.ExecuteProgram(shellProcess, console, fullPath, args);
+				}
+				
+				// Read the PATH environment variable to find well-known program paths.
+				string pathEnvironmentVariable = shellProcess.Environment["PATH"];
+				string[] paths = pathEnvironmentVariable.Split(':', StringSplitOptions.RemoveEmptyEntries);
+				
+				// Try each program path, check if a full file exists at the given location. If it does, try executing it.
+				VirtualFileSystem fs = shellProcess.User.Computer.GetFileSystem(shellProcess.User);
+				foreach (string path in paths)
+				{
+					string fullPath = PathUtility.Combine(path, name);
+					if (fs.FileExists(fullPath))
+						return shellProcess.User.Computer.ExecuteProgram(shellProcess, console, fullPath, args);
+				}
+				
+				// Found nothing... :(
+				return null;
+			}
 			
 			public ISystemProcess? SpawnCommandProcess(ISystemProcess shellProcess, ITextConsole console)
 			{
@@ -380,7 +412,7 @@ namespace UI.Shell
 				if (shell.ProcessBuiltIn(shellProcess, console, Name, ArgumentList))
 					return null;
 
-				ISystemProcess? commandProcess = shellProcess.User.Computer.ExecuteProgram(shellProcess, console, Name, ArgumentList);
+				ISystemProcess? commandProcess = FindProgram(shellProcess, console, Name, ArgumentList);
 				if (commandProcess == null)
 					console.WriteText($"sh: {Name}: command not found");
 				
