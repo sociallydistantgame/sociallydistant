@@ -1,4 +1,6 @@
 ﻿#nullable enable
+using OS.FileSystems;
+
 namespace OS.Devices
 {
 	public interface IComputer
@@ -17,5 +19,14 @@ namespace OS.Devices
 		/// <param name="arguments">Command-line arguments to pass to the program to run</param>
 		/// <returns>The forked child process for the program, or null if the program doesn't exist.</returns>
 		ISystemProcess? ExecuteProgram(ISystemProcess parentProcess, ITextConsole console, string programName, string[] arguments);
+
+		/// <summary>
+		///		Gets an instance of the <see cref="VirtualFileSystem" /> class that
+		///		interacts with this computer's root filesystem with the permissions
+		///		of the given user.
+		/// </summary>
+		/// <param name="user">The user to operate the filesystem with. Must belong to this computer.</param>
+		/// <returns>A view into the computer's file system from the perspective of the given user.</returns>
+		VirtualFileSystem GetFileSystem(IUser user);
 	}
 }

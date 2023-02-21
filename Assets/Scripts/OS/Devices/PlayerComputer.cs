@@ -1,5 +1,6 @@
 ﻿#nullable enable
 using System.Collections.Generic;
+using OS.FileSystems;
 using UnityEngine.Assertions;
 
 namespace OS.Devices
@@ -10,6 +11,7 @@ namespace OS.Devices
 		private Dictionary<int, IUser> users = new Dictionary<int, IUser>();
 		private Dictionary<string, int> usernameMap = new Dictionary<string, int>();
 		private PlayerUser playerUser;
+		private PlayerFileSystem playerFileSystem;
 
 		/// <inheritdoc />
 		public string Name => hostname;
@@ -23,6 +25,7 @@ namespace OS.Devices
 
 			this.playerUser = new PlayerUser(this, username);
 			this.AddUser(this.playerUser);
+			this.playerFileSystem = new PlayerFileSystem(this);
 		}
 		
 		/// <inheritdoc />
@@ -45,6 +48,12 @@ namespace OS.Devices
 		public ISystemProcess? ExecuteProgram(ISystemProcess parentProcess, ITextConsole console, string programName, string[] arguments)
 		{
 			return null;
+		}
+
+		/// <inheritdoc />
+		public VirtualFileSystem GetFileSystem(IUser user)
+		{
+			return new VirtualFileSystem(this.playerFileSystem, user);
 		}
 
 		private void AddUser(IUser user)
