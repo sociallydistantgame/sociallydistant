@@ -19,6 +19,9 @@ namespace Architecture
 		/// <inheritdoc />"/>
 		public bool IsAlive => isAlive;
 		
+		/// <inheritdoc />
+		public IEnvironmentVariableProvider Environment { get; }
+		
 		/// <inheritdoc />"/>
 		public int Id { get; }
 		
@@ -30,6 +33,7 @@ namespace Architecture
 			Name = "syslogin";
 			this.pidGenerator = pidGenerator;
 			this.WorkingDirectory = parent.WorkingDirectory;
+			this.Environment = parent.Environment.DeepClone();
 			
 			this.coordinator = coordinator;
 			this.loginUser = loginUser;

@@ -11,6 +11,7 @@ namespace Architecture
 	{
 		private readonly DeviceCoordinator coordinator;
 		private readonly UniqueIntGenerator pidGenerator = new UniqueIntGenerator();
+		private readonly SimpleEnvironmentVariableProvider environment = new SimpleEnvironmentVariableProvider();
 		private bool isAlive = true;
 
 		/// <inheritdoc />
@@ -28,6 +29,9 @@ namespace Architecture
 		/// <inheritdoc />
 		public IUser User { get; private set; }
 
+		/// <inheritdoc />
+		public IEnvironmentVariableProvider Environment => this.environment;
+		
 		/// <inheritdoc />
 		public ISystemProcess? Parent => null;
 

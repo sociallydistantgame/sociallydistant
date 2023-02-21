@@ -34,12 +34,15 @@ namespace Architecture
 		/// <inheritdoc />
 		public string WorkingDirectory { get; set; }
 		
+		/// <inheritdoc />
+		public IEnvironmentVariableProvider Environment { get; }
+		
 		public SystemProcess(UniqueIntGenerator pidGenerator, DeviceCoordinator coordinator, ISystemProcess parent, IUser user)
 		{
 			this.pidGenerator = pidGenerator;
 			this.coordinator = coordinator;
 			this.WorkingDirectory = parent.WorkingDirectory;
-			
+			this.Environment = parent.Environment.DeepClone();
 			this.Id = pidGenerator.GetNextValue();
 			this.Name = parent.Name;
 			this.User = user;

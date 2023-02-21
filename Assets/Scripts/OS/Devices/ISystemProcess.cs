@@ -13,7 +13,8 @@ namespace OS.Devices
 		IEnumerable<ISystemProcess> Children { get; }
 		string WorkingDirectory { get; set; }
 		bool IsAlive { get; }
-
+		IEnvironmentVariableProvider Environment { get; }
+		
 		event Action<ISystemProcess>? Killed;
 
 		ISystemProcess Fork();

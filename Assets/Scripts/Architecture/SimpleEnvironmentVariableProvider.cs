@@ -1,0 +1,42 @@
+﻿#nullable enable
+using System;
+using System.Collections.Generic;
+using OS.Devices;
+
+namespace Architecture
+{
+	public class SimpleEnvironmentVariableProvider : IEnvironmentVariableProvider
+	{
+		private readonly Dictionary<string, string> envVariables = new Dictionary<string, string>();
+
+		/// <inheritdoc />
+		public string this[string key]
+		{
+			get
+			{
+				if (envVariables.TryGetValue(key, out string value))
+					return value;
+				return string.Empty;
+			}
+			set
+			{
+				if (envVariables.ContainsKey(key))
+					envVariables[key] = value;
+				else envVariables.Add(key, value);
+			}
+		}
+
+		/// <inheritdoc />
+		public IEnvironmentVariableProvider DeepClone()
+		{
+			var clone = new SimpleEnvironmentVariableProvider();
+
+			foreach (string key in envVariables.Keys)
+			{
+				clone.envVariables.Add(key, envVariables[key]);
+			}
+			
+			return clone;
+		}
+	}
+}
