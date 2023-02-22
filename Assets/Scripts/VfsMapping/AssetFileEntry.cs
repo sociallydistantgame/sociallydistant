@@ -50,6 +50,13 @@ namespace VfsMapping
 		}
 
 		/// <inheritdoc />
+		public bool TryOpenWriteAppend(IUser user, out Stream? stream)
+		{
+			stream = null;
+			return false;
+		}
+
+		/// <inheritdoc />
 		public virtual bool TryExecute(ISystemProcess process, ITextConsole console, string[] arguments)
 		{
 			return false;

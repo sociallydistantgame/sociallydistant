@@ -191,6 +191,20 @@ namespace OS.FileSystems
 
 			return stream;
 		}
+		
+		public Stream OpenWriteAppend(string path)
+		{
+			string[] parts = PathUtility.Split(path);
+			IFileEntry? file = FindFileEntry(parts, create: true);
+
+			if (file == null)
+				throw new FileNotFoundException();
+
+			if (!file.TryOpenWriteAppend(this.user, out Stream? stream) || stream == null)
+				throw new InvalidOperationException("Permission denied");
+
+			return stream;
+		}
 
 		public ISystemProcess Execute(ISystemProcess parentProcess, string path, ITextConsole console, string[] arguments)
 		{
