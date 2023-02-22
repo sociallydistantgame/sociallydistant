@@ -5,5 +5,8 @@ namespace UI.Shell
 	{
 		string GetVariableValue(string name);
 		void SetVariableValue(string name, string newValue);
+		
+		string CurrentWorkingDirectory { get; }
+		string CurrentHomeDirectory { get; }
 	}
 }

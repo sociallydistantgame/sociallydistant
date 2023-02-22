@@ -34,6 +34,13 @@ namespace UI.Shell
 		/// <inheritdoc />
 		public bool IsExecutionHalted => false;
 
+		/// <inheritdoc />
+		public string CurrentWorkingDirectory => process?.WorkingDirectory ?? "/";
+		
+		/// <inheritdoc />
+		public string CurrentHomeDirectory => process?.User?.Home ?? "/";
+		
+		
 		public InteractiveShell(MonoBehaviour unityBehaviour)
 		{
 			this.unityBehaviour = unityBehaviour;
@@ -487,6 +494,11 @@ namespace UI.Shell
 			public IArgumentEvaluator[] ArgumentList { get; }
 			public FileRedirectionType RedirectionType { get; }
 			public string FilePath { get; }
+
+			public string FullFilePath
+			{
+				get => PathUtility.Combine(shell.CurrentWorkingDirectory, FilePath);
+			}
 			
 			public CommandData(InteractiveShell shell,string name, IEnumerable<IArgumentEvaluator> argumentSource, FileRedirectionType redirectionType, string path)
 			{
@@ -534,23 +546,51 @@ namespace UI.Shell
 				// Evaluate arguments now.
 				string[] args = ArgumentList.Select(x => x.GetArgumentText(this.shell)).ToArray();
 				
-				// TODO: File redirection. Should be easy.
-				
-				if (shell.ProcessBuiltIn(shellProcess, console, Name, args))
+				// Get the vfs
+				var vfs = shellProcess.User.Computer.GetFileSystem(shellProcess.User);
+
+				// What console are we going to send to the command?
+				ITextConsole realConsole = console;
+
+				switch (this.RedirectionType)
+				{
+					case FileRedirectionType.Overwrite:
+						realConsole = new FileOutputConsole(console, vfs.OpenWrite(this.FullFilePath));
+						break;
+				}
+
+				if (shell.ProcessBuiltIn(shellProcess, realConsole, Name, args))
+				{
+					if (realConsole is IDisposable disposable)
+						disposable.Dispose();
 					return null;
+				}
 
 				// Process text arguments to make sure we remove their trailing spaces
 				ShellUtility.TrimTrailingSpaces(ref args);
 
-				ISystemProcess? commandProcess = FindProgram(shellProcess, console, Name, args);
+				ISystemProcess? commandProcess = FindProgram(shellProcess, realConsole, Name, args);
 				if (commandProcess == null)
 					console.WriteText($"sh: {Name}: command not found" + Environment.NewLine);
 				
 				// special case for commands that kill the process IMMEDIATELY
 				// on the same frame this was called
 				if (commandProcess != null && !commandProcess.IsAlive)
+				{
+					if (realConsole is IDisposable disposable)
+						disposable.Dispose();
 					return null;
+				}
+
+				void handleKilled(ISystemProcess proc)
+				{
+					if (realConsole is IDisposable disposable)
+						disposable.Dispose();
+					proc.Killed -= handleKilled;
+				}
 				
+				if (commandProcess != null)
+					commandProcess.Killed += handleKilled;
 				return commandProcess;
 			}
 		}
