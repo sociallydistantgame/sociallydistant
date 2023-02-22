@@ -10,6 +10,7 @@ using Codice.Client.Common;
 using Newtonsoft.Json.Serialization;
 using OS.Devices;
 using OS.FileSystems;
+using OS.FileSystems.Host;
 using PlasticPipe.PlasticProtocol.Client;
 using UnityEngine;
 using Utility;
@@ -559,6 +560,9 @@ namespace UI.Shell
 						break;
 					case FileRedirectionType.Overwrite:
 						realConsole = new FileOutputConsole(console, vfs.OpenWrite(this.FullFilePath));
+						break;
+					case FileRedirectionType.Input:
+						realConsole = new FileInputConsole(console, vfs.OpenRead(this.FullFilePath));
 						break;
 				}
 
