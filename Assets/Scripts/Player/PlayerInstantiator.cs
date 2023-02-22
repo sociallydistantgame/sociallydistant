@@ -47,7 +47,7 @@ namespace Player
 
 		private void Start()
 		{
-			var playerComputer = new PlayerComputer("socdist-fakeenv", "user");
+			var playerComputer = new PlayerComputer("socdist-fakeenv", "user", Application.persistentDataPath);
 			var player = new PlayerInstance();
 
 			FileSystemTable.MountFileSystemsToComputer(playerComputer, fstab);
