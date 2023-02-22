@@ -12,5 +12,5 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: fd4582e99249491f8ff6a0fda3558a28, type: 3}
   m_Name: Cat
   m_EditorClassIdentifier: 
-  binaryName: 
+  binaryName: cat
   autoKillOnComplete: 1

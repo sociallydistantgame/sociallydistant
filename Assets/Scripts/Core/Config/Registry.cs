@@ -1,7 +1,9 @@
 ﻿#nullable enable
 
 using System;
+using System.Collections.Generic;
 using System.IO;
+using System.Linq;
 using Unity.Plastic.Newtonsoft.Json.Linq;
 using UnityEngine;
 using Application = UnityEngine.Device.Application;
@@ -26,6 +28,44 @@ namespace Core.Config
 			LoadRegistry();
 		}
 
+		public static void Reload()
+		{
+			LoadRegistry();
+			Updated?.Invoke();
+		}
+
+		public static IEnumerable<KeyValuePair<string, JToken?>> GetAllKeys()
+		{
+			ThrowIfNotInitialized();
+
+			foreach (KeyValuePair<string, JToken?> key in currentRegistry)
+			{
+				yield return key;
+			}
+		}
+
+		public static bool HasKey(string key)
+			=> GetAllKeys().Any(x => x.Key == key);
+
+		public static void ResetKey(string key)
+		{
+			ThrowIfNotInitialized();
+
+			if (!HasKey(key))
+				return;
+
+			currentRegistry.Remove(key);
+			SaveRegistry();
+			Updated?.Invoke();
+		}
+		
+		public static bool HasValue<T>(string key)
+		{
+			ThrowIfNotInitialized();
+
+			return TryGetValue<T>(key, out _);
+		}
+		
 		public static bool TryGetValue<T>(string key, out T? value)
 		{
 			ThrowIfNotInitialized();
