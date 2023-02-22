@@ -43,6 +43,13 @@ namespace OS.FileSystems.Host
 		}
 
 		/// <inheritdoc />
+		public bool TryOpenWriteAppend(IUser user, out Stream? stream)
+		{
+			stream = File.Open(hostFile, FileMode.Append);
+			return true;
+		}
+
+		/// <inheritdoc />
 		public bool TryExecute(ISystemProcess process, ITextConsole console, string[] arguments)
 		{
 			return false;

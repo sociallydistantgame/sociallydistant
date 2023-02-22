@@ -554,6 +554,9 @@ namespace UI.Shell
 
 				switch (this.RedirectionType)
 				{
+					case FileRedirectionType.Append:
+						realConsole = new FileOutputConsole(console, vfs.OpenWriteAppend(this.FullFilePath));
+						break;
 					case FileRedirectionType.Overwrite:
 						realConsole = new FileOutputConsole(console, vfs.OpenWrite(this.FullFilePath));
 						break;
