@@ -1,13 +1,16 @@
 ﻿#nullable enable
 using System.Collections.Generic;
 using System.Diagnostics;
+using System.IO;
 using OS.FileSystems;
+using OS.FileSystems.Host;
 using UnityEngine.Assertions;
 
 namespace OS.Devices
 {
 	public class PlayerComputer : IComputer
 	{
+		private readonly string hostHomeDirectory = string.Empty;
 		private string hostname;
 		private Dictionary<int, IUser> users = new Dictionary<int, IUser>();
 		private Dictionary<string, int> usernameMap = new Dictionary<string, int>();
@@ -18,17 +21,22 @@ namespace OS.Devices
 		public string Name => hostname;
 		public PlayerUser PlayerUser => playerUser;
 		
-		public PlayerComputer(string hostname, string username)
+		public PlayerComputer(string hostname, string username, string hostSaveDirectory)
 		{
 			this.hostname = hostname;
 
-			this.AddUser(new SuperUser(this));
+			IUser su = new SuperUser(this);
+			this.AddUser(su);
 
 			this.playerUser = new PlayerUser(this, username);
 			this.AddUser(this.playerUser);
 			this.playerFileSystem = new PlayerFileSystem(this);
+
+			hostHomeDirectory = Path.Combine(hostSaveDirectory, "home");
 			
-			
+			// Gives the player a place to save data to!
+			GetFileSystem(su)
+				.Mount(playerUser.Home, new HostJail(hostHomeDirectory));
 		}
 		
 		/// <inheritdoc />

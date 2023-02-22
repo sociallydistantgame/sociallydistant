@@ -35,6 +35,9 @@ namespace UI.Applications.Terminal
 			// and send characters to it.
 			this.textConsole = st.StartSession();
 			
+			// Move to the user's home directory.
+			this.process.WorkingDirectory = this.process.User.Home;
+			
 			// Fork a child process for the shell or specified command-line
 			// application to use.
 			this.shellProcess = this.process.Fork();
