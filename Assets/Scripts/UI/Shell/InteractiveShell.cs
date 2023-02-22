@@ -544,7 +544,7 @@ namespace UI.Shell
 
 				ISystemProcess? commandProcess = FindProgram(shellProcess, console, Name, args);
 				if (commandProcess == null)
-					console.WriteText($"sh: {Name}: command not found");
+					console.WriteText($"sh: {Name}: command not found" + Environment.NewLine);
 				
 				// special case for commands that kill the process IMMEDIATELY
 				// on the same frame this was called

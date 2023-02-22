@@ -19,6 +19,7 @@ namespace OS.Devices
 			entryBuilder.AddDirectory("bin");
 			entryBuilder.AddDirectory("dev");
 			entryBuilder.AddDirectory("etc");
+			entryBuilder.AddDirectory("sbin");
 			entryBuilder.AddDirectory("home")
 				.AddDirectory(playerComputer.PlayerUser.UserName);
 			entryBuilder.AddDirectory("root");

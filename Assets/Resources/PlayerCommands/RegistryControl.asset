@@ -9,8 +9,8 @@ MonoBehaviour:
   m_GameObject: {fileID: 0}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 695b0bd7c2604850ba5d0a19f2b6b109, type: 3}
-  m_Name: MakeDirectory
+  m_Script: {fileID: 11500000, guid: b3bf1ddd158b494884d6241b69f64570, type: 3}
+  m_Name: RegistryControl
   m_EditorClassIdentifier: 
-  binaryName: mkdir
+  binaryName: 
   autoKillOnComplete: 1
