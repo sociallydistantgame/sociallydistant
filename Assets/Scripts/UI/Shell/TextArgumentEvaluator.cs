@@ -13,7 +13,8 @@ namespace UI.Shell
 		/// <inheritdoc />
 		public string GetArgumentText(ICommandShell shell)
 		{
-			return text;
+			// We add a trailing space for shell builtins to use, but the shell will automatically trim this.
+			return text + " ";
 		}
 	}
 }

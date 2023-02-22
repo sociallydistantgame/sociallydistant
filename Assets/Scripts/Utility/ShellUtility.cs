@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using Architecture;
@@ -8,6 +9,19 @@ namespace Utility
 {
 	public static class ShellUtility
 	{
+		public static void TrimTrailingSpaces(ref string[] args)
+		{
+			for (var i = 0; i < args.Length; i++)
+			{
+				string arg = args[i];
+				if (arg.EndsWith(" "))
+				{
+					arg = arg.Substring(0, arg.Length - 1);
+					args[i] = arg;
+				}
+			}
+		}
+		
 		/// <summary>
 		///		Tokenizes the given raw command-line input into a list of words
 		///		and returns whether one should continue reading lines of text.
@@ -101,6 +115,18 @@ namespace Utility
 			return !(quote || escape);
 		}
 
+		public static bool IsIdentifier(this string text)
+		{
+			// TODO: More performant way of handling this?
+			return text.All(IsIdentifier);
+		}
+		
+		public static bool IsIdentifier(char character)
+		{
+			return character == '_'
+			       || char.IsLetterOrDigit(character);
+		}
+		
 		public static IEnumerable<ShellToken> IdentifyTokens(StringBuilder rawInput)
 		{
 			// Convert the string to a char array so we can create an ArrayView over it.
@@ -121,6 +147,8 @@ namespace Utility
 				tokenBuilder.Length = 0;
 				return new ShellToken(ShellTokenType.Text, tokenText);
 			}
+
+			var quoteStart = '\0';
 			
 			// Keep going until we've ended the string
 			while (!charView.EndOfArray)
@@ -157,10 +185,24 @@ namespace Utility
 						break;
 					}
 
-					// Quote mark
-					case '"':
+					// String literal end
+					case { } when
+						charView.Current == quoteStart 
+						&& inQuote:
 					{
-						inQuote = !inQuote;
+						quoteStart = '\0';
+						inQuote = false;
+						if (tokenBuilder.Length > 0)
+							yield return EndTextToken();
+						break;
+					}
+
+					// String literal start
+					case '"' when !inQuote:
+					case '\'' when !inQuote:
+					{
+						quoteStart = charView.Current;
+						inQuote = true;
 						if (tokenBuilder.Length > 0)
 							yield return EndTextToken();
 						break;
@@ -186,6 +228,16 @@ namespace Utility
 						break;
 					}
 					
+					// Assignment
+					case '=':
+					{
+						if (tokenBuilder.Length > 0)
+							yield return EndTextToken();
+
+						yield return new ShellToken(ShellTokenType.AssignmentOperator, charView.Current.ToString());
+						break;
+					}
+					
 					// Pipe
 					case '|':
 					{
@@ -207,13 +259,42 @@ namespace Utility
 						break;
 					}
 					
-					// Variable access - only when next character is a letter, and we aren't building a token already
-					case '$' when char.IsLetter(charView.Next) && tokenBuilder.Length==0:
+					// Variable identifiers when:
+					//	- we're not in a string literal at all, or
+					//	- we're in a double-quote literal, and
+					//	- the next character is an identifier char, or
+					//	- the next character is an opening curly brace
+					case '$' when
+						IsIdentifier(charView.Next)
+						|| charView.Next == '{'
+						&& (!inQuote || quoteStart != '\''):
 					{
-						yield return new ShellToken(ShellTokenType.VariableAccess, charView.Current.ToString());
+						if (tokenBuilder.Length > 0)
+							yield return EndTextToken();
+
+						// if next char is an opening curly brace, advance one char and check for an identifier
+						if (charView.Next == '{')
+						{
+							charView.Advance();
+							if (!IsIdentifier(charView.Next))
+								throw new InvalidOperationException("Identifier expected");
+						}
+						
+						do
+						{
+							charView.Advance();
+							tokenBuilder.Append(charView.Current);
+						} while (IsIdentifier(charView.Next));
+
+						// if next char is a closing curly, skip
+						if (charView.Next == '}')
+							charView.Advance();
+						
+						yield return new ShellToken(ShellTokenType.VariableAccess, tokenBuilder.ToString());
+						tokenBuilder.Length = 0;
 						break;
 					}
-					
+
 					// Overwrite File
 					case '>':
 					{
@@ -271,6 +352,7 @@ namespace Utility
 		FileInput,
 		ParallelExecute,
 		SequentialExecute,
-		VariableAccess
+		VariableAccess,
+		AssignmentOperator
 	}
 }
