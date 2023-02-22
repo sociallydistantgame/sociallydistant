@@ -76,7 +76,7 @@ namespace OS.FileSystems.Host
 		{
 			string fullPath = Path.Combine(hostPath, name);
 			if (!File.Exists(fullPath))
-				File.Create(fullPath);
+				File.Create(fullPath).Dispose();
 
 			entry = new HostFileEntry(this, fullPath);
 			return true;

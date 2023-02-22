@@ -86,7 +86,7 @@ namespace OS.FileSystems
 			return currentEntry;
 		}
 
-		private IFileEntry? FindFileEntry(ReadOnlySpan<string> path, IUser? reader = null)
+		private IFileEntry? FindFileEntry(ReadOnlySpan<string> path, IUser? reader = null, bool create = false)
 		{
 			reader ??= this.user;
 			
@@ -105,7 +105,10 @@ namespace OS.FileSystems
 				if (fileEntry.Name == filename)
 					return fileEntry;
 			}
-			
+
+			if (create && parentDirectory.TryCreateFile(reader, filename, out IFileEntry? newFile) && newFile != null)
+				return newFile;
+
 			return null;
 		}
 
@@ -178,7 +181,7 @@ namespace OS.FileSystems
 		public Stream OpenWrite(string path)
 		{
 			string[] parts = PathUtility.Split(path);
-			IFileEntry? file = FindFileEntry(parts);
+			IFileEntry? file = FindFileEntry(parts, create: true);
 
 			if (file == null)
 				throw new FileNotFoundException();
