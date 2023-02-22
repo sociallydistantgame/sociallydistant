@@ -29,6 +29,7 @@ namespace UI.Shell
 		private readonly List<string> tokenList = new List<string>();
 		private readonly Queue<ShellInstruction> pendingInstructions = new Queue<ShellInstruction>();
 		private ShellInstruction? currentInstruction = null;
+		private VirtualFileSystem vfs;
 
 		/// <inheritdoc />
 		public bool IsExecutionHalted => false;
@@ -43,7 +44,27 @@ namespace UI.Shell
 		{
 			this.process = process;
 			this.consoleDevice = consoleDevice;
+			this.vfs = process.User.Computer.GetFileSystem(process.User);
+
 			initialized = true;
+			
+			// Execute the .shrc file if it exists. We don't really have support for scripts yet so
+			// this is temporary.
+			string homeFolder = process.User.Home;
+			string shrcPath = PathUtility.Combine(homeFolder, ".shrc");
+			if (!vfs.FileExists(shrcPath))
+				return;
+
+			string shrcScriptText = vfs.ReadAllText(shrcPath);
+
+			foreach (string line in shrcScriptText.Split('\n'))
+			{
+				this.lineBuilder.Length = 0;
+				this.lineBuilder.Append(line);
+				ProcessTokens();
+			}
+
+			shellState = ShellState.Executing;
 		}
 
 		public void SetVariableValue(string name, string newValue)

@@ -172,7 +172,36 @@ namespace Utility
 					{
 						charView.Advance();
 						if (!charView.EndOfArray)
-							tokenBuilder.Append(charView.Current);
+						{
+							switch (charView.Current)
+							{
+								case 'r':
+									tokenBuilder.Append('\r');
+									break;
+								case 'n':
+									tokenBuilder.Append('\n');
+									break;
+								case 'a':
+									tokenBuilder.Append('\a');
+									break;
+								case 'e':
+									tokenBuilder.Append('\x1b');
+									break;
+								case 'b':
+									tokenBuilder.Append('\b');
+									break;
+								case 'v':
+									tokenBuilder.Append('\v');
+									break;
+								case 't':
+									tokenBuilder.Append('\t');
+									break;
+								default:
+									tokenBuilder.Append(charView.Current);
+									break;
+							}
+						}
+
 						break;
 					}
 					
