@@ -207,6 +207,13 @@ namespace Utility
 						break;
 					}
 					
+					// Variable access - only when next character is a letter, and we aren't building a token already
+					case '$' when char.IsLetter(charView.Next) && tokenBuilder.Length==0:
+					{
+						yield return new ShellToken(ShellTokenType.VariableAccess, charView.Current.ToString());
+						break;
+					}
+					
 					// Overwrite File
 					case '>':
 					{
@@ -263,6 +270,7 @@ namespace Utility
 		Append,
 		FileInput,
 		ParallelExecute,
-		SequentialExecute
+		SequentialExecute,
+		VariableAccess
 	}
 }
