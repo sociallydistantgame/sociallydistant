@@ -17,7 +17,8 @@ using Utility;
 namespace UI.Shell
 {
 	public class InteractiveShell :
-		ITerminalProcessController
+		ITerminalProcessController,
+		ICommandShell
 	{
 		private ISystemProcess? process;
 		private ITextConsole? consoleDevice;
@@ -120,6 +121,11 @@ namespace UI.Shell
 					break;
 				}
 			}
+		}
+
+		public string GetVariableValue(string name)
+		{
+			return this.process.Environment[name];
 		}
 
 		private void ProcessTokens()
@@ -261,21 +267,62 @@ namespace UI.Shell
 		private CommandData ParseCommandWithArguments(ArrayView<ShellToken> tokenView)
 		{
 			string name = tokenView.Current.Text;
-			var arguments = new List<string>();
+			var arguments = new List<IArgumentEvaluator>();
 
 			tokenView.Advance();
 			
-			while (!tokenView.EndOfArray && tokenView.Current.TokenType == ShellTokenType.Text)
-			{
-				arguments.Add(tokenView.Current.Text);
-				tokenView.Advance();
-			}
-			
+			while (ParseArgument(tokenView, out IArgumentEvaluator? evaluator) && evaluator != null)
+				arguments.Add(evaluator);
+
 			// If we have tokens remaining, we will need to check for redirection markers.
 			return ParseRedirection(tokenView, name, arguments);
 		}
 
-		private CommandData ParseRedirection(ArrayView<ShellToken> tokenView, string name, List<string> arguments)
+		private bool ParseArgument(ArrayView<ShellToken> tokenView, out IArgumentEvaluator? evaluator)
+		{
+			if (tokenView.EndOfArray)
+			{
+				evaluator = null;
+				return false;
+			}
+
+			evaluator = tokenView.Current.TokenType switch
+			{
+				ShellTokenType.VariableAccess when tokenView.Next?.TokenType == ShellTokenType.Text => ParseVariableAccess(tokenView),
+				ShellTokenType.Text => ParseTextArgument(tokenView),
+				_ => null
+			};
+
+			return evaluator != null;
+		}
+
+		private IArgumentEvaluator? ParseVariableAccess(ArrayView<ShellToken> tokenView)
+		{
+			if (tokenView.EndOfArray || tokenView.Current.TokenType != ShellTokenType.VariableAccess)
+				return null;
+
+			if (tokenView.Next?.TokenType != ShellTokenType.Text)
+				return null;
+
+			tokenView.Advance();
+
+			string text = tokenView.Current.Text;
+			tokenView.Advance();
+
+			return new VariableAccessEvaluator(text);
+		}
+		
+		private IArgumentEvaluator? ParseTextArgument(ArrayView<ShellToken> tokenView)
+		{
+			if (tokenView.EndOfArray || tokenView.Current.TokenType != ShellTokenType.Text)
+				return null;
+
+			string text = tokenView.Current.Text;
+			tokenView.Advance();
+			return new TextArgumentEvaluator(text);
+		}
+		
+		private CommandData ParseRedirection(ArrayView<ShellToken> tokenView, string name, List<IArgumentEvaluator> arguments)
 		{
 			// No tokens left.
 			if (tokenView.Next == null)
@@ -360,11 +407,11 @@ namespace UI.Shell
 			private readonly InteractiveShell shell;
 			
 			public string Name { get; }
-			public string[] ArgumentList { get; }
+			public IArgumentEvaluator[] ArgumentList { get; }
 			public FileRedirectionType RedirectionType { get; }
 			public string FilePath { get; }
 			
-			public CommandData(InteractiveShell shell,string name, IEnumerable<string> argumentSource, FileRedirectionType redirectionType, string path)
+			public CommandData(InteractiveShell shell,string name, IEnumerable<IArgumentEvaluator> argumentSource, FileRedirectionType redirectionType, string path)
 			{
 				this.shell = shell;
 				
@@ -407,12 +454,15 @@ namespace UI.Shell
 			
 			public ISystemProcess? SpawnCommandProcess(ISystemProcess shellProcess, ITextConsole console)
 			{
+				// Evaluate arguments now.
+				string[] args = ArgumentList.Select(x => x.GetArgumentText(this.shell)).ToArray();
+				
 				// TODO: File redirection. Should be easy.
 				
-				if (shell.ProcessBuiltIn(shellProcess, console, Name, ArgumentList))
+				if (shell.ProcessBuiltIn(shellProcess, console, Name, args))
 					return null;
 
-				ISystemProcess? commandProcess = FindProgram(shellProcess, console, Name, ArgumentList);
+				ISystemProcess? commandProcess = FindProgram(shellProcess, console, Name, args);
 				if (commandProcess == null)
 					console.WriteText($"sh: {Name}: command not found");
 				
