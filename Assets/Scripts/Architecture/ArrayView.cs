@@ -43,6 +43,18 @@ namespace Architecture
 			ThrowIfEndOfCollection();
 			index++;
 		}
+
+		public void Previous()
+		{
+			ThrowIfBeginOfCollection();
+			index--;
+		}
+
+		private void ThrowIfBeginOfCollection()
+		{
+			if (index == 0)
+				throw new InvalidOperationException("Beginning of collection");
+		}
 		
 		private void ThrowIfEndOfCollection()
 		{

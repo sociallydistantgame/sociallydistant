@@ -46,6 +46,12 @@ namespace UI.Shell
 			initialized = true;
 		}
 
+		public void SetVariableValue(string name, string newValue)
+		{
+			if (this.process != null)
+				this.process.Environment[name] = newValue;
+		}
+
 		/// <inheritdoc />
 		public void Update()
 		{
@@ -125,7 +131,7 @@ namespace UI.Shell
 
 		public string GetVariableValue(string name)
 		{
-			return this.process.Environment[name];
+			return this.process?.Environment[name] ?? name;
 		}
 
 		private void ProcessTokens()
@@ -184,6 +190,8 @@ namespace UI.Shell
 			{
 				case "cd":
 				{
+					ShellUtility.TrimTrailingSpaces(ref arguments);
+					
 					if (arguments.Length == 0)
 						process.WorkingDirectory = process.User.Home;
 					else
@@ -206,7 +214,7 @@ namespace UI.Shell
 					break;
 				case "echo":
 				{
-					string text = string.Join(" ", arguments);
+					string text = string.Join(string.Empty, arguments);
 					console.WriteText(text + Environment.NewLine);
 					break;
 				}
@@ -260,8 +268,61 @@ namespace UI.Shell
 
 		private ShellInstruction ParseSingleInstruction(ArrayView<ShellToken> tokenView)
 		{
+			// We first try to parse a variable assignment instruction. If that fails, fall back to parsing a command.
+			ShellInstruction? assignment = ParseVariableAssignment(tokenView);
+			if (assignment != null)
+				return assignment;
+			
 			CommandData command = ParseCommandWithArguments(tokenView);
 			return new SingleInstruction(command);
+		}
+
+		private ShellInstruction? ParseVariableAssignment(ArrayView<ShellToken> tokenView)
+		{
+			// End of array? Parse nothing
+			if (tokenView.EndOfArray)
+				return null;
+			
+			// Only parse assignments if the current token is either Text or VariableAccess,
+			// and is an identifier.
+			if (tokenView.Current.TokenType != ShellTokenType.Text && tokenView.Current.TokenType != ShellTokenType.VariableAccess)
+				return null;
+
+			if (!tokenView.Current.Text.IsIdentifier())
+				return null;
+			
+			// If there isn't a next token, parse nothing
+			if (tokenView.Next == null)
+				return null;
+			
+			// Only parse assignments if the assignment operator is present as the next token
+			if (tokenView.Next.TokenType != ShellTokenType.AssignmentOperator)
+				return null;
+			
+			// get identifier
+			string identifier = tokenView.Current.Text;
+			tokenView.Advance();
+			
+			// Skip the assignment operator
+			tokenView.Advance();
+			
+			// We must parse at least one argument evaluator for the assignment instruction
+			// to be considered valid. If we get a null, then we must go back two elements before
+			// returning. Otherwise we can't fallback to parsing a command instruction.
+			var argumentList = new List<IArgumentEvaluator>();
+			while (ParseArgument(tokenView, out IArgumentEvaluator? evaluator) && evaluator != null)
+			{
+				argumentList.Add(evaluator);
+			}
+
+			if (argumentList.Count == 0)
+			{
+				tokenView.Previous();
+				tokenView.Previous();
+				return null;
+			}
+
+			return new AssignmentInstruction(this, identifier, argumentList);
 		}
 		
 		private CommandData ParseCommandWithArguments(ArrayView<ShellToken> tokenView)
@@ -288,7 +349,7 @@ namespace UI.Shell
 
 			evaluator = tokenView.Current.TokenType switch
 			{
-				ShellTokenType.VariableAccess when tokenView.Next?.TokenType == ShellTokenType.Text => ParseVariableAccess(tokenView),
+				ShellTokenType.VariableAccess => ParseVariableAccess(tokenView),
 				ShellTokenType.Text => ParseTextArgument(tokenView),
 				_ => null
 			};
@@ -300,11 +361,6 @@ namespace UI.Shell
 		{
 			if (tokenView.EndOfArray || tokenView.Current.TokenType != ShellTokenType.VariableAccess)
 				return null;
-
-			if (tokenView.Next?.TokenType != ShellTokenType.Text)
-				return null;
-
-			tokenView.Advance();
 
 			string text = tokenView.Current.Text;
 			tokenView.Advance();
@@ -461,6 +517,9 @@ namespace UI.Shell
 				
 				if (shell.ProcessBuiltIn(shellProcess, console, Name, args))
 					return null;
+
+				// Process text arguments to make sure we remove their trailing spaces
+				ShellUtility.TrimTrailingSpaces(ref args);
 
 				ISystemProcess? commandProcess = FindProgram(shellProcess, console, Name, args);
 				if (commandProcess == null)
@@ -745,84 +804,6 @@ namespace UI.Shell
 				this.currentCommandProcess = null;
 				isCompleted = true;
 			}
-		}
-	}
-
-	public class LineListConsole : ITextConsole
-	{
-		private readonly StringBuilder buffer = new StringBuilder();
-		private int readPosition = 0;
-		
-		/// <inheritdoc />
-		public void ClearScreen()
-		{
-			buffer.Length = 0;
-			readPosition = 0;
-		}
-
-		/// <inheritdoc />
-		public void WriteText(string text)
-		{
-			buffer.Append(text);
-		}
-
-		/// <inheritdoc />
-		public bool TryDequeueSubmittedInput(out string input)
-		{
-			input = string.Empty;
-
-			if (readPosition == buffer.Length)
-				return false;
-
-			input = ReadUntil('\n');
-			return true;
-		}
-
-		private string ReadUntil(char character)
-		{
-			var sb = new StringBuilder();
-
-			while (readPosition < buffer.Length)
-			{
-				char current = buffer[readPosition];
-				if (character == current)
-					break;
-
-				sb.Append(current);
-				readPosition++;
-			}
-			
-			return sb.ToString();
-		}
-	}
-
-	public class RedirectedConsole : ITextConsole
-	{
-		private readonly ITextConsole input;
-		private readonly ITextConsole output;
-
-		public RedirectedConsole(ITextConsole input, ITextConsole output)
-		{
-			this.input = input;
-			this.output = output;
-		}
-
-		/// <inheritdoc />
-		public void ClearScreen()
-		{
-			output.ClearScreen();
-		}
-
-		/// <inheritdoc />
-		public void WriteText(string text)
-		{
-			output.WriteText(text);
-		}
-
-		/// <inheritdoc />
-		public bool TryDequeueSubmittedInput(out string input)
-		{
-			return this.input.TryDequeueSubmittedInput(out input);
 		}
 	}
 } 
