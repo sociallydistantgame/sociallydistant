@@ -179,7 +179,7 @@ namespace UI.Shell
 				case "cd":
 				{
 					if (arguments.Length == 0)
-						process.WorkingDirectory = "/";
+						process.WorkingDirectory = process.User.Home;
 					else
 					{
 						string path = arguments[0];
