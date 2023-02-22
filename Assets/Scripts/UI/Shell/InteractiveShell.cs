@@ -93,68 +93,96 @@ namespace UI.Shell
 			if (!initialized)
 				return;
 
-			switch (shellState)
+			// Probably a better way of handling errors but I'm not ready to find it yet.
+			// This is open-source for a reason, though.
+			// - Michael
+			try
 			{
-				case ShellState.Init:
+				switch (shellState)
 				{
-					WritePrompt();
-					lineBuilder.Length = 0;
-					shellState = shellState = ShellState.Reading;
-					break;
-				}
-				case ShellState.Reading:
-				{
-					if (consoleDevice.TryDequeueSubmittedInput(out string nextLine))
+					case ShellState.Init:
 					{
-						lineBuilder.Append(nextLine);
-						shellState = ShellState.Processing;
+						WritePrompt();
+						lineBuilder.Length = 0;
+						shellState = shellState = ShellState.Reading;
+						break;
 					}
-					break;
-				}
-				case ShellState.Processing:
-				{
-					// Clear the token list
-					tokenList.Clear();
-					
-					// Tokenize the current input.
-					bool shouldExecute = ShellUtility.SimpleTokenize(lineBuilder, tokenList);
+					case ShellState.Reading:
+					{
+						if (consoleDevice.TryDequeueSubmittedInput(out string nextLine))
+						{
+							lineBuilder.Append(nextLine);
+							shellState = ShellState.Processing;
+						}
 
-					if (!shouldExecute)
-					{
-						lineBuilder.AppendLine();
-						consoleDevice.WriteText(" --> ");
-						shellState = ShellState.Reading;
+						break;
 					}
-					else
+					case ShellState.Processing:
 					{
-						ProcessTokens();
-						
-						shellState = ShellState.Executing;
+						// Clear the token list
+						tokenList.Clear();
+
+						// Tokenize the current input.
+						bool shouldExecute = ShellUtility.SimpleTokenize(lineBuilder, tokenList);
+
+						if (!shouldExecute)
+						{
+							lineBuilder.AppendLine();
+							consoleDevice.WriteText(" --> ");
+							shellState = ShellState.Reading;
+						}
+						else
+						{
+							ProcessTokens();
+
+							shellState = ShellState.Executing;
+						}
+
+						break;
 					}
-					
-					break;
-				}
-				case ShellState.Executing:
-				{
-					if (currentInstruction != null)
+					case ShellState.Executing:
 					{
-						currentInstruction.Update();
-						if (!currentInstruction.IsComplete)
+						if (currentInstruction != null)
+						{
+							currentInstruction.Update();
+							if (!currentInstruction.IsComplete)
+								return;
+
+							currentInstruction = null;
+						}
+
+						if (pendingInstructions.Count > 0)
+						{
+							currentInstruction = pendingInstructions.Dequeue();
+							currentInstruction.Begin(this.process, this.consoleDevice);
 							return;
+						}
 
-						currentInstruction = null;
+						shellState = ShellState.Init;
+						break;
 					}
-
-					if (pendingInstructions.Count > 0)
-					{
-						currentInstruction = pendingInstructions.Dequeue();
-						currentInstruction.Begin(this.process, this.consoleDevice);
-						return;
-					}
-					
-					shellState = ShellState.Init;
-					break;
 				}
+			}
+			catch (Exception sex) // get your mind out of the gutter, it stands for "shell exception"
+			{
+				// stop execution of any current instruction
+				// and any child process
+				foreach (ISystemProcess childProcess in this.process.Children.ToArray())
+					childProcess.Kill();
+
+				currentInstruction = null;
+				
+				// clear pending instructions
+				pendingInstructions.Clear();
+				
+				// reinit the shell
+				shellState = ShellState.Init;
+				
+				// log the full error to Unity
+				Debug.LogException(sex);
+				
+				// Log a partial error to the console
+				this.consoleDevice.WriteText(sex.Message + Environment.NewLine);
 			}
 		}
 
