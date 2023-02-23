@@ -7,11 +7,11 @@ namespace CustomInput.InputManagers
 {
 	public class WindowInputManager : IInputManager
 	{
-		private WindowDragService dragService;
+		private WindowFocusService focusService;
 		
-		public WindowInputManager(WindowDragService dragService)
+		public WindowInputManager(WindowFocusService focusService)
 		{
-			this.dragService = dragService;
+			this.focusService = focusService;
 		}
 		
 		/// <inheritdoc />

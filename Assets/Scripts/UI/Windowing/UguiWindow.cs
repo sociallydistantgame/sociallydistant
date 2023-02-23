@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using TMPro;
 using UnityEngine;
 using UnityEngine.EventSystems;
+using UnityEngine.Serialization;
 using UnityEngine.UI;
 using Utility;
 
@@ -29,9 +30,10 @@ namespace UI.Windowing
 		private Vector2 alignmentBackup;
 		private readonly List<IWindowCloseBlocker> closeBlockers = new List<IWindowCloseBlocker>();
 
+		[FormerlySerializedAs("dragService")]
 		[Header("Dependencies")]
 		[SerializeField]
-		private WindowDragService dragService = null!;
+		private WindowFocusService focusService = null!;
 		
 		[Header("UI")]
 		[SerializeField]
@@ -49,7 +51,7 @@ namespace UI.Windowing
 		[SerializeField]
 		private Button minimizeButton = null!;
 
-		public WindowDragService DragService => dragService;
+		public WindowFocusService FocusService => focusService;
 
 		/// <inheritdoc />
 		public event Action<IWindow> WindowClosed;
@@ -173,13 +175,20 @@ namespace UI.Windowing
 		private void CheckNewFocusedWindow()
 		{
 			if (eventSystemFocusedGameObject == null)
+			{
+				focusService.SetWindow(null);
 				return;
+			}
 
 			UguiWindow? newWindow = eventSystemFocusedGameObject.GetComponentInParents<UguiWindow>();
 			if (newWindow == null)
+			{
+				focusService.SetWindow(null);
 				return;
+			}
 
 			newWindow.transform.SetAsLastSibling();
+			focusService.SetWindow(newWindow);
 		}
 
 		public void Close()
