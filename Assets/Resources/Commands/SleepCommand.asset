@@ -9,8 +9,8 @@ MonoBehaviour:
   m_GameObject: {fileID: 0}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: b3bf1ddd158b494884d6241b69f64570, type: 3}
-  m_Name: RegistryControl
+  m_Script: {fileID: 11500000, guid: c490816f200b4e4f915cb2a563367c6e, type: 3}
+  m_Name: SleepCommand
   m_EditorClassIdentifier: 
-  binaryName: registryctl
+  binaryName: 
   autoKillOnComplete: 1
