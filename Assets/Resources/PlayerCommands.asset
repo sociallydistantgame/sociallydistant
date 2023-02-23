@@ -13,4 +13,4 @@ MonoBehaviour:
   m_Name: PlayerCommands
   m_EditorClassIdentifier: 
   searchDirectories:
-  - Commands
+  - PlayerCommands

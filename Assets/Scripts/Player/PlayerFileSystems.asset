@@ -17,3 +17,5 @@ MonoBehaviour:
     fileSystemAsset: {fileID: 11400000, guid: 381071cc8ecea2f438297c0ca0d4ab62, type: 2}
   - path: /bin
     fileSystemAsset: {fileID: 11400000, guid: 636046208431e244688835b0094f864c, type: 2}
+  - path: /sbin
+    fileSystemAsset: {fileID: 11400000, guid: 1f75ffa9d5b9324439eba560cd9028c9, type: 2}
