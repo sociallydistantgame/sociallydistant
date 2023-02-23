@@ -12,5 +12,5 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: c490816f200b4e4f915cb2a563367c6e, type: 3}
   m_Name: SleepCommand
   m_EditorClassIdentifier: 
-  binaryName: 
-  autoKillOnComplete: 1
+  binaryName: sleep
+  autoKillOnComplete: 0

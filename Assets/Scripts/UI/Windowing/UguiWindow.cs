@@ -12,8 +12,12 @@ namespace UI.Windowing
 		MonoBehaviour,
 		ISelectHandler,
 		IDeselectHandler,
+		IPointerDownHandler,
 		IWindowWithClient<RectTransform>
 	{
+		private static UguiWindow firstWindow = null!;
+		private bool isFirstWindow = false;
+		private GameObject? eventSystemFocusedGameObject;
 		private WindowState currentWindowState;
 		private LayoutElement layoutElement;
 		private RectTransform currentClient;
@@ -132,6 +136,50 @@ namespace UI.Windowing
 			this.maximizeButton.onClick.AddListener(ToggleMaximize);
 			this.minimizeButton.onClick.AddListener(Minimize);
 			this.closeButton.onClick.AddListener(Close);
+
+			if (firstWindow == null)
+			{
+				firstWindow = this;
+				isFirstWindow = true;
+			}
+		}
+
+		private void OnDestroy()
+		{
+			if (firstWindow == this)
+				firstWindow = null;
+		}
+
+		private void Update()
+		{
+			UpdateFocusedWindow();
+		}
+
+		private void UpdateFocusedWindow()
+		{
+			if (!isFirstWindow)
+				return;
+
+			if (EventSystem.current == null)
+				return;
+
+			if (EventSystem.current.currentSelectedGameObject != this.eventSystemFocusedGameObject)
+			{
+				this.eventSystemFocusedGameObject = EventSystem.current.currentSelectedGameObject;
+				this.CheckNewFocusedWindow();
+			}
+		}
+
+		private void CheckNewFocusedWindow()
+		{
+			if (eventSystemFocusedGameObject == null)
+				return;
+
+			UguiWindow? newWindow = eventSystemFocusedGameObject.GetComponentInParents<UguiWindow>();
+			if (newWindow == null)
+				return;
+
+			newWindow.transform.SetAsLastSibling();
 		}
 
 		public void Close()
@@ -236,19 +284,33 @@ namespace UI.Windowing
 		/// <inheritdoc />
 		public void OnSelect(BaseEventData eventData)
 		{
-			Debug.Log("Window selected");
+			this.transform.SetAsLastSibling();
 		}
 
 		/// <inheritdoc />
 		public void OnDeselect(BaseEventData eventData)
 		{
-			Debug.Log("Window deselected");
+			if (EventSystem.current == null)
+				return;
+
+			if (EventSystem.current.currentSelectedGameObject == null)
+				return;
+
+			UguiWindow? otherWindow = EventSystem.current.currentSelectedGameObject.GetComponentInParent<UguiWindow>();
+			if (otherWindow == this)
+				this.transform.SetAsLastSibling();
 		}
 
 		/// <inheritdoc />
 		public void SetWorkspace(IWorkspaceDefinition workspace)
 		{
 			this.Workspace = workspace;
+		}
+
+		/// <inheritdoc />
+		public void OnPointerDown(PointerEventData eventData)
+		{
+			this.transform.SetAsLastSibling();
 		}
 	}
 }
