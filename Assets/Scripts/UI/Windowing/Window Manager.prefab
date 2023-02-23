@@ -116,6 +116,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   fallbackWorkspaceArea: {fileID: 449013092087491275}
   windowPrefab: {fileID: 1602860447138099268, guid: 476b4570c6d8d7847ba7390d74fbf861, type: 3}
+  messageDialogPrefab: {fileID: 83979407045804883, guid: 7de826be29adfe641a14227882743d69, type: 3}
 --- !u!1 &4410748591909211741
 GameObject:
   m_ObjectHideFlags: 0

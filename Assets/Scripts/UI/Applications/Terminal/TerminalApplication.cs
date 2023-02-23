@@ -5,6 +5,7 @@ using Architecture;
 using OS.Devices;
 using UI.Shell;
 using UI.Terminal.SimpleTerminal;
+using UI.UiHelpers;
 using UI.Windowing;
 using UnityEngine;
 using Utility;
@@ -22,12 +23,14 @@ namespace UI.Applications.Terminal
 		private SimpleTerminalRenderer st = null!;
 		private ITextConsole? textConsole;
 		private ITerminalProcessController? shell;
+		private DialogHelper dialogHelper = null!;
 		private bool isWaitingForInput;
 
 		private void Awake()
 		{
 			this.AssertAllFieldsAreSerialized(typeof(TerminalApplication));
 			this.MustGetComponentInChildren(out st);
+			this.MustGetComponent(out dialogHelper);
 		}
 
 		private void Start()
@@ -76,6 +79,20 @@ namespace UI.Applications.Terminal
 			
 			if (shell.IsExecutionHalted)
 			{
+				if (!dialogHelper.AreAnyDialogsOpen)
+				{
+					dialogHelper.AskQuestion(
+						"Force-quit running tasks?",
+						"There are tasks currently running inside this Terminal. Are you sure you want to quit the Terminal and force-quit all currently-running tasks? Any unsaved data will be lost.",
+						this.window,
+						result =>
+						{
+							if (result)
+								process.Kill();
+						}
+					);
+				}
+				
 				this.st.Bell();
 				return false;
 			}

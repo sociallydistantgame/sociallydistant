@@ -51,6 +51,9 @@ namespace UI.Windowing
 		public event Action<IWindow> WindowClosed;
 
 		/// <inheritdoc />
+		public IWorkspaceDefinition Workspace { get; private set; } = null!;
+		
+		/// <inheritdoc />
 		public string Title
 		{
 			get => titleText.text;
@@ -121,6 +124,7 @@ namespace UI.Windowing
 		private void Awake()
 		{
 			this.AssertAllFieldsAreSerialized(typeof(UguiWindow));
+			
 			this.MustGetComponent(out rectTransform);
 			this.MustGetComponent(out contentSizeFitter);
 			this.clientArea.MustGetComponent(out layoutElement);
@@ -239,6 +243,12 @@ namespace UI.Windowing
 		public void OnDeselect(BaseEventData eventData)
 		{
 			Debug.Log("Window deselected");
+		}
+
+		/// <inheritdoc />
+		public void SetWorkspace(IWorkspaceDefinition workspace)
+		{
+			this.Workspace = workspace;
 		}
 	}
 }
