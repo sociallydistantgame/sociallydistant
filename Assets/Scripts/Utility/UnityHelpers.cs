@@ -46,6 +46,24 @@ namespace Utility
             element = result;
         }
 
+        // Raphael...I'm sorry...if you EVER look at this code...
+        // I am sorry you had to.
+        public static T? GetComponentInParents<T>(this GameObject behaviour)
+            where T : class
+        {
+            Transform? t = behaviour.transform;
+            while (t != null)
+            {
+                T component = t.gameObject.GetComponent<T>();
+                if (component != null)
+                    return component;
+                t = t.parent;
+            }
+
+            return null;
+        }
+        
+        
         public static bool IsLastSibling(this Transform transform)
         {
             if (transform.parent == null)
