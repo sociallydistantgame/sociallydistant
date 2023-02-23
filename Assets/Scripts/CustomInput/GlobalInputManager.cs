@@ -6,6 +6,7 @@ using CustomInput.InputManagers;
 using Player;
 using UI.Windowing;
 using UnityEngine;
+using UnityEngine.Serialization;
 using Utility;
 
 namespace CustomInput
@@ -19,8 +20,9 @@ namespace CustomInput
 		[SerializeField]
 		private PlayerInstanceHolder playerHolder = null!;
 
+		[FormerlySerializedAs("windowDragService")]
 		[SerializeField]
-		private WindowDragService windowDragService = null!;
+		private WindowFocusService windowFocusService = null!;
 
 		private void Awake()
 		{
@@ -31,7 +33,7 @@ namespace CustomInput
 
 		private void Start()
 		{
-			inputManagers.Insert(0, new WindowInputManager(windowDragService));
+			inputManagers.Insert(0, new WindowInputManager(windowFocusService));
 		}
 
 		private void OnEnable()
