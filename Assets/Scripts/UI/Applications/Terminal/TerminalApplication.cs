@@ -13,7 +13,8 @@ namespace UI.Applications.Terminal
 {
 	public class TerminalApplication :
 		MonoBehaviour,
-		IProgramOpenHandler
+		IProgramOpenHandler,
+		IWindowCloseBlocker
 	{
 		private ISystemProcess process = null!;
 		private IWindow window = null!;
@@ -65,6 +66,21 @@ namespace UI.Applications.Terminal
 		{
 			this.process = process;
 			this.window = window;
+		}
+
+		/// <inheritdoc />
+		public bool CheckCanClose()
+		{
+			if (shell == null)
+				return true;
+			
+			if (shell.IsExecutionHalted)
+			{
+				this.st.Bell();
+				return false;
+			}
+
+			return true;
 		}
 	}
 }
