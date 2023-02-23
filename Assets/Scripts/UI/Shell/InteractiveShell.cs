@@ -664,8 +664,11 @@ namespace UI.Shell
 			/// <inheritdoc />
 			public override void Update()
 			{
-				first.Update();
-				next.Update();
+				if (!first.IsComplete)
+					first.Update();
+				
+				if (!next.IsComplete)
+					next.Update();
 			}
 		}
 
