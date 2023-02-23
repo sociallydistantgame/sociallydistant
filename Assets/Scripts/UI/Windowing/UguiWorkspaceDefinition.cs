@@ -19,7 +19,7 @@ namespace UI.Windowing
 		public UguiWindow CreateWindow(string title, RectTransform client)
 		{
 			UguiWindow newWindow = Object.Instantiate(windowPrefab, workspaceArea);
-
+			newWindow.SetWorkspace(this);
 			newWindow.Title = title;
 
 			if (client != null)

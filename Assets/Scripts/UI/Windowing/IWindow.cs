@@ -4,16 +4,17 @@ using UnityEngine;
 
 namespace UI.Windowing
 {
-	public interface IWindow
+	public interface IWindow : ICloseable
 	{
 		public event Action<IWindow>? WindowClosed; 
 
+		IWorkspaceDefinition Workspace { get; }
 		string Title { get; set; }
 		WindowState WindowState { get; set; }
 		
 		bool EnableCloseButton { get; set; }
-		bool EnableMaximizeButton { get; }
-		bool EnableMinimizeButton { get; }
+		bool EnableMaximizeButton { get; set; }
+		bool EnableMinimizeButton { get; set; }
 		
 		bool IsActive { get; }
 		
@@ -23,12 +24,7 @@ namespace UI.Windowing
 		void ToggleMaximize();
 		void Restore();
 		void Minimize();
-		void Close();
 		void ForceClose();
-	}
-
-	public interface IWindowCloseBlocker
-	{
-		bool CheckCanClose();
+		void SetWorkspace(IWorkspaceDefinition workspace);
 	}
 }

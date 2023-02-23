@@ -12,5 +12,7 @@ namespace UI.Windowing
 		TWorkspace FallbackWorkspace { get; }
 
 		TWorkspace DefineWorkspace(TWorkspaceCreationParameters? creationParams);
+		
+		IMessageDialog CreateMessageDialog(string title, IWindow? parent = null!);
 	}
 }

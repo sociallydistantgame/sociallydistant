@@ -18,6 +18,9 @@ namespace UI.Windowing
 		[Header("Prefabs")]
 		[SerializeField]
 		private UguiWindow windowPrefab = null!;
+
+		[SerializeField]
+		private UguiMessageDialog messageDialogPrefab = null!;
 		
 		/// <inheritdoc />
 		public ObservableList<UguiWorkspaceDefinition> WorkspaceList { get; private set; } = new ObservableList<UguiWorkspaceDefinition>();
@@ -40,6 +43,25 @@ namespace UI.Windowing
 			this.WorkspaceList.Add(workspace);
 
 			return workspace;
+		}
+
+		/// <inheritdoc />
+		public IMessageDialog CreateMessageDialog(string title, IWindow? parent = null)
+		{
+			IWorkspaceDefinition targetWorkspace = parent?.Workspace ?? fallbackWorkspace;
+			IWindow dialogWindow = targetWorkspace.CreateWindow(title);
+			
+			// instantiate the dialog prefab as disabled
+			messageDialogPrefab.gameObject.SetActive(false);
+			UguiMessageDialog dialogInstance = Instantiate(messageDialogPrefab);
+			messageDialogPrefab.gameObject.SetActive(true);
+			
+			// Link it to the parent window.
+			dialogInstance.Setup(dialogWindow);
+			
+			// wake it up
+			dialogInstance.gameObject.SetActive(true);
+			return dialogInstance;
 		}
 	}
 }

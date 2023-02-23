@@ -13,6 +13,11 @@ namespace Architecture
 		public event Action<T>? ItemAdded;
 		public event Action<T>? ItemRemoved;
 
+		public T this[int index]
+		{
+			get => this.underlyingList[index];
+		}
+		
 		/// <inheritdoc />
 		public IEnumerator<T> GetEnumerator()
 		{
