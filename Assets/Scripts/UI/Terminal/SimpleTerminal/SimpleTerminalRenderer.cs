@@ -858,7 +858,7 @@ namespace UI.Terminal.SimpleTerminal
             this.term.esc &= ~(EscapeState.ESC_STR_END | EscapeState.ESC_STR);
         }
 
-        private void Bell()
+        public void Bell()
         {
             if (this.asciiBeep != null)
                 this.trixelAudio.Play(this.asciiBeep);

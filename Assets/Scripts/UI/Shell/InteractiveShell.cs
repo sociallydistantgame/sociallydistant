@@ -33,7 +33,7 @@ namespace UI.Shell
 		private VirtualFileSystem vfs;
 
 		/// <inheritdoc />
-		public bool IsExecutionHalted => false;
+		public bool IsExecutionHalted => currentInstruction != null;
 
 		/// <inheritdoc />
 		public string CurrentWorkingDirectory => process?.WorkingDirectory ?? "/";
