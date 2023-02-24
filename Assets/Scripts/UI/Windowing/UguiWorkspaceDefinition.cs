@@ -1,5 +1,4 @@
 ﻿using Architecture;
-using UnityEditor.SceneTemplate;
 using UnityEngine;
 
 namespace UI.Windowing

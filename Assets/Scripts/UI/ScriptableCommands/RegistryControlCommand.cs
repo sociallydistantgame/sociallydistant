@@ -4,7 +4,7 @@ using System.Collections.Generic;
 using System.Linq;
 using Architecture;
 using Core.Config;
-using Unity.Plastic.Newtonsoft.Json.Linq;
+using Newtonsoft.Json.Linq;
 using UnityEngine;
 
 namespace UI.ScriptableCommands

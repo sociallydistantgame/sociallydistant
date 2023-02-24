@@ -13,10 +13,14 @@ namespace UI.Windowing
 		MonoBehaviour,
 		IMessageDialog
 	{
-		private IWindow parentWindow;
+		private IWindow? parentWindow;
 		private ObservableList<MessageBoxButtonData> buttonsList = new ObservableList<MessageBoxButtonData>();
 		private List<ButtonWidget> widgets = new List<ButtonWidget>();
+		private MessageDialogIcon iconType;
 
+		[SerializeField]
+		private TextMeshProUGUI textIcon = null!;
+		
 		[SerializeField]
 		private TextMeshProUGUI titleText = null!;
 
@@ -50,7 +54,18 @@ namespace UI.Windowing
 		}
 
 		/// <inheritdoc />
-		public MessageDialogIcon Icon { get; set; }
+		public MessageDialogIcon Icon
+		{
+			get => iconType;
+			set
+			{
+				if (iconType != value)
+				{
+					iconType = value;
+					UpdateIcon();
+				}
+			}
+		}
 
 		/// <inheritdoc />
 		public ObservableList<MessageBoxButtonData> Buttons => buttonsList;
@@ -128,6 +143,18 @@ namespace UI.Windowing
 			
 			this.MustGetComponent(out RectTransform rect);
 			rectClientWindow.SetClient(rect);
+		}
+
+		private void UpdateIcon()
+		{
+			this.textIcon.SetText(iconType switch
+			{
+				MessageDialogIcon.Information => "\ue1eb",
+				MessageDialogIcon.Warning => "\ue8b2",
+				MessageDialogIcon.Question => "\ue94c",
+				MessageDialogIcon.Error => "\ue000",
+				_ => "\ue000"
+			});
 		}
 	}
 }

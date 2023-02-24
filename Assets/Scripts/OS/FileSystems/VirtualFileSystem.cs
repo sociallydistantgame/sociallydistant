@@ -1,10 +1,8 @@
 ﻿#nullable enable
 using System;
-using System.Collections;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
-using Codice.Client.Common;
 using OS.Devices;
 using Utility;
 

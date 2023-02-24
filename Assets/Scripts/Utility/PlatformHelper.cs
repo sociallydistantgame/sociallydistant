@@ -1,5 +1,6 @@
 ﻿#nullable enable
 
+using UnityEditor;
 using UnityEngine;
 
 namespace Utility
@@ -14,6 +15,15 @@ namespace Utility
 		public static void SetClipboardText(string text)
 		{
 			GUIUtility.systemCopyBuffer = text;
+		}
+
+		public static void QuitToDesktop()
+		{
+#if UNITY_EDITOR
+			EditorApplication.ExitPlaymode();
+#else
+			Application.Quit();
+#endif
 		}
 	}
 }
