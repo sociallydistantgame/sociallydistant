@@ -6,12 +6,9 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using Architecture;
-using Codice.Client.Common;
-using Newtonsoft.Json.Serialization;
 using OS.Devices;
 using OS.FileSystems;
 using OS.FileSystems.Host;
-using PlasticPipe.PlasticProtocol.Client;
 using UnityEngine;
 using Utility;
 
@@ -30,7 +27,7 @@ namespace UI.Shell
 		private readonly List<string> tokenList = new List<string>();
 		private readonly Queue<ShellInstruction> pendingInstructions = new Queue<ShellInstruction>();
 		private ShellInstruction? currentInstruction = null;
-		private VirtualFileSystem vfs;
+		private VirtualFileSystem vfs = null!;
 
 		/// <inheritdoc />
 		public bool IsExecutionHalted => currentInstruction != null;

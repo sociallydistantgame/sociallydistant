@@ -4,8 +4,6 @@ using System.IO;
 using Architecture;
 using OS.Devices;
 using OS.FileSystems;
-using UnityEditor.VersionControl;
-using UnityEngine;
 
 namespace VfsMapping
 {

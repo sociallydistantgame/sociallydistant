@@ -10,7 +10,7 @@ namespace OS.FileSystems.Immutable
 	{
 		private readonly IFileSystem filesystem;
 		private readonly List<ImmutableDirectoryTree> children = new List<ImmutableDirectoryTree>();
-		private readonly List<Unity.Plastic.Newtonsoft.Json.Serialization.Func<IDirectoryEntry, IFileEntry>> fileRequest = new List<Unity.Plastic.Newtonsoft.Json.Serialization.Func<IDirectoryEntry, IFileEntry>>();
+		private readonly List<Func<IDirectoryEntry, IFileEntry>> fileRequest = new List<Func<IDirectoryEntry, IFileEntry>>();
 
 		public string Name { get; set; } = string.Empty;
 
@@ -19,7 +19,7 @@ namespace OS.FileSystems.Immutable
 			this.filesystem = fs;
 		}
 
-		public void AddFileRequest(Unity.Plastic.Newtonsoft.Json.Serialization.Func<IDirectoryEntry, IFileEntry> creationFunction)
+		public void AddFileRequest(Func<IDirectoryEntry, IFileEntry> creationFunction)
 		{
 			this.fileRequest.Add(creationFunction);
 		}
@@ -51,7 +51,7 @@ namespace OS.FileSystems.Immutable
 			entry.SetSubEntries(subEntryList);
 
 			var fileEntries = new List<IFileEntry>();
-			foreach (Unity.Plastic.Newtonsoft.Json.Serialization.Func<IDirectoryEntry, IFileEntry>? creationFunction in fileRequest)
+			foreach (Func<IDirectoryEntry, IFileEntry>? creationFunction in fileRequest)
 			{
 				// Call the creation function to create the file entry
 				IFileEntry fileEntry = creationFunction(entry);

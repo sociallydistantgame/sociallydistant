@@ -1,4 +1,5 @@
-﻿using System;
+﻿#nullable enable
+using System;
 using System.Collections.Generic;
 using TMPro;
 using UnityEngine;
@@ -16,15 +17,15 @@ namespace UI.Windowing
 		IPointerDownHandler,
 		IWindowWithClient<RectTransform>
 	{
-		private static UguiWindow firstWindow = null!;
+		private static UguiWindow? firstWindow = null!;
 		private bool isFirstWindow = false;
 		private GameObject? eventSystemFocusedGameObject;
 		private WindowState currentWindowState;
-		private LayoutElement layoutElement;
-		private RectTransform currentClient;
+		private LayoutElement layoutElement = null!;
+		private RectTransform currentClient = null!;
 		private RectTransform rectTransform = null!;
 		private Vector2 positionBackup;
-		private ContentSizeFitter contentSizeFitter;
+		private ContentSizeFitter contentSizeFitter = null!;
 		private Vector2 anchorMinBackup;
 		private Vector2 anchorMaxBackup;
 		private Vector2 alignmentBackup;
@@ -54,7 +55,7 @@ namespace UI.Windowing
 		public WindowFocusService FocusService => focusService;
 
 		/// <inheritdoc />
-		public event Action<IWindow> WindowClosed;
+		public event Action<IWindow>? WindowClosed;
 
 		/// <inheritdoc />
 		public IWorkspaceDefinition Workspace { get; private set; } = null!;
