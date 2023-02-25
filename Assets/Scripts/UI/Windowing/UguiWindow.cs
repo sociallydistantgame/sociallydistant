@@ -243,6 +243,8 @@ namespace UI.Windowing
 
 			currentClient = newClient;
 			currentClient.SetParent(clientArea);
+
+			currentClient.localScale = Vector3.one;
 			
 			this.closeBlockers.AddRange(this.currentClient.GetComponentsInChildren<IWindowCloseBlocker>(true));
 		}
