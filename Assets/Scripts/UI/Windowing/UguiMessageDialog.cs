@@ -136,7 +136,7 @@ namespace UI.Windowing
 			}
 
 			window.EnableMaximizeButton = false;
-			window.EnableMaximizeButton = false;
+			window.EnableMinimizeButton = false;
 			window.EnableCloseButton = false;
 			
 			window.MinimumSize = Vector2.zero;

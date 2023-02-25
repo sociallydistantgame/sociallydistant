@@ -84,8 +84,8 @@ namespace UI.Windowing
 		/// <inheritdoc />
 		public bool EnableCloseButton
 		{
-			get => closeButton.enabled;
-			set => closeButton.enabled = value;
+			get => closeButton.gameObject.activeSelf;
+			set => closeButton.gameObject.SetActive(value);
 		}
 
 		/// <inheritdoc />
