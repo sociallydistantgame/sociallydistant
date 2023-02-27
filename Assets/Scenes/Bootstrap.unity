@@ -262,5 +262,9 @@ PrefabInstance:
       propertyPath: m_Name
       value: Mandatory Scro[ts
       objectReference: {fileID: 0}
+    - target: {fileID: 6429399752762212090, guid: 95f08b35d97b81fc9b34731db0d0b446, type: 3}
+      propertyPath: defaultBackdrop
+      value: 
+      objectReference: {fileID: 2800000, guid: 5c897359a9ff5a948be54f9aec1c1e7d, type: 3}
     m_RemovedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: 95f08b35d97b81fc9b34731db0d0b446, type: 3}
