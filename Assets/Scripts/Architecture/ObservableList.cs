@@ -6,13 +6,16 @@ using System.Collections.Generic;
 
 namespace Architecture
 {
-	public class ObservableList<T> : ICollection<T>
+	public class ObservableList<T> :
+		IReadOnlyObservableList<T>,
+		ICollection<T>
 	{
 		private readonly List<T> underlyingList = new List<T>();
 
 		public event Action<T>? ItemAdded;
 		public event Action<T>? ItemRemoved;
 
+	
 		public T this[int index]
 		{
 			get => this.underlyingList[index];
