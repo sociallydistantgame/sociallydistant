@@ -1,7 +1,9 @@
 ﻿#nullable enable
 using System;
 using System.Collections.Generic;
+using Architecture;
 using TMPro;
+using UI.Widgets;
 using UnityEngine;
 using UnityEngine.EventSystems;
 using UnityEngine.Serialization;
@@ -35,8 +37,11 @@ namespace UI.Windowing
 		[Header("Dependencies")]
 		[SerializeField]
 		private WindowFocusService focusService = null!;
-		
+
 		[Header("UI")]
+		[SerializeField]
+		private CompositeIconWidget iconWidget = null!;
+		
 		[SerializeField]
 		private RectTransform clientArea = null!;
 
@@ -57,6 +62,13 @@ namespace UI.Windowing
 		/// <inheritdoc />
 		public event Action<IWindow>? WindowClosed;
 
+		/// <inheritdoc />
+		public CompositeIcon Icon
+		{
+			get => iconWidget.Icon;
+			set => iconWidget.Icon = value;
+		}
+		
 		/// <inheritdoc />
 		public IWorkspaceDefinition Workspace { get; private set; } = null!;
 		
