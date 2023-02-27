@@ -21,6 +21,9 @@ namespace Architecture
 		[SerializeField]
 		private RectTransform programGuiPrefab = null!;
 
+		[SerializeField]
+		private CompositeIcon programIcon;
+		
 		/// <inheritdoc />
 		public string Name => binaryName;
 		
@@ -29,6 +32,8 @@ namespace Architecture
 		
 		/// <inheritdoc />
 		public string WindowTitle => this.windowTitle;
+
+		public CompositeIcon Icon => this.programIcon;
 		
 		/// <inheritdoc />
 		public void InstantiateIntoWindow(ISystemProcess process, IWindowWithClient<RectTransform> window)
@@ -43,6 +48,7 @@ namespace Architecture
 			
 			// Set window attributes
 			window.Title = this.WindowTitle;
+			window.Icon = this.Icon;
 			
 			// Find a ProcessKillHandler component on the spawned program. If
 			// we don't find one, we must add one.

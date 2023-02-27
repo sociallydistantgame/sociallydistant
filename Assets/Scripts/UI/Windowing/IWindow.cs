@@ -1,5 +1,6 @@
 ﻿#nullable enable
 using System;
+using Architecture;
 using UnityEngine;
 
 namespace UI.Windowing
@@ -10,6 +11,7 @@ namespace UI.Windowing
 
 		IWorkspaceDefinition Workspace { get; }
 		string Title { get; set; }
+		CompositeIcon Icon { get; set; }
 		WindowState WindowState { get; set; }
 		
 		bool EnableCloseButton { get; set; }

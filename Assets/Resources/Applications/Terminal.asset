@@ -15,3 +15,7 @@ MonoBehaviour:
   binaryName: sterm
   windowTitle: Terminal
   programGuiPrefab: {fileID: 536731253686827546, guid: cbfa175b53c5a7d44a0088de659735be, type: 3}
+  programIcon:
+    textIcon: \ueb8e
+    spriteIcon: {fileID: 0}
+    iconColor: {r: 1, g: 1, b: 1, a: 1}
