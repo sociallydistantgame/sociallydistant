@@ -5,6 +5,7 @@ using System.Collections.Generic;
 using Architecture;
 using OS.Devices;
 using OS.FileSystems;
+using UI.Backdrop;
 using UnityEngine;
 using Utility;
 
@@ -39,6 +40,10 @@ namespace Player
 		[Header("Environment")]
 		[SerializeField]
 		private EnvironmentVariablesAsset environmentVariables = null!;
+
+		[Header("Backdrop")]
+		[SerializeField]
+		private Texture2D defaultBackdrop = null!;
 		
 		private void Awake()
 		{
@@ -72,6 +77,9 @@ namespace Player
 			desktopGameObject.MustGetComponent(out player.Desktop);
 			windowManagerGameObject.MustGetComponent(out player.WindowManager);
 
+			// set the default backdrop
+			player.BackdropController.SetBackdrop(new BackdropSettings(Color.white, defaultBackdrop));
+			
 			this.playerInstanceHolder.Value = player;
 		}
 
