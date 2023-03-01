@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 
 namespace Core.Serialization
 {
@@ -568,5 +569,491 @@ namespace Core.Serialization
 			value.Serialize(serializer);
 			return true;
 		}
+
+		#region Collection serialization
+
+		public static void SerializeCollectionAtRevision<TRevision>(ref IReadOnlyList<sbyte> collection, IRevisionedSerializer<TRevision> serializer, TRevision revision)
+			where TRevision : Enum
+		{
+			if (serializer.IsReading)
+			{
+				var newCollection = new List<sbyte>();
+				var newCount = 0;
+				SerializeAtRevision(ref newCount, serializer, revision, 0);
+				
+				for (var i = 0; i < newCount; i++)
+				{
+					sbyte newElement = default;
+					SerializeAtRevision(ref newElement, serializer, revision, default);
+					newCollection.Add(newElement);
+				}
+				
+				collection = newCollection;
+			}
+			
+			if (serializer.IsWriting)
+			{
+				int elementCount = collection.Count;
+				SerializeAtRevision(ref elementCount, serializer, revision, elementCount);
+				
+				for (var i = 0; i < elementCount; i++)
+				{
+					sbyte element = collection[i];
+					SerializeAtRevision(ref element, serializer, revision, element);
+				}
+			}
+		}
+		
+		public static void SerializeCollectionAtRevision<TRevision>(ref IReadOnlyList<byte> collection, IRevisionedSerializer<TRevision> serializer, TRevision revision)
+			where TRevision : Enum
+		{
+			if (serializer.IsReading)
+			{
+				var newCollection = new List<byte>();
+				var newCount = 0;
+				SerializeAtRevision(ref newCount, serializer, revision, 0);
+				
+				for (var i = 0; i < newCount; i++)
+				{
+					byte newElement = default;
+					SerializeAtRevision(ref newElement, serializer, revision, default);
+					newCollection.Add(newElement);
+				}
+				
+				collection = newCollection;
+			}
+			
+			if (serializer.IsWriting)
+			{
+				int elementCount = collection.Count;
+				SerializeAtRevision(ref elementCount, serializer, revision, elementCount);
+				
+				for (var i = 0; i < elementCount; i++)
+				{
+					byte element = collection[i];
+					SerializeAtRevision(ref element, serializer, revision, element);
+				}
+			}
+		}
+		
+		public static void SerializeCollectionAtRevision<TRevision>(ref IReadOnlyList<short> collection, IRevisionedSerializer<TRevision> serializer, TRevision revision)
+			where TRevision : Enum
+		{
+			if (serializer.IsReading)
+			{
+				var newCollection = new List<short>();
+				var newCount = 0;
+				SerializeAtRevision(ref newCount, serializer, revision, 0);
+				
+				for (var i = 0; i < newCount; i++)
+				{
+					short newElement = default;
+					SerializeAtRevision(ref newElement, serializer, revision, default);
+					newCollection.Add(newElement);
+				}
+				
+				collection = newCollection;
+			}
+			
+			if (serializer.IsWriting)
+			{
+				int elementCount = collection.Count;
+				SerializeAtRevision(ref elementCount, serializer, revision, elementCount);
+				
+				for (var i = 0; i < elementCount; i++)
+				{
+					short element = collection[i];
+					SerializeAtRevision(ref element, serializer, revision, element);
+				}
+			}
+		}
+		
+		public static void SerializeCollectionAtRevision<TRevision>(ref IReadOnlyList<ushort> collection, IRevisionedSerializer<TRevision> serializer, TRevision revision)
+			where TRevision : Enum
+		{
+			if (serializer.IsReading)
+			{
+				var newCollection = new List<ushort>();
+				var newCount = 0;
+				SerializeAtRevision(ref newCount, serializer, revision, 0);
+				
+				for (var i = 0; i < newCount; i++)
+				{
+					ushort newElement = default;
+					SerializeAtRevision(ref newElement, serializer, revision, default);
+					newCollection.Add(newElement);
+				}
+				
+				collection = newCollection;
+			}
+			
+			if (serializer.IsWriting)
+			{
+				int elementCount = collection.Count;
+				SerializeAtRevision(ref elementCount, serializer, revision, elementCount);
+				
+				for (var i = 0; i < elementCount; i++)
+				{
+					ushort element = collection[i];
+					SerializeAtRevision(ref element, serializer, revision, element);
+				}
+			}
+		}
+		
+		public static void SerializeCollectionAtRevision<TRevision>(ref IReadOnlyList<int> collection, IRevisionedSerializer<TRevision> serializer, TRevision revision)
+			where TRevision : Enum
+		{
+			if (serializer.IsReading)
+			{
+				var newCollection = new List<int>();
+				var newCount = 0;
+				SerializeAtRevision(ref newCount, serializer, revision, 0);
+				
+				for (var i = 0; i < newCount; i++)
+				{
+					int newElement = default;
+					SerializeAtRevision(ref newElement, serializer, revision, default);
+					newCollection.Add(newElement);
+				}
+				
+				collection = newCollection;
+			}
+			
+			if (serializer.IsWriting)
+			{
+				int elementCount = collection.Count;
+				SerializeAtRevision(ref elementCount, serializer, revision, elementCount);
+				
+				for (var i = 0; i < elementCount; i++)
+				{
+					int element = collection[i];
+					SerializeAtRevision(ref element, serializer, revision, element);
+				}
+			}
+		}
+		
+		public static void SerializeCollectionAtRevision<TRevision>(ref IReadOnlyList<uint> collection, IRevisionedSerializer<TRevision> serializer, TRevision revision)
+			where TRevision : Enum
+		{
+			if (serializer.IsReading)
+			{
+				var newCollection = new List<uint>();
+				var newCount = 0;
+				SerializeAtRevision(ref newCount, serializer, revision, 0);
+				
+				for (var i = 0; i < newCount; i++)
+				{
+					uint newElement = default;
+					SerializeAtRevision(ref newElement, serializer, revision, default);
+					newCollection.Add(newElement);
+				}
+				
+				collection = newCollection;
+			}
+			
+			if (serializer.IsWriting)
+			{
+				int elementCount = collection.Count;
+				SerializeAtRevision(ref elementCount, serializer, revision, elementCount);
+				
+				for (var i = 0; i < elementCount; i++)
+				{
+					uint element = collection[i];
+					SerializeAtRevision(ref element, serializer, revision, element);
+				}
+			}
+		}
+		
+		public static void SerializeCollectionAtRevision<TRevision>(ref IReadOnlyList<long> collection, IRevisionedSerializer<TRevision> serializer, TRevision revision)
+			where TRevision : Enum
+		{
+			if (serializer.IsReading)
+			{
+				var newCollection = new List<long>();
+				var newCount = 0;
+				SerializeAtRevision(ref newCount, serializer, revision, 0);
+				
+				for (var i = 0; i < newCount; i++)
+				{
+					long newElement = default;
+					SerializeAtRevision(ref newElement, serializer, revision, default);
+					newCollection.Add(newElement);
+				}
+				
+				collection = newCollection;
+			}
+			
+			if (serializer.IsWriting)
+			{
+				int elementCount = collection.Count;
+				SerializeAtRevision(ref elementCount, serializer, revision, elementCount);
+				
+				for (var i = 0; i < elementCount; i++)
+				{
+					long element = collection[i];
+					SerializeAtRevision(ref element, serializer, revision, element);
+				}
+			}
+		}
+		
+		public static void SerializeCollectionAtRevision<TRevision>(ref IReadOnlyList<ulong> collection, IRevisionedSerializer<TRevision> serializer, TRevision revision)
+			where TRevision : Enum
+		{
+			if (serializer.IsReading)
+			{
+				var newCollection = new List<ulong>();
+				var newCount = 0;
+				SerializeAtRevision(ref newCount, serializer, revision, 0);
+				
+				for (var i = 0; i < newCount; i++)
+				{
+					ulong newElement = default;
+					SerializeAtRevision(ref newElement, serializer, revision, default);
+					newCollection.Add(newElement);
+				}
+				
+				collection = newCollection;
+			}
+			
+			if (serializer.IsWriting)
+			{
+				int elementCount = collection.Count;
+				SerializeAtRevision(ref elementCount, serializer, revision, elementCount);
+				
+				for (var i = 0; i < elementCount; i++)
+				{
+					ulong element = collection[i];
+					SerializeAtRevision(ref element, serializer, revision, element);
+				}
+			}
+		}
+		
+		public static void SerializeCollectionAtRevision<TRevision>(ref IReadOnlyList<bool> collection, IRevisionedSerializer<TRevision> serializer, TRevision revision)
+			where TRevision : Enum
+		{
+			if (serializer.IsReading)
+			{
+				var newCollection = new List<bool>();
+				var newCount = 0;
+				SerializeAtRevision(ref newCount, serializer, revision, 0);
+				
+				for (var i = 0; i < newCount; i++)
+				{
+					bool newElement = default;
+					SerializeAtRevision(ref newElement, serializer, revision, default);
+					newCollection.Add(newElement);
+				}
+				
+				collection = newCollection;
+			}
+			
+			if (serializer.IsWriting)
+			{
+				int elementCount = collection.Count;
+				SerializeAtRevision(ref elementCount, serializer, revision, elementCount);
+				
+				for (var i = 0; i < elementCount; i++)
+				{
+					bool element = collection[i];
+					SerializeAtRevision(ref element, serializer, revision, element);
+				}
+			}
+		}
+		
+		public static void SerializeCollectionAtRevision<TRevision>(ref IReadOnlyList<float> collection, IRevisionedSerializer<TRevision> serializer, TRevision revision)
+			where TRevision : Enum
+		{
+			if (serializer.IsReading)
+			{
+				var newCollection = new List<float>();
+				var newCount = 0;
+				SerializeAtRevision(ref newCount, serializer, revision, 0);
+				
+				for (var i = 0; i < newCount; i++)
+				{
+					float newElement = default;
+					SerializeAtRevision(ref newElement, serializer, revision, default);
+					newCollection.Add(newElement);
+				}
+				
+				collection = newCollection;
+			}
+			
+			if (serializer.IsWriting)
+			{
+				int elementCount = collection.Count;
+				SerializeAtRevision(ref elementCount, serializer, revision, elementCount);
+				
+				for (var i = 0; i < elementCount; i++)
+				{
+					float element = collection[i];
+					SerializeAtRevision(ref element, serializer, revision, element);
+				}
+			}
+		}
+		
+		public static void SerializeCollectionAtRevision<TRevision>(ref IReadOnlyList<double> collection, IRevisionedSerializer<TRevision> serializer, TRevision revision)
+			where TRevision : Enum
+		{
+			if (serializer.IsReading)
+			{
+				var newCollection = new List<double>();
+				var newCount = 0;
+				SerializeAtRevision(ref newCount, serializer, revision, 0);
+				
+				for (var i = 0; i < newCount; i++)
+				{
+					double newElement = default;
+					SerializeAtRevision(ref newElement, serializer, revision, default);
+					newCollection.Add(newElement);
+				}
+				
+				collection = newCollection;
+			}
+			
+			if (serializer.IsWriting)
+			{
+				int elementCount = collection.Count;
+				SerializeAtRevision(ref elementCount, serializer, revision, elementCount);
+				
+				for (var i = 0; i < elementCount; i++)
+				{
+					double element = collection[i];
+					SerializeAtRevision(ref element, serializer, revision, element);
+				}
+			}
+		}
+		
+		public static void SerializeCollectionAtRevision<TRevision>(ref IReadOnlyList<decimal> collection, IRevisionedSerializer<TRevision> serializer, TRevision revision)
+			where TRevision : Enum
+		{
+			if (serializer.IsReading)
+			{
+				var newCollection = new List<decimal>();
+				var newCount = 0;
+				SerializeAtRevision(ref newCount, serializer, revision, 0);
+				
+				for (var i = 0; i < newCount; i++)
+				{
+					decimal newElement = default;
+					SerializeAtRevision(ref newElement, serializer, revision, default);
+					newCollection.Add(newElement);
+				}
+				
+				collection = newCollection;
+			}
+			
+			if (serializer.IsWriting)
+			{
+				int elementCount = collection.Count;
+				SerializeAtRevision(ref elementCount, serializer, revision, elementCount);
+				
+				for (var i = 0; i < elementCount; i++)
+				{
+					decimal element = collection[i];
+					SerializeAtRevision(ref element, serializer, revision, element);
+				}
+			}
+		}
+		
+		public static void SerializeCollectionAtRevision<TRevision>(ref IReadOnlyList<char> collection, IRevisionedSerializer<TRevision> serializer, TRevision revision)
+			where TRevision : Enum
+		{
+			if (serializer.IsReading)
+			{
+				var newCollection = new List<char>();
+				var newCount = 0;
+				SerializeAtRevision(ref newCount, serializer, revision, 0);
+				
+				for (var i = 0; i < newCount; i++)
+				{
+					char newElement = default;
+					SerializeAtRevision(ref newElement, serializer, revision, default);
+					newCollection.Add(newElement);
+				}
+				
+				collection = newCollection;
+			}
+			
+			if (serializer.IsWriting)
+			{
+				int elementCount = collection.Count;
+				SerializeAtRevision(ref elementCount, serializer, revision, elementCount);
+				
+				for (var i = 0; i < elementCount; i++)
+				{
+					char element = collection[i];
+					SerializeAtRevision(ref element, serializer, revision, element);
+				}
+			}
+		}
+		
+		public static void SerializeCollectionAtRevision<TRevision>(ref IReadOnlyList<string> collection, IRevisionedSerializer<TRevision> serializer, TRevision revision)
+			where TRevision : Enum
+		{
+			if (serializer.IsReading)
+			{
+				var newCollection = new List<string>();
+				var newCount = 0;
+				SerializeAtRevision(ref newCount, serializer, revision, 0);
+				
+				for (var i = 0; i < newCount; i++)
+				{
+					string newElement = default;
+					SerializeAtRevision(ref newElement, serializer, revision, default);
+					newCollection.Add(newElement);
+				}
+				
+				collection = newCollection;
+			}
+			
+			if (serializer.IsWriting)
+			{
+				int elementCount = collection.Count;
+				SerializeAtRevision(ref elementCount, serializer, revision, elementCount);
+				
+				for (var i = 0; i < elementCount; i++)
+				{
+					string element = collection[i];
+					SerializeAtRevision(ref element, serializer, revision, element);
+				}
+			}
+		}
+		
+		public static void SerializeCollectionAtRevision<TSerializable, TRevision>(ref IReadOnlyList<TSerializable> collection, IRevisionedSerializer<TRevision> serializer, TRevision revision)
+			where TRevision : Enum
+			where TSerializable : struct, ISerializable
+		{
+			if (serializer.IsReading)
+			{
+				var newCollection = new List<TSerializable>();
+				var newCount = 0;
+				SerializeAtRevision(ref newCount, serializer, revision, 0);
+				
+				for (var i = 0; i < newCount; i++)
+				{
+					TSerializable newElement = default;
+					SerializeAtRevision(ref newElement, serializer, revision, default);
+					newCollection.Add(newElement);
+				}
+				
+				collection = newCollection;
+			}
+			
+			if (serializer.IsWriting)
+			{
+				int elementCount = collection.Count;
+				SerializeAtRevision(ref elementCount, serializer, revision, elementCount);
+				
+				for (var i = 0; i < elementCount; i++)
+				{
+					TSerializable element = collection[i];
+					SerializeAtRevision(ref element, serializer, revision, element);
+				}
+			}
+		}
+		
+
+		#endregion
 	}
 }
