@@ -10,6 +10,7 @@ GameObject:
   m_Component:
   - component: {fileID: 1191197961681005175}
   - component: {fileID: 4288992397192032517}
+  - component: {fileID: 6999765597382563579}
   m_Layer: 0
   m_Name: Mandatory Scripts
   m_TagString: Untagged
@@ -51,6 +52,19 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   worldHolder: {fileID: 11400000, guid: 6ddfb5183f8225440a5d156e7fb16747, type: 2}
+--- !u!114 &6999765597382563579
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2343866427358102259}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: ba32283d936c4552985efdadfae661af, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  hookSearchPath: InitializationHooks
 --- !u!1001 &698093834370466672
 PrefabInstance:
   m_ObjectHideFlags: 0
