@@ -34,7 +34,7 @@ namespace UI.Windowing
 		private void Update()
 		{
 			bool wasActive = isActive;
-			bool isActiveNow = focusService.FocusedWindow == window;
+			bool isActiveNow = ReferenceEquals(focusService.FocusedWindow, window);
 			if (wasActive != isActiveNow)
 			{
 				isActive = isActiveNow;
