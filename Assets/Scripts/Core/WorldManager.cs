@@ -10,13 +10,19 @@ namespace Core
     {
         private World world;
         private UniqueIntGenerator instanceIdGenerator;
+        private DataEventDispatcher eventDispatcher;
+        private DataCallbacks dataCallbacks;
 
         public World World => world;
-
+        public DataCallbacks Callbacks => dataCallbacks;
+        
         public WorldManager()
         {
+            eventDispatcher = new DataEventDispatcher();
             instanceIdGenerator = new UniqueIntGenerator();
-            world = new World(instanceIdGenerator);
+            dataCallbacks = new DataCallbacks(eventDispatcher);
+            
+            world = new World(instanceIdGenerator, eventDispatcher);
         }
 
         public ObjectId GetNextObjectId()
