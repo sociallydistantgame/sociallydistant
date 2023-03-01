@@ -20,5 +20,12 @@ namespace Core.WorldData
 		{
 			Computers.Serialize(serializer, WorldRevision.AddedComputers);
 		}
+
+		public void Wipe()
+		{
+			// You must wipe the world in reverse order of how you would create or serialize it.
+			// This ensures proper handling of deleting objects that depend on other objects.
+			this.Computers.Clear();
+		}
 	}
 }

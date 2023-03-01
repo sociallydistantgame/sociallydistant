@@ -1,12 +1,12 @@
 ﻿#nullable enable
 
+using System;
 using Codice.CM.WorkspaceServer.Tree;
 
 namespace Core.Serialization
 {
-	public interface IDataWriter
+	public interface IDataWriter : IDisposable
 	{
-		void Dispose();
 		void Write(sbyte value);
 		void Write(byte value);
 		void Write(short value);

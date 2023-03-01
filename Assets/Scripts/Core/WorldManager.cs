@@ -41,5 +41,10 @@ namespace Core
             var serializer = new WorldSerializer(reader);
             world.Serialize(serializer);
         }
+
+        public void WipeWorld()
+        {
+            this.world.Wipe();
+        }
     }
 }

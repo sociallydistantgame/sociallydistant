@@ -65,6 +65,15 @@ namespace Core.DataManagement
 			instanceIdGenerator.DeclareUnused(data.InstanceId.Id);
 			eventDispatcher.Modify.Invoke(previous, data);
 		}
+
+		public void Clear()
+		{
+			while (dataElements.Count > 0)
+			{
+				TDataElement element = dataElements[0];
+				Remove(element);
+			}
+		}
 		
 		public void Serialize(IRevisionedSerializer<TRevision> serializer, TRevision revision)
 		{
