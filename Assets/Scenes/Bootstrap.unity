@@ -260,7 +260,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 2343866427358102259, guid: 95f08b35d97b81fc9b34731db0d0b446, type: 3}
       propertyPath: m_Name
-      value: Mandatory Scro[ts
+      value: Mandatory Scripts
       objectReference: {fileID: 0}
     - target: {fileID: 6429399752762212090, guid: 95f08b35d97b81fc9b34731db0d0b446, type: 3}
       propertyPath: defaultBackdrop
