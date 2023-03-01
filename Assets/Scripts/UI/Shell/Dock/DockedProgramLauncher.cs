@@ -20,7 +20,7 @@ namespace UI.Shell.Dock
 	public class DockedProgramLauncher : MonoBehaviour
 	{
 		private CompositeIconWidget iconWidget = null!;
-		private Button button;
+		private Button button = null!;
 
 		[SerializeField]
 		private PlayerInstanceHolder player = null!;

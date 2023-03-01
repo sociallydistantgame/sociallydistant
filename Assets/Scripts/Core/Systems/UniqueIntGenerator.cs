@@ -18,12 +18,23 @@ namespace Core.Systems
 			nextValue = value;
 		}
 
+		public void ClaimUsedValue(int value)
+		{
+			if (usedValues.Contains(value))
+				return;
+
+			usedValues.Add(value);
+
+			while (usedValues.Contains(nextValue))
+				nextValue++;
+		}
+
 		public int GetNextValue()
 		{
 			while (usedValues.Contains(nextValue))
 				nextValue++;
 
-			usedValues.Add(nextValue);
+			ClaimUsedValue(nextValue);
 			return nextValue;
 		}
 	}
