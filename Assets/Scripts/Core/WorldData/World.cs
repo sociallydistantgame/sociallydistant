@@ -11,9 +11,9 @@ namespace Core.WorldData
 	{
 		public readonly DataTable<WorldComputerData, WorldRevision> Computers;
 
-		public World(UniqueIntGenerator instanceIdGenerator)
+		public World(UniqueIntGenerator instanceIdGenerator, DataEventDispatcher eventDispatcher)
 		{
-			Computers = new DataTable<WorldComputerData, WorldRevision>(instanceIdGenerator);
+			Computers = new DataTable<WorldComputerData, WorldRevision>(instanceIdGenerator, eventDispatcher);
 		}
 
 		public void Serialize(IRevisionedSerializer<WorldRevision> serializer)

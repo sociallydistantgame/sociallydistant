@@ -12,6 +12,7 @@ namespace Core.DataManagement
 		private UniqueIntGenerator instanceIdGenerator;
 		private List<TDataElement> dataElements = new List<TDataElement>();
 		private Dictionary<ObjectId, int> dataIndexMap = new Dictionary<ObjectId, int>();
+		private readonly DataEventDispatcher eventDispatcher;
 
 		public TDataElement this[ObjectId instanceId]
 		{
@@ -24,9 +25,10 @@ namespace Core.DataManagement
 			}
 		}
 
-		public DataTable(UniqueIntGenerator instanceIdgenerator)
+		public DataTable(UniqueIntGenerator instanceIdgenerator, DataEventDispatcher eventDispatcher)
 		{
 			this.instanceIdGenerator = instanceIdgenerator;
+			this.eventDispatcher = eventDispatcher;
 		}
 
 		public void Add(TDataElement data)
@@ -39,6 +41,8 @@ namespace Core.DataManagement
 
 			dataIndexMap.Add(data.InstanceId, dataElements.Count);
 			dataElements.Add(data);
+			
+			eventDispatcher.Create.Invoke(data);
 		}
 
 		public void Remove(TDataElement data)
@@ -48,6 +52,7 @@ namespace Core.DataManagement
 
 			dataElements.RemoveAt(index);
 			dataIndexMap.Remove(data.InstanceId);
+			eventDispatcher.Delete.Invoke(data);
 		}
 
 		public void Modify(TDataElement data)
@@ -55,11 +60,12 @@ namespace Core.DataManagement
 			if (!dataIndexMap.TryGetValue(data.InstanceId, out int index))
 				throw new InvalidOperationException($"Instance ID not found: {data.InstanceId.Id}");
 
+			TDataElement previous = dataElements[index];
 			dataElements[index] = data;
 			instanceIdGenerator.DeclareUnused(data.InstanceId.Id);
+			eventDispatcher.Modify.Invoke(previous, data);
 		}
 		
-		/// <inheritdoc />
 		public void Serialize(IRevisionedSerializer<TRevision> serializer, TRevision revision)
 		{
 			// How many elements do we have in the data table?
