@@ -249,5 +249,324 @@ namespace Core.Serialization
 				value = (TSerializable) s;
 			}
 		}
+		
+		public static bool IgnoreAfterRevision<TRevision>(IRevisionedSerializer<TRevision> serializer, TRevision revision, out sbyte value)
+			where TRevision : Enum
+		{
+			value = default;
+			
+			if (serializer.IsWriting)
+				return false;
+				
+			if (!serializer.IsReading)
+				return false;
+				
+			// Ignore if the provided revision is older than or the same as
+			// the current revision.
+			if (serializer.RevisionComparer.IsCurrentOrOlder(revision))
+				return false;
+				
+			serializer.Serialize(ref value);
+			return true;
+		}
+		
+		public static bool IgnoreAfterRevision<TRevision>(IRevisionedSerializer<TRevision> serializer, TRevision revision, out byte value)
+			where TRevision : Enum
+		{
+			value = default;
+			
+			if (serializer.IsWriting)
+				return false;
+				
+			if (!serializer.IsReading)
+				return false;
+				
+			// Ignore if the provided revision is older than or the same as
+			// the current revision.
+			if (serializer.RevisionComparer.IsCurrentOrOlder(revision))
+				return false;
+				
+			serializer.Serialize(ref value);
+			return true;
+		}
+		
+		public static bool IgnoreAfterRevision<TRevision>(IRevisionedSerializer<TRevision> serializer, TRevision revision, out short value)
+			where TRevision : Enum
+		{
+			value = default;
+			
+			if (serializer.IsWriting)
+				return false;
+				
+			if (!serializer.IsReading)
+				return false;
+				
+			// Ignore if the provided revision is older than or the same as
+			// the current revision.
+			if (serializer.RevisionComparer.IsCurrentOrOlder(revision))
+				return false;
+				
+			serializer.Serialize(ref value);
+			return true;
+		}
+		
+		public static bool IgnoreAfterRevision<TRevision>(IRevisionedSerializer<TRevision> serializer, TRevision revision, out ushort value)
+			where TRevision : Enum
+		{
+			value = default;
+			
+			if (serializer.IsWriting)
+				return false;
+				
+			if (!serializer.IsReading)
+				return false;
+				
+			// Ignore if the provided revision is older than or the same as
+			// the current revision.
+			if (serializer.RevisionComparer.IsCurrentOrOlder(revision))
+				return false;
+				
+			serializer.Serialize(ref value);
+			return true;
+		}
+		
+		public static bool IgnoreAfterRevision<TRevision>(IRevisionedSerializer<TRevision> serializer, TRevision revision, out int value)
+			where TRevision : Enum
+		{
+			value = default;
+			
+			if (serializer.IsWriting)
+				return false;
+				
+			if (!serializer.IsReading)
+				return false;
+				
+			// Ignore if the provided revision is older than or the same as
+			// the current revision.
+			if (serializer.RevisionComparer.IsCurrentOrOlder(revision))
+				return false;
+				
+			serializer.Serialize(ref value);
+			return true;
+		}
+		
+		public static bool IgnoreAfterRevision<TRevision>(IRevisionedSerializer<TRevision> serializer, TRevision revision, out uint value)
+			where TRevision : Enum
+		{
+			value = default;
+			
+			if (serializer.IsWriting)
+				return false;
+				
+			if (!serializer.IsReading)
+				return false;
+				
+			// Ignore if the provided revision is older than or the same as
+			// the current revision.
+			if (serializer.RevisionComparer.IsCurrentOrOlder(revision))
+				return false;
+				
+			serializer.Serialize(ref value);
+			return true;
+		}
+		
+		public static bool IgnoreAfterRevision<TRevision>(IRevisionedSerializer<TRevision> serializer, TRevision revision, out long value)
+			where TRevision : Enum
+		{
+			value = default;
+			
+			if (serializer.IsWriting)
+				return false;
+				
+			if (!serializer.IsReading)
+				return false;
+				
+			// Ignore if the provided revision is older than or the same as
+			// the current revision.
+			if (serializer.RevisionComparer.IsCurrentOrOlder(revision))
+				return false;
+				
+			serializer.Serialize(ref value);
+			return true;
+		}
+		
+		public static bool IgnoreAfterRevision<TRevision>(IRevisionedSerializer<TRevision> serializer, TRevision revision, out ulong value)
+			where TRevision : Enum
+		{
+			value = default;
+			
+			if (serializer.IsWriting)
+				return false;
+				
+			if (!serializer.IsReading)
+				return false;
+				
+			// Ignore if the provided revision is older than or the same as
+			// the current revision.
+			if (serializer.RevisionComparer.IsCurrentOrOlder(revision))
+				return false;
+				
+			serializer.Serialize(ref value);
+			return true;
+		}
+		
+		public static bool IgnoreAfterRevision<TRevision>(IRevisionedSerializer<TRevision> serializer, TRevision revision, out bool value)
+			where TRevision : Enum
+		{
+			value = default;
+			
+			if (serializer.IsWriting)
+				return false;
+				
+			if (!serializer.IsReading)
+				return false;
+				
+			// Ignore if the provided revision is older than or the same as
+			// the current revision.
+			if (serializer.RevisionComparer.IsCurrentOrOlder(revision))
+				return false;
+				
+			serializer.Serialize(ref value);
+			return true;
+		}
+		
+		public static bool IgnoreAfterRevision<TRevision>(IRevisionedSerializer<TRevision> serializer, TRevision revision, out float value)
+			where TRevision : Enum
+		{
+			value = default;
+			
+			if (serializer.IsWriting)
+				return false;
+				
+			if (!serializer.IsReading)
+				return false;
+				
+			// Ignore if the provided revision is older than or the same as
+			// the current revision.
+			if (serializer.RevisionComparer.IsCurrentOrOlder(revision))
+				return false;
+				
+			serializer.Serialize(ref value);
+			return true;
+		}
+		
+		public static bool IgnoreAfterRevision<TRevision>(IRevisionedSerializer<TRevision> serializer, TRevision revision, out double value)
+			where TRevision : Enum
+		{
+			value = default;
+			
+			if (serializer.IsWriting)
+				return false;
+				
+			if (!serializer.IsReading)
+				return false;
+				
+			// Ignore if the provided revision is older than or the same as
+			// the current revision.
+			if (serializer.RevisionComparer.IsCurrentOrOlder(revision))
+				return false;
+				
+			serializer.Serialize(ref value);
+			return true;
+		}
+		
+		public static bool IgnoreAfterRevision<TRevision>(IRevisionedSerializer<TRevision> serializer, TRevision revision, out decimal value)
+			where TRevision : Enum
+		{
+			value = default;
+			
+			if (serializer.IsWriting)
+				return false;
+				
+			if (!serializer.IsReading)
+				return false;
+				
+			// Ignore if the provided revision is older than or the same as
+			// the current revision.
+			if (serializer.RevisionComparer.IsCurrentOrOlder(revision))
+				return false;
+				
+			serializer.Serialize(ref value);
+			return true;
+		}
+		
+		public static bool IgnoreAfterRevision<TRevision>(IRevisionedSerializer<TRevision> serializer, TRevision revision, out char value)
+			where TRevision : Enum
+		{
+			value = default;
+			
+			if (serializer.IsWriting)
+				return false;
+				
+			if (!serializer.IsReading)
+				return false;
+				
+			// Ignore if the provided revision is older than or the same as
+			// the current revision.
+			if (serializer.RevisionComparer.IsCurrentOrOlder(revision))
+				return false;
+				
+			serializer.Serialize(ref value);
+			return true;
+		}
+		
+		public static bool IgnoreAfterRevision<TRevision>(IRevisionedSerializer<TRevision> serializer, TRevision revision, out string value)
+			where TRevision : Enum
+		{
+			value = default;
+			
+			if (serializer.IsWriting)
+				return false;
+				
+			if (!serializer.IsReading)
+				return false;
+				
+			// Ignore if the provided revision is older than or the same as
+			// the current revision.
+			if (serializer.RevisionComparer.IsCurrentOrOlder(revision))
+				return false;
+				
+			serializer.Serialize(ref value);
+			return true;
+		}
+		
+		public static bool IgnoreAfterRevision<TRevision>(IRevisionedSerializer<TRevision> serializer, TRevision revision, out ISerializable value)
+			where TRevision : Enum
+		{
+			value = default;
+			
+			if (serializer.IsWriting)
+				return false;
+				
+			if (!serializer.IsReading)
+				return false;
+				
+			// Ignore if the provided revision is older than or the same as
+			// the current revision.
+			if (serializer.RevisionComparer.IsCurrentOrOlder(revision))
+				return false;
+				
+			serializer.Serialize(ref value);
+			return true;
+		}
+
+		public static bool IgnoreAfterRevision<TRevision, TSerializable>(IRevisionedSerializer<TRevision> serializer, TRevision revision, out TSerializable value)
+			where TRevision : Enum
+			where TSerializable : struct, ISerializable<TRevision>
+		{
+			value = default;
+			if (serializer.IsWriting)
+				return false;
+
+			if (!serializer.IsReading)
+				return false;
+
+
+			if (serializer.RevisionComparer.IsCurrentOrOlder(revision))
+				return false;
+				
+			value.Serialize(serializer);
+			return true;
+		}
 	}
 }
