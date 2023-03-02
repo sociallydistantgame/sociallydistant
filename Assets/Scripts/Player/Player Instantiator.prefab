@@ -45,6 +45,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   playerInstanceHolder: {fileID: 11400000, guid: b143bb84d08c6044bb9b1a69e33c8460, type: 2}
+  gameManager: {fileID: 11400000, guid: de6543312575e7f4294170ad6b5ed997, type: 2}
   deviceCoordinator: {fileID: 11400000, guid: aaa2ed62d698c314f96dbf5e0b134aad, type: 2}
   fstab: {fileID: 11400000, guid: 5f07683a37747fb4aa3eb1a9988eb20c, type: 2}
   uiRootPrefab: {fileID: 6404087894138473668, guid: 59522fc76d98843479569295ef34bcef, type: 3}
@@ -52,3 +53,4 @@ MonoBehaviour:
   desktopPrefab: {fileID: 94841126449236779, guid: 2d3bebba157bed94fa6fe837f5cbd2b8, type: 3}
   windowManagerPrefab: {fileID: 3873711479734453863, guid: 180479df6586f3f41aa4d32d884cd9e5, type: 3}
   environmentVariables: {fileID: 11400000, guid: 66aac6d84e661da45acad8d220849082, type: 2}
+  defaultBackdrop: {fileID: 0}

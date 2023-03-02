@@ -35,6 +35,13 @@ namespace GameplaySystems.GameManagement
 
 		public string? CurrentGamePath => currentGamePath;
 
+		public string CurrentPlayerName => currentGame?.playerName ?? "player";
+		public string CurrentPlayerHostName => currentGame?.playerComputerName ?? "localhost";
+
+		public event Action GameStarted;
+		public event Action GameEnded;
+		
+		
 		public GameManager(WorldManagerHolder world)
 		{
 			this.world = world;
@@ -115,6 +122,7 @@ namespace GameplaySystems.GameManagement
 			using var dataReader = new BinaryDataReader(reader);
 			
 			world.Value.LoadWorld(dataReader);
+			GameStarted?.Invoke();
 		}
 
 		public void EndCurrentGame()
@@ -124,6 +132,7 @@ namespace GameplaySystems.GameManagement
 			world.Value.WipeWorld();
 			currentGame = null;
 			currentGamePath = null;
+			GameEnded?.Invoke();
 		}
 		
 		public void StartNewGame(string saveId, string playerName, string playerHostName)
@@ -155,6 +164,7 @@ namespace GameplaySystems.GameManagement
 			world.Value.WipeWorld();
 
 			SaveCurrentGame();
+			GameStarted?.Invoke();
 		}
 
 		public void SaveCurrentGame()
