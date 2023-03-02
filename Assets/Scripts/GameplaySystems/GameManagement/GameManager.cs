@@ -5,6 +5,7 @@ using System.Collections.Generic;
 using System.IO;
 using System.Text;
 using Core;
+using Core.Config;
 using Core.Serialization.Binary;
 using Newtonsoft.Json;
 using UnityEngine;
@@ -22,11 +23,11 @@ namespace GameplaySystems.GameManagement
 
 		private string? currentGamePath;
 		private SaveFileParameters? currentGame;
-		
+
 		/// <summary>
 		///		Gets a path where all game data must be stored.
 		/// </summary>
-		public string GameDataDirectory => Application.persistentDataPath;
+		public string GameDataDirectory => Registry.GameDataPath;
 
 		/// <summary>
 		///		Gets a path where all save files are located.
