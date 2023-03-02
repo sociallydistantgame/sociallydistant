@@ -27,8 +27,11 @@ namespace Player
 		[Header("File System Table")]
 		[SerializeField]
 		private FileSystemTableAsset fstab = null!;
-		
+
 		[Header("Prefabs")]
+		[SerializeField]
+		private GameObject loginManagerPrefab = null!;
+		
 		[SerializeField]
 		private GameObject uiRootPrefab = null!;
 
@@ -56,6 +59,9 @@ namespace Player
 
 		private void Start()
 		{
+			gameManager.Value.GameStarted += OnGameStart;
+			gameManager.Value.GameEnded += OnGameEnded;
+			
 			var playerComputer = new PlayerComputer(gameManager.Value);
 			var player = new PlayerInstance();
 
@@ -75,6 +81,7 @@ namespace Player
 			GameObject uiRootGameObject = Instantiate(uiRootPrefab);
 			GameObject backdropGameObject = Instantiate(backdropPrefab, uiRootGameObject.transform);
 			GameObject desktopGameObject = Instantiate(desktopPrefab, uiRootGameObject.transform);
+			GameObject loginManagerGameObject = Instantiate(loginManagerPrefab, uiRootGameObject.transform);
 			GameObject windowManagerGameObject = Instantiate(windowManagerPrefab, uiRootGameObject.transform);
 
 			desktopPrefab.SetActive(true);
@@ -84,11 +91,29 @@ namespace Player
 			backdropGameObject.MustGetComponent(out player.BackdropController);
 			desktopGameObject.MustGetComponent(out player.Desktop);
 			windowManagerGameObject.MustGetComponent(out player.WindowManager);
+			loginManagerGameObject.MustGetComponent(out player.LoginManager);
 
 			// set the default backdrop
 			player.BackdropController.SetBackdrop(new BackdropSettings(Color.white, defaultBackdrop));
 			
 			this.playerInstanceHolder.Value = player;
+		}
+
+		private void OnGameEnded()
+		{
+			playerInstanceHolder.Value.Desktop.gameObject.SetActive(false);
+			
+			// We do this to force a rebuild of the player VFS such that we are no longer reading/writing in the save file.
+			playerInstanceHolder.Value.Computer.SetPlayerUserName(gameManager.Value.CurrentPlayerName);
+			
+			FileSystemTable.MountFileSystemsToComputer(playerInstanceHolder.Value.Computer, fstab);
+		}
+
+		private void OnGameStart()
+		{
+			playerInstanceHolder.Value.Computer.SetPlayerUserName(gameManager.Value.CurrentPlayerName);
+			FileSystemTable.MountFileSystemsToComputer(playerInstanceHolder.Value.Computer, fstab);
+			playerInstanceHolder.Value.Desktop.gameObject.SetActive(true);
 		}
 
 		private void OnDestroy()
@@ -97,10 +122,6 @@ namespace Player
 
 			deviceCoordinator.ForgetComputer(player.Computer);
 			
-			Destroy(player.WindowManager.gameObject);
-			Destroy(player.BackdropController.gameObject);
-			Destroy(player.UiRoot);
-
 			playerInstanceHolder.Value = default;
 		}
 	}

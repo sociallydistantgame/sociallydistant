@@ -1,6 +1,7 @@
 ﻿#nullable enable
 using OS.Devices;
 using UI.Backdrop;
+using UI.Login;
 using UI.Shell;
 using UI.Windowing;
 using UnityEngine;
@@ -16,5 +17,6 @@ namespace Player
 		public BackdropController BackdropController;
 		public Desktop Desktop;
 		public WindowManager WindowManager;
+		public LoginManager LoginManager;
 	}
 }

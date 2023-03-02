@@ -17,7 +17,7 @@ namespace Core.Config
 
 		public static event Action? Updated;
 		
-		public static string GameDataPath => Application.persistentDataPath;
+		public static string GameDataPath => Application.persistentDataPath.Replace('/', Path.DirectorySeparatorChar);
 		public static string RegistryFilePath => Path.Combine(GameDataPath, "settings.json");
 		public static void Initialize()
 		{

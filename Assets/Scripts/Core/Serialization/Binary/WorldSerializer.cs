@@ -39,6 +39,10 @@ namespace Core.Serialization.Binary
 			this.reader = null;
 			this.writer = writer;
 			this.revisionComparer = new WorldRevisionComparer(); // will automatically set current revision to the latest one
+			
+			// It's up to us to write the revision.
+			var rawRevision = (short) revisionComparer.Current;
+			writer.Write(rawRevision);
 		}
 
 		/// <inheritdoc />
