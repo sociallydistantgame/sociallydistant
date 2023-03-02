@@ -1,7 +1,9 @@
 ﻿#nullable enable
+using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
+using GameplaySystems.GameManagement;
 using OS.FileSystems;
 using OS.FileSystems.Host;
 using UnityEngine.Assertions;
@@ -10,31 +12,39 @@ namespace OS.Devices
 {
 	public class PlayerComputer : IComputer
 	{
-		private readonly string hostHomeDirectory = string.Empty;
-		private string hostname;
+		private readonly GameManager gameManager;
+		private readonly IUser su;
+		private string hostHomeDirectory = string.Empty;
 		private Dictionary<int, IUser> users = new Dictionary<int, IUser>();
 		private Dictionary<string, int> usernameMap = new Dictionary<string, int>();
 		private PlayerUser playerUser;
 		private PlayerFileSystem playerFileSystem;
 
 		/// <inheritdoc />
-		public string Name => hostname;
+		public string Name => gameManager.CurrentPlayerHostName;
 		public PlayerUser PlayerUser => playerUser;
 		
-		public PlayerComputer(string hostname, string username, string hostSaveDirectory)
+		public PlayerComputer(GameManager gameManager)
 		{
-			this.hostname = hostname;
+			this.gameManager = gameManager;
 
-			IUser su = new SuperUser(this);
+			su = new SuperUser(this);
 			this.AddUser(su);
 
-			this.playerUser = new PlayerUser(this, username);
+			this.playerUser = new PlayerUser(this, gameManager.CurrentPlayerName);
 			this.AddUser(this.playerUser);
-			this.playerFileSystem = new PlayerFileSystem(this);
 
-			hostHomeDirectory = Path.Combine(hostSaveDirectory, "home");
+			this.RebuildVfs();
+		}
+
+		public void RebuildVfs()
+		{
+			string homeParent = gameManager.CurrentGamePath ?? gameManager.GameDataDirectory;
+			string homePath = Path.Combine(homeParent, "home");
+			hostHomeDirectory = homePath;
+
+			this.playerFileSystem = new PlayerFileSystem(this);
 			
-			// Gives the player a place to save data to!
 			GetFileSystem(su)
 				.Mount(playerUser.Home, new HostJail(hostHomeDirectory));
 		}
@@ -43,6 +53,16 @@ namespace OS.Devices
 		public bool FindUserById(int id, out IUser? user)
 		{
 			return users.TryGetValue(id, out user);
+		}
+
+		public void SetPlayerUserName(string username)
+		{
+			if (username == "root")
+				throw new InvalidOperationException("Cannot name a non-root user 'root'.");
+
+			this.playerUser.UserName = username;
+
+			this.RebuildVfs();
 		}
 
 		/// <inheritdoc />

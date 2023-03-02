@@ -3,6 +3,7 @@
 using System;
 using System.Collections.Generic;
 using Architecture;
+using GameplaySystems.GameManagement;
 using OS.Devices;
 using OS.FileSystems;
 using UI.Backdrop;
@@ -17,6 +18,9 @@ namespace Player
 		[SerializeField]
 		private PlayerInstanceHolder playerInstanceHolder = null!;
 
+		[SerializeField]
+		private GameManagerHolder gameManager = null!;
+		
 		[SerializeField]
 		private DeviceCoordinator deviceCoordinator = null!;
 
@@ -52,7 +56,7 @@ namespace Player
 
 		private void Start()
 		{
-			var playerComputer = new PlayerComputer("socdist-fakeenv", "user", Application.persistentDataPath);
+			var playerComputer = new PlayerComputer(gameManager.Value);
 			var player = new PlayerInstance();
 
 			FileSystemTable.MountFileSystemsToComputer(playerComputer, fstab);
@@ -66,11 +70,15 @@ namespace Player
 				player.OsInitProcess.Environment[pair.Key] = pair.Value;
 			}
 			
+			desktopPrefab.SetActive(false);
+
 			GameObject uiRootGameObject = Instantiate(uiRootPrefab);
 			GameObject backdropGameObject = Instantiate(backdropPrefab, uiRootGameObject.transform);
 			GameObject desktopGameObject = Instantiate(desktopPrefab, uiRootGameObject.transform);
 			GameObject windowManagerGameObject = Instantiate(windowManagerPrefab, uiRootGameObject.transform);
 
+			desktopPrefab.SetActive(true);
+			
 			player.UiRoot = uiRootGameObject;
 			
 			backdropGameObject.MustGetComponent(out player.BackdropController);

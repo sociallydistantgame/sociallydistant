@@ -7,7 +7,7 @@ namespace OS.Devices
 		public int Id => 1000;
 
 		/// <inheritdoc />
-		public string UserName { get; private set; }
+		public string UserName { get; set; }
 
 		/// <inheritdoc />
 		public string Home { get; private set; }
