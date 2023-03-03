@@ -19,9 +19,6 @@ namespace GameplaySystems.NonPlayerComputers
 		[SerializeField]
 		private WorldManagerHolder world = null!;
 
-		[SerializeField]
-		private DeviceCoordinator deviceCoordinator = null!;
-
 		[Header("Prefabs")]
 		[SerializeField]
 		private NonPlayerComputer computerPrefab = null!;

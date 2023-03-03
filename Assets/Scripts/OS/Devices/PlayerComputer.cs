@@ -18,7 +18,7 @@ namespace OS.Devices
 		private Dictionary<int, IUser> users = new Dictionary<int, IUser>();
 		private Dictionary<string, int> usernameMap = new Dictionary<string, int>();
 		private PlayerUser playerUser;
-		private PlayerFileSystem playerFileSystem;
+		private PlayerFileSystem? playerFileSystem;
 
 		/// <inheritdoc />
 		public string Name => gameManager.CurrentPlayerHostName;
@@ -86,7 +86,10 @@ namespace OS.Devices
 		/// <inheritdoc />
 		public VirtualFileSystem GetFileSystem(IUser user)
 		{
-			return new VirtualFileSystem(this.playerFileSystem, user);
+			if (playerFileSystem == null)
+				RebuildVfs();
+			
+			return new VirtualFileSystem(this.playerFileSystem!, user);
 		}
 
 		private void AddUser(IUser user)

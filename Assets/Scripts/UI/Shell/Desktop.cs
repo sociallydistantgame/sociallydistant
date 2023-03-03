@@ -27,10 +27,6 @@ namespace UI.Shell
 		[SerializeField]
 		private RectTransform workspaceArea = null!;
 
-		[Header("Default Apps")]
-		[SerializeField]
-		private UguiProgram defaultTerminal = null!;
-		
 		public IWorkspaceDefinition CurrentWorkspace => currentWorkspace;
 
 		private void Awake()
