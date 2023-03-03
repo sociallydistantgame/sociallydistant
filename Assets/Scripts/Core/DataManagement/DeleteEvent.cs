@@ -6,12 +6,12 @@ namespace Core.DataManagement
 	public class DeleteEvent
 	{
 		public delegate void DeleteCallback<TDataElement>(TDataElement subject)
-			where TDataElement : struct, IDataWithId;
+			where TDataElement : struct;
 
 		private Dictionary<Type, List<object>> invocationLists = new Dictionary<Type, List<object>>();
 
 		public void AddCallback<TDataElement>(DeleteCallback<TDataElement> callback)
-			where TDataElement : struct, IDataWithId
+			where TDataElement : struct
 		{
 			Type type = typeof(TDataElement);
 
@@ -25,7 +25,7 @@ namespace Core.DataManagement
 		}
 		
 		public void RemoveCallback<TDataElement>(DeleteCallback<TDataElement> callback)
-			where TDataElement : struct, IDataWithId
+			where TDataElement : struct
 		{
 			Type type = typeof(TDataElement);
 
@@ -39,7 +39,7 @@ namespace Core.DataManagement
 		}
 
 		public void Invoke<TDataElement>(TDataElement data)
-			where TDataElement : struct, IDataWithId
+			where TDataElement : struct
 		{
 			Type type = typeof(TDataElement);
 			

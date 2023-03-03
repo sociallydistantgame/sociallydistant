@@ -2715,6 +2715,7 @@ GameObject:
   - component: {fileID: 9007089586595391236}
   - component: {fileID: 4283839064565251189}
   - component: {fileID: 3947373650472253936}
+  - component: {fileID: 9010133731185459002}
   m_Layer: 5
   m_Name: Day Of Week
   m_TagString: Untagged
@@ -2839,6 +2840,21 @@ MonoBehaviour:
   m_hasFontAssetChanged: 0
   m_baseMaterial: {fileID: 0}
   m_maskOffset: {x: 0, y: 0, z: 0, w: 0}
+--- !u!114 &9010133731185459002
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 6188348289732038506}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 5411f34b7dbc40fe8d4ef08be50589c6, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  worldHolder: {fileID: 11400000, guid: 6ddfb5183f8225440a5d156e7fb16747, type: 2}
+  textFormat: DAYNAME
+  abbreviateDayOfWeek: 0
 --- !u!1 &6236432228589000893
 GameObject:
   m_ObjectHideFlags: 0
@@ -3413,6 +3429,7 @@ GameObject:
   - component: {fileID: 3384796664204128780}
   - component: {fileID: 5722226630932928347}
   - component: {fileID: 4559313330833903533}
+  - component: {fileID: 2317803896773733204}
   m_Layer: 5
   m_Name: Time Of Day
   m_TagString: Untagged
@@ -3537,6 +3554,21 @@ MonoBehaviour:
   m_hasFontAssetChanged: 0
   m_baseMaterial: {fileID: 0}
   m_maskOffset: {x: 0, y: 0, z: 0, w: 0}
+--- !u!114 &2317803896773733204
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 7597357237064200184}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 5411f34b7dbc40fe8d4ef08be50589c6, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  worldHolder: {fileID: 11400000, guid: 6ddfb5183f8225440a5d156e7fb16747, type: 2}
+  textFormat: TIME
+  abbreviateDayOfWeek: 0
 --- !u!1 &7601547748736491551
 GameObject:
   m_ObjectHideFlags: 0
@@ -4430,6 +4462,7 @@ GameObject:
   - component: {fileID: 8442970791244961081}
   - component: {fileID: 4251792613451090338}
   - component: {fileID: 6752089651824613307}
+  - component: {fileID: 5279335670528106097}
   m_Layer: 5
   m_Name: Tray Clock
   m_TagString: Untagged
@@ -4554,6 +4587,21 @@ MonoBehaviour:
   m_hasFontAssetChanged: 0
   m_baseMaterial: {fileID: 0}
   m_maskOffset: {x: 0, y: 0, z: 0, w: 0}
+--- !u!114 &5279335670528106097
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 8910843248026665348}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 5411f34b7dbc40fe8d4ef08be50589c6, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  worldHolder: {fileID: 11400000, guid: 6ddfb5183f8225440a5d156e7fb16747, type: 2}
+  textFormat: TIME - <b>DAYNAME</b>
+  abbreviateDayOfWeek: 1
 --- !u!1 &9048315296943152807
 GameObject:
   m_ObjectHideFlags: 0
