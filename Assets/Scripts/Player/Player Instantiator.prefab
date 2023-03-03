@@ -53,5 +53,6 @@ MonoBehaviour:
   backdropPrefab: {fileID: 1876961014414637132, guid: 437971ffa9ad15844ab503f02119cf2b, type: 3}
   desktopPrefab: {fileID: 94841126449236779, guid: 2d3bebba157bed94fa6fe837f5cbd2b8, type: 3}
   windowManagerPrefab: {fileID: 3873711479734453863, guid: 180479df6586f3f41aa4d32d884cd9e5, type: 3}
+  popoverLayerPrefab: {fileID: 6738298882049385100, guid: 1976ad0fb0713fe438182c366418dcc7, type: 3}
   environmentVariables: {fileID: 11400000, guid: 66aac6d84e661da45acad8d220849082, type: 2}
   defaultBackdrop: {fileID: 0}

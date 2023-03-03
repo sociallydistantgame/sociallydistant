@@ -44,6 +44,9 @@ namespace Player
 		[SerializeField]
 		private GameObject windowManagerPrefab = null!;
 
+		[SerializeField]
+		private GameObject popoverLayerPrefab = null!;
+		
 		[Header("Environment")]
 		[SerializeField]
 		private EnvironmentVariablesAsset environmentVariables = null!;
@@ -83,6 +86,7 @@ namespace Player
 			GameObject desktopGameObject = Instantiate(desktopPrefab, uiRootGameObject.transform);
 			GameObject loginManagerGameObject = Instantiate(loginManagerPrefab, uiRootGameObject.transform);
 			GameObject windowManagerGameObject = Instantiate(windowManagerPrefab, uiRootGameObject.transform);
+			GameObject popoverLayerGameObject = Instantiate(popoverLayerPrefab, uiRootGameObject.transform);
 
 			desktopPrefab.SetActive(true);
 			
@@ -92,6 +96,7 @@ namespace Player
 			desktopGameObject.MustGetComponent(out player.Desktop);
 			windowManagerGameObject.MustGetComponent(out player.WindowManager);
 			loginManagerGameObject.MustGetComponent(out player.LoginManager);
+			popoverLayerGameObject.MustGetComponent(out player.PopoverLayer);
 
 			// set the default backdrop
 			player.BackdropController.SetBackdrop(new BackdropSettings(Color.white, defaultBackdrop));
