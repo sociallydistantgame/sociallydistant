@@ -3,6 +3,7 @@
 using System;
 using Architecture;
 using Player;
+using UI.Popovers;
 using UI.Widgets;
 using UnityEngine;
 using UnityEngine.UI;
@@ -16,11 +17,13 @@ namespace UI.Shell.Dock
 {
 	[ExecuteInEditMode]
 	[RequireComponent(typeof(CompositeIconWidget))]
+	[RequireComponent(typeof(Popover))]
 	[RequireComponent(typeof(Button))]
 	public class DockedProgramLauncher : MonoBehaviour
 	{
 		private CompositeIconWidget iconWidget = null!;
 		private Button button = null!;
+		private Popover popover;
 
 		[SerializeField]
 		private PlayerInstanceHolder player = null!;
@@ -35,6 +38,7 @@ namespace UI.Shell.Dock
 		{
 			this.MustGetComponent(out iconWidget);
 			this.MustGetComponent(out button);
+			this.MustGetComponent(out popover);
 		}
 
 		private void OnEnable()
@@ -49,6 +53,16 @@ namespace UI.Shell.Dock
 
 		private void Update()
 		{
+			if (program == null)
+				popover.enabled = false;
+			else
+			{
+				if (!popover.enabled)
+					popover.enabled = true;
+
+				popover.Text = program.Name;
+			}
+			
 #if UNITY_EDITOR
 			if (EditorApplication.isPlaying)
 				return;
@@ -59,6 +73,7 @@ namespace UI.Shell.Dock
 			else
 				iconWidget.Icon = program.Icon;
 #endif
+
 		}
 
 		private void OnClick()
