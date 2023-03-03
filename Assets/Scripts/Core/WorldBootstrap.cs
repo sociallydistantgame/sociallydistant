@@ -49,5 +49,10 @@ PREPARING THE WORLD MANAGER!");
 
             this.worldHolder.Value = new WorldManager();
         }
+
+        private void Update()
+        {
+            worldHolder.Value.UpdateWorldClock();
+        }
     }
 }

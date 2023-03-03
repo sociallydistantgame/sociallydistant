@@ -6,12 +6,12 @@ namespace Core.DataManagement
 	public class ModifyEvent
 	{
 		public delegate void ModifyCallback<TDataElement>(TDataElement subjectPrevious, TDataElement subjectNew)
-			where TDataElement : struct, IDataWithId;
+			where TDataElement : struct;
 
 		private Dictionary<Type, List<object>> invocationLists = new Dictionary<Type, List<object>>();
 
 		public void AddCallback<TDataElement>(ModifyCallback<TDataElement> callback)
-			where TDataElement : struct, IDataWithId
+			where TDataElement : struct
 		{
 			Type type = typeof(TDataElement);
 
@@ -25,7 +25,7 @@ namespace Core.DataManagement
 		}
 		
 		public void RemoveCallback<TDataElement>(ModifyCallback<TDataElement> callback)
-			where TDataElement : struct, IDataWithId
+			where TDataElement : struct
 		{
 			Type type = typeof(TDataElement);
 
@@ -39,7 +39,7 @@ namespace Core.DataManagement
 		}
 
 		public void Invoke<TDataElement>(TDataElement subjectPrevious, TDataElement subjectNew)
-			where TDataElement : struct, IDataWithId
+			where TDataElement : struct
 		{
 			Type type = typeof(TDataElement);
 			

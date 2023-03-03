@@ -10,37 +10,37 @@
 		}
 
 		public void AddCreateCallback<TDataElement>(CreateEvent.CreateCallback<TDataElement> callback)
-			where TDataElement : struct, IDataWithId
+			where TDataElement : struct
 		{
 			eventDispatcher.Create.AddCallback(callback);
 		}
 		
 		public void RemoveCreateCallback<TDataElement>(CreateEvent.CreateCallback<TDataElement> callback)
-			where TDataElement : struct, IDataWithId
+			where TDataElement : struct
 		{
 			eventDispatcher.Create.RemoveCallback(callback);
 		}
 		
 		public void AddDeleteCallback<TDataElement>(DeleteEvent.DeleteCallback<TDataElement> callback)
-			where TDataElement : struct, IDataWithId
+			where TDataElement : struct
 		{
 			eventDispatcher.Delete.AddCallback(callback);
 		}
 		
 		public void RemoveDeleteCallback<TDataElement>(DeleteEvent.DeleteCallback<TDataElement> callback)
-			where TDataElement : struct, IDataWithId
+			where TDataElement : struct
 		{
 			eventDispatcher.Delete.RemoveCallback(callback);
 		}
 		
 		public void AddModifyCallback<TDataElement>(ModifyEvent.ModifyCallback<TDataElement> callback)
-			where TDataElement : struct, IDataWithId
+			where TDataElement : struct
 		{
 			eventDispatcher.Modify.AddCallback(callback);
 		}
 		
 		public void RemoveModifyCallback<TDataElement>(ModifyEvent.ModifyCallback<TDataElement> callback)
-			where TDataElement : struct, IDataWithId
+			where TDataElement : struct
 		{
 			eventDispatcher.Modify.RemoveCallback(callback);
 		}
