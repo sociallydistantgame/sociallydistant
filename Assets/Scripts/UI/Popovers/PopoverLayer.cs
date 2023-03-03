@@ -9,7 +9,7 @@ namespace UI.Popovers
 {
 	public class PopoverLayer : MonoBehaviour
 	{
-		private RectTransform myRect;
+		private RectTransform myRect = null!;
 		
 		[Header("UI")]
 		[SerializeField]

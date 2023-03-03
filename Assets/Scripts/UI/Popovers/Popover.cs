@@ -12,7 +12,7 @@ namespace UI.Popovers
 		IPointerExitHandler,
 		IPointerMoveHandler
 	{
-		private RectTransform myTransform;
+		private RectTransform myTransform = null!;
 		private bool isDisplayingPopOver = false;
 		private float timeUntilDisplay = 0;
 		private bool isCountingDown = false;

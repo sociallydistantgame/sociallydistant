@@ -9,15 +9,12 @@ using Core.Config;
 using Core.Serialization.Binary;
 using Newtonsoft.Json;
 using UnityEngine;
-using Application = UnityEngine.Device.Application;
 
 namespace GameplaySystems.GameManagement
 {
 	public class GameManager
 	{
 		private readonly string worldFileName = "world.bin";
-		private readonly string playerHomeDirectoryName = "home";
-		private readonly string npcHomesDirectoryName = "npcs";
 		private readonly string paramsFileName = "params.json";
 		private WorldManagerHolder world;
 
@@ -39,8 +36,8 @@ namespace GameplaySystems.GameManagement
 		public string CurrentPlayerName => currentGame?.playerName ?? "player";
 		public string CurrentPlayerHostName => currentGame?.playerComputerName ?? "localhost";
 
-		public event Action GameStarted;
-		public event Action GameEnded;
+		public event Action? GameStarted;
+		public event Action? GameEnded;
 		
 		
 		public GameManager(WorldManagerHolder world)
@@ -206,20 +203,5 @@ namespace GameplaySystems.GameManagement
 			
 			File.WriteAllText(paramsFile, json);
 		}
-	}
-
-	/// <summary>
-	///		Represents the contents of the "params.json" file found in a Socially Distant save file.
-	/// </summary>
-	public class SaveFileParameters
-	{
-		public string playerName;
-		public string playerComputerName;
-		public DateTime creationDate;
-		public DateTime lastPlayedDate;
-		public string lastPlayedMissionName;
-
-		[NonSerialized]
-		public string saveId;
 	}
 }

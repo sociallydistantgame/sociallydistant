@@ -23,7 +23,7 @@ namespace UI.Shell.Dock
 	{
 		private CompositeIconWidget iconWidget = null!;
 		private Button button = null!;
-		private Popover popover;
+		private Popover popover = null!;
 
 		[SerializeField]
 		private PlayerInstanceHolder player = null!;
