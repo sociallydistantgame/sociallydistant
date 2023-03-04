@@ -5,6 +5,7 @@ using Core;
 using Core.WorldData.Data;
 using OS.Devices;
 using OS.FileSystems;
+using OS.Network;
 using UnityEngine;
 using Utility;
 
@@ -57,6 +58,9 @@ namespace GameplaySystems.NonPlayerComputers
 		{
 			throw new NotImplementedException();
 		}
+
+		/// <inheritdoc />
+		public INetworkInterface? Network => null;
 
 		public void UpdateWorldData(WorldComputerData data)
 		{

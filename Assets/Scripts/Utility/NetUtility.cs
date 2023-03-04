@@ -115,13 +115,22 @@ namespace Utility
 				mask |= (uint) (1 << (31 - i));
 			}
 
-			if ((address & mask) != address)
-				return false;
+
+			// Lower range is just the network address itself
+			uint lowerRange = address;
+			
+			// Group size is how many addresses we can allocate.
+			// We get this by doing a bitwise NOT of the mask.
+			// Higher range is lower range + group size
+			uint groupSize = ~mask;
+			uint higherRange = lowerRange + groupSize;
 
 			subnet = new Subnet
 			{
-				NetworkAddress = (uint) address,
-				Mask = mask
+				NetworkAddress = address & mask,
+				Mask = mask,
+				LowerRange = lowerRange,
+				HigherRange = higherRange
 			};
 			
 			return true;

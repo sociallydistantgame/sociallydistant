@@ -6,6 +6,7 @@ using System.IO;
 using GameplaySystems.GameManagement;
 using OS.FileSystems;
 using OS.FileSystems.Host;
+using OS.Network;
 using UnityEngine.Assertions;
 
 namespace OS.Devices
@@ -91,6 +92,9 @@ namespace OS.Devices
 			
 			return new VirtualFileSystem(this.playerFileSystem!, user);
 		}
+
+		/// <inheritdoc />
+		public INetworkInterface? Network => null;
 
 		private void AddUser(IUser user)
 		{
