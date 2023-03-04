@@ -1,5 +1,6 @@
 ﻿#nullable enable
 using OS.FileSystems;
+using OS.Network;
 
 namespace OS.Devices
 {
@@ -28,5 +29,7 @@ namespace OS.Devices
 		/// <param name="user">The user to operate the filesystem with. Must belong to this computer.</param>
 		/// <returns>A view into the computer's file system from the perspective of the given user.</returns>
 		VirtualFileSystem GetFileSystem(IUser user);
+		
+		INetworkInterface? Network { get; }
 	}
 }

@@ -9,7 +9,16 @@ namespace OS.Network
 	{
 		public uint NetworkAddress;
 		public uint Mask;
+		public uint LowerRange;
+		public uint HigherRange;
 
+		public uint FirstHost => LowerRange + 1;
+		public uint LastHost => HigherRange - 1;
+		public uint GroupSize => ~Mask + 1;
+		public uint UsableAddressSize => GroupSize - 2;
+		public uint NetworkId => NetworkAddress & ~Mask;
+		
+		
 		public string CidrNotation
 			=> $"{NetUtility.GetNetworkAddressString(NetworkAddress & Mask)}/{NetUtility.CountBits(Mask)}";
 

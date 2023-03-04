@@ -9,6 +9,7 @@ namespace Core.WorldData.Data
 	{
 		private ObjectId id;
 		private string hostname;
+		private long macAddress;
 
 		/// <inheritdoc />
 		public ObjectId InstanceId
@@ -22,12 +23,19 @@ namespace Core.WorldData.Data
 			get => hostname;
 			set => hostname = value;
 		}
+
+		public long MacAddress
+		{
+			get => macAddress;
+			set => macAddress = value;
+		}
 		
 		/// <inheritdoc />
 		public void Serialize(IRevisionedSerializer<WorldRevision> serializer)
 		{
 			SerializationUtility.SerializeAtRevision(ref id, serializer, WorldRevision.AddedComputers, ObjectId.Invalid);
 			SerializationUtility.SerializeAtRevision(ref hostname, serializer, WorldRevision.AddedComputers, "localhost");
+			SerializationUtility.SerializeAtRevision(ref macAddress, serializer, WorldRevision.AddedMacAddresses, default);
 		}
 	}
 }
