@@ -60,7 +60,7 @@ namespace UI.Shell.Dock
 				if (!popover.enabled)
 					popover.enabled = true;
 
-				popover.Text = program.Name;
+				popover.Text = program.WindowTitle;
 			}
 			
 #if UNITY_EDITOR
