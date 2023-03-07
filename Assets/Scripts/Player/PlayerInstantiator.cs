@@ -4,6 +4,7 @@ using System;
 using System.Collections.Generic;
 using Architecture;
 using GameplaySystems.GameManagement;
+using GameplaySystems.Networld;
 using OS.Devices;
 using OS.FileSystems;
 using UI.Backdrop;
@@ -18,6 +19,9 @@ namespace Player
 		[SerializeField]
 		private PlayerInstanceHolder playerInstanceHolder = null!;
 
+		[SerializeField]
+		private NetworkSimulationHolder networkSimulation = null!;
+		
 		[SerializeField]
 		private GameManagerHolder gameManager = null!;
 		
@@ -65,9 +69,15 @@ namespace Player
 			gameManager.Value.GameStarted += OnGameStart;
 			gameManager.Value.GameEnded += OnGameEnded;
 			
-			var playerComputer = new PlayerComputer(gameManager.Value);
+			// Create a ghost LAN for the player
+			LocalAreaNetwork playerLan = networkSimulation.Value.CreateLocalAreaNetwork();
+			
+			
+			var playerComputer = new PlayerComputer(gameManager.Value, playerLan);
 			var player = new PlayerInstance();
 
+			player.PlayerLan = playerLan;
+			
 			FileSystemTable.MountFileSystemsToComputer(playerComputer, fstab);
 			
 			player.Computer = playerComputer;

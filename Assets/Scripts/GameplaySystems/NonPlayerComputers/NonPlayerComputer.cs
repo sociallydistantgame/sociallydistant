@@ -3,6 +3,7 @@ using System;
 using Architecture;
 using Core;
 using Core.WorldData.Data;
+using GameplaySystems.Networld;
 using OS.Devices;
 using OS.FileSystems;
 using OS.Network;
@@ -60,7 +61,7 @@ namespace GameplaySystems.NonPlayerComputers
 		}
 
 		/// <inheritdoc />
-		public INetworkInterface? Network => null;
+		public NetworkConnection? Network => null;
 
 		public void UpdateWorldData(WorldComputerData data)
 		{

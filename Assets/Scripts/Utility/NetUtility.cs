@@ -7,6 +7,16 @@ namespace Utility
 {
 	public static class NetUtility
 	{
+		public static readonly Subnet LoopbackSubnet = new Subnet
+		{
+			NetworkAddress = 0x7f000000,
+			Mask = 0xfffffff0,
+			LowerRange = 0x7f000000,
+			HigherRange = 0x7f00000f
+		};
+
+		public static uint LoopbackAddress => LoopbackSubnet.FirstHost;
+		
 		public static bool TryParseNetworkAddress(string networkAddressString, out uint networkAddress)
 		{
 			networkAddress = default;
