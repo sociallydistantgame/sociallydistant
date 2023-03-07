@@ -1,4 +1,5 @@
 ﻿#nullable enable
+using GameplaySystems.Networld;
 using OS.Devices;
 using OS.FileSystems;
 using UI.Terminal;
@@ -16,6 +17,7 @@ namespace Architecture
 		protected ConsoleWrapper Console { get; private set; } = null!;
 		protected string[] Arguments { get; private set; } = null!;
 		protected VirtualFileSystem FileSystem { get; private set; } = null!;
+		protected NetworkConnection? Network => this.process.User.Computer.Network;
 
 		protected string CurrentWorkingDirectory => process.WorkingDirectory;
 		

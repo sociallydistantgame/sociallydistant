@@ -1,4 +1,5 @@
 ﻿#nullable enable
+using GameplaySystems.Networld;
 using OS.Devices;
 using UI.Backdrop;
 using UI.Login;
@@ -20,5 +21,7 @@ namespace Player
 		public WindowManager WindowManager;
 		public LoginManager LoginManager;
 		public PopoverLayer PopoverLayer;
+
+		public LocalAreaNetwork PlayerLan;
 	}
 }

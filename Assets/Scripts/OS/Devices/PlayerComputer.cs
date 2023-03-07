@@ -4,10 +4,12 @@ using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
 using GameplaySystems.GameManagement;
+using GameplaySystems.Networld;
 using OS.FileSystems;
 using OS.FileSystems.Host;
 using OS.Network;
 using UnityEngine.Assertions;
+using UnityEngine.UIElements;
 
 namespace OS.Devices
 {
@@ -20,13 +22,16 @@ namespace OS.Devices
 		private Dictionary<string, int> usernameMap = new Dictionary<string, int>();
 		private PlayerUser playerUser;
 		private PlayerFileSystem? playerFileSystem;
+		private LocalAreaNetwork playerLan;
 
 		/// <inheritdoc />
 		public string Name => gameManager.CurrentPlayerHostName;
 		public PlayerUser PlayerUser => playerUser;
 		
-		public PlayerComputer(GameManager gameManager)
+		public PlayerComputer(GameManager gameManager, LocalAreaNetwork playerLan)
 		{
+			this.playerLan = playerLan;
+			this.Network = this.playerLan.CreateDevice();
 			this.gameManager = gameManager;
 
 			su = new SuperUser(this);
@@ -94,7 +99,7 @@ namespace OS.Devices
 		}
 
 		/// <inheritdoc />
-		public INetworkInterface? Network => null;
+		public NetworkConnection Network { get; private set; }
 
 		private void AddUser(IUser user)
 		{

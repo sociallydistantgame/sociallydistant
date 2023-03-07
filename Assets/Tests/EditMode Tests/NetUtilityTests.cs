@@ -41,7 +41,7 @@ namespace Tests.EditMode_Tests
 					NetworkAddress = 0x0a000000,
 					LowerRange = 0x0a000000,
 					HigherRange = 0x0a0000ff
-				},
+				}
 			},
 			{
 				"224.248.0.0/16", new ExpectedSubnet

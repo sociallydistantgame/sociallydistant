@@ -1,4 +1,5 @@
 ﻿#nullable enable
+using GameplaySystems.Networld;
 using OS.FileSystems;
 using OS.Network;
 
@@ -30,6 +31,6 @@ namespace OS.Devices
 		/// <returns>A view into the computer's file system from the perspective of the given user.</returns>
 		VirtualFileSystem GetFileSystem(IUser user);
 		
-		INetworkInterface? Network { get; }
+		NetworkConnection? Network { get; }
 	}
 }
