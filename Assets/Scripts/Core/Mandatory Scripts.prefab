@@ -12,6 +12,7 @@ GameObject:
   - component: {fileID: 4288992397192032517}
   - component: {fileID: 6999765597382563579}
   - component: {fileID: 7322622585105815768}
+  - component: {fileID: 5671059977316604281}
   m_Layer: 0
   m_Name: Mandatory Scripts
   m_TagString: Untagged
@@ -79,6 +80,23 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   platformHolder: {fileID: 11400000, guid: 1d0bbeb2ca1b67443b6c229a5e830b95, type: 2}
+--- !u!114 &5671059977316604281
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2343866427358102259}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 8f0d9dd380384e6c9e5d99f7d44674d7, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  world: {fileID: 11400000, guid: 6ddfb5183f8225440a5d156e7fb16747, type: 2}
+  gameManager: {fileID: 11400000, guid: de6543312575e7f4294170ad6b5ed997, type: 2}
+  playerInstance: {fileID: 11400000, guid: b143bb84d08c6044bb9b1a69e33c8460, type: 2}
+  networkSimulation: {fileID: 11400000, guid: 6fee4a465da4dd349b98f36a9ac9ec26, type: 2}
+  platform: {fileID: 11400000, guid: 1d0bbeb2ca1b67443b6c229a5e830b95, type: 2}
 --- !u!1001 &698093834370466672
 PrefabInstance:
   m_ObjectHideFlags: 0
