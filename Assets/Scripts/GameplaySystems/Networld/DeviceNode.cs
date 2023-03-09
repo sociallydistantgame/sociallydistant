@@ -111,10 +111,7 @@ namespace GameplaySystems.Networld
 				{
 					Packet response = packet.Clone();
 
-					response.SourceAddress = packet.DestinationAddress;
-					response.SourcePort = packet.DestinationPort;
-					response.DestinationAddress = packet.SourceAddress;
-					response.DestinationPort = packet.SourcePort;
+					response.SwapSourceAndDestination();
 					response.PacketType = PacketType.Pong;
 
 					sourceInterface.Send(response);
@@ -129,10 +126,7 @@ namespace GameplaySystems.Networld
 					if (packetEvent.Refused)
 					{
 						Packet response = packet.Clone();
-						response.SourceAddress = packet.DestinationAddress;
-						response.SourcePort = packet.DestinationPort;
-						response.DestinationAddress = packet.SourceAddress;
-						response.DestinationPort = packet.SourcePort;
+						response.SwapSourceAndDestination();
 						response.PacketType = PacketType.Refusal;
 						sourceInterface.Send(response);
 					}
