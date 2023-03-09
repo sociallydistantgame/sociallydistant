@@ -1,0 +1,40 @@
+﻿#nullable enable
+using Core.DataManagement;
+using Core.Serialization;
+
+namespace Core.WorldData.Data
+{
+	public struct WorldNetworkConnection : ISerializable<WorldRevision>, IDataWithId
+	{
+		private ObjectId instanceId;
+		private ObjectId computerId;
+		private ObjectId lanId;
+
+		/// <inheritdoc />
+		public ObjectId InstanceId
+		{
+			get => instanceId;
+			set => instanceId = value;
+		}
+
+		public ObjectId ComputerId
+		{
+			get => computerId;
+			set => computerId = value;
+		}
+
+		public ObjectId LanId
+		{
+			get => lanId;
+			set => lanId = value;
+		}
+
+		/// <inheritdoc />
+		public void Serialize(IRevisionedSerializer<WorldRevision> serializer)
+		{
+			SerializationUtility.SerializeAtRevision(ref instanceId, serializer, WorldRevision.AddedInternetServiceProviders, default);
+			SerializationUtility.SerializeAtRevision(ref computerId, serializer, WorldRevision.AddedInternetServiceProviders, default);
+			SerializationUtility.SerializeAtRevision(ref lanId, serializer, WorldRevision.AddedInternetServiceProviders, default);
+		}
+	}
+}
