@@ -2,11 +2,12 @@
 {
 	public enum WorldRevision
 	{
-		Begin=0,
+		Begin = 0,
 		AddedComputers = 1,
 		AddedWorldTime = 2,
 		AddedMacAddresses = 3,
-		
+		AddedInternetServiceProviders = 4,
+
 		Latest
 	}
 }
