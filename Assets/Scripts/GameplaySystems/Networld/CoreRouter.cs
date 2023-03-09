@@ -76,10 +76,17 @@ namespace GameplaySystems.Networld
 			internetServiceProvider.ConnectLan(ghostNode);
 		}
 
-		public InternetServiceNode CreateServiceProvider()
+		public InternetServiceNode CreateServiceProvider(string cidrAddressRange)
 		{
-			var node = new InternetServiceNode();
+			if (!NetUtility.TryParseCidrNotation(cidrAddressRange, out Subnet subnet))
+				throw new InvalidOperationException("Cannot parse the CIDR string for the internet service provider's address range.");
+
+			if (localSubnetTemplates.Contains(subnet))
+				throw new InvalidOperationException("Cannot use a local address space for an internet service provider.");
+
+			var node = new InternetServiceNode(subnet);
 			var neighbourInterface = new NetworkInterface();
+			neighbourInterface.MakeAddressable(subnet, subnet.FirstHost);
 			node.NetworkInterface.Connect(neighbourInterface);
 			this.neighbours.Add(node);
 			this.neighbourInterfaces.Add(neighbourInterface);

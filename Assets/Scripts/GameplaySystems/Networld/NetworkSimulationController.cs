@@ -15,10 +15,10 @@ namespace GameplaySystems.Networld
 			this.coreRouter = coreRouter;
 		}
 
-		private InternetServiceProvider CreateInternetServiceProvider()
+		private InternetServiceProvider CreateInternetServiceProvider(string cidrAddressRange)
 		{
 			// Create an ISP node in the simulation
-			InternetServiceNode ispNode = coreRouter.CreateServiceProvider();
+			InternetServiceNode ispNode = coreRouter.CreateServiceProvider(cidrAddressRange);
 			
 			// Create the ISP itself.
 			return new InternetServiceProvider(this, ispNode);
