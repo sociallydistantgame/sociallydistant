@@ -118,5 +118,33 @@ namespace GameplaySystems.Networld
 			// Keep track of the LAN so we can update it
 			this.localAreaNodes.Add(node);
 		}
+
+		public void DropClient(LocalAreaNode node)
+		{
+			// Which interface was this node connected to? If none, we stop.
+			if (!lanInterfaces.TryGetValue(node, out int index))
+				return;
+			
+			// Get that interface.
+			NetworkInterface ourInterface = this.neighbourInterfaces[index];
+			
+			// Remove it.
+			this.neighbourInterfaces.RemoveAt(index);
+			this.lanInterfaces.Remove(node);
+			
+			// Shift all interface indices above the one we just axed
+			foreach (LocalAreaNode key in lanInterfaces.Keys)
+			{
+				if (lanInterfaces[key] > index)
+					lanInterfaces[key]--;
+			}
+			
+			// Drop the addresses on both interfaces
+			ourInterface.MakeUnaddressable();
+			node.NetworkInterface.MakeUnaddressable();
+			
+			// Disconnect them.
+			node.NetworkInterface.Disconnect();
+		}
 	}
 }

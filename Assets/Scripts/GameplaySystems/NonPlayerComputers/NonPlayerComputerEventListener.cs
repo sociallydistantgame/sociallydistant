@@ -39,6 +39,11 @@ namespace GameplaySystems.NonPlayerComputers
 			UninstallEvents();
 		}
 
+		public bool TryGetComputer(ObjectId id, out NonPlayerComputer computer)
+		{
+			return this.instances.TryGetValue(id, out computer);
+		}
+		
 		private void InstallEvents()
 		{
 			this.world.Value.Callbacks.AddCreateCallback<WorldComputerData>(OnCreateComputer);

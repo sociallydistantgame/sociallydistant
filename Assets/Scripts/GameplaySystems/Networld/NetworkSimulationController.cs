@@ -1,6 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
+﻿using System.Collections.Generic;
 using OS.Network;
 using UnityEditor.VersionControl;
 
@@ -9,19 +7,30 @@ namespace GameplaySystems.Networld
 	public sealed class NetworkSimulationController
 	{
 		private CoreRouter coreRouter;
+		private readonly Dictionary<InternetServiceProvider, InternetServiceNode> isps = new Dictionary<InternetServiceProvider, InternetServiceNode>();
+		private readonly Dictionary<LocalAreaNetwork, LocalAreaNode> lans = new Dictionary<LocalAreaNetwork, LocalAreaNode>();
 
 		public NetworkSimulationController(CoreRouter coreRouter)
 		{
 			this.coreRouter = coreRouter;
 		}
 
-		private InternetServiceProvider CreateInternetServiceProvider(string cidrAddressRange)
+		internal bool LookupLanNode(LocalAreaNetwork lan, out LocalAreaNode node)
+		{
+			return lans.TryGetValue(lan, out node);
+		}
+		
+		public InternetServiceProvider CreateInternetServiceProvider(string cidrAddressRange)
 		{
 			// Create an ISP node in the simulation
 			InternetServiceNode ispNode = coreRouter.CreateServiceProvider(cidrAddressRange);
 			
 			// Create the ISP itself.
-			return new InternetServiceProvider(this, ispNode);
+			var ispController = new InternetServiceProvider(this, ispNode, coreRouter);
+
+			this.isps.Add(ispController, ispNode);
+			
+			return ispController;
 		}
 
 		public LocalAreaNetwork CreateLocalAreaNetwork()
@@ -31,94 +40,33 @@ namespace GameplaySystems.Networld
 			// of it.
 			LocalAreaNode lanNode = coreRouter.CreateGhostLan();
 
-			return new LocalAreaNetwork(this, lanNode);
-		}
-	}
+			var lanController = new LocalAreaNetwork(this, lanNode);
 
-	public class InternetServiceProvider
-	{
-		private readonly NetworkSimulationController simulation;
-		private readonly InternetServiceNode node;
-		private List<Edge<LocalAreaNetwork, InternetServiceProvider>> edges = new List<Edge<LocalAreaNetwork, InternetServiceProvider>>();
-
-		public InternetServiceProvider(NetworkSimulationController simulation, InternetServiceNode node)
-		{
-			this.simulation = simulation;
-			this.node = node;
-		}
-
-		public void ConnectLan(Edge<LocalAreaNetwork, InternetServiceProvider> connection)
-		{
-			if (connection.Side1 == null)
-				return;
-
-			if (connection.Token != connection.Side1.Token)
-				throw new InvalidOperationException("The specified connection link object was not created by the LAN object defined as side 1 of the connection. You are using this API incorrectly and C# provides no friendly way for me to stop you from doing so, and so you got this exception instead. Fucking hell.");
-
-			if (connection.Side2 != null)
-				connection.Side1.DisconnectFromInternet();
-
-			connection.Side2 = this;
-			this.edges.Add(connection);
-		}
-
-		public void DisconnectLan(LocalAreaNetwork lan)
-		{
-			if (lan.InternetServiceProvider != this)
-				return;
+			this.lans.Add(lanController, lanNode);
 			
-			// Find the edge that has the given LAN as side 1
-			Edge<LocalAreaNetwork, InternetServiceProvider>? edge = edges.FirstOrDefault(x => x.Side1 == lan);
-			if (edge == null)
-				return;
-
-			edges.Remove(edge);
-			edge.Side2 = null;
+			return lanController;
 		}
-	}
 
-	public class LocalAreaNetwork
-	{
-		private Edge<LocalAreaNetwork, InternetServiceProvider> connection = new Edge<LocalAreaNetwork, InternetServiceProvider>();
-		private NetworkSimulationController simulation;
-		private LocalAreaNode node;
-		
-		public Guid Token => connection.Token;
-
-		public InternetServiceProvider? InternetServiceProvider => connection.Side2;
-
-		public LocalAreaNetwork(NetworkSimulationController simulation, LocalAreaNode node)
+		public IEnumerable<InternetServiceProvider> GetInternetProviders()
 		{
-			this.simulation = simulation;
-			this.node = node;
+			return isps.Keys;
 		}
-		
-		public void ConnectToInternet(InternetServiceProvider isp)
+
+		public IEnumerable<LocalAreaNetwork> GetLans()
 		{
-			DisconnectFromInternet();
-
-			isp.ConnectLan(this.connection);
+			return lans.Keys;
 		}
 
-		public void DisconnectFromInternet()
+		public void DeleteLan(LocalAreaNetwork lan)
 		{
-			if (connection.Side2 == null)
-				return;
+			if (lan.InternetServiceProvider != null)
+				lan.DisconnectFromInternet();
 
-			connection.Side2.DisconnectLan(this);
+			if (this.lans.TryGetValue(lan, out LocalAreaNode lanNode))
+			{
+				coreRouter.DeleteLocalNode(lanNode);
+				lans.Remove(lan);
+			}
 		}
-
-		public NetworkConnection CreateDevice()
-		{
-			return this.node.SetUpNewDevice();
-		}
-	}
-	
-	public class Edge<T1, T2>
-	{
-		public T1? Side1 { get; set; }
-		public T2? Side2 { get; set; }
-
-		public Guid Token { get; } = Guid.NewGuid();
 	}
 }

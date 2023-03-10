@@ -73,5 +73,10 @@ namespace Architecture
 
 			Debug.Log($"Process {process.Id} on {process.User.Computer.Name} ran by user {process.User.UserName}: Killed");
 		}
+
+		public IEnumerable<IInitProcess> GetAllRootTasks()
+		{
+			return this.computers.Values;
+		}
 	}
 }

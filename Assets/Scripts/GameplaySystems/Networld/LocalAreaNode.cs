@@ -9,6 +9,7 @@ namespace GameplaySystems.Networld
 {
 	public class LocalAreaNode : INetworkSwitch
 	{
+		private readonly Dictionary<NetworkConnection, DeviceNode> connections = new Dictionary<NetworkConnection, DeviceNode>();
 		private List<NetworkInterface> insideInterfaces = new List<NetworkInterface>();
 		private NetworkInterface outboundInterface = new NetworkInterface();
 		private List<DeviceNode> devices = new List<DeviceNode>();
@@ -237,17 +238,50 @@ namespace GameplaySystems.Networld
 			deviceNode.NetworkInterface.Connect(newInterface);
 			
 			// Return the NetworkConnection that the rest of the game is allowed to use.
-			return deviceNode.NetworkConnection;
+			NetworkConnection connection = deviceNode.NetworkConnection;
+			this.connections.Add(connection, deviceNode);
+			return connection;
 		}
-	}
 
-	public class PortForwardingRule
-	{
-		public uint GlobalAddress { get; set; }
-		public uint InsideAddress { get; set; }
-		public uint OutsideAddress { get; set; }
-		public ushort InsidePort { get; set; }
-		public ushort OutsidePort { get; set; }
-		public ushort GlobalPort { get; set; }
+		public void DeleteDevice(NetworkConnection connection)
+		{
+			// Find the device
+			if (!connections.TryGetValue(connection, out DeviceNode node))
+				return;
+			
+			// Disconnect it from our LAN.
+			node.NetworkInterface.Disconnect();
+			
+			// Find the corresponding LAN interface, it'll have just been disconnected.
+			NetworkInterface? lanInterface = this.insideInterfaces.FirstOrDefault(x => !x.Connected && x != this.NetworkInterface);
+			if (lanInterface != null)
+			{
+				// Remove any forwarding rules associated with it
+				for (int i = forwardingTable.Count - 1; i >= 0; i--)
+				{
+					if (forwardingTable[i].InsideAddress != lanInterface.NetworkAddress)
+						continue;
+					
+					// Drop the port reservation, if any
+					PortForwardingRule rule = forwardingTable[i];
+					if (portTranslations.ContainsKey((rule.InsideAddress, rule.InsidePort)))
+						portTranslations.Remove((rule.InsideAddress, rule.InsidePort));
+					
+					// Drop the rule itself
+					forwardingTable.RemoveAt(i);
+				}
+				
+				// Drop the interface itself.
+				insideInterfaces.Remove(lanInterface);
+			}
+			
+			// Find the IP reservation for the node and remove it.
+			uint ipReservation = reservations.Keys.FirstOrDefault(x => reservations[x] == node);
+			if (reservations.ContainsKey(ipReservation))
+				reservations.Remove(ipReservation);
+			
+			// Drop the device from our list
+			devices.Remove(node);
+		}
 	}
 }

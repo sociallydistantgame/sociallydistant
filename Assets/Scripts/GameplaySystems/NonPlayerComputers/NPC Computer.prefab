@@ -16,7 +16,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!4 &8746881451945948163
 Transform:
   m_ObjectHideFlags: 0
@@ -46,3 +46,6 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   world: {fileID: 11400000, guid: 6ddfb5183f8225440a5d156e7fb16747, type: 2}
   deviceCoordinator: {fileID: 11400000, guid: aaa2ed62d698c314f96dbf5e0b134aad, type: 2}
+  networkSimulation: {fileID: 11400000, guid: 6fee4a465da4dd349b98f36a9ac9ec26, type: 2}
+  environmentVariables: {fileID: 11400000, guid: 66aac6d84e661da45acad8d220849082, type: 2}
+  fileSystemTable: {fileID: 11400000, guid: bb828d8e8ac833d4d8e497900bd7a3e9, type: 2}
