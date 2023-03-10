@@ -120,5 +120,10 @@ namespace Core.DataManagement
 				this.eventDispatcher.Create.Invoke(element);
 			}
 		}
+
+		public TDataElement[] ToArray()
+		{
+			return this.dataElements.ToArray();
+		}
 	}
 }

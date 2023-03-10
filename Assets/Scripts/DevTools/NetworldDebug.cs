@@ -25,11 +25,20 @@ namespace DevTools
 		/// <inheritdoc />
 		public void OnMenuGUI(DeveloperMenu devMenu)
 		{
+			if (GUILayout.Button("Set Player's ISP"))
+				devMenu.PushMenu(new SetPlayerIspMenu(world));
+			
 			if (GUILayout.Button("Create ISP"))
 				devMenu.PushMenu(new CreateIspMenu(world));
+
+			if (GUILayout.Button("Create LAN"))
+				devMenu.PushMenu(new CreateLanMenu(world));
 			
 			if (GUILayout.Button("Create Computer"))
 				devMenu.PushMenu(new CreateComputerMenu(world));
+			
+			if (GUILayout.Button("Set LAN for Computer"))
+				devMenu.PushMenu(new SetComputerLANMenu(world));
 		}
 	}
 }

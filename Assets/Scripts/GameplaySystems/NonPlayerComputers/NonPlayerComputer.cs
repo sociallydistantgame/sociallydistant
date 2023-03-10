@@ -100,7 +100,7 @@ namespace GameplaySystems.NonPlayerComputers
 		}
 
 		/// <inheritdoc />
-		public NetworkConnection? Network => null;
+		public NetworkConnection? Network => networkConnection;
 
 		public void UpdateWorldData(WorldComputerData data)
 		{
