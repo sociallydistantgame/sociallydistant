@@ -27,6 +27,11 @@ namespace GameplaySystems.GameManagement
 		public string GameDataDirectory => Registry.GameDataPath;
 
 		/// <summary>
+		///		Gets a value indicating whether the game is active.
+		/// </summary>
+		public bool IsGameActive => currentGame != null;
+		
+		/// <summary>
 		///		Gets a path where all save files are located.
 		/// </summary>
 		public string AllSavesDirectory => Path.Combine(GameDataDirectory, "saves");

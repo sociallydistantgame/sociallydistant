@@ -3,6 +3,7 @@ using Core;
 using Core.WorldData;
 using GameplaySystems.Networld;
 using Player;
+using UnityEngine;
 
 namespace DevTools
 {
@@ -22,8 +23,13 @@ namespace DevTools
 		}
 		
 		/// <inheritdoc />
-		public void OnGUI()
+		public void OnMenuGUI(DeveloperMenu devMenu)
 		{
+			if (GUILayout.Button("Create ISP"))
+				devMenu.PushMenu(new CreateIspMenu(world));
+			
+			if (GUILayout.Button("Create Computer"))
+				devMenu.PushMenu(new CreateComputerMenu(world));
 		}
 	}
 }

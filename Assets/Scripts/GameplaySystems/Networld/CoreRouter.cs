@@ -92,5 +92,21 @@ namespace GameplaySystems.Networld
 			this.neighbourInterfaces.Add(neighbourInterface);
 			return node;
 		}
+
+		public void DeleteLocalNode(LocalAreaNode node)
+		{
+			this.localAreaNodes.Remove(node);
+		}
+
+		public void MakeGhostNetwork(LocalAreaNode node)
+		{
+			if (node.NetworkInterface.Addressable || node.NetworkInterface.Connected)
+				throw new InvalidOperationException("LAN nodes cannot be turned into ghost nodes if they're connected to something.");
+
+			if (this.localAreaNodes.Contains(node))
+				return;
+			
+			this.localAreaNodes.Add(node);
+		}
 	}
 }

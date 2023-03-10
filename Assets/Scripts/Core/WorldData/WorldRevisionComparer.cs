@@ -36,25 +36,25 @@ namespace Core.WorldData
         /// <inheritdoc />
         public bool IsCurrentOrNewer(WorldRevision revision)
         {
-            return revision >= Current;
+            return Current >= revision;
         }
 
         /// <inheritdoc />
         public bool IsCurrentOrOlder(WorldRevision revision)
         {
-            return revision <= Current;
+            return Current <= revision;
         }
 
         /// <inheritdoc />
         public bool IsNewer(WorldRevision revision)
         {
-            return revision > Current;
+            return Current > revision;
         }
 
         /// <inheritdoc />
         public bool IsOlder(WorldRevision revision)
         {
-            return revision < Current;
+            return Current < revision;
         }
     }
 }

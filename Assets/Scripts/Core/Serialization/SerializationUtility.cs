@@ -10,7 +10,7 @@ namespace Core.Serialization
 		{
 			if (serializer.IsReading)
 			{
-				if (serializer.RevisionComparer.IsNewer(revision))
+				if (serializer.RevisionComparer.IsOlder(revision))
 					value = defaultValue;
 				else serializer.Serialize(ref value);
 			}
@@ -25,7 +25,7 @@ namespace Core.Serialization
 		{
 			if (serializer.IsReading)
 			{
-				if (serializer.RevisionComparer.IsNewer(revision))
+				if (serializer.RevisionComparer.IsOlder(revision))
 					value = defaultValue;
 				else serializer.Serialize(ref value);
 			}
@@ -40,7 +40,7 @@ namespace Core.Serialization
 		{
 			if (serializer.IsReading)
 			{
-				if (serializer.RevisionComparer.IsNewer(revision))
+				if (serializer.RevisionComparer.IsOlder(revision))
 					value = defaultValue;
 				else serializer.Serialize(ref value);
 			}
@@ -55,7 +55,7 @@ namespace Core.Serialization
 		{
 			if (serializer.IsReading)
 			{
-				if (serializer.RevisionComparer.IsNewer(revision))
+				if (serializer.RevisionComparer.IsOlder(revision))
 					value = defaultValue;
 				else serializer.Serialize(ref value);
 			}
@@ -70,7 +70,7 @@ namespace Core.Serialization
 		{
 			if (serializer.IsReading)
 			{
-				if (serializer.RevisionComparer.IsNewer(revision))
+				if (serializer.RevisionComparer.IsOlder(revision))
 					value = defaultValue;
 				else serializer.Serialize(ref value);
 			}
@@ -85,7 +85,7 @@ namespace Core.Serialization
 		{
 			if (serializer.IsReading)
 			{
-				if (serializer.RevisionComparer.IsNewer(revision))
+				if (serializer.RevisionComparer.IsOlder(revision))
 					value = defaultValue;
 				else serializer.Serialize(ref value);
 			}
@@ -100,7 +100,7 @@ namespace Core.Serialization
 		{
 			if (serializer.IsReading)
 			{
-				if (serializer.RevisionComparer.IsNewer(revision))
+				if (serializer.RevisionComparer.IsOlder(revision))
 					value = defaultValue;
 				else serializer.Serialize(ref value);
 			}
@@ -115,7 +115,7 @@ namespace Core.Serialization
 		{
 			if (serializer.IsReading)
 			{
-				if (serializer.RevisionComparer.IsNewer(revision))
+				if (serializer.RevisionComparer.IsOlder(revision))
 					value = defaultValue;
 				else serializer.Serialize(ref value);
 			}
@@ -130,7 +130,7 @@ namespace Core.Serialization
 		{
 			if (serializer.IsReading)
 			{
-				if (serializer.RevisionComparer.IsNewer(revision))
+				if (serializer.RevisionComparer.IsOlder(revision))
 					value = defaultValue;
 				else serializer.Serialize(ref value);
 			}
@@ -145,7 +145,7 @@ namespace Core.Serialization
 		{
 			if (serializer.IsReading)
 			{
-				if (serializer.RevisionComparer.IsNewer(revision))
+				if (serializer.RevisionComparer.IsOlder(revision))
 					value = defaultValue;
 				else serializer.Serialize(ref value);
 			}
@@ -160,7 +160,7 @@ namespace Core.Serialization
 		{
 			if (serializer.IsReading)
 			{
-				if (serializer.RevisionComparer.IsNewer(revision))
+				if (serializer.RevisionComparer.IsOlder(revision))
 					value = defaultValue;
 				else serializer.Serialize(ref value);
 			}
@@ -175,7 +175,7 @@ namespace Core.Serialization
 		{
 			if (serializer.IsReading)
 			{
-				if (serializer.RevisionComparer.IsNewer(revision))
+				if (serializer.RevisionComparer.IsOlder(revision))
 					value = defaultValue;
 				else serializer.Serialize(ref value);
 			}
@@ -190,7 +190,7 @@ namespace Core.Serialization
 		{
 			if (serializer.IsReading)
 			{
-				if (serializer.RevisionComparer.IsNewer(revision))
+				if (serializer.RevisionComparer.IsOlder(revision))
 					value = defaultValue;
 				else serializer.Serialize(ref value);
 			}
@@ -205,7 +205,7 @@ namespace Core.Serialization
 		{
 			if (serializer.IsReading)
 			{
-				if (serializer.RevisionComparer.IsNewer(revision))
+				if (serializer.RevisionComparer.IsOlder(revision))
 					value = defaultValue;
 				else serializer.Serialize(ref value);
 			}
@@ -234,7 +234,7 @@ namespace Core.Serialization
 		{
 			if (serializer.IsReading)
 			{
-				if (serializer.RevisionComparer.IsNewer(revision))
+				if (serializer.RevisionComparer.IsOlder(revision))
 					value = defaultValue;
 				else
 				{

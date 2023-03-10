@@ -72,6 +72,6 @@ namespace Core.Serialization.Binary
 
 		/// <inheritdoc />
 		public void Write(string value)
-			=> binaryWriter.Write(value);
+			=> binaryWriter.Write(value ?? string.Empty);
 	}
 }

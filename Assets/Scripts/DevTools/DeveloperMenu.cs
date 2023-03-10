@@ -1,7 +1,7 @@
 ﻿#nullable enable
 
-using System;
 using System.Collections.Generic;
+using Architecture;
 using Core;
 using GamePlatform;
 using GameplaySystems.GameManagement;
@@ -28,6 +28,9 @@ namespace DevTools
 		private WorldManagerHolder world = null!;
 
 		[SerializeField]
+		private DeviceCoordinator deviceCoordinator = null!;
+		
+		[SerializeField]
 		private GameManagerHolder gameManager = null!;
 
 		[SerializeField]
@@ -46,7 +49,9 @@ namespace DevTools
 
 		private void Start()
 		{
-			menus.Insert(0, new NetworldDebug(world.Value, networkSimulation.Value, playerInstance));
+			menus.Insert(0, new GameManagerDebug(gameManager));
+			menus.Insert(1, new NetworldDebug(world.Value, networkSimulation.Value, playerInstance));
+			menus.Insert(2, new GodModeMenu(deviceCoordinator, playerInstance));
 		}
 
 		private Rect GetScreenRect()
@@ -79,13 +84,10 @@ namespace DevTools
 			if (currentMenu != null)
 			{
 				GUILayout.Label(currentMenu.Name);
-				currentMenu.OnGUI();
+				currentMenu.OnMenuGUI(this);
 				if (GUILayout.Button("Go back"))
 				{
-					if (menuStack.Count > 0)
-						currentMenu = menuStack.Pop();
-					else
-						currentMenu = null;
+					PopMenu();
 				}
 			}
 			else
@@ -94,7 +96,7 @@ namespace DevTools
 				{
 					if (GUILayout.Button(menu.Name))
 					{
-						currentMenu = menu;
+						PushMenu(menu);
 						break;
 					}
 				}
@@ -102,6 +104,22 @@ namespace DevTools
 
 			GUILayout.EndScrollView();
 			GUILayout.EndArea();
+		}
+
+		public void PushMenu(IDevMenu menu)
+		{
+			if (this.currentMenu != null)
+				this.menuStack.Push(this.currentMenu);
+
+			this.currentMenu = menu;
+		}
+
+		public void PopMenu()
+		{
+			if (menuStack.Count > 0)
+				currentMenu = menuStack.Pop();
+			else
+				currentMenu = null;
 		}
 	}
 }

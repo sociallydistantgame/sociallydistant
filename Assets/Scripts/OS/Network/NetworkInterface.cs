@@ -23,6 +23,8 @@ namespace OS.Network
 		private BinaryDataReader? reader;
 		private bool addressable = false;
 
+		public bool Connected => otherInterface != null;
+		
 		public bool Addressable => addressable;
 
 		public string Name { get; }
@@ -35,6 +37,13 @@ namespace OS.Network
 		{
 			this.Name = name;
 			this.MacAddress = (long) Random.Range(0, long.MaxValue >> 16);
+		}
+
+		public void MakeUnaddressable()
+		{
+			this.addressable = false;
+			this.address = default;
+			this.subnet = default;
 		}
 		
 		public void MakeAddressable(Subnet subnet, uint address)

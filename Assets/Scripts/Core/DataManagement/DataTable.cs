@@ -111,9 +111,13 @@ namespace Core.DataManagement
 				SerializationUtility.SerializeAtRevision(ref element, serializer, serializer.RevisionComparer.Earliest);
 
 				instanceIdGenerator.ClaimUsedValue(element.InstanceId.Id);
-				
+
 				this.dataIndexMap.Add(element.InstanceId, i);
+				
 				dataElements.Add(element);
+				
+				// Fire the Create event for this data element.
+				this.eventDispatcher.Create.Invoke(element);
 			}
 		}
 	}

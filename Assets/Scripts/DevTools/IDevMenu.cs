@@ -4,6 +4,6 @@
 	{
 		string Name { get; }
 
-		void OnGUI();
+		void OnMenuGUI(DeveloperMenu devMenu);
 	}
 }

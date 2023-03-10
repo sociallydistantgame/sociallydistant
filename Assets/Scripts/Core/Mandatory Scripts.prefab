@@ -93,6 +93,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   world: {fileID: 11400000, guid: 6ddfb5183f8225440a5d156e7fb16747, type: 2}
+  deviceCoordinator: {fileID: 11400000, guid: aaa2ed62d698c314f96dbf5e0b134aad, type: 2}
   gameManager: {fileID: 11400000, guid: de6543312575e7f4294170ad6b5ed997, type: 2}
   playerInstance: {fileID: 11400000, guid: b143bb84d08c6044bb9b1a69e33c8460, type: 2}
   networkSimulation: {fileID: 11400000, guid: 6fee4a465da4dd349b98f36a9ac9ec26, type: 2}
