@@ -74,6 +74,13 @@ namespace GameplaySystems.Networld
 			if (!NetworkInterface.Addressable)
 				return;
 			
+			// If the source address is that of our outbound interface, send it to the Internet straight away.
+			if (packet.SourceAddress == this.outboundInterface.NetworkAddress)
+			{
+				this.outboundInterface.Send(packet);
+				return;
+			}
+			
 			// Find a port-forwarding rule that matches all of the packet's attributes.
 			PortForwardingRule? rule = this.forwardingTable.FirstOrDefault(x => x.InsideAddress == packet.SourceAddress
 			                                                                    && x.InsidePort == packet.SourcePort
@@ -144,8 +151,22 @@ namespace GameplaySystems.Networld
 			if ((packet.SourceAddress & this.insideNetwork.Mask) == insideNetwork.NetworkAddress
 			    && packet.DestinationAddress == insideNetwork.FirstHost)
 			{
-				HandleOwnPacket(packet);
-				return;
+				if(HandleOwnPacket(packet, true))
+					return;
+			}
+			
+			// For packets destined to our outside interface that are also coming from outside of the LAN, handle them
+			// internally as well. This allows anyone on the net to ping us.
+			//
+			// Note: We don't accept these packets if they originate from inside the LAN. IT'S NOT A BUG!
+			// The intended behaviour is for the packet to be scooped up by the Internet Service Node and
+			// sent straight back to us.
+			if ((packet.SourceAddress & this.insideNetwork.Mask) != insideNetwork.NetworkAddress
+			    && outboundInterface.Addressable
+			    && packet.DestinationAddress == outboundInterface.NetworkAddress)
+			{
+				if (HandleOwnPacket(packet, false))
+					return;
 			}
 			
 			// For packets originating within our network, leave them as-is.
@@ -154,7 +175,7 @@ namespace GameplaySystems.Networld
 				sendQueue.Enqueue(packet);
 				return;
 			}
-			
+
 			// Find a forwarding rule matching the destination address and port
 			PortForwardingRule? rule = forwardingTable.FirstOrDefault(x => (x.OutsideAddress==packet.SourceAddress || x.OutsideAddress==0)
 			                                                               && (x.OutsidePort == packet.SourcePort || x.OutsidePort==0)
@@ -176,7 +197,7 @@ namespace GameplaySystems.Networld
 			sendQueue.Enqueue(packet);
 		}
 
-		private void HandleOwnPacket(Packet packet)
+		private bool HandleOwnPacket(Packet packet, bool refuseUnrecognized)
 		{
 			switch (packet.PacketType)
 			{
@@ -188,13 +209,18 @@ namespace GameplaySystems.Networld
 				}
 				default:
 				{
+					if (!refuseUnrecognized)
+						return false;
+					
 					packet.SwapSourceAndDestination();
 					packet.PacketType = PacketType.Refusal;
+
 					break;
 				}
 			}
 
 			sendQueue.Enqueue(packet);
+			return true;
 		}
 		
 		private void ReadPackets(NetworkInterface iface)
