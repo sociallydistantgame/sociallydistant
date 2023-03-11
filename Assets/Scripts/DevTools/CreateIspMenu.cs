@@ -60,15 +60,4 @@ namespace DevTools
 			}
 		}
 	}
-
-	public static class DebugGUILayout
-	{
-		public static byte ByteField(byte value)
-		{
-			if (byte.TryParse(GUILayout.TextField(value.ToString()), out byte newValue))
-				return newValue;
-			
-			return value;
-		}
-	}
 }

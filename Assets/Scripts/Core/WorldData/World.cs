@@ -16,8 +16,9 @@ namespace Core.WorldData
 		public readonly DataTable<WorldInternetServiceProviderData, WorldRevision> InternetProviders;
 		public readonly DataTable<WorldLocalNetworkData, WorldRevision> LocalAreaNetworks;
 		public readonly DataTable<WorldNetworkConnection, WorldRevision> NetworkConnections;
-		
-		
+		public readonly DataTable<WorldPortForwardingRule, WorldRevision> PortForwardingRules;
+
+
 
 		public World(UniqueIntGenerator instanceIdGenerator, DataEventDispatcher eventDispatcher)
 		{
@@ -27,6 +28,7 @@ namespace Core.WorldData
 			InternetProviders = new DataTable<WorldInternetServiceProviderData, WorldRevision>(instanceIdGenerator, eventDispatcher);
 			LocalAreaNetworks = new DataTable<WorldLocalNetworkData, WorldRevision>(instanceIdGenerator, eventDispatcher);
 			NetworkConnections = new DataTable<WorldNetworkConnection, WorldRevision>(instanceIdGenerator, eventDispatcher);
+			PortForwardingRules = new DataTable<WorldPortForwardingRule, WorldRevision>(instanceIdGenerator, eventDispatcher);
 		}
 
 		public void Serialize(IRevisionedSerializer<WorldRevision> serializer)
@@ -36,15 +38,18 @@ namespace Core.WorldData
 			InternetProviders.Serialize(serializer, WorldRevision.AddedInternetServiceProviders);
 			LocalAreaNetworks.Serialize(serializer, WorldRevision.AddedInternetServiceProviders);
 			NetworkConnections.Serialize(serializer, WorldRevision.AddedInternetServiceProviders);
-			
+
 			// serialize after networking stuff, because it relies on them.
 			PlayerData.Serialize(serializer);
+
+			PortForwardingRules.Serialize(serializer, WorldRevision.AddedPortForwarding);
 		}
 
 		public void Wipe()
 		{
 			// You must wipe the world in reverse order of how you would create or serialize it.
 			// This ensures proper handling of deleting objects that depend on other objects.
+			this.PortForwardingRules.Clear();
 			this.PlayerData.Value = default;
 			this.NetworkConnections.Clear();
 			this.LocalAreaNetworks.Clear();

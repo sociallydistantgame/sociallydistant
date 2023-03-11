@@ -54,7 +54,8 @@ namespace GameplaySystems.Networld
 		{
 			if (!IsValid)
 				return;
-			
+
+			packet.SourcePort = this.port;
 			deviceNode?.EnqueuePacketForDelivery(packet);
 		}
 	}

@@ -53,6 +53,7 @@ namespace OS.Network
 
 			this.subnet = subnet;
 			this.address = address;
+			this.addressable = true;
 		}
 
 		public void Connect(NetworkInterface otherInterface)

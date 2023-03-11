@@ -69,10 +69,8 @@ namespace GameplaySystems.Networld
 						
 						// Notify the sender that we've accepted the connection
 						Packet response = packetEvent.Packet.Clone();
-						response.SourcePort = packetEvent.Packet.DestinationPort;
-						response.SourceAddress = packetEvent.Packet.DestinationAddress;
-						response.DestinationAddress = packetEvent.Packet.SourceAddress;
-						response.DestinationPort = packetEvent.Packet.SourcePort;
+						response.SwapSourceAndDestination();
+						response.PacketType = PacketType.ConnectAccept;
 						
 						// Encode the connection ID
 						var transmissionPacket = new TransmissionProtocolMessage();

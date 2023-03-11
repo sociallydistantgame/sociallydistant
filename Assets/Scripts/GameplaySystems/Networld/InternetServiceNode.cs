@@ -54,6 +54,12 @@ namespace GameplaySystems.Networld
 			NetworkInterface? mostSpecificNetwork = null;
 			foreach (NetworkInterface iface in Neighbours)
 			{
+				if (iface.NetworkAddress == destination)
+				{
+					mostSpecificNetwork = iface;
+					break;
+				}
+				
 				if ((destination & iface.SubnetMask) != (iface.NetworkAddress & iface.SubnetMask))
 					continue;
 

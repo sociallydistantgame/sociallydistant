@@ -39,6 +39,9 @@ namespace DevTools
 			
 			if (GUILayout.Button("Set LAN for Computer"))
 				devMenu.PushMenu(new SetComputerLANMenu(world));
+			
+			if (GUILayout.Button("Manage LAN Forwarding Tables"))
+				devMenu.PushMenu(new ManageForwardingTablesMenu(world));
 		}
 	}
 }
