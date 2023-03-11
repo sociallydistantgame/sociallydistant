@@ -15,6 +15,7 @@ namespace GameplaySystems.Networld
 	{
 		private readonly Dictionary<ObjectId, InternetServiceProvider> isps = new Dictionary<ObjectId, InternetServiceProvider>();
 		private readonly Dictionary<ObjectId, LocalAreaNetwork> lans = new Dictionary<ObjectId, LocalAreaNetwork>();
+		private readonly Dictionary<ObjectId, ForwardingTableEntry> portForwardEntries = new Dictionary<ObjectId, ForwardingTableEntry>();
 		private NonPlayerComputerEventListener npcComputers = null!;
 
 		[Header("Dependencies")]
@@ -59,17 +60,26 @@ namespace GameplaySystems.Networld
 			world.Value.Callbacks.AddModifyCallback<WorldNetworkConnection>(OnModifyConnection);
 			
 			world.Value.Callbacks.AddModifyCallback<WorldPlayerData>(OnPlayerDataModified);
+
+			world.Value.Callbacks.AddCreateCallback<WorldPortForwardingRule>(OnCreatePortForwardingRule);
+			world.Value.Callbacks.AddModifyCallback<WorldPortForwardingRule>(OnModifyPortForwardingRule);
+			world.Value.Callbacks.AddDeleteCallback<WorldPortForwardingRule>(OnDeletePortForwardingRule);
 		}
 
+		
 		private void OnPlayerDataModified(WorldPlayerData subjectprevious, WorldPlayerData subjectnew)
 		{
-			if (subjectprevious.PlayerInternetProvider == subjectnew.PlayerInternetProvider)
-				return;
-			
-			playerInstance.Value.PlayerLan.DisconnectFromInternet();
 			if (isps.TryGetValue(subjectnew.PlayerInternetProvider, out InternetServiceProvider isp))
 			{
+				if (playerInstance.Value.PlayerLan.InternetServiceProvider == isp)
+					return;
+				
+				playerInstance.Value.PlayerLan.DisconnectFromInternet();
 				playerInstance.Value.PlayerLan.ConnectToInternet(isp);
+			}
+			else
+			{
+				playerInstance.Value.PlayerLan.DisconnectFromInternet();
 			}
 		}
 
@@ -88,8 +98,74 @@ namespace GameplaySystems.Networld
 			world.Value.Callbacks.RemoveModifyCallback<WorldNetworkConnection>(OnModifyConnection);
 			
 			world.Value.Callbacks.RemoveModifyCallback<WorldPlayerData>(OnPlayerDataModified);
+			
+			world.Value.Callbacks.RemoveCreateCallback<WorldPortForwardingRule>(OnCreatePortForwardingRule);
+			world.Value.Callbacks.RemoveModifyCallback<WorldPortForwardingRule>(OnModifyPortForwardingRule);
+			world.Value.Callbacks.RemoveDeleteCallback<WorldPortForwardingRule>(OnDeletePortForwardingRule);
 		}
 
+		private void OnDeletePortForwardingRule(WorldPortForwardingRule subject)
+		{
+			if (!portForwardEntries.TryGetValue(subject.InstanceId, out ForwardingTableEntry entry))
+				return;
+
+			entry.Delete();
+			portForwardEntries.Remove(subject.InstanceId);
+		}
+
+		private void OnModifyPortForwardingRule(WorldPortForwardingRule subjectprevious, WorldPortForwardingRule subjectnew)
+		{
+			// get the LAN
+			if (!lans.TryGetValue(subjectnew.LanId, out LocalAreaNetwork lan))
+				return;
+			
+			// and the computer
+			if (!npcComputers.TryGetComputer(subjectnew.ComputerId, out NonPlayerComputer computer))
+				return;
+			
+			// Computer must have a network
+			if (computer.Network == null)
+				return;
+			
+			// Computer must be connected to this LAN
+			if (!lan.ContainsDevice(computer.Network))
+				return;
+
+			if (!portForwardEntries.TryGetValue(subjectnew.InstanceId, out ForwardingTableEntry entry))
+				return;
+
+			entry.Delete();
+			portForwardEntries.Remove(subjectnew.InstanceId);
+
+			OnCreatePortForwardingRule(subjectnew);
+		}
+
+		private void OnCreatePortForwardingRule(WorldPortForwardingRule subject)
+		{
+			// get the LAN
+			if (!lans.TryGetValue(subject.LanId, out LocalAreaNetwork lan))
+				return;
+			
+			// and the computer
+			if (!npcComputers.TryGetComputer(subject.ComputerId, out NonPlayerComputer computer))
+				return;
+			
+			// Computer must have a network
+			if (computer.Network == null)
+				return;
+			
+			// Computer must be connected to this LAN
+			if (!lan.ContainsDevice(computer.Network))
+				return;
+			
+			if (!portForwardEntries.TryGetValue(subject.InstanceId, out ForwardingTableEntry entry))
+			{
+				entry = lan.GetForwardingRule(computer.Network, subject.LocalPort, subject.GlobalPort);
+				this.portForwardEntries.Add(subject.InstanceId, entry);
+			}
+		}
+
+		
 		private void OnModifyConnection(WorldNetworkConnection subjectprevious, WorldNetworkConnection subjectnew)
 		{
 			HandleConnect(subjectnew);

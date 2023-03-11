@@ -7,6 +7,7 @@
 		AddedWorldTime = 2,
 		AddedMacAddresses = 3,
 		AddedInternetServiceProviders = 4,
+		AddedPortForwarding = 5,
 
 		Latest
 	}

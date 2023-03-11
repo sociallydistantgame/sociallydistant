@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Runtime.InteropServices.WindowsRuntime;
+using Codice.CM.Common;
 using OS.Network;
 using Steamworks;
 
@@ -155,9 +156,9 @@ namespace GameplaySystems.Networld
 			}
 			
 			// Find a forwarding rule matching the destination address and port
-			PortForwardingRule? rule = forwardingTable.FirstOrDefault(x => x.OutsideAddress == packet.SourcePort
-			                                                               && x.OutsidePort == packet.SourcePort
-			                                                               && x.GlobalAddress == packet.DestinationAddress
+			PortForwardingRule? rule = forwardingTable.FirstOrDefault(x => (x.OutsideAddress==packet.SourceAddress || x.OutsideAddress==0)
+			                                                               && (x.OutsidePort == packet.SourcePort || x.OutsidePort==0)
+			                                                               && (x.GlobalAddress == packet.DestinationAddress || x.GlobalAddress == 0)
 			                                                               && x.GlobalPort == packet.DestinationPort);
 			
 			// If no rule was found, refuse the packet
@@ -283,5 +284,44 @@ namespace GameplaySystems.Networld
 			// Drop the device from our list
 			devices.Remove(node);
 		}
+		
+		public ForwardingTableEntry GetForwardingRule(NetworkConnection connection, ushort insidePort, ushort outsidePort)
+		{
+			if (!connections.TryGetValue(connection, out DeviceNode node))
+				throw new InvalidOperationException("Device is not a part of this LAN");
+
+			uint insideAddress = node.NetworkInterface.NetworkAddress;
+		
+			// Find an existing rule matching the criteria
+			PortForwardingRule? rule = forwardingTable.FirstOrDefault(x => x.InsideAddress == insideAddress
+			                                                               && x.InsidePort == insidePort
+			                                                               && x.GlobalAddress == 0
+			                                                               && x.GlobalPort == outsidePort);
+			
+			// Create it if there's none.
+			if (rule == null)
+			{
+				rule = new PortForwardingRule
+				{
+					InsideAddress = insideAddress,
+					InsidePort = insidePort,
+					GlobalPort = outsidePort
+				};
+
+				forwardingTable.Add(rule);
+				
+				// Reserve the port in the translation table so we don't try to reserve it somewhere else
+				this.portTranslations.Add((insideAddress, insidePort), outsidePort);
+			}
+
+			return new ForwardingTableEntry(this.forwardingTable, rule, this.portTranslations);
+		}
+
+		public bool ContainsDevice(NetworkConnection connection)
+		{
+			return this.connections.ContainsKey(connection);
+		}
 	}
+	
+	
 }

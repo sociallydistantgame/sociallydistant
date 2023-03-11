@@ -16,6 +16,7 @@ namespace GameplaySystems.Networld
 		{
 			this.simulation = simulation;
 			this.node = node;
+			this.connection.Side1 = this;
 		}
 		
 		public void ConnectToInternet(InternetServiceProvider isp)
@@ -41,6 +42,16 @@ namespace GameplaySystems.Networld
 		public void DeleteDevice(NetworkConnection connection)
 		{
 			this.node.DeleteDevice(connection);
+		}
+
+		public ForwardingTableEntry GetForwardingRule(NetworkConnection connection, ushort insidePort, ushort outsidePort)
+		{
+			return this.node.GetForwardingRule(connection, insidePort, outsidePort);
+		}
+
+		public bool ContainsDevice(NetworkConnection connection)
+		{
+			return node.ContainsDevice(connection);
 		}
 	}
 }
