@@ -139,16 +139,10 @@ namespace UI.Terminal.SimpleTerminal
         
         public int DefaultRowCount => this.rowCount;
         public int DefaultColumnCount => this.columnCount;
-        public float CharacterWidth => this.TextWidthApproximation('?', font, fontSize);
+        public float CharacterWidth => CalculateCharSize('?', font, fontSize).x;
 
-        public float LineHeight
-        {
-            get
-            {
-                return CalculateCharSize('?', font, fontSize).y;
-            }
-        }
-        
+        public float LineHeight => CalculateCharSize('?', font, fontSize).y;
+
         /*/// <inheritdoc />
         protected override void ExecuteDefaultAction(EventBase evt)
         {
@@ -193,8 +187,7 @@ namespace UI.Terminal.SimpleTerminal
             this.lastBlink = 0;
         }
 
-
-        private bool ritchie;
+        
         private void Update()
         {
             if (this.master is null)
@@ -212,32 +205,29 @@ namespace UI.Terminal.SimpleTerminal
             float nwh = this.parentRectTransform.rect.height;
             if (this.ww != nww || this.wh != nwh)
             {
-                if (!ritchie)
+                this.ww = nww;
+                this.wh = nwh;
+
+                if (!this.drawing)
                 {
-                    this.ww = nww;
-                    this.wh = nwh;
+                    this.drawing = true;
+                    this.trigger = this.now;
+                }
 
-                    if (!this.drawing)
-                    {
-                        this.drawing = true;
-                        this.trigger = this.now;
-                    }
+                float cw = this.CharacterWidth;
+                float ch = this.LineHeight;
 
-                    float cw = this.CharacterWidth;
-                    float ch = this.LineHeight;
+                int r = (int)Math.Ceiling(this.wh / ch) - 1;
+                int c = (int)Math.Ceiling(this.ww / cw) - 1;
 
-                    int r = (int)Math.Ceiling(this.wh / ch) - 1;
-                    int c = (int)Math.Ceiling(this.ww / cw) - 1;
+                r = Math.Max(r, this.DefaultRowCount);
+                c = Math.Max(c, this.DefaultColumnCount);
 
-                    r = Math.Max(r, this.DefaultRowCount);
-                    c = Math.Max(c, this.DefaultColumnCount);
-
-                    this.layoutElement.minWidth = DefaultColumnCount * cw;
-                    this.layoutElement.minHeight = this.DefaultRowCount * ch;
-                    if (r != this.term.row || c != this.term.col)
-                    {
-                        this.Resize(c, r);
-                    }
+                this.layoutElement.minWidth = DefaultColumnCount * cw;
+                this.layoutElement.minHeight = this.DefaultRowCount * ch;
+                if (r != this.term.row || c != this.term.col)
+                {
+                    this.Resize(c, r);
                 }
             }
 
