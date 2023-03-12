@@ -40,48 +40,6 @@ namespace UI.Terminal.SimpleTerminal
             this.fg.fontSize = fontSize;
         }
         
-        public void SwapWith(RenderedLine other)
-        {
-            TextMeshProUGUI otherfg = other.fg;
-            TextMeshProUGUI otherbg = other.bg;
-            TextPiece[] otherpieces = other.pieces;
-            StringBuilder otherbsb = other.bsb;
-            StringBuilder otherfsb = other.fsb;
-
-            // Take possession of the other line's text
-            otherbg.transform.SetParent(rootTransform);
-            otherfg.transform.SetParent(rootTransform);
-
-            // Give our own text to the other line
-            this.bg.transform.SetParent(other.rootTransform);
-            this.fg.transform.SetParent(other.rootTransform);
-            
-            // Give the other line our current references
-            other.bg = this.bg;
-            other.fg = this.fg;
-            other.pieces = this.pieces;
-            other.bsb = this.bsb;
-            other.fsb = this.fsb;
-
-            // Take the other line's data
-            this.bg = otherbg;
-            this.fg = otherfg;
-            this.pieces = otherpieces;
-            this.bsb = other.bsb;
-            this.fsb = otherfsb;
-        }
-
-        public void CopyFrom(RenderedLine other)
-        {
-            Array.Copy(other.pieces, 0, this.pieces, 0, this.pieces.Length);
-
-            this.bg.text = other.bg.text;
-            this.fg.text = other.fg.text;
-
-            this.bsb = new StringBuilder(this.bg.text);
-            this.fsb = new StringBuilder(this.fg.text);
-        }
-
         public void SetColumnSize(int cols)
         {
             int l = this.pieces.Length;
@@ -110,6 +68,10 @@ namespace UI.Terminal.SimpleTerminal
             this.fg = fgGameObject.AddComponent<TextMeshProUGUI>();
             this.bg = bgGameObject.AddComponent<TextMeshProUGUI>();
 
+            // Prevent word-wrapping because it's handled by the terminal
+            this.fg.enableWordWrapping = false;
+            this.bg.enableWordWrapping = false;
+            
             var bgLayoutElement = bgGameObject.AddComponent<LayoutElement>();
             bgLayoutElement.ignoreLayout = true;
 
@@ -125,7 +87,7 @@ namespace UI.Terminal.SimpleTerminal
             //   TEXT LINE
             //     BACKGROUND
             //     TEXT
-            this.rootTransform.SetParent(this.term.transform);
+            this.rootTransform.SetParent(this.term.TextAreaTransform);
             bg.transform.SetParent(rootTransform);
             fg.transform.SetParent(rootTransform);
 
