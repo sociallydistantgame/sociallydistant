@@ -18,6 +18,8 @@ namespace Architecture
 		protected string[] Arguments { get; private set; } = null!;
 		protected VirtualFileSystem FileSystem { get; private set; } = null!;
 		protected NetworkConnection? Network => this.process.User.Computer.Network;
+		protected string UserName => process.User.UserName;
+		protected string HostName => process.User.Computer.Name;
 
 		protected string CurrentWorkingDirectory => process.WorkingDirectory;
 		
