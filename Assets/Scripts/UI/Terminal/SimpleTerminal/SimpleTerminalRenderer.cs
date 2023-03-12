@@ -136,7 +136,12 @@ namespace UI.Terminal.SimpleTerminal
         [Header("Sound Effects")]
         [SerializeField]
         private SoundEffectAsset asciiBeep = null!;
+
+        [Header("Layout")]
+        [SerializeField]
+        private VerticalLayoutGroup textAreaGroup = null!;
         
+        public RectTransform TextAreaTransform => textAreaGroup.transform as RectTransform;
         public int DefaultRowCount => this.rowCount;
         public int DefaultColumnCount => this.columnCount;
         public float CharacterWidth => CalculateCharSize('?', font, fontSize).x;
