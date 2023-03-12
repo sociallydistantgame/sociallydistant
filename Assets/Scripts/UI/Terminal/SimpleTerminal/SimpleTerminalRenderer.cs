@@ -3040,8 +3040,9 @@ namespace UI.Terminal.SimpleTerminal
             font.TryAddCharacters(ch.ToString());
             if (!font.characterLookupTable.TryGetValue(ch, out TMP_Character character))
                 character = font.characterLookupTable['?'];
-            float width = character.glyph.metrics.horizontalAdvance * pointSizeScale +
-                          (styleSpacingAdjustment + normalSpacingAdjustment) * emScale;
+            float width = (character.glyph.metrics.horizontalAdvance * pointSizeScale +
+                           (styleSpacingAdjustment + normalSpacingAdjustment) * emScale)
+                          / transform.lossyScale.x;
 
             return new Vector2(width, height);
         }
