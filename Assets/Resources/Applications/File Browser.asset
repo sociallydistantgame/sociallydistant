@@ -14,7 +14,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   binaryName: browse
   windowTitle: File Browser
-  programGuiPrefab: {fileID: 536731253686827546, guid: cbfa175b53c5a7d44a0088de659735be, type: 3}
+  programGuiPrefab: {fileID: 536731253686827546, guid: a70850b7b67e6b5e1a8c2e5549c9af43, type: 3}
   programIcon:
     textIcon: \ue2c7
     spriteIcon: {fileID: 0}
