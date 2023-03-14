@@ -40,11 +40,11 @@ namespace UI.Shell
 			while (readPosition < buffer.Length)
 			{
 				char current = buffer[readPosition];
+				readPosition++;
 				if (character == current)
 					break;
 
 				sb.Append(current);
-				readPosition++;
 			}
 			
 			return sb.ToString();
