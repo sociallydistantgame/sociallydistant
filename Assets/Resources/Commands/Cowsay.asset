@@ -12,5 +12,5 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 909d9b1134d44630a589eac58dc2d119, type: 3}
   m_Name: Cowsay
   m_EditorClassIdentifier: 
-  binaryName: 
+  binaryName: cowsay
   autoKillOnComplete: 1
