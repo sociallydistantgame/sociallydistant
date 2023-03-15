@@ -15,6 +15,9 @@ namespace VfsMapping
 		/// <inheritdoc />
 		public string Name { get; }
 
+		/// <inheritdoc />
+		public abstract bool CanExecute { get; }
+		
 		protected TAssetType Asset => asset;
 		
 		/// <inheritdoc />

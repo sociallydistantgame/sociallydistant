@@ -10,6 +10,9 @@ namespace VfsMapping
 	public sealed class UguiProgramBinaryFile : AssetFileEntry<UguiProgram>
 	{
 		/// <inheritdoc />
+		public override bool CanExecute => true;
+		
+		/// <inheritdoc />
 		public UguiProgramBinaryFile(IDirectoryEntry parent, UguiProgram asset) : base(parent, asset)
 		{ }
 

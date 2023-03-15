@@ -8,6 +8,9 @@ namespace VfsMapping
 	public sealed class ScriptableCommandFileEntry : AssetFileEntry<ScriptableCommandBase>
 	{
 		/// <inheritdoc />
+		public override bool CanExecute => true;
+		
+		/// <inheritdoc />
 		public ScriptableCommandFileEntry(IDirectoryEntry parent, ScriptableCommandBase asset) : base(parent, asset)
 		{ }
 

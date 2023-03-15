@@ -12,6 +12,9 @@ namespace OS.FileSystems.Host
 		public string Name => Path.GetFileName(hostFile);
 
 		/// <inheritdoc />
+		public bool CanExecute => false;
+		
+		/// <inheritdoc />
 		public IDirectoryEntry Parent { get; }
 
 		public HostFileEntry(IDirectoryEntry parent, string fullPath)
