@@ -204,6 +204,17 @@ namespace OS.FileSystems
 			return stream;
 		}
 
+		public bool IsExecutable(string path)
+		{
+			string[] parts = PathUtility.Split(path);
+			IFileEntry? file = FindFileEntry(parts, this.user);
+
+			if (file == null)
+				return false;
+
+			return file.CanExecute;
+		}
+		
 		public ISystemProcess Execute(ISystemProcess parentProcess, string path, ITextConsole console, string[] arguments)
 		{
 			string[] parts = PathUtility.Split(path);
