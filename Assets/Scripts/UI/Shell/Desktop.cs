@@ -53,7 +53,7 @@ namespace UI.Shell
 				throw new InvalidOperationException("Cannot launch a program window because the workspace didn't create a valid window.");
 
 			// Spawn the program
-			program.InstantiateIntoWindow(windowProcess, win);
+			program.InstantiateIntoWindow(windowProcess, win, console);
 			return windowProcess;
 		}
 	}

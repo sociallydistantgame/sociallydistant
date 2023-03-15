@@ -91,7 +91,10 @@ namespace Utility
 			if (lastSeparator == -1)
 				return string.Empty;
 
-			return path.Substring(0, lastSeparator);
+			string parent = path.Substring(0, lastSeparator);
+			if (parent.Length == 0)
+				return SeparatorChar.ToString();
+			return parent;
 		}
 	}
 }

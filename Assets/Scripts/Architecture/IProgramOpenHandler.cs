@@ -6,6 +6,6 @@ namespace Architecture
 {
 	public interface IProgramOpenHandler
 	{
-		void OnProgramOpen(ISystemProcess process, IWindow window);
+		void OnProgramOpen(ISystemProcess process, IWindow window, ITextConsole console);
 	}
 }

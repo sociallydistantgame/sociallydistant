@@ -28,6 +28,7 @@ namespace UI.Applications.FileManager
 		private Stack<string> future = new Stack<string>();
 		private ITextConsole console = null!;
 
+		public bool CanGoUp => currentDirectory != "/";
 		public bool CanGoBack => history.Any();
 		public bool CanGoForward => future.Any();
 
@@ -66,12 +67,13 @@ namespace UI.Applications.FileManager
 		}
 
 		/// <inheritdoc />
-		public void OnProgramOpen(ISystemProcess process, IWindow window)
+		public void OnProgramOpen(ISystemProcess process, IWindow window, ITextConsole console)
 		{
 			this.process = process;
 			this.window = window;
 			this.vfs = process.User.Computer.GetFileSystem(process.User);
 			this.currentDirectory = this.process.WorkingDirectory;
+			this.console = console;
 		}
 
 		private void UpdateUI()
@@ -81,7 +83,7 @@ namespace UI.Applications.FileManager
 
 			this.backButton.enabled = CanGoBack;
 			this.forwardButton.enabled = CanGoForward;
-			this.upButton.enabled = false;
+			this.upButton.enabled = CanGoUp;
 			
 			// Get all directories AND files in the current one
 			var allEntries = new List<string>();
@@ -122,13 +124,13 @@ namespace UI.Applications.FileManager
 				GoTo(path);
 			else if (vfs.IsExecutable(path))
 			{
-				process.User.Computer.ExecuteProgram(process, null, path, Array.Empty<string>());
+				process.User.Computer.ExecuteProgram(process, console, path, Array.Empty<string>());
 			}
 		}
 
 		public void GoUp()
 		{
-			throw new NotImplementedException();
+			GoTo(PathUtility.GetDirectoryName(currentDirectory));
 		}
 
 		
