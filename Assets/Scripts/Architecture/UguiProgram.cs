@@ -36,7 +36,7 @@ namespace Architecture
 		public CompositeIcon Icon => this.programIcon;
 		
 		/// <inheritdoc />
-		public void InstantiateIntoWindow(ISystemProcess process, IWindowWithClient<RectTransform> window)
+		public void InstantiateIntoWindow(ISystemProcess process, IWindowWithClient<RectTransform> window, ITextConsole console)
 		{
 			// Delay execution of Awake until we're ready.
 			programGuiPrefab.gameObject.SetActive(false);
@@ -63,7 +63,7 @@ namespace Architecture
 			IProgramOpenHandler[] openHandlers = programRect.gameObject.GetComponentsInChildren<IProgramOpenHandler>(true);
 			foreach (IProgramOpenHandler handler in openHandlers)
 			{
-				handler.OnProgramOpen(process, window);
+				handler.OnProgramOpen(process, window, console);
 			}
 
 			// Enable the program rect so Awake gets called

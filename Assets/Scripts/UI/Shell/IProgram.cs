@@ -8,6 +8,6 @@ namespace UI.Shell
 		string BinaryName { get; }
 		string WindowTitle { get; }
 		
-		void InstantiateIntoWindow(ISystemProcess process, IWindowWithClient<TProgramUserInterface> window);
+		void InstantiateIntoWindow(ISystemProcess process, IWindowWithClient<TProgramUserInterface> window, ITextConsole console);
 	}
 }
