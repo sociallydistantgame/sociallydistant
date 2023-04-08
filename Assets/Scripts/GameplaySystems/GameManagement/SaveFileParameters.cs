@@ -6,6 +6,7 @@ namespace GameplaySystems.GameManagement
 	/// <summary>
 	///		Represents the contents of the "params.json" file found in a Socially Distant save file.
 	/// </summary>
+	[Serializable]
 	public class SaveFileParameters
 	{
 		public string? playerName;

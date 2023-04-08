@@ -7,7 +7,7 @@ using System.Text;
 using Core;
 using Core.Config;
 using Core.Serialization.Binary;
-using Newtonsoft.Json;
+using System.Text.Json;
 using UnityEngine;
 
 namespace GameplaySystems.GameManagement
@@ -75,7 +75,7 @@ namespace GameplaySystems.GameManagement
 				try
 				{
 					string json = File.ReadAllText(paramsPath);
-					parameters = Newtonsoft.Json.JsonConvert.DeserializeObject<SaveFileParameters>(json);
+					parameters = JsonUtility.FromJson<SaveFileParameters>(json);
 				}
 				catch (Exception ex)
 				{
@@ -204,7 +204,7 @@ namespace GameplaySystems.GameManagement
 			currentGame!.lastPlayedDate = DateTime.UtcNow;
 			
 			string paramsFile = Path.Combine(currentGamePath!, paramsFileName);
-			string json = JsonConvert.SerializeObject(currentGame!);
+			string json = JsonUtility.ToJson(currentGame);
 			
 			File.WriteAllText(paramsFile, json);
 		}

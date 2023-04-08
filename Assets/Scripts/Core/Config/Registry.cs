@@ -4,8 +4,8 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
-using Newtonsoft.Json.Linq;
 using UnityEngine;
+using System.Text.Json;
 using Application = UnityEngine.Device.Application;
 
 namespace Core.Config
@@ -13,7 +13,7 @@ namespace Core.Config
 	public static class Registry
 	{
 		private static bool initialized;
-		private static JObject currentRegistry = new JObject();
+		private static VariantDatabase currentRegistry = new VariantDatabase();
 
 		public static event Action? Updated;
 		
@@ -34,11 +34,11 @@ namespace Core.Config
 			Updated?.Invoke();
 		}
 
-		public static IEnumerable<KeyValuePair<string, JToken?>> GetAllKeys()
+		public static IEnumerable<KeyValuePair<string, Variant?>> GetAllKeys()
 		{
 			ThrowIfNotInitialized();
 
-			foreach (KeyValuePair<string, JToken?> key in currentRegistry)
+			foreach (KeyValuePair<string, Variant?> key in currentRegistry)
 			{
 				yield return key;
 			}
@@ -71,13 +71,12 @@ namespace Core.Config
 			ThrowIfNotInitialized();
 			value = default;
 
-			if (currentRegistry.TryGetValue(key, out JToken? jobj))
+			if (currentRegistry.TryGetValue(key, out Variant? jobj))
 			{
-				RegistryValue<T>? registryValue = jobj.ToObject<RegistryValue<T>>();
-				if (registryValue is null)
+				if (!jobj.Is<T>())
 					return false;
 
-				value = registryValue.Value;
+				value = jobj.GetValue<T>();
 				return true;
 			}
 
@@ -102,18 +101,12 @@ namespace Core.Config
 				if (value is null)
 					currentRegistry.Remove(key);
 				else
-					currentRegistry[key] = JObject.FromObject(new RegistryValue<T>
-					{
-						Value = value
-					});
+					currentRegistry[key] = Variant.FromObject(value);
 			}
 			else
 			{
 				if (value is not null)
-					currentRegistry.Add(key, JObject.FromObject(new RegistryValue<T>
-					{
-						Value = value
-					}));
+					currentRegistry.Add(key, Variant.FromObject(value));
 			}
 
 			SaveRegistry();
@@ -128,7 +121,7 @@ namespace Core.Config
 		
 		private static void WipeRegistry()
 		{
-			currentRegistry = new JObject();
+			currentRegistry = new VariantDatabase();
 		}
 
 		private static void LoadRegistry()
@@ -140,7 +133,7 @@ namespace Core.Config
 
 				try
 				{
-					currentRegistry = JObject.Parse(json);
+					currentRegistry = VariantDatabase.Parse(json);
 					success = true;
 				}
 				catch (Exception ex)
