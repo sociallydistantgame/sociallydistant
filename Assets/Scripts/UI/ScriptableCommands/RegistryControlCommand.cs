@@ -4,7 +4,7 @@ using System.Collections.Generic;
 using System.Linq;
 using Architecture;
 using Core.Config;
-using Newtonsoft.Json.Linq;
+using System.Text.Json.Nodes;
 using UnityEngine;
 
 namespace UI.ScriptableCommands
@@ -39,7 +39,7 @@ namespace UI.ScriptableCommands
 					if (Registry.HasKey(keyName))
 					{
 						string textValue = Registry.GetAllKeys().FirstOrDefault(x => x.Key == keyName)
-							.Value?["Value"]?.ToString() ?? "<null>";
+							.Value?.ToString() ?? "<null>";
 
 						Console.WriteLine($"{keyName}: {textValue}");
 					}
@@ -78,9 +78,9 @@ namespace UI.ScriptableCommands
 		
 		private void DumpRegistryContents()
 		{
-			KeyValuePair<string, JToken?>[] keyPairs = Registry.GetAllKeys().ToArray();
+			KeyValuePair<string, Variant?>[] keyPairs = Registry.GetAllKeys().ToArray();
 			string[] keys = keyPairs.Select(x => x.Key).ToArray();
-			string[] textValues = keyPairs.Select(x => x.Value?["Value"]?.ToString() ?? "<null>").ToArray();
+			string[] textValues = keyPairs.Select(x => x.Value?.Value?.ToString() ?? "<null>").ToArray();
 
 			int longestKey = keys.Select(x => x.Length).OrderByDescending(x => x).First();
 			int longestValue = textValues.Select(x => x.Length).OrderByDescending(x => x).First();
