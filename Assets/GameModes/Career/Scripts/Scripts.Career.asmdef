@@ -1,0 +1,16 @@
+{
+    "name": "Scripts.Career",
+    "rootNamespace": "",
+    "references": [
+        "GUID:4497cc6d32f1cce0c9ecb27f90245bad"
+    ],
+    "includePlatforms": [],
+    "excludePlatforms": [],
+    "allowUnsafeCode": false,
+    "overrideReferences": false,
+    "precompiledReferences": [],
+    "autoReferenced": true,
+    "defineConstraints": [],
+    "versionDefines": [],
+    "noEngineReferences": false
+}
