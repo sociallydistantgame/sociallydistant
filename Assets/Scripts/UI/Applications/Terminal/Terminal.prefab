@@ -103,6 +103,8 @@ GameObject:
   - component: {fileID: 7106833574078219422}
   - component: {fileID: 518235230467898234}
   - component: {fileID: 797704888478535449}
+  - component: {fileID: 6798772278567799090}
+  - component: {fileID: 8872636909277723952}
   m_Layer: 0
   m_Name: Text Area
   m_TagString: Untagged
@@ -190,6 +192,34 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   m_HorizontalFit: 2
   m_VerticalFit: 2
+--- !u!114 &6798772278567799090
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 5309517041679775206}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 15c2cf89e30d4e29b737448c1c1abd5d, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  font: {fileID: 11400000, guid: d0626ae8c7fb25f449d6427b591abfaf, type: 2}
+  fontSize: 16
+  asciiBeep: {fileID: 0}
+  backgroundGraphic: {fileID: 8831732625854447881}
+--- !u!114 &8872636909277723952
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 5309517041679775206}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 0fbc272f4694434a9f2819136c9cdd4c, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
 --- !u!1 &9067614289341803092
 GameObject:
   m_ObjectHideFlags: 0
@@ -201,8 +231,8 @@ GameObject:
   - component: {fileID: 2531279400707136200}
   - component: {fileID: 8352000045016702562}
   - component: {fileID: 2744779468550916393}
-  - component: {fileID: 2375884414938296448}
-  - component: {fileID: 4659640462490114886}
+  - component: {fileID: 8657135228340164640}
+  - component: {fileID: 8831732625854447881}
   m_Layer: 0
   m_Name: Terminal Emulator
   m_TagString: Untagged
@@ -274,9 +304,8 @@ MonoBehaviour:
   maxLatency: 0
   blinkTimeout: 0
   mouseScrollLineCount: 3
-  asciiBeep: {fileID: 0}
   textAreaGroup: {fileID: 7106833574078219422}
---- !u!222 &2375884414938296448
+--- !u!222 &8657135228340164640
 CanvasRenderer:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -284,7 +313,7 @@ CanvasRenderer:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 9067614289341803092}
   m_CullTransparentMesh: 1
---- !u!114 &4659640462490114886
+--- !u!114 &8831732625854447881
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}

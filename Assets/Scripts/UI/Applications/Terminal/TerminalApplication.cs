@@ -93,7 +93,6 @@ namespace UI.Applications.Terminal
 					);
 				}
 				
-				this.st.Bell();
 				return false;
 			}
 

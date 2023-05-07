@@ -6,6 +6,7 @@ using OS.Devices;
 using UI.Terminal.SimpleTerminal.Data;
 using UI.Terminal.SimpleTerminal.Pty;
 using UnityEngine;
+using Utility;
 using static UI.Terminal.SimpleTerminal.Data.EmulatorConstants;
 
 namespace UI.Terminal.SimpleTerminal
@@ -13,6 +14,7 @@ namespace UI.Terminal.SimpleTerminal
     public class SimpleTerminalSession : ITextConsole
     {
         private LineEditorState lineEditorState;
+        private readonly SimpleTerminal term;
         private readonly PseudoTerminal pty;
         private readonly byte[] ttybuf = new byte[1024];
         private int ttybuflen;
@@ -24,8 +26,9 @@ namespace UI.Terminal.SimpleTerminal
         private StringBuilder line = new StringBuilder();
         private int cursor;
 
-        public SimpleTerminalSession(PseudoTerminal pty)
+        public SimpleTerminalSession(SimpleTerminal term, PseudoTerminal pty)
         {
+            this.term = term;
             this.pty = pty;
         }
 
@@ -203,7 +206,7 @@ namespace UI.Terminal.SimpleTerminal
                 var len = 0;
                 var width = 0;
 
-                control = SimpleTerminalRenderer.IsControl(u);
+                control = SimpleTerminal.IsControl(u);
 
                 if (u < 127)
                 {
@@ -214,14 +217,14 @@ namespace UI.Terminal.SimpleTerminal
                 {
                     len = TermUtf8.utf8encode(u, c);
 
-                    if (!control && (width = SimpleTerminalRenderer.wcwidth(u)) == -1)
+                    if (!control && (width = SimpleTerminal.Wcwidth(u)) == -1)
                         width = 1;
                 }
 
                 if ((this.lineEditorState.esc & EscapeState.ESC_STR) != 0)
                 {
                     if (u == '\a' || u == 030 || u == 032 || u == 033 ||
-                        SimpleTerminalRenderer.ISCONTROLC1(u))
+                        SimpleTerminal.Iscontrolc1(u))
                     {
                         this.lineEditorState.esc &= ~(EscapeState.ESC_START | EscapeState.ESC_STR);
                         this.lineEditorState.esc |= EscapeState.ESC_STR_END;
@@ -247,7 +250,7 @@ namespace UI.Terminal.SimpleTerminal
                             return;
                         this.strescseq.siz *= 2;
                         this.strescseq.buf =
-                            SimpleTerminalRenderer.XRealloc(ref this.strescseq.buf, this.strescseq.siz);
+                            SimpleTerminal.XRealloc(ref this.strescseq.buf, this.strescseq.siz);
                     }
 
                     var ptr = new IntPtr(c);
@@ -268,7 +271,7 @@ namespace UI.Terminal.SimpleTerminal
                     if ((this.lineEditorState.esc & EscapeState.ESC_CSI) != 0)
                     {
                         this.csiescseq.buf[this.csiescseq.len++] = (byte)u;
-                        if (SimpleTerminalRenderer.BETWEEN(u, 0x40, 0x7E) ||
+                        if (SimpleTerminal.Between(u, 0x40, 0x7E) ||
                             this.csiescseq.len >= this.csiescseq.buf.Length - 1)
                         {
                             this.lineEditorState.esc = 0;
@@ -423,7 +426,7 @@ namespace UI.Terminal.SimpleTerminal
                     {
                         np = null;
                         byte** nnp = &np;
-                        v = SimpleTerminalRenderer.strtol(p2, ref nnp, 10);
+                        v = GottaGoFast.strtol(p2, ref nnp, 10);
                         if (np == p)
                             v = 0;
                         if (v == long.MaxValue || v == long.MinValue)
@@ -637,14 +640,14 @@ namespace UI.Terminal.SimpleTerminal
             if (!this.lineEditorState.isEditing)
                 return;
 
-            string[] lines = this.WordWrap(this.line, this.lineEditorState.firstLineColumn, this.pty.Columns,
+            string[] lines = this.WordWrap(this.line, this.lineEditorState.firstLineColumn, this.term.Columns,
                 out int cx, out int cy);
 
             // Determine if we need to scroll.
             int bottom = this.lineEditorState.firstLineRow + lines.Length;
-            if (bottom > this.pty.Rows)
+            if (bottom > this.term.Rows)
             {
-                int scroll = bottom - this.pty.Rows;
+                int scroll = bottom - this.term.Rows;
                 this.lineEditorState.firstLineRow -= scroll; // Adjust first row to compensate
 
                 // Scroll up
@@ -675,8 +678,8 @@ namespace UI.Terminal.SimpleTerminal
             if (!this.lineEditorState.isEditing)
             {
                 this.lineEditorState.isEditing = true;
-                this.lineEditorState.firstLineColumn = this.pty.CursorLeft;
-                this.lineEditorState.firstLineRow = this.pty.CursorTop;
+                this.lineEditorState.firstLineColumn = this.term.CursorLeft;
+                this.lineEditorState.firstLineRow = this.term.CursorTop;
                 this.prevLineCount = 0;
             }
         }

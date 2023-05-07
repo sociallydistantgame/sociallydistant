@@ -13,11 +13,6 @@ namespace UI.Terminal.SimpleTerminal.Pty
         private ThreadSafeFifoBuffer inputStream;
         private ThreadSafeFifoBuffer outputStream;
 
-        public int CursorLeft => this.options.CursorLeft;
-        public int CursorTop => this.options.CursorTop;
-        public int Rows => this.options.RowCount;
-        public int Columns => this.options.ColumnCount;
-
         /// <inheritdoc/>
         public override bool CanRead => true;
 

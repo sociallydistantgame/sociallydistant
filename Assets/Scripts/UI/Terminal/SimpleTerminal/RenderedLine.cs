@@ -15,7 +15,7 @@ namespace UI.Terminal.SimpleTerminal
     public class RenderedLine
     {
         private TextPiece[] pieces = Array.Empty<TextPiece>();
-        private readonly SimpleTerminalRenderer term;
+        private readonly UguiTerminalScreen term;
         private RectTransform rootTransform;
         private GameObject root;
         private TextMeshProUGUI bg;
@@ -25,7 +25,7 @@ namespace UI.Terminal.SimpleTerminal
 
         public Rect rect => this.rootTransform.rect;
 
-        public RenderedLine(SimpleTerminalRenderer term)
+        public RenderedLine(UguiTerminalScreen term)
         {
             this.term = term;
 
@@ -87,7 +87,7 @@ namespace UI.Terminal.SimpleTerminal
             //   TEXT LINE
             //     BACKGROUND
             //     TEXT
-            this.rootTransform.SetParent(this.term.TextAreaTransform);
+            this.rootTransform.SetParent(this.term.transform);
             bg.transform.SetParent(rootTransform);
             fg.transform.SetParent(rootTransform);
 
