@@ -19,9 +19,17 @@ namespace UI.Terminal
 			textConsole.ClearScreen();
 		}
 
+		public string Normalize(string text)
+		{
+			return text.Replace("\r\n", "\n")
+				.Replace("\n\r", "\n")
+				.Replace("\r", "\n")
+				.Replace("\n", Environment.NewLine);
+		}
+		
 		public void Write(string text)
 		{
-			textConsole.WriteText(text);
+			textConsole.WriteText(Normalize(text));
 		}
 
 		public void WriteLine()
