@@ -9,6 +9,52 @@ namespace Utility
 {
 	public static class ShellUtility
 	{
+		public static string MakeAbsolutePath(string path, string homeDirectory)
+		{
+			string[] parts = PathUtility.Split(path);
+			string[] homeParts = PathUtility.Split(homeDirectory);
+			
+			var partStack = new Stack<string>();
+
+			foreach (string part in parts)
+			{
+				if (part == "~")
+				{
+					partStack.Clear();
+					foreach (string homePart in homeParts)
+						partStack.Push(homePart);
+
+					continue;
+				}
+
+				if (part == ".")
+					continue;
+
+				if (part == "..")
+				{
+					if (partStack.Count > 0)
+						partStack.Pop();
+					continue;
+				}
+
+				if (!string.IsNullOrWhiteSpace(part))
+					partStack.Push(part);
+			}
+
+			var sb = new StringBuilder();
+
+			while (partStack.Count > 0)
+			{
+				sb.Insert(0, partStack.Pop());
+				sb.Insert(0, "/");
+			}
+			
+			if (sb.Length == 0)
+				sb.Append("/");
+			
+			return sb.ToString();
+		}
+		
 		public static void TrimTrailingSpaces(ref string[] args)
 		{
 			for (var i = 0; i < args.Length; i++)
