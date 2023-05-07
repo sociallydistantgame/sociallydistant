@@ -13,7 +13,9 @@ namespace UI.Terminal.SimpleTerminal
 	public class UguiTerminalScreen : MonoBehaviour, IDrawableScreen
 	{
 		private readonly Dictionary<int, string> colors = new Dictionary<int, string>();
-        
+
+		private Color bgColor;
+		private Texture2D? bgImage;
 		private TrixelAudioSource trixelAudio;
 		private SimpleTerminalRenderer term;
 		private float characterWidth;
@@ -32,6 +34,10 @@ namespace UI.Terminal.SimpleTerminal
 		[SerializeField]
 		private SoundEffectAsset asciiBeep = null!;
 
+		[Header("Appearance")]
+		[SerializeField]
+		private bool showBackgroundColor;
+		
 		[Header("UI")]
 		[SerializeField]
 		private Graphic backgroundGraphic;
@@ -145,13 +151,22 @@ namespace UI.Terminal.SimpleTerminal
 			this.SetColor(258, "000000");
 			this.SetColor(259, "e6e6e6");
 
-			string bg = "#" + this.GetColor(DefaultBackgroundId);
-			
-			// TODO: Background image support
-			if (ColorUtility.TryParseHtmlString(bg, out Color bgColor))
-				this.backgroundGraphic.color = bgColor;
+			this.UpdateBackgroundColor();
 		}
-        
+
+		private void UpdateBackgroundColor()
+		{
+			string bg = "#" + this.GetColor(DefaultBackgroundId);
+
+			if (!ColorUtility.TryParseHtmlString(bg, out bgColor) || !showBackgroundColor)
+				bgColor = new Color(0, 0, 0, 0);
+		}
+
+		private void Update()
+		{
+			this.backgroundGraphic.color = bgColor;
+		}
+
 		public void Bell()
 		{
 			if (this.asciiBeep != null)
