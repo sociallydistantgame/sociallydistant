@@ -116,10 +116,10 @@ namespace UI.ScriptableCommands
 				.Replace("{colors}", colors);
 
 			// Split the formatted information
-			string[] dataLines = formattedSysInfo.Split(Environment.NewLine);
+			string[] dataLines = Console.Normalize(formattedSysInfo).Split(Environment.NewLine);
 
 			// Split the ASCII lines
-			string[] asciiLines = asciiArt.Split(Environment.NewLine);
+			string[] asciiLines = Console.Normalize(asciiArt).Split(Environment.NewLine);
 			
 			// Find the longest line in the ASCII art
 			int longestAsciiLine = asciiLines.Select(x => x.Length)
