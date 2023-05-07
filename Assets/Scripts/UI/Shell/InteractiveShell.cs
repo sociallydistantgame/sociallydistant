@@ -251,14 +251,16 @@ namespace UI.Shell
 					else
 					{
 						string path = arguments[0];
-						if (path != ".")
-						{
-							if (path == "..")
-								process.WorkingDirectory = PathUtility.GetDirectoryName(process.WorkingDirectory);
-							else
-								process.WorkingDirectory = PathUtility.Combine(process.WorkingDirectory, path);
-						}
+						string newPath = PathUtility.Combine(process.WorkingDirectory, path);
 
+						newPath = ShellUtility.MakeAbsolutePath(newPath, process.User.Home);
+
+						if (process.User.Computer.GetFileSystem(process.User).DirectoryExists(newPath))
+							process.WorkingDirectory = newPath;
+						else
+						{
+							console.WriteText($"sh: cd: {newPath}: Directory not found.{Environment.NewLine}");
+						}
 					}
 					
 					break;
