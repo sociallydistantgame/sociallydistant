@@ -207,6 +207,7 @@ MonoBehaviour:
   font: {fileID: 11400000, guid: d0626ae8c7fb25f449d6427b591abfaf, type: 2}
   fontSize: 16
   asciiBeep: {fileID: 0}
+  showBackgroundColor: 0
   backgroundGraphic: {fileID: 8831732625854447881}
 --- !u!114 &8872636909277723952
 MonoBehaviour:
