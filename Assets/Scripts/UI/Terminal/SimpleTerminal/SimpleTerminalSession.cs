@@ -586,6 +586,7 @@ namespace UI.Terminal.SimpleTerminal
             var builder = new StringBuilder();
 
             if (source.Length > 0)
+            {
                 for (var i = 0; i <= source.Length; i++)
                 {
                     if (i == this.cursor)
@@ -619,18 +620,18 @@ namespace UI.Terminal.SimpleTerminal
                         continue;
                     }
 
-                    if (x == cols - 1)
+                    if (x == cols)
                     {
                         x = 0;
                         y++;
                         lines.Add(builder.ToString());
                         builder.Length = 0;
-                        continue;
                     }
 
                     builder.Append(character);
                     x++;
                 }
+            }
 
             return lines.ToArray();
         }
