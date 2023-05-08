@@ -53,7 +53,9 @@ namespace UI.Terminal.SimpleTerminal
 
 		public void Enter()
 		{
-			this.Write(Environment.NewLine);
+			// We only write a CR, even on POSIX systems, since this maps to Enter in the line editor. Writing
+			// the LF breaks line editor.
+			this.Write("\r");
 		}
 
 		public void Char(char ch)

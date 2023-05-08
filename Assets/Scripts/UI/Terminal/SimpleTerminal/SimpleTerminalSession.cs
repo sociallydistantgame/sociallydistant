@@ -573,70 +573,7 @@ namespace UI.Terminal.SimpleTerminal
 
             return true;
         }
-
-        private string[] WordWrap(StringBuilder source, int firstColumn, int cols, out int cursorX, out int cursorY)
-        {
-            var lines = new List<string>();
-
-            int x = firstColumn;
-            var y = 0;
-
-            cursorX = x;
-            cursorY = y;
-
-            var builder = new StringBuilder();
-
-            if (source.Length > 0)
-            {
-                for (var i = 0; i <= source.Length; i++)
-                {
-                    if (i == this.cursor)
-                    {
-                        cursorX = x;
-                        cursorY = y;
-                    }
-
-                    if (i == source.Length)
-                    {
-                        if (builder.Length > 0)
-                        {
-                            lines.Add(builder.ToString());
-                            builder.Length = 0;
-                        }
-
-                        break;
-                    }
-
-                    char character = source[i];
-
-                    if (character == '\r')
-                        continue;
-
-                    if (character == '\n')
-                    {
-                        x = 0;
-                        y++;
-                        lines.Add(builder.ToString());
-                        builder.Length = 0;
-                        continue;
-                    }
-
-                    if (x == cols)
-                    {
-                        x = 0;
-                        y++;
-                        lines.Add(builder.ToString());
-                        builder.Length = 0;
-                    }
-
-                    builder.Append(character);
-                    x++;
-                }
-            }
-
-            return lines.ToArray();
-        }
-
+        
         private void RenderLineEditor()
         {
             if (!this.lineEditorState.isEditing)
@@ -676,7 +613,7 @@ namespace UI.Terminal.SimpleTerminal
             this.WriteText(wordWrapped);
 
             // Move cursor to where it should be in the line editor
-            this.WriteText($"\x1b[{this.lineEditorState.firstLineRow + 1 + cy};{cx + 1}H");
+            this.WriteText($"\x1b[{cy + 1};{cx + 1}H");
 
             this.prevLineCount = lineCount;
         }
