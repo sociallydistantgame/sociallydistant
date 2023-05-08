@@ -111,6 +111,9 @@ namespace UI.Terminal.SimpleTerminal
 			{
 				caretX = 0;
 				caretY++;
+
+				if (caretY > y)
+					height++;
 			}
 			
 			return stringBuilder.ToString();
