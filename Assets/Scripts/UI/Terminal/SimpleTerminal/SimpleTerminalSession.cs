@@ -16,6 +16,7 @@ namespace UI.Terminal.SimpleTerminal
         private LineEditorState lineEditorState;
         private readonly SimpleTerminal term;
         private readonly PseudoTerminal pty;
+        private readonly LineWrapper lineWrapper = new LineWrapper();
         private readonly byte[] ttybuf = new byte[1024];
         private int ttybuflen;
         private readonly Queue<string> lineQueue = new Queue<string>();
@@ -641,11 +642,10 @@ namespace UI.Terminal.SimpleTerminal
             if (!this.lineEditorState.isEditing)
                 return;
 
-            string[] lines = this.WordWrap(this.line, this.lineEditorState.firstLineColumn, this.term.Columns,
-                out int cx, out int cy);
-
+            string wordWrapped = lineWrapper.Wrap(this.line, lineEditorState.firstLineColumn, lineEditorState.firstLineRow, term.Columns, this.cursor, out int cx, out int cy, out int lineCount);
+            
             // Determine if we need to scroll.
-            int bottom = this.lineEditorState.firstLineRow + lines.Length;
+            int bottom = this.lineEditorState.firstLineRow + lineCount;
             if (bottom > this.term.Rows)
             {
                 int scroll = bottom - this.term.Rows;
@@ -655,23 +655,20 @@ namespace UI.Terminal.SimpleTerminal
                 this.WriteText($"\x1b[{scroll}S");
             }
 
+            // Move the cursor back to the start of the line, visually
             this.WriteText($"\x1b[{this.lineEditorState.firstLineRow + 1};{this.lineEditorState.firstLineColumn + 1}H");
 
             // If we have previous text, then we need to delete it
-            int linesToDelete = Math.Max(this.prevLineCount, lines.Length);
+            int linesToDelete = Math.Max(this.prevLineCount, lineCount);
             if (linesToDelete > 0) this.WriteText("\x1b[0J");
 
             // Write each line
-            for (var i = 0; i < lines.Length; i++)
-            {
-                if (i > 0) this.WriteText(Environment.NewLine);
-                this.WriteText(lines[i]);
-            }
+            this.WriteText(wordWrapped);
 
             // Move cursor to where it should be in the line editor
             this.WriteText($"\x1b[{this.lineEditorState.firstLineRow + 1 + cy};{cx + 1}H");
 
-            this.prevLineCount = lines.Length;
+            this.prevLineCount = lineCount;
         }
 
         private void SetupLineEditor()
