@@ -646,6 +646,7 @@ namespace UI.Terminal.SimpleTerminal
             
             // Determine if we need to scroll.
             int bottom = this.lineEditorState.firstLineRow + lineCount;
+            int previousBottom = this.lineEditorState.firstLineRow + prevLineCount; 
             if (bottom > this.term.Rows)
             {
                 int scroll = bottom - this.term.Rows;
@@ -653,6 +654,15 @@ namespace UI.Terminal.SimpleTerminal
 
                 // Scroll up
                 this.WriteText($"\x1b[{scroll}S");
+            }
+            
+            // Handle scrolling back down when we no longer occupy the last line.
+            if (previousBottom > bottom && previousBottom==this.term.Rows)
+            {
+                int scroll = previousBottom - bottom;
+                this.lineEditorState.firstLineRow += scroll; // Adjust first row to compensate
+
+                this.WriteText($"\x1b[{scroll}T");
             }
 
             // Move the cursor back to the start of the line, visually
