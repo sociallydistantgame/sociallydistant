@@ -121,6 +121,9 @@ namespace UI.Terminal.SimpleTerminal
             var fgAdjust = 0;
             for (int i = start; i < end && i < pieces.Length; i++)
             {
+                if (i == 131)
+                    i = 131;
+                
                 // Grab the glyph and corresponding piece by-ref.
                 // Thank you modern C#
                 ref TextPiece piece = ref this.pieces[i];
@@ -470,7 +473,23 @@ namespace UI.Terminal.SimpleTerminal
 
                 if (bgChanged)
                 {
-                    if (!isLast)
+                    if (isLast)
+                    {
+                        if (!this.isDefaultBG)
+                            bgBuilder.Insert(this.bg, "</mark>");
+                        
+                        bgBuilder.Insert(this.bg, ">_</color>");
+                        bgBuilder.Insert(this.bg, this.bgColor);
+                        bgBuilder.Insert(this.bg, "<color=#");
+
+                        if (!this.isDefaultBG)
+                        {
+                            bgBuilder.Insert(this.bg, "ff>");
+                            bgBuilder.Insert(this.bg, this.bgColor);
+                            bgBuilder.Insert(this.bg, "<mark=#");
+                        }
+                    }
+                    else
                     {
                         bgBuilder.Insert(this.bg, ">_");
                         bgBuilder.Insert(this.bg, this.bgColor);
