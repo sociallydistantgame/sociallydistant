@@ -2610,23 +2610,26 @@ namespace UI.Terminal.SimpleTerminal
 
 		private void Draw()
 		{
-			int cx = this.term.c.x, ocx = this.term.ocx, ocy = this.term.ocy;
+			int cx = this.term.c.x;
+			int cy = term.c.y;
+			int ocx = this.term.ocx;
+			int ocy = this.term.ocy;
 
 			/* adjust cursor position */
-			this.term.ocx = Math.Clamp(this.term.ocx, 0, this.term.col - 1);
-			this.term.ocy = Math.Clamp(this.term.ocy, 0, this.term.row - 1);
-			if ((this.term.line[this.term.ocy].glyphs[this.term.ocx].mode & GlyphAttribute.ATTR_WDUMMY) != 0)
-				this.term.ocx--;
-			if ((this.term.line[this.term.c.y].glyphs[cx].mode & GlyphAttribute.ATTR_WDUMMY) != 0)
+			ocx = Math.Clamp(ocx, 0, this.term.col - 1);
+			ocy = Math.Clamp(ocy, 0, this.term.row - 1);
+			if ((this.term.line[ocy].glyphs[ocx].mode & GlyphAttribute.ATTR_WDUMMY) != 0)
+				ocx--;
+			if ((this.term.line[cy].glyphs[cx].mode & GlyphAttribute.ATTR_WDUMMY) != 0)
 				cx--;
 
-			this.UpdateCursorRect(cx, this.term.c.y, ref this.term.line[this.term.c.y].glyphs[cx], this.term.ocx,
-				this.term.ocy, ref this.term.line[this.term.ocy].glyphs[this.term.ocx]);
+			this.UpdateCursorRect(cx, cy, ref this.term.line[cy].glyphs[cx], ocx,
+				ocy, ref this.term.line[ocy].glyphs[ocx]);
 
 			this.DrawRegion(0, 0, this.term.col, this.term.row);
             
 			this.term.ocx = cx;
-			this.term.ocy = this.term.c.y;
+			this.term.ocy = cy;
 
 			// if (ocx != term.ocx || ocy != term.ocy)
 			//    xximspot(term.ocx, term.ocy);
@@ -2660,8 +2663,9 @@ namespace UI.Terminal.SimpleTerminal
 
 			ref Glyph oldGlyph = ref this.Tlineabs(ocy).glyphs[ocx];
 			ref Glyph newGlyph = ref this.Tlineabs(cy).glyphs[cx];
-            
-			oldGlyph.mode &= ~GlyphAttribute.ATTR_REVERSE;
+
+			if (cx != ocx || cy != ocy)
+				oldGlyph.mode &= ~GlyphAttribute.ATTR_REVERSE;
 
 			if (this.isFocused)
 			{
