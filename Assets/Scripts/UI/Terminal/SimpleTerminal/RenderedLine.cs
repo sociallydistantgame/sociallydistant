@@ -145,9 +145,6 @@ namespace UI.Terminal.SimpleTerminal
                 piece.SetUnderline((glyph.mode & GlyphAttribute.ATTR_UNDERLINE) != 0);
                 piece.SetStruck((glyph.mode & GlyphAttribute.ATTR_STRUCK) != 0);
 
-                if (glyph.u == '$')
-                    glyph.u = '$';
-
                 bool reversed = (glyph.mode & GlyphAttribute.ATTR_REVERSE) != 0;
 
                 if (this.term.Selected(i, y))
