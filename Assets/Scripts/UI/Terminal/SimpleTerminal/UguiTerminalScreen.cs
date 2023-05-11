@@ -1,10 +1,13 @@
-﻿using System;
+﻿#define USE_OLD_RENDERER
+
+using System;
 using System.Collections.Generic;
 using TMPro;
 using TrixelCreative.TrixelAudio;
 using TrixelCreative.TrixelAudio.Data;
 using UI.Terminal.SimpleTerminal.Data;
 using UnityEngine;
+using UnityEngine.Rendering;
 using UnityEngine.UI;
 using Utility;
 
@@ -13,13 +16,14 @@ namespace UI.Terminal.SimpleTerminal
 	public class UguiTerminalScreen : MonoBehaviour, IDrawableScreen
 	{
 		private readonly Dictionary<int, string> colors = new Dictionary<int, string>();
-
+		
 		private Color bgColor;
 		private Texture2D? bgImage;
 		private TrixelAudioSource trixelAudio;
 		private SimpleTerminalRenderer term;
 		private float characterWidth;
 		private float lineHeight;
+		private NewTextMeshProTerminalRenderer textRenderer;
         
 		private RenderedLine[] renderedLines = Array.Empty<RenderedLine>();
 
@@ -46,14 +50,24 @@ namespace UI.Terminal.SimpleTerminal
 
 		public float LineHeight => lineHeight;
 		public float CharacterWidth => characterWidth;
-		
-		
+		public float UnscaledLineHeight { get; private set; }
+		public float UnscaledCharacterWidth { get; private set; }
+
 		private void Awake()
 		{
 			this.MustGetComponent(out trixelAudio);
 			this.MustGetComponentInParent(out term);
 			this.CalculateTextSize();
 			this.ApplyFallbackPalette();
+
+#if !USE_OLD_RENDERER
+			this.textRenderer = new NewTextMeshProTerminalRenderer(this.transform);
+#endif
+		}
+
+		private void Start()
+		{
+			// this.textRenderer?.SetFont(this.font, this.fontSize);
 		}
 
 		public bool Selected(int x, int y)
@@ -62,16 +76,22 @@ namespace UI.Terminal.SimpleTerminal
 		}
 
 		/// <inheritdoc />
-		public void DrawLine(ref Glyph[] glyphs, int x1, int y, int x2)
+		public void DrawLine(SimpleTerminal term, ref Glyph[] glyphs, int x1, int y, int x2)
 		{
+#if USE_OLD_RENDERER
 			RenderedLine line = this.renderedLines[y];
-			line.SetGlyphs(ref glyphs, x1, x2, y);   
+			line.SetGlyphs(ref glyphs, x1, x2, y);
+#endif
 		}
 
 		/// <inheritdoc />
 		public void Resize(int columns, int rows)
 		{
+			// textRenderer?.Resize(columns, rows);
+			
+#if USE_OLD_RENDERER
 			ReallocateTextPool(columns, rows);
+#endif
 		}
         
 		private void ReallocateTextPool(int columns, int rows)
@@ -165,6 +185,8 @@ namespace UI.Terminal.SimpleTerminal
 		private void Update()
 		{
 			this.backgroundGraphic.color = bgColor;
+
+			this.textRenderer?.Update();
 		}
 
 		public void Bell()
@@ -208,6 +230,8 @@ namespace UI.Terminal.SimpleTerminal
 
 			this.characterWidth = width;
 			this.lineHeight = height;
+			UnscaledLineHeight = height * transform.lossyScale.y;
+			UnscaledCharacterWidth = CharacterWidth * transform.lossyScale.x;
 		}
 	}
 }

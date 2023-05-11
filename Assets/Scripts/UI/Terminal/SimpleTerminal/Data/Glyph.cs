@@ -4,7 +4,7 @@ namespace UI.Terminal.SimpleTerminal.Data
 {
     public struct Glyph
     {
-        public uint u;
+        public char character;
         public GlyphAttribute mode;
         public int bg;
         public int fg;

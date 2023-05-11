@@ -4,7 +4,7 @@ namespace UI.Terminal.SimpleTerminal
 {
 	public interface IDrawableScreen
 	{
-		void DrawLine(ref Glyph[] glyphs, int x1, int y, int x2);
+		void DrawLine(SimpleTerminal term, ref Glyph[] glyphs, int x1, int y, int x2);
 
 		void Resize(int columns, int rows);
 

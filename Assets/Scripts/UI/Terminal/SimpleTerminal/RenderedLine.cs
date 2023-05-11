@@ -20,6 +20,7 @@ namespace UI.Terminal.SimpleTerminal
         private GameObject root;
         private TextMeshProUGUI bg;
         private TextMeshProUGUI fg;
+        private LayoutElement rootLayoutElement;
         private StringBuilder bsb;
         private StringBuilder fsb;
 
@@ -61,6 +62,7 @@ namespace UI.Terminal.SimpleTerminal
             // Create the root visual element that holds the foreground and background text.
             this.root = new GameObject("SimpleTerminal Line Object");
             this.rootTransform = root.AddComponent<RectTransform>();
+            this.rootLayoutElement = root.AddComponent<LayoutElement>();
 
             // Create the Label elements for the background and foreground text.
             var bgGameObject = new GameObject("Background");
@@ -97,6 +99,8 @@ namespace UI.Terminal.SimpleTerminal
             bgRect.pivot = Vector2.zero;
             bgRect.anchoredPosition = Vector3.zero;
             bgRect.sizeDelta = Vector2.zero;
+
+            rootLayoutElement.minHeight = this.term.UnscaledLineHeight;
         }
 
         public void SetGlyphs(ref Glyph[] glyphs, int start, int end, int y)
@@ -110,20 +114,17 @@ namespace UI.Terminal.SimpleTerminal
             // Track if anything has actually changed
             var hasAnythingChanged = false;
 
+            // Track where the change starts
+            int bgDirt = 0;
+            int fgDirt = 0;
+            int bgClean = 0;
+            int fgClean = 0;
+            int renderstart = -1;
+            int lastPrintable = 0;
+
             // Now we must update the changed glyphs.
-            int bgDirtStart = -1;
-            int fgDirtStart = -1;
-            int bgDirtCount = -1;
-            var fgDirtCount = 0;
-            var bgRemoved = 0;
-            var fgRemoved = 0;
-            var bgAdjust = 0;
-            var fgAdjust = 0;
-            for (int i = start; i < end && i < pieces.Length; i++)
+            for (int i = start; i < pieces.Length; i++)
             {
-                if (i == 131)
-                    i = 131;
-                
                 // Grab the glyph and corresponding piece by-ref.
                 // Thank you modern C#
                 ref TextPiece piece = ref this.pieces[i];
@@ -141,7 +142,7 @@ namespace UI.Terminal.SimpleTerminal
                     piece.FGStart = 0;
                 }
 
-                piece.SetCharacter(glyph.u == 0 ? ' ' : (char)glyph.u);
+                piece.SetCharacter(glyph.character == 0 ? ' ' : glyph.character);
                 piece.SetBold((glyph.mode & GlyphAttribute.ATTR_BOLD) != 0);
                 piece.SetFaint((glyph.mode & GlyphAttribute.ATTR_FAINT) != 0);
                 piece.SetItalic((glyph.mode & GlyphAttribute.ATTR_ITALIC) != 0);
@@ -168,138 +169,87 @@ namespace UI.Terminal.SimpleTerminal
                 piece.SetFGColor(fgColor);
                 piece.SetBGColor(bgColor);
 
+                bool isPrintable = glyph.character != '\0' && glyph.character != ' ';
+                bool isBackgroundColored = bgColorId != term.DefaultBackgroundId;
+
+                if (isPrintable || isBackgroundColored)
+                    lastPrintable = i;
+                
                 if (piece.IsDirty)
                 {
+                    // first change
+                    if (renderstart == -1)
+                        renderstart = i;
+                    
                     hasAnythingChanged = true;
 
-                    if (bgDirtStart < 0) bgDirtStart = piece.BGStart;
-
-                    if (fgDirtStart < 0)
-                        fgDirtStart = piece.FGStart;
-
-                    bgDirtCount += piece.BGLength;
-                    fgDirtCount += piece.FGLength;
-
+                    bgDirt = bgClean;
+                    fgDirt = fgClean;
+                    
                     piece.BGLength = 0;
                     piece.FGLength = 0;
-                    piece.BGStart = bgDirtStart;
-                    piece.FGStart = fgDirtStart;
+                }
+                else if (hasAnythingChanged)
+                {
+                    // A previous glyph is dirty, therefore the current one must be marked as dirty.
+                    piece.SetDirty();
+                    piece.BGLength = 0;
+                    piece.FGLength = 0;
                 }
                 else
                 {
-                    // If only the exact start of the line is dirty, we can
-                    // optimize this whole thing by simply decreasing the length
-                    // of the string builders.
-                    //
-                    // But if the middle of the string is dirty, we have to remove
-                    // ranges of text from the string builders. Otherwise it'll corrupt
-                    // the whole string.
-
-                    var shouldBeDirty = false;
-                    if (bgDirtStart >= 0)
-                    {
-                        // if (bgDirtStart == 0)
-                        //     bsb.Length -= bgDirtCount;
-                        // else
-                        if (bgDirtCount > 0)
-                        {
-                            bgDirtCount += piece.BGLength;
-                            int len = Math.Min(this.bsb.Length - bgDirtStart, bgDirtCount);
-                            if (this.bsb.Length > bgDirtStart && len > 0) this.bsb.Remove(bgDirtStart, len);
-                            shouldBeDirty = true;
-                            piece.BGLength = 0;
-                        }
-
-                        piece.BGStart = bgDirtStart;
-
-                        bgRemoved += bgDirtCount;
-                        bgDirtCount = 0;
-                        bgDirtStart = -1;
-                    }
-
-                    if (fgDirtStart >= 0)
-                    {
-                        // if (fgDirtStart == 0)
-                        //     fsb.Length -= fgDirtCount;
-                        // else
-                        if (fgDirtCount > 0)
-                        {
-                            fgDirtCount += piece.FGLength;
-                            int len = Math.Min(this.fsb.Length - fgDirtStart, fgDirtCount);
-                            if (this.fsb.Length > fgDirtStart && len > 0) this.fsb.Remove(fgDirtStart, len);
-                            shouldBeDirty = true;
-                            piece.FGLength = 0;
-                        }
-
-                        piece.FGStart = fgDirtStart;
-
-                        fgRemoved += fgDirtCount;
-                        fgDirtCount = 0;
-                        fgDirtStart = -1;
-                    }
-
-                    if (shouldBeDirty)
-                        piece.SetDirty();
-
-                    bgAdjust += piece.BGLength;
-                    fgAdjust += piece.FGLength;
+                    bgClean += piece.BGLength;
+                    fgClean += piece.FGLength;
                 }
             }
-
-            // Situations where there's dirtyness that hasn't been cleared
-            if (fgDirtStart >= 0 || bgDirtStart >= 0)
-            {
-                if (bgDirtStart >= 0)
-                {
-                    if (this.bsb.Length > bgDirtStart) this.bsb.Length = bgDirtStart;
-
-                    bgRemoved += bgDirtCount;
-                    bgDirtCount = 0;
-                    bgDirtStart = -1;
-                }
-
-                if (fgDirtStart >= 0)
-                {
-                    if (this.fsb.Length > fgDirtStart) this.fsb.Length = fgDirtStart;
-
-                    fgRemoved += fgDirtCount;
-                    fgDirtCount = 0;
-                    fgDirtStart = -1;
-                }
-            }
-
+            
+            
             // If nothing's changed, then do nothing.
             if (!hasAnythingChanged)
                 return;
 
-            // Now we tell each piece to rebuild.
-            for (var i = 0; i < this.pieces.Length; i++)
+            // Nuke all the garbage
+            bsb.Length = bgDirt;
+            fsb.Length = fgDirt;
+
+            if (lastPrintable > 0)
             {
-                bool isFirst = i == 0;
-                bool isLast = i == this.pieces.Length - 1;
+                // Activate the text
+                bg.gameObject.SetActive(true);
+                fg.gameObject.SetActive(true);
 
-                ref TextPiece current = ref this.pieces[i];
+                // Now we tell each piece to rebuild.
+                for (var i = renderstart; i <= lastPrintable; i++)
+                {
+                    bool isFirst = i == 0;
+                    bool isLast = i == lastPrintable;
 
-                if (isFirst)
-                {
-                    current.UpdateText(ref current, true, isLast, this.bsb, this.fsb);
-                }
-                else
-                {
-                    ref TextPiece prev = ref this.pieces[i - 1];
-                    current.UpdateText(ref prev, false, isLast, this.bsb, this.fsb);
+                    ref TextPiece current = ref this.pieces[i];
+
+                    if (isFirst)
+                    {
+                        current.UpdateText(ref current, true, isLast, this.bsb, this.fsb);
+                    }
+                    else
+                    {
+                        ref TextPiece prev = ref this.pieces[i - 1];
+                        current.UpdateText(ref prev, false, isLast, this.bsb, this.fsb);
+                    }
+
+                    if (isLast)
+                        break;
                 }
             }
+            else
+            {
+                bg.gameObject.SetActive(false);
+                fg.gameObject.SetActive(false);                
+            }
+            
+            rootLayoutElement.minHeight = this.term.UnscaledLineHeight;
 
-            this.bsb.TrimEnd();
-            this.fsb.TrimEnd();
-
-            ref TextPiece last = ref this.pieces[this.pieces.Length - 1];
-            Assert.IsFalse(last.BGStart + last.BGLength < this.bsb.Length);
-            Assert.IsFalse(last.FGStart + last.FGLength < this.fsb.Length);
-
-            this.bg.text = this.bsb.ToString();
-            this.fg.text = this.fsb.ToString();
+            this.bg.SetText(this.bsb);
+            this.fg.SetText(this.fsb);
         }
 
         private struct TextPiece
@@ -372,39 +322,6 @@ namespace UI.Terminal.SimpleTerminal
             {
                 this.__init();
 
-                // Check if the end position of the previous piece doesn't line up with our start.
-                // If that's happened, we still need to update our start position but do not need
-                // to modify the actual text.
-                if (!isFirst)
-                {
-                    int bgEnd = previous.bg + previous.bgLen;
-                    int fgEnd = previous.fg + previous.fgLen;
-
-                    if (this.bg != bgEnd)
-                    {
-                        this.bg = bgEnd;
-                        this.dirty = true;
-
-                        if (this.bgLen > 0 && bgBuilder.Length > this.bg + this.bgLen)
-                        {
-                            bgBuilder.Remove(this.bg, this.bgLen);
-                            this.bgLen = 0;
-                        }
-                    }
-
-                    if (this.fg != fgEnd)
-                    {
-                        this.fg = fgEnd;
-                        this.dirty = true;
-
-                        if (this.fgLen > 0 && fgBuilder.Length > this.fg + this.fgLen)
-                        {
-                            fgBuilder.Remove(this.fg, this.fgLen);
-                            this.fgLen = 0;
-                        }
-                    }
-                }
-
                 // Do nothing if we're not dirty
                 if (!this.dirty)
                     return;
@@ -439,150 +356,96 @@ namespace UI.Terminal.SimpleTerminal
                 // check if our StringBuilders have enough length to insert our markup
                 // and character. Otherwise we'll crash trying to insert.
                 //
-                // This is part of an optimization that trims excess whitespace off the
-                // finished text before submitting to TMP.
-                if (bgChanged || hasMarkupChanged || this.character != ' ')
-                {
-                    int requiredfg = this.fg;
-                    int requiredbg = this.bg;
-
-                    if (fgBuilder.Length < requiredfg)
-                    {
-                        int diff = requiredfg - fgBuilder.Length;
-                        for (var i = 0; i < diff; i++) fgBuilder.Append(' ');
-                    }
-
-                    if (bgBuilder.Length < requiredbg)
-                    {
-                        int diff = requiredbg - bgBuilder.Length;
-                        for (var i = 0; i < diff; i++) bgBuilder.Append(previous.isDefaultBG ? ' ' : '_');
-                    }
-                }
-
                 // This is how we'll track our new length
                 int bgLenold = bgBuilder.Length;
                 int fgLenOld = fgBuilder.Length;
-
-                // Skip rendering spaces when there's no markup to render
-                if (this.character == ' ' && !hasMarkupChanged && !isFirst && !bgChanged)
-                {
-                    this.bgLen = 1;
-                    this.fgLen = 1;
-                    return;
-                }
-
+                
                 if (bgChanged)
                 {
+                    if (!isFirst)
+                        if (this.isDefaultBG)
+                            bgBuilder.Append("</mark>");
+                    
                     if (isLast)
                     {
                         if (!this.isDefaultBG)
-                            bgBuilder.Insert(this.bg, "</mark>");
-                        
-                        bgBuilder.Insert(this.bg, ">_</color>");
-                        bgBuilder.Insert(this.bg, this.bgColor);
-                        bgBuilder.Insert(this.bg, "<color=#");
-
-                        if (!this.isDefaultBG)
                         {
-                            bgBuilder.Insert(this.bg, "ff>");
-                            bgBuilder.Insert(this.bg, this.bgColor);
-                            bgBuilder.Insert(this.bg, "<mark=#");
+                            bgBuilder.Append("<mark=#");
+                            bgBuilder.Append(this.bgColor);
+                            bgBuilder.Append("ff>");
                         }
+                        
+                        
+                        bgBuilder.Append("<color=#");
+                        bgBuilder.Append(this.bgColor);
+                        bgBuilder.Append(">_</color>");
+                        
+                        if (!this.isDefaultBG)
+                            bgBuilder.Append("</mark>");
                     }
                     else
                     {
-                        bgBuilder.Insert(this.bg, ">_");
-                        bgBuilder.Insert(this.bg, this.bgColor);
-                        bgBuilder.Insert(this.bg, "<color=#");
-
                         if (!this.isDefaultBG)
                         {
-                            bgBuilder.Insert(this.bg, "ff>");
-                            bgBuilder.Insert(this.bg, this.bgColor);
-                            bgBuilder.Insert(this.bg, "<mark=#");
+                            bgBuilder.Append("<mark=#");
+                            bgBuilder.Append(this.bgColor);
+                            bgBuilder.Append("ff>");
                         }
+                        
+                        bgBuilder.Append("<color=#");
+                        bgBuilder.Append(this.bgColor);
+                        bgBuilder.Append(">_");
                     }
-
-                    if (!isFirst)
-                        if (this.isDefaultBG)
-                            bgBuilder.Insert(this.bg, "</mark>");
                 }
                 else
                 {
                     if (this.isDefaultBG)
-                        bgBuilder.Insert(this.bg, ' ');
+                        bgBuilder.Append(' ');
                     else
-                        bgBuilder.Insert(this.bg, '_');
-                }
-
-                // Insert the character itself.
-                if (fuck)
-                {
-                    // We need to add an underscore here instead
-                    // of a space, that way the background highlight shows correctly
-                    fgBuilder.Insert(this.fg, $"<color=#00000000>_<color=#{this.fgColor}>");
-                }
-                else
-                {
-                    if (isLast && !this.isDefaultBG && this.character == ' ')
-                    {
-                        fgBuilder.Insert(this.fg, $"<color=#00000000>_<color=#{this.fgColor}>");
-                    }
-                    else
-                    {
-                        bool noparse = this.character is ('<' or '>');
-
-                        if (noparse)
-                            fgBuilder.Insert(this.fg, "</noparse>");
-
-                        fgBuilder.Insert(this.fg, this.character);
-
-                        if (noparse)
-                            fgBuilder.Insert(this.fg, "<noparse>");
-                    }
-                }
-
-                if (faintChanged)
-                {
-                    if (this.faint)
-                        fgBuilder.Insert(this.fg, "<alpha=#7f>");
-                    else
-                        fgBuilder.Insert(this.fg, "<alpha=#ff>");
+                        bgBuilder.Append( '_');
                 }
 
                 // Color
                 if (fgChanged)
                 {
-                    fgBuilder.Insert(this.fg, '>');
-                    fgBuilder.Insert(this.fg, this.fgColor);
-                    fgBuilder.Insert(this.fg, "<color=#");
+                    fgBuilder.Append("<color=#");
+                    fgBuilder.Append(this.fgColor);
+                    fgBuilder.Append('>');
                 }
 
+                if (faintChanged)
+                {
+                    if (this.faint)
+                        fgBuilder.Append("<alpha=#7f>");
+                    else
+                        fgBuilder.Append("<alpha=#ff>");
+                }
+                
                 // Bold
                 if (boldChanged)
                 {
                     if (this.bold)
-                        fgBuilder.Insert(this.fg, "<b>");
+                        fgBuilder.Append("<b>");
                     else if (!isFirst)
-                        fgBuilder.Insert(this.fg, "</b>");
+                        fgBuilder.Append("</b>");
                 }
 
                 // Italic
                 if (italicChanged)
                 {
                     if (this.italic)
-                        fgBuilder.Insert(this.fg, "<i>");
+                        fgBuilder.Append("<i>");
                     else if (!isFirst)
-                        fgBuilder.Insert(this.fg, "</i>");
+                        fgBuilder.Append("</i>");
                 }
 
                 // Underline
                 if (underlineChanged)
                 {
                     if (this.underline)
-                        fgBuilder.Insert(this.fg, "<u>");
+                        fgBuilder.Append("<u>");
                     else if (!isFirst)
-                        fgBuilder.Insert(this.fg, "</u>");
+                        fgBuilder.Append("</u>");
                 }
 
 
@@ -590,9 +453,36 @@ namespace UI.Terminal.SimpleTerminal
                 if (struckChanged)
                 {
                     if (this.struck)
-                        fgBuilder.Insert(this.fg, "<s>");
+                        fgBuilder.Append("<s>");
                     else if (!isFirst)
-                        fgBuilder.Insert(this.fg, "</s>");
+                        fgBuilder.Append("</s>");
+                }
+                
+                // Insert the character itself.
+                if (fuck)
+                {
+                    // We need to add an underscore here instead
+                    // of a space, that way the background highlight shows correctly
+                    fgBuilder.Append($"<color=#00000000>_<color=#{this.fgColor}>");
+                }
+                else
+                {
+                    if (isLast && !this.isDefaultBG && this.character == ' ')
+                    {
+                        fgBuilder.Append($"<color=#00000000>_<color=#{this.fgColor}>");
+                    }
+                    else
+                    {
+                        bool noparse = this.character is ('<' or '>');
+
+                        if (noparse)
+                            fgBuilder.Append("<noparse>");
+
+                        fgBuilder.Append(this.character);
+
+                        if (noparse)
+                            fgBuilder.Append("</noparse>");
+                    }
                 }
 
                 // Update our lengths
