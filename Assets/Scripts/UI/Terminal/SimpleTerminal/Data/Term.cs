@@ -20,7 +20,7 @@ namespace UI.Terminal.SimpleTerminal.Data
         public int charset;
         public int icharset;
         public int[] tabs = Array.Empty<int>();
-        public uint lastc;
+        public char lastc;
         public int histi;
         public Line[] hist = Array.Empty<Line>();
         public int scr;

@@ -9,25 +9,25 @@ namespace UI.Terminal.SimpleTerminal
 {
 	public class SimpleTerminal
 	{
-		private static readonly string[] vt100_0 = new string[62]
+		private static readonly char[] vt100_0 = new char[62]
 		{
 			/* 0x41 - 0x7e */
-			"↑", "↓", "→", "←", "█", "▚", "☃", /* A - G */
-			string.Empty, string.Empty, string.Empty, string.Empty, string.Empty, string.Empty, string.Empty,
-			string.Empty, /* H - O */
-			string.Empty, string.Empty, string.Empty, string.Empty, string.Empty, string.Empty, string.Empty,
-			string.Empty, /* P - W */
-			string.Empty, string.Empty, string.Empty, string.Empty, string.Empty, string.Empty, string.Empty,
-			" ", /* X - _ */
-			"◆", "▒", "␉", "␌", "␍", "␊", "°", "±", /* ` - g */
-			"␤", "␋", "┘", "┐", "┌", "└", "┼", "⎺", /* h - o */
-			"⎻", "─", "⎼", "⎽", "├", "┤", "┴", "┬", /* p - w */
-			"│", "≤", "≥", "π", "≠", "£", "·" /* x - ~ */
+			'↑', '↓', '→', '←', '█', '▚', '☃', /* A - G */
+			'\0', '\0', '\0', '\0', '\0', '\0', '\0',
+			'\0', /* H - O */
+			'\0', '\0', '\0', '\0', '\0', '\0', '\0',
+			'\0', /* P - W */
+			'\0', '\0', '\0', '\0', '\0', '\0', '\0',
+			' ', /* X - _ */
+			'◆', '▒', '␉', '␌', '␍', '␊', '°', '±', /* ` - g */
+			'␤', '␋', '┘', '┐', '┌', '└', '┼', '⎺', /* h - o */
+			'⎻', '─', '⎼', '⎽', '├', '┤', '┴', '┬', /* p - w */
+			'│', '≤', '≥', 'π', '≠', '£', '·'
 		};
 
 		private const int HISTSIZE = 2000;
 		private const int RESIZEBUFFER = 1000;
-		private const int BUFSIZ = 8192;
+		private const int BUFSIZ = 16384;
 		public const int defaultbg = 258;
 		private const int defaultfg = 259;
 
@@ -290,9 +290,9 @@ namespace UI.Terminal.SimpleTerminal
 		private void TtyUpdate()
 		{
 			// Here's where we read from the master pty device to get new characters to output.
-			int ret = this.TtyRead();
+			int ret = 0;
 
-			if (ret > 0)
+			while ((ret = this.TtyRead()) > 0)
 			{
 				if (!this.drawing)
 				{
@@ -357,38 +357,36 @@ namespace UI.Terminal.SimpleTerminal
 
 			return ret;
 		}
+
+		private readonly char[] decodeBuffer = new char[BUFSIZ];
 		
 		private int TerminalWrite(byte[] buf, int buflen, bool showControl)
 		{
 			var charsize = 0;
-			var u = 0u;
+			var u = '\0';
 			var n = 0;
+			int charCount = 0;
+			if (this.IS_SET(TermMode.MODE_UTF8))
+				charCount = Encoding.UTF8.GetChars(buf, 0, buflen, decodeBuffer, 0);
+			else
+				charCount = Encoding.ASCII.GetChars(buf, 0, buflen, decodeBuffer, 0);
 
-			for (n = 0; n < buflen; n += charsize)
+
+			for (n = 0; n < charCount; n++)
 			{
-				if (this.IS_SET(TermMode.MODE_UTF8))
-				{
-					charsize = TermUtf8.utf8decode(buf, n, out u, buflen - n);
-					if (charsize == 0)
-						break;
-				}
-				else
-				{
-					u = (uint)(buf[n] & 0xff);
-					charsize = 1;
-				}
-
+				u = decodeBuffer[n];
+				
 				if (showControl && IsControl(u))
 				{
 					if ((u & 0x80) != 0)
 					{
-						u &= 0x7f;
+						u &= (char) 0x7f;
 						this.PutChar('^');
 						this.PutChar('[');
 					}
 					else if (u != '\n' && u != '\r' && u != '\t')
 					{
-						u ^= 0x40;
+						u ^= (char) 0x40;
 						this.PutChar('^');
 					}
 				}
@@ -782,7 +780,7 @@ namespace UI.Terminal.SimpleTerminal
 			this.term.c.x = Math.Clamp(x, 0, this.term.col - 1);
 		}
 		
-		private void PutChar(uint u)
+		private void PutChar(char u)
 		{
 			unsafe
 			{
@@ -849,7 +847,7 @@ namespace UI.Terminal.SimpleTerminal
 				{
 					this.ControlCode(u);
 
-					if (this.term.esc == 0) this.term.lastc = 0;
+					if (this.term.esc == 0) this.term.lastc = '\0';
 					return;
 				}
 				else if ((this.term.esc & EscapeState.ESC_START) != 0)
@@ -926,11 +924,11 @@ namespace UI.Terminal.SimpleTerminal
 						if ((g1.mode & GlyphAttribute.ATTR_WIDE) != 0 && this.term.c.x + 2 < this.term.col)
 						{
 							ref Glyph g2 = ref this.term.line[this.term.c.y].glyphs[this.term.c.x + 2];
-							g2.u = ' ';
+							g2.character = ' ';
 							g2.mode &= GlyphAttribute.ATTR_WDUMMY;
 						}
 
-						g1.u = '\0';
+						g1.character = '\0';
 						g1.mode = GlyphAttribute.ATTR_WDUMMY;
 					}
 				}
@@ -947,14 +945,14 @@ namespace UI.Terminal.SimpleTerminal
 			}
 		}
 
-		private void SetChar(uint u, ref Glyph attr, int x, int y)
+		private void SetChar(char u, ref Glyph attr, int x, int y)
 		{
 			/*
 			 * The table is proudly stolen from rxvt.
 			 */
 			if (this.term.trantbl[this.term.charset] == Charset.CS_GRAPHIC0 &&
-			    Between(u, 0x41, 0x7e) && !string.IsNullOrEmpty(vt100_0[u - 0x41]))
-				TermUtf8.utf8decode(Encoding.UTF8.GetBytes(vt100_0[u - 0x41]), 0, out u, (int)EmulatorConstants.UTF_SIZ);
+			    Between(u, 0x41, 0x7e) && vt100_0[u - 0x41] != '\0')
+				u = vt100_0[u - 0x41]; ;
 
 			ref Glyph g = ref this.term.line[y].glyphs[x];
 			if ((g.mode & GlyphAttribute.ATTR_WIDE) != 0)
@@ -962,14 +960,14 @@ namespace UI.Terminal.SimpleTerminal
 				if (x + 1 < this.term.col)
 				{
 					ref Glyph g1 = ref this.term.line[y].glyphs[x + 1];
-					g1.u = ' ';
+					g1.character = ' ';
 					g1.mode &= ~GlyphAttribute.ATTR_WDUMMY;
 				}
 			}
 			else if ((g.mode & GlyphAttribute.ATTR_WDUMMY) != 0)
 			{
 				ref Glyph g1 = ref this.term.line[y].glyphs[x - 1];
-				g1.u = ' ';
+				g1.character = ' ';
 				g1.mode &= ~GlyphAttribute.ATTR_WIDE;
 			}
 
@@ -978,7 +976,7 @@ namespace UI.Terminal.SimpleTerminal
 			g.fg = attr.fg;
 			g.fgRgb = attr.fgRgb;
 			g.bg = attr.bg;
-			g.u = u;
+			g.character = u;
 			g.mode |= GlyphAttribute.ATTR_SET;
 		}
 		
@@ -1812,7 +1810,7 @@ namespace UI.Terminal.SimpleTerminal
 			}
 
 			gp.mode = GlyphAttribute.ATTR_NULL;
-			gp.u = ' ';
+			gp.character = ' ';
 		}
 		
 		private void DeleteLine(int n)
@@ -2043,7 +2041,7 @@ namespace UI.Terminal.SimpleTerminal
                      * beginning of a line.
                      */
 					prevgp = ref this.Tline(y).glyphs[x];
-					prevdelim = Isdelim(prevgp.u);
+					prevdelim = Isdelim(prevgp.character);
 					for (;;)
 					{
 						newx = x + direction;
@@ -2074,10 +2072,10 @@ namespace UI.Terminal.SimpleTerminal
 							break;
 
 						gp = ref this.Tline(newy).glyphs[newx];
-						delim = Isdelim(gp.u);
+						delim = Isdelim(gp.character);
 						if ((gp.mode & GlyphAttribute.ATTR_WDUMMY) == 0 && (delim != prevdelim ||
-						                                                    (delim && !(gp.u == ' ' &&
-						                                                                prevgp.u == ' '))))
+						                                                    (delim && !(gp.character == ' ' &&
+						                                                                prevgp.character == ' '))))
 							break;
 
 						x = newx;
@@ -2562,7 +2560,7 @@ namespace UI.Terminal.SimpleTerminal
 				}
 				else
 				{
-					sb.Append((char)glyph.u);
+					sb.Append((char)glyph.character);
 					gp++;
 				}
 			}
@@ -2651,7 +2649,7 @@ namespace UI.Terminal.SimpleTerminal
 
 		private void DrawLine(ref Glyph[] glyphs, int x1, int y, int x2)
 		{
-			screen.DrawLine(ref glyphs, x1, y, x2);
+			screen.DrawLine(this, ref glyphs, x1, y, x2);
 		}
 		
 		private void UpdateCursorRect(int cx, int cy, ref Glyph g, int ocx, int ocy, ref Glyph og)

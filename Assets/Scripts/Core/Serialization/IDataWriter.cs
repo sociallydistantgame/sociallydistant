@@ -1,7 +1,6 @@
 ﻿#nullable enable
 
 using System;
-using Codice.CM.WorkspaceServer.Tree;
 
 namespace Core.Serialization
 {
