@@ -8,6 +8,7 @@ using GameplaySystems.Networld;
 using OS.FileSystems;
 using OS.FileSystems.Host;
 using OS.Network;
+using Player;
 using UnityEngine.Assertions;
 using UnityEngine.UIElements;
 
@@ -18,6 +19,7 @@ namespace OS.Devices
 		private readonly GameManager gameManager;
 		private readonly IUser su;
 		private string hostHomeDirectory = string.Empty;
+		private readonly PlayerFileOverrider fileOverrider;
 		private Dictionary<int, IUser> users = new Dictionary<int, IUser>();
 		private Dictionary<string, int> usernameMap = new Dictionary<string, int>();
 		private PlayerUser playerUser;
@@ -28,11 +30,12 @@ namespace OS.Devices
 		public string Name => gameManager.CurrentPlayerHostName;
 		public PlayerUser PlayerUser => playerUser;
 		
-		public PlayerComputer(GameManager gameManager, LocalAreaNetwork playerLan)
+		public PlayerComputer(GameManager gameManager, LocalAreaNetwork playerLan, PlayerFileOverrider fileOverrider)
 		{
 			this.playerLan = playerLan;
 			this.Network = this.playerLan.CreateDevice();
 			this.gameManager = gameManager;
+			this.fileOverrider = fileOverrider;
 
 			su = new SuperUser(this);
 			this.AddUser(su);
@@ -95,7 +98,7 @@ namespace OS.Devices
 			if (playerFileSystem == null)
 				RebuildVfs();
 			
-			return new VirtualFileSystem(this.playerFileSystem!, user);
+			return new VirtualFileSystem(this.playerFileSystem!, user, fileOverrider);
 		}
 
 		/// <inheritdoc />

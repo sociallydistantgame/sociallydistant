@@ -29,7 +29,7 @@ namespace Core.WorldData.Data
 			get => macAddress;
 			set => macAddress = value;
 		}
-		
+
 		/// <inheritdoc />
 		public void Serialize(IRevisionedSerializer<WorldRevision> serializer)
 		{

@@ -12,11 +12,13 @@ namespace OS.FileSystems
 	{
 		private readonly IFileSystem rootfs;
 		private readonly IUser user;
+		private readonly IFileOverrider? fileOverrider = null;
 
-		public VirtualFileSystem(IFileSystem rootfs, IUser user)
+		public VirtualFileSystem(IFileSystem rootfs, IUser user, IFileOverrider? fileOverrider = null)
 		{
 			this.rootfs = rootfs;
 			this.user = user;
+			this.fileOverrider = fileOverrider;
 		}
 
 		private IDirectoryEntry? FindDirectoryEntry(ReadOnlySpan<string> path, IUser? reader = null)
@@ -98,6 +100,13 @@ namespace OS.FileSystems
 				return null;
 
 			string filename = path[^1];
+
+			if (fileOverrider != null)
+			{
+				if (fileOverrider.TryGetFile(reader, parentPath, filename, out IFileEntry? entry))
+					return entry;
+			}
+			
 			foreach (IFileEntry fileEntry in parentDirectory.ReadFileEntries(reader))
 			{
 				if (fileEntry.Name == filename)

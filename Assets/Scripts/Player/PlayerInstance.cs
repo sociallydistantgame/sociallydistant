@@ -21,6 +21,7 @@ namespace Player
 		public WindowManager WindowManager;
 		public LoginManager LoginManager;
 		public PopoverLayer PopoverLayer;
+		public PlayerFileOverrider FileOverrider;
 
 		public LocalAreaNetwork PlayerLan;
 	}

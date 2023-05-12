@@ -23,6 +23,7 @@ namespace GameplaySystems.NonPlayerComputers
 		private NetworkConnection? networkConnection;
 		private SuperUser su;
 		private NonPlayerFileSystem fs;
+		private NpcFileOverrider fileOverrider;
 
 		[Header("Dependencies")]
 		[SerializeField]
@@ -96,7 +97,7 @@ namespace GameplaySystems.NonPlayerComputers
 		/// <inheritdoc />
 		public VirtualFileSystem GetFileSystem(IUser user)
 		{
-			return new VirtualFileSystem(this.fs, user);
+			return new VirtualFileSystem(this.fs, user, this.fileOverrider);
 		}
 
 		/// <inheritdoc />
@@ -138,6 +139,11 @@ namespace GameplaySystems.NonPlayerComputers
 			
 			// Mount file systems from Unity
 			FileSystemTable.MountFileSystemsToComputer(this, this.fileSystemTable);
+		}
+
+		public void SetFileOverrider(NpcFileOverrider overrider)
+		{
+			this.fileOverrider = overrider;
 		}
 	}
 }
