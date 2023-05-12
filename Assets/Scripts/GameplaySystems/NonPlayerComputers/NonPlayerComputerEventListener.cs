@@ -1,11 +1,11 @@
 ﻿#nullable enable
 
-using System;
 using System.Collections.Generic;
 using Architecture;
 using Core;
 using Core.DataManagement;
 using Core.WorldData.Data;
+using OS.FileSystems;
 using UnityEngine;
 using Utility;
 
@@ -14,6 +14,7 @@ namespace GameplaySystems.NonPlayerComputers
 	public class NonPlayerComputerEventListener : MonoBehaviour
 	{
 		private readonly Dictionary<ObjectId, NonPlayerComputer> instances = new Dictionary<ObjectId, NonPlayerComputer>();
+		private readonly Dictionary<ObjectId, NpcFileOverrider> overriders = new Dictionary<ObjectId, NpcFileOverrider>();
 
 		[Header("Dependencies")]
 		[SerializeField]
@@ -65,6 +66,7 @@ namespace GameplaySystems.NonPlayerComputers
 
 			instances.Remove(subject.InstanceId);
 			Destroy(computer.gameObject);
+			overriders.Remove(subject.InstanceId);
 		}
 
 		private void OnModifyComputer(WorldComputerData subjectprevious, WorldComputerData subjectnew)
@@ -76,10 +78,17 @@ namespace GameplaySystems.NonPlayerComputers
 		private void OnCreateComputer(WorldComputerData subject)
 		{
 			var setActive = false;
+			if (!overriders.TryGetValue(subject.InstanceId, out NpcFileOverrider overrider))
+			{
+				overrider = new NpcFileOverrider();
+				overriders.Add(subject.InstanceId, overrider);
+			}
+			
 			if (!instances.TryGetValue(subject.InstanceId, out NonPlayerComputer computer))
 			{
 				this.computerPrefab.gameObject.SetActive(false);
 				computer = Instantiate(computerPrefab);
+				computer.SetFileOverrider(overrider);
 				instances.Add(subject.InstanceId, computer);
 				setActive = true;
 			}
@@ -88,6 +97,11 @@ namespace GameplaySystems.NonPlayerComputers
 			
 			if (setActive)
 				computer.gameObject.SetActive(true);
+		}
+
+		public IFileOverrider GetNpcFileOverrider(ObjectId computer)
+		{
+			return overriders[computer];
 		}
 	}
 }

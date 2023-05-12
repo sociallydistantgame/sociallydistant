@@ -71,11 +71,13 @@ namespace Player
 			
 			// Create a ghost LAN for the player
 			LocalAreaNetwork playerLan = networkSimulation.Value.CreateLocalAreaNetwork();
-			
-			
-			var playerComputer = new PlayerComputer(gameManager.Value, playerLan);
+
+
+			var fileOverrider = new PlayerFileOverrider();
+			var playerComputer = new PlayerComputer(gameManager.Value, playerLan, fileOverrider);
 			var player = new PlayerInstance();
 
+			player.FileOverrider = fileOverrider;
 			player.PlayerLan = playerLan;
 			
 			FileSystemTable.MountFileSystemsToComputer(playerComputer, fstab);

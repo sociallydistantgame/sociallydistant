@@ -44,3 +44,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 10b292f0ba5c4a85b08ddffca7bb6013, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  playerInstance: {fileID: 11400000, guid: b143bb84d08c6044bb9b1a69e33c8460, type: 2}
+  world: {fileID: 11400000, guid: 6ddfb5183f8225440a5d156e7fb16747, type: 2}
+  exploitsResourcePath: Exploits
+  payloadsResourcePath: Payloads
