@@ -297,10 +297,22 @@ namespace OS.FileSystems
 			
 			if (directory == null)
 				throw new DirectoryNotFoundException();
+
+			var overriddenFiles = new List<string>();
+
+			if (this.fileOverrider != null)
+			{
+				foreach (string filename in fileOverrider.EnumerateFiles(this.user, parts))
+				{
+					overriddenFiles.Add(filename);
+					yield return PathUtility.Combine(path, filename);
+				}
+			}
 			
 			foreach (IFileEntry subEntry in directory.ReadFileEntries(this.user))
 			{
-				yield return PathUtility.Combine(path, subEntry.Name);
+				if (!overriddenFiles.Contains(subEntry.Name))
+					yield return PathUtility.Combine(path, subEntry.Name);
 			}
 		}
 
