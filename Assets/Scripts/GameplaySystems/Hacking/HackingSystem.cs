@@ -1,11 +1,12 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
+using System.Linq;
 using Core;
 using Core.DataManagement;
 using Core.WorldData.Data;
 using GameplaySystems.NonPlayerComputers;
 using OS.FileSystems;
 using Player;
+using UI.Widgets;
 using UnityEngine;
 using Utility;
 
@@ -13,6 +14,8 @@ namespace GameplaySystems.Hacking
 {
 	public class HackingSystem : MonoBehaviour
 	{
+		private readonly Dictionary<ObjectId, CraftedExploitFile> craftedExploits = new Dictionary<ObjectId, CraftedExploitFile>();
+
 		private ExploitAsset[] exploits;
 		private PayloadAsset[] payloads;
 		private NonPlayerComputerEventListener npcComputers;
@@ -53,6 +56,14 @@ namespace GameplaySystems.Hacking
 
 		private void OnCraftedExploitDeleted(WorldCraftedExploitData subject)
 		{
+			if (!craftedExploits.TryGetValue(subject.InstanceId, out CraftedExploitFile file))
+				return;
+			
+			IFileOverrider overrider = GetFileOverrider(subject.Computer);
+			string[] path = PathUtility.Split(subject.FilePath);
+
+			overrider.RemoveFile(path, file);
+			craftedExploits.Remove(subject.InstanceId);
 		}
 
 		private void OnCraftedExploitModified(WorldCraftedExploitData subjectprevious, WorldCraftedExploitData subjectnew)
@@ -61,6 +72,27 @@ namespace GameplaySystems.Hacking
 
 		private void OnCraftedExploitCreated(WorldCraftedExploitData subject)
 		{
+			IFileOverrider overrider = GetFileOverrider(subject.Computer);
+			string directoryName = PathUtility.GetDirectoryName(subject.FilePath);
+			string[] directory = PathUtility.Split(directoryName);
+
+			if (!craftedExploits.TryGetValue(subject.InstanceId, out CraftedExploitFile file))
+			{
+				file = new CraftedExploitFile();
+				craftedExploits.Add(subject.InstanceId, file);
+			}
+
+			overrider.AddFile(directory, file);
+			UpdateInstance(subject, file);
+		}
+
+		private void UpdateInstance(WorldCraftedExploitData subject, CraftedExploitFile file)
+		{
+			string filename = PathUtility.GetFileName(subject.FilePath);
+
+			file.Name = filename;
+			file.Exploit = Exploits.First(x => x.Name == subject.Exploit);
+			file.Payload = Payloads.FirstOrDefault(x => x.Name == subject.Exploit);
 		}
 
 		private IFileOverrider GetFileOverrider(ObjectId computer)
