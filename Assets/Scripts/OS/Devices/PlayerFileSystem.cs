@@ -28,7 +28,9 @@ namespace OS.Devices
 
 			ImmutableDirectoryTree usrDirectory = entryBuilder.AddDirectory("usr");
 			usrDirectory.AddDirectory("bin");
-			usrDirectory.AddDirectory("lib");
+			ImmutableDirectoryTree usrLib = usrDirectory.AddDirectory("lib");
+			usrLib.AddDirectory("exploits");
+			usrLib.AddDirectory("payloads");
 			usrDirectory.AddDirectory("share");
 
 			RootDirectory = entryBuilder.Build();

@@ -42,6 +42,12 @@ namespace Architecture
 		}
 
 		/// <inheritdoc />
+		public bool IsSet(string variable)
+		{
+			return this.environmentVariables.Any(x => x.Key == variable);
+		}
+
+		/// <inheritdoc />
 		public IEnvironmentVariableProvider DeepClone()
 		{
 			// Clone into a SimpleEnvironmentVariableProvider because we may be doing this in a player build

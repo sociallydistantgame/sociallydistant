@@ -19,3 +19,7 @@ MonoBehaviour:
     fileSystemAsset: {fileID: 11400000, guid: 636046208431e244688835b0094f864c, type: 2}
   - path: /sbin
     fileSystemAsset: {fileID: 11400000, guid: 1f75ffa9d5b9324439eba560cd9028c9, type: 2}
+  - path: /usr/lib/payloads
+    fileSystemAsset: {fileID: 11400000, guid: 785e352128f42e24a9cb2a3d3b8fb903, type: 2}
+  - path: /usr/lib/exploits
+    fileSystemAsset: {fileID: 11400000, guid: f7743ae685cc2aa45a30996a3b0d6610, type: 2}

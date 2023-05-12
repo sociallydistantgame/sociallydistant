@@ -5,6 +5,8 @@ namespace OS.Devices
 	{
 		string this[string key] { get; set; }
 
+		bool IsSet(string variable);
+		
 		IEnvironmentVariableProvider DeepClone();
 	}
 }
