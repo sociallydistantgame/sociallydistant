@@ -27,6 +27,12 @@ namespace Architecture
 		}
 
 		/// <inheritdoc />
+		public bool IsSet(string variable)
+		{
+			return this.envVariables.ContainsKey(variable);
+		}
+
+		/// <inheritdoc />
 		public IEnvironmentVariableProvider DeepClone()
 		{
 			var clone = new SimpleEnvironmentVariableProvider();

@@ -204,7 +204,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 15c2cf89e30d4e29b737448c1c1abd5d, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  font: {fileID: 11400000, guid: d0626ae8c7fb25f449d6427b591abfaf, type: 2}
+  font: {fileID: 11400000, guid: 01f7b1a20704caa4ea69a70de99e7999, type: 2}
   fontSize: 16
   asciiBeep: {fileID: 0}
   showBackgroundColor: 0

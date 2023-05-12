@@ -3,6 +3,7 @@ using System;
 using Architecture;
 using OS.FileSystems;
 using OS.FileSystems.Immutable;
+using Player;
 
 namespace VfsMapping
 {
@@ -42,6 +43,43 @@ namespace VfsMapping
 		public void Unmount(IDirectoryEntry mountPoint)
 		{
 			throw new System.NotImplementedException();
+		}
+
+		/// <inheritdoc />
+		public bool IsMounted(IFileSystem fs)
+		{
+			return false;
+		}
+
+		/// <inheritdoc />
+		public IDirectoryEntry RootDirectory { get; }
+	}
+
+	public sealed class UnlockableAssetFileSystem<TAssetType, TFileEntryType> : IFileSystem
+		where TAssetType : UnityEngine.Object, IUnlockableAsset
+		where TFileEntryType : UnlockableAssetFileEntry<TAssetType>
+	{
+		public UnlockableAssetFileSystem(TAssetType[] assets, PlayerInstanceHolder player)
+		{
+			RootDirectory = new UnlockableAssetDirectory<TAssetType, TFileEntryType>(this, assets, player);
+		}
+
+		/// <inheritdoc />
+		public IFileSystem? GetMountedFileSystem(IDirectoryEntry mountPoint)
+		{
+			return null;
+		}
+
+		/// <inheritdoc />
+		public void Mount(IDirectoryEntry mountPoint, IFileSystem filesystem)
+		{
+			throw new NotImplementedException();
+		}
+
+		/// <inheritdoc />
+		public void Unmount(IDirectoryEntry mountPoint)
+		{
+			throw new NotImplementedException();
 		}
 
 		/// <inheritdoc />

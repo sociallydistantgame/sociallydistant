@@ -1,6 +1,7 @@
 ﻿#nullable enable
 
 using System;
+using System.Diagnostics;
 using GameplaySystems.Networld;
 using OS.Devices;
 using OS.Tasks;
@@ -58,11 +59,31 @@ namespace Architecture
 			proc?.Kill();
 		}
 
-		protected virtual void OnMain() {}
+		protected virtual void OnMain()
+		{
+			this.EndProcess();
+		}
 
 		protected void EndProcess()
 		{
 			proc.Kill();
+		}
+
+		protected bool TryGetEnvironmentVariable(string variable, out string? value)
+		{
+			value = default;
+			if (this.proc == null!)
+				return false;
+
+			if (proc.Environment.IsSet(variable))
+			{
+				value = proc.Environment[variable];
+				return true;
+			}
+			else
+			{
+				return false;
+			}
 		}
 	}
 }
