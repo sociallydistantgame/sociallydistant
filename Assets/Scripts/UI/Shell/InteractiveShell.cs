@@ -875,6 +875,9 @@ namespace UI.Shell
 			/// <inheritdoc />
 			public override void Update()
 			{
+				if (IsComplete)
+					return;
+				
 				if (console == null)
 					return;
 				
@@ -897,10 +900,10 @@ namespace UI.Shell
 
 			private void HandleCommandProcessKilled(ISystemProcess process)
 			{
-				waiting = false;
+				isCompleted = true;
 				process.Killed -= HandleCommandProcessKilled;
 				this.currentCommandProcess = null;
-				isCompleted = true;
+				waiting = false;
 			}
 		}
 	}

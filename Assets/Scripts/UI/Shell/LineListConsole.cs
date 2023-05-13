@@ -8,6 +8,8 @@ namespace UI.Shell
 		private readonly StringBuilder buffer = new StringBuilder();
 		private int readPosition = 0;
 		
+		public bool SuppressInput { get; set; }
+		
 		/// <inheritdoc />
 		public void ClearScreen()
 		{

@@ -20,7 +20,7 @@ namespace Architecture
 			
 			// Pass everything onto the script
 			instance.Main(process, console, arguments);
-			
+
 			// Wake the script up!
 			instance.gameObject.SetActive(true);
 		}

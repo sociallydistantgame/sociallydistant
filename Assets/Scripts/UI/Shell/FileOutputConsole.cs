@@ -13,6 +13,12 @@ namespace UI.Shell
 		private readonly Stream fileStream;
 		private readonly StreamWriter fileWriter;
 
+		public bool SuppressInput
+		{
+			get => input.SuppressInput;
+			set => input.SuppressInput = value;
+		}
+		
 		public FileOutputConsole(ITextConsole input, Stream output)
 		{
 			this.input = input;
