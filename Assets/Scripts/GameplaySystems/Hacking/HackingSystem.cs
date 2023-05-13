@@ -3,7 +3,9 @@ using System.Linq;
 using Core;
 using Core.DataManagement;
 using Core.WorldData.Data;
+using GameplaySystems.Networld;
 using GameplaySystems.NonPlayerComputers;
+using OS.Devices;
 using OS.FileSystems;
 using Player;
 using UI.Widgets;
@@ -14,6 +16,7 @@ namespace GameplaySystems.Hacking
 {
 	public class HackingSystem : MonoBehaviour
 	{
+		private readonly Dictionary<ObjectId, Listener> hackables = new Dictionary<ObjectId, Listener>();
 		private readonly Dictionary<ObjectId, CraftedExploitFile> craftedExploits = new Dictionary<ObjectId, CraftedExploitFile>();
 
 		private ExploitAsset[] exploits;
@@ -52,6 +55,24 @@ namespace GameplaySystems.Hacking
 			world.Value.Callbacks.AddCreateCallback<WorldCraftedExploitData>(OnCraftedExploitCreated);
 			world.Value.Callbacks.AddModifyCallback<WorldCraftedExploitData>(OnCraftedExploitModified);
 			world.Value.Callbacks.AddDeleteCallback<WorldCraftedExploitData>(OnCraftedExploitDeleted);
+			
+			world.Value.Callbacks.AddCreateCallback<WorldHackableData>(OnHackableCreated);
+		}
+
+		private void OnHackableCreated(WorldHackableData subject)
+		{
+			IComputer? computer = GetComputer(subject.ComputerId);
+			if (computer == null)
+				return;
+
+			if (computer.Network == null)
+				return;
+
+			if (!hackables.TryGetValue(subject.InstanceId, out Listener listener))
+			{
+				listener = computer.Network.Listen(subject.Port, subject.ServerType, subject.SecurityLevel);
+				hackables.Add(subject.InstanceId, listener);
+			}
 		}
 
 		private void OnCraftedExploitDeleted(WorldCraftedExploitData subject)
@@ -95,6 +116,17 @@ namespace GameplaySystems.Hacking
 			file.Payload = Payloads.FirstOrDefault(x => x.Name == subject.Exploit);
 		}
 
+		private IComputer GetComputer(ObjectId computer)
+		{
+			if (computer == ObjectId.Invalid)
+				return playerInstance.Value.Computer;
+			else
+			{
+				this.npcComputers.TryGetComputer(computer, out NonPlayerComputer npc);
+				return npc;
+			}
+		}
+		
 		private IFileOverrider GetFileOverrider(ObjectId computer)
 		{
 			if (computer == ObjectId.Invalid)

@@ -85,6 +85,8 @@ namespace Player
 			player.Computer = playerComputer;
 			player.OsInitProcess = deviceCoordinator.SetUpComputer(playerComputer);
 
+			playerComputer.SetInitProcess(player.OsInitProcess);
+			
 			// Copy environment vars to the init process
 			foreach (KeyValuePair<string, string> pair in this.environmentVariables)
 			{

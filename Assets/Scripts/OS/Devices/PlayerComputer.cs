@@ -25,6 +25,8 @@ namespace OS.Devices
 		private PlayerUser playerUser;
 		private PlayerFileSystem? playerFileSystem;
 		private LocalAreaNetwork playerLan;
+		private ISystemProcess? initProcess;
+		private ISystemProcess? systemd;
 
 		/// <inheritdoc />
 		public string Name => gameManager.CurrentPlayerHostName;
@@ -33,7 +35,7 @@ namespace OS.Devices
 		public PlayerComputer(GameManager gameManager, LocalAreaNetwork playerLan, PlayerFileOverrider fileOverrider)
 		{
 			this.playerLan = playerLan;
-			this.Network = this.playerLan.CreateDevice();
+			this.Network = this.playerLan.CreateDevice(this);
 			this.gameManager = gameManager;
 			this.fileOverrider = fileOverrider;
 
@@ -104,6 +106,16 @@ namespace OS.Devices
 		/// <inheritdoc />
 		public NetworkConnection Network { get; private set; }
 
+		/// <inheritdoc />
+		public ISystemProcess? CreateDaemonProcess(string name)
+		{
+			ISystemProcess? result = systemd?.Fork();
+			if (result != null)
+				result.Name = name;
+
+			return result;
+		}
+
 		private void AddUser(IUser user)
 		{
 			Assert.IsTrue(user.Computer == this, "User does not belong to the player computer.");
@@ -112,6 +124,17 @@ namespace OS.Devices
 
 			this.users.Add(user.Id, user);
 			this.usernameMap.Add(user.UserName, user.Id);
+		}
+
+		internal void SetInitProcess(ISystemProcess? initProcess)
+		{
+			if (this.initProcess != null)
+				throw new InvalidOperationException("You already fucking did this, ya dummy");
+
+			this.initProcess = initProcess;
+			this.systemd = this.initProcess.Fork();
+			systemd.Name = "systemd";
+
 		}
 	}
 }

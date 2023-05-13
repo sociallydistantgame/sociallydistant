@@ -92,24 +92,24 @@ namespace GameplaySystems.Networld
 			callback?.Invoke(pingResult);
 		}
 
-		private Listener ListenInternal(ushort port)
+		private Listener ListenInternal(ushort port, ServerType serverType, SecurityLevel secLevel)
 		{
 			if (listeners.ContainsKey(port))
 				throw new InvalidOperationException("Port " + port + " is already in use.");
 
-			var handle = new ListenerHandle(port, listeners, deviceNode);
+			var handle = new ListenerHandle(port, listeners, deviceNode, serverType, secLevel);
 			var listener = new Listener(handle);
 			listeners.Add(port, listener);
 
 			return listener;
 		}
 		
-		public Listener Listen(ushort port)
+		public Listener Listen(ushort port, ServerType serverType = ServerType.Netcat, SecurityLevel secLevel = SecurityLevel.Open)
 		{
 			if (port >= (ushort.MaxValue - MaximumOutboundConnections))
 				Debug.LogWarning("Creating a listener on port " + port + " for in-bound connections is generally not advised. You are taking up one of the " + MaximumOutboundConnections + " reserved ports for out-bound traffic.");
 
-			return ListenInternal(port);
+			return ListenInternal(port, serverType, secLevel);
 		}
 
 		public IEnumerator Connect(uint remoteAddress, ushort port, Action<ConnectionResult> callback)
@@ -123,7 +123,7 @@ namespace GameplaySystems.Networld
 			{
 				if (!listeners.ContainsKey(outboundPort))
 				{
-					localListener = ListenInternal(outboundPort);
+					localListener = ListenInternal(outboundPort, ServerType.Netcat, SecurityLevel.Open);
 					break;
 				}
 

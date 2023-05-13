@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using OS.Devices;
 using OS.Network;
 
 namespace GameplaySystems.Networld
@@ -233,7 +234,7 @@ namespace GameplaySystems.Networld
 		/// <inheritdoc />
 		public NetworkInterface NetworkInterface => outboundInterface;
 
-		public NetworkConnection SetUpNewDevice()
+		public NetworkConnection SetUpNewDevice(IComputer computer)
 		{
 			// Reserve an IP address for the device
 			uint networkAddress = simulatedDefaultGatewayAddress + 1;
@@ -246,7 +247,7 @@ namespace GameplaySystems.Networld
 			// Create the new device node... pretend this line of code just magically bought a computer.
 			// We don't know what computer it is but it has an Ethernet port and it's our job to
 			// wire it up.
-			var deviceNode = new DeviceNode(insideNetwork, simulatedDefaultGatewayAddress, networkAddress);
+			var deviceNode = new DeviceNode(insideNetwork, simulatedDefaultGatewayAddress, networkAddress, computer);
 			devices.Add(deviceNode);
 			reservations.Add(networkAddress, deviceNode);
 

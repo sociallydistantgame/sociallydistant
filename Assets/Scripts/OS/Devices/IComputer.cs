@@ -32,5 +32,7 @@ namespace OS.Devices
 		VirtualFileSystem GetFileSystem(IUser user);
 		
 		NetworkConnection? Network { get; }
+
+		ISystemProcess? CreateDaemonProcess(string name);
 	}
 }

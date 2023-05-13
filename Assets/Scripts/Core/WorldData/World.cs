@@ -17,7 +17,8 @@ namespace Core.WorldData
 		public readonly DataTable<WorldNetworkConnection, WorldRevision> NetworkConnections;
 		public readonly DataTable<WorldPortForwardingRule, WorldRevision> PortForwardingRules;
 		public readonly DataTable<WorldCraftedExploitData, WorldRevision> CraftedExploits;
-
+		public readonly DataTable<WorldHackableData, WorldRevision> Hackables;
+		
 
 
 		public World(UniqueIntGenerator instanceIdGenerator, DataEventDispatcher eventDispatcher)
@@ -30,6 +31,8 @@ namespace Core.WorldData
 			NetworkConnections = new DataTable<WorldNetworkConnection, WorldRevision>(instanceIdGenerator, eventDispatcher);
 			PortForwardingRules = new DataTable<WorldPortForwardingRule, WorldRevision>(instanceIdGenerator, eventDispatcher);
 			CraftedExploits = new DataTable<WorldCraftedExploitData, WorldRevision>(instanceIdGenerator, eventDispatcher);
+			Hackables = new DataTable<WorldHackableData, WorldRevision>(instanceIdGenerator, eventDispatcher);
+			
 		}
 
 		public void Serialize(IRevisionedSerializer<WorldRevision> serializer)
@@ -43,6 +46,7 @@ namespace Core.WorldData
 			// serialize after networking stuff, because it relies on them.
 			PlayerData.Serialize(serializer);
 
+			Hackables.Serialize(serializer, WorldRevision.AddedHackables);
 			PortForwardingRules.Serialize(serializer, WorldRevision.AddedPortForwarding);
 			
 			CraftedExploits.Serialize(serializer, WorldRevision.AddedExploitCrafting);
@@ -54,6 +58,7 @@ namespace Core.WorldData
 			// This ensures proper handling of deleting objects that depend on other objects.
 			this.CraftedExploits.Clear();
 			this.PortForwardingRules.Clear();
+			this.Hackables.Clear();
 			this.PlayerData.Value = default;
 			this.NetworkConnections.Clear();
 			this.LocalAreaNetworks.Clear();

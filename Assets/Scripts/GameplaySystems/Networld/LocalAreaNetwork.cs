@@ -1,4 +1,5 @@
 ﻿using System;
+using OS.Devices;
 
 namespace GameplaySystems.Networld
 {
@@ -34,9 +35,9 @@ namespace GameplaySystems.Networld
 			connection.Side2.DisconnectLan(this);
 		}
 
-		public NetworkConnection CreateDevice()
+		public NetworkConnection CreateDevice(IComputer computer)
 		{
-			return this.node.SetUpNewDevice();
+			return this.node.SetUpNewDevice(computer);
 		}
 
 		public void DeleteDevice(NetworkConnection connection)

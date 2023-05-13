@@ -24,6 +24,7 @@ namespace GameplaySystems.NonPlayerComputers
 		private SuperUser su;
 		private NonPlayerFileSystem fs;
 		private NpcFileOverrider fileOverrider;
+		private ISystemProcess systemd;
 
 		[Header("Dependencies")]
 		[SerializeField]
@@ -53,6 +54,8 @@ namespace GameplaySystems.NonPlayerComputers
 			RebuildVfs();
 			
 			this.initProcess = this.deviceCoordinator.SetUpComputer(this);
+			this.systemd = this.initProcess.Fork();
+			this.systemd.Name = "systemd";
 			
 			// Apply environment variables to the system
 			foreach (KeyValuePair<string, string> keyPair in environmentVariables)
@@ -103,6 +106,15 @@ namespace GameplaySystems.NonPlayerComputers
 		/// <inheritdoc />
 		public NetworkConnection? Network => networkConnection;
 
+		/// <inheritdoc />
+		public ISystemProcess? CreateDaemonProcess(string name)
+		{
+			ISystemProcess? result = systemd?.Fork();
+			if (result != null)
+				result.Name = name;
+			return result;
+		}
+
 		public void UpdateWorldData(WorldComputerData data)
 		{
 			worldData = data;
@@ -115,7 +127,7 @@ namespace GameplaySystems.NonPlayerComputers
 				return;
 
 			currentLan = lan;
-			networkConnection = currentLan.CreateDevice();
+			networkConnection = currentLan.CreateDevice(this);
 		}
 		
 		public void DisconnectLan()

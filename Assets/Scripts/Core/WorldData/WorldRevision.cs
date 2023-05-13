@@ -9,6 +9,7 @@
 		AddedInternetServiceProviders = 4,
 		AddedPortForwarding = 5,
 		AddedExploitCrafting = 6,
+		AddedHackables = 7,
 
 		Latest
 	}
