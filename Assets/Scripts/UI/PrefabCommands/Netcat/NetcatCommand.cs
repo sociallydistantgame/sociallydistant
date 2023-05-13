@@ -12,6 +12,12 @@ namespace UI.PrefabCommands.Netcat
 {
 	public class NetcatCommand : CommandScript
 	{
+		/// <inheritdoc />
+		protected override void OnMain()
+		{
+			
+		}
+
 		private void Start()
 		{
 			// We don't have an options parser yet so this is a hack
