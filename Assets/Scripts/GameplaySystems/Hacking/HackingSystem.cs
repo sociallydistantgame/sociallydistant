@@ -78,7 +78,7 @@ namespace GameplaySystems.Hacking
 
 			if (!craftedExploits.TryGetValue(subject.InstanceId, out CraftedExploitFile file))
 			{
-				file = new CraftedExploitFile();
+				file = new CraftedExploitFile(world.Value, subject.InstanceId);
 				craftedExploits.Add(subject.InstanceId, file);
 			}
 
