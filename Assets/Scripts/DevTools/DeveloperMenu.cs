@@ -52,6 +52,7 @@ namespace DevTools
 			menus.Insert(0, new GameManagerDebug(gameManager));
 			menus.Insert(1, new NetworldDebug(world.Value, networkSimulation.Value, playerInstance));
 			menus.Insert(2, new GodModeMenu(deviceCoordinator, playerInstance));
+			menus.Insert(3, new HackablesMenu(world));
 		}
 
 		private Rect GetScreenRect()

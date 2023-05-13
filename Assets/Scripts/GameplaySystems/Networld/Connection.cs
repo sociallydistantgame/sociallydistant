@@ -5,6 +5,8 @@
 		private Listener.ConnectionHandle handle;
 
 		public bool Connected => handle.IsValid;
+
+		public ServerInfo ServerInfo => handle.ServerInfo;
 		
 		internal Connection(Listener.ConnectionHandle handle)
 		{

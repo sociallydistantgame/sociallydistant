@@ -1,7 +1,9 @@
 ﻿#nullable enable
 using System;
 using Architecture;
+using OS.Devices;
 using Player;
+using UI.Terminal;
 using UnityEngine;
 
 namespace GameplaySystems.Hacking
@@ -13,8 +15,7 @@ namespace GameplaySystems.Hacking
 	{
 		[SerializeField]
 		private string payloadName;
-
-
+		
 		/// <inheritdoc />
 		public string Name => payloadName;
 
@@ -34,6 +35,11 @@ namespace GameplaySystems.Hacking
 		public bool Unlock(PlayerInstanceHolder player)
 		{
 			throw new NotImplementedException();
+		}
+
+		public void Run(ISystemProcess process, ConsoleWrapper console)
+		{
+			System.Diagnostics.Process.Start("https://youtu.be/K7Hn1rPQouU");
 		}
 	}
 }

@@ -28,6 +28,8 @@ namespace Architecture
 		protected string WorkingDirectory => proc.WorkingDirectory;
 		protected string HomeDirectory => proc.User.Home;
 
+		public string ProcessName => proc.Name;
+		
 		/// <inheritdoc />
 		public void Main(ISystemProcess process, ITextConsole console, string[] arguments)
 		{
@@ -61,7 +63,6 @@ namespace Architecture
 
 		protected virtual void OnMain()
 		{
-			this.EndProcess();
 		}
 
 		protected void EndProcess()

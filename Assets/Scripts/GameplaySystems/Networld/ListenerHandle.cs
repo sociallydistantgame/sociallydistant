@@ -1,22 +1,26 @@
 ﻿using System;
 using System.Collections.Generic;
+using OS.Devices;
 using OS.Network;
 
 namespace GameplaySystems.Networld
 {
 	public sealed class ListenerHandle
 	{
+		private ServerInfo serverInfo;
 		private DeviceNode? deviceNode;
 		private Dictionary<ushort, Listener>? listeners;
 		private ushort port;
 
+		public ServerInfo ServerInfo => serverInfo;
+		
 		public event Action<PacketEvent> PacketReceived; 
 
 		public bool IsValid => deviceNode != null
 		                       && listeners != null
 		                       && listeners.ContainsKey(port);
 
-		public ListenerHandle(ushort port, Dictionary<ushort, Listener> listeners, DeviceNode node)
+		public ListenerHandle(ushort port, Dictionary<ushort, Listener> listeners, DeviceNode node,  ServerType serverType, SecurityLevel secLevel)
 		{
 			this.deviceNode = node;
 			this.listeners = listeners;
@@ -24,6 +28,12 @@ namespace GameplaySystems.Networld
 
 			if (this.deviceNode != null)
 				this.deviceNode.UnhandledPacketReceived += OnPacketReceived;
+
+			ISystemProcess? serverProc = null;
+			if (serverType != ServerType.Netcat)
+				serverProc = node.Computer.CreateDaemonProcess(serverType.ToString());
+			
+			this.serverInfo = new ServerInfo(node.Computer, serverType, secLevel, serverProc);
 		}
 
 		private void OnPacketReceived(PacketEvent packetEvent)

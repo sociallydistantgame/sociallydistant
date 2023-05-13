@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections;
 using System.Collections.Generic;
+using OS.Devices;
 using OS.Network;
 using UnityEngine.InputSystem.LowLevel;
 using Utility;
@@ -26,9 +27,12 @@ namespace GameplaySystems.Networld
 		public event Action<PacketEvent> UnhandledPacketReceived; 
 
 		public NetworkConnection NetworkConnection => connection;
+		public IComputer Computer { get; }
 
-		public DeviceNode(Subnet localSubnet, uint defaultGateway, uint localAddress)
+		public DeviceNode(Subnet localSubnet, uint defaultGateway, uint localAddress, IComputer computer)
 		{
+			Computer = computer;
+			
 			this.localSubnet = localSubnet;
 			this.defaultGateway = defaultGateway;
 			this.localAddress = localAddress;

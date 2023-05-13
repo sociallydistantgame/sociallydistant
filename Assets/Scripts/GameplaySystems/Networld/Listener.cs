@@ -15,6 +15,8 @@ namespace GameplaySystems.Networld
 		private Dictionary<uint, ConnectionHandle> connections = new Dictionary<uint, ConnectionHandle>();
 		private Queue<Connection> pendingConnections = new Queue<Connection>();
 
+		public ServerInfo ServerInfo => handle.ServerInfo;
+		
 		public Listener(ListenerHandle handle)
 		{
 			this.handle = handle;
@@ -147,7 +149,8 @@ namespace GameplaySystems.Networld
 			private uint remoteADdress;
 			private ushort remotePort;
 			private Queue<byte[]> receivedData = new Queue<byte[]>();
-			
+
+			public ServerInfo ServerInfo => listener.ServerInfo;
 
 			public bool IsValid => listener != null
 			                       && listener.connections.ContainsKey(connectionId);
