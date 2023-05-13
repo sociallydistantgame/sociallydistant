@@ -120,10 +120,10 @@ namespace UI.Terminal.SimpleTerminal
             int bgClean = 0;
             int fgClean = 0;
             int renderstart = -1;
-            int lastPrintable = 0;
+            int lastPrintable = -1;
 
             // Now we must update the changed glyphs.
-            for (int i = start; i < pieces.Length; i++)
+            for (int i = 0; i < pieces.Length; i++)
             {
                 // Grab the glyph and corresponding piece by-ref.
                 // Thank you modern C#
@@ -142,15 +142,7 @@ namespace UI.Terminal.SimpleTerminal
                     piece.FGStart = 0;
                 }
 
-                piece.SetCharacter(glyph.character == 0 ? ' ' : glyph.character);
-                piece.SetBold((glyph.mode & GlyphAttribute.ATTR_BOLD) != 0);
-                piece.SetFaint((glyph.mode & GlyphAttribute.ATTR_FAINT) != 0);
-                piece.SetItalic((glyph.mode & GlyphAttribute.ATTR_ITALIC) != 0);
-                piece.SetUnderline((glyph.mode & GlyphAttribute.ATTR_UNDERLINE) != 0);
-                piece.SetStruck((glyph.mode & GlyphAttribute.ATTR_STRUCK) != 0);
-
                 bool reversed = (glyph.mode & GlyphAttribute.ATTR_REVERSE) != 0;
-
                 if (this.term.Selected(i, y))
                     reversed = !reversed;
 
@@ -160,14 +152,25 @@ namespace UI.Terminal.SimpleTerminal
                 Color rgbFgColor = reversed ? default : glyph.fgRgb;
                 Color rgbBgColor = reversed ? glyph.fgRgb : default;
 
-                piece.isDefaultBG = this.term.DefaultBackgroundId == bgColorId;
+                
+                if (i >= start && i <= end)
+                {
+                    piece.SetCharacter(glyph.character == 0 ? ' ' : glyph.character);
+                    piece.SetBold((glyph.mode & GlyphAttribute.ATTR_BOLD) != 0);
+                    piece.SetFaint((glyph.mode & GlyphAttribute.ATTR_FAINT) != 0);
+                    piece.SetItalic((glyph.mode & GlyphAttribute.ATTR_ITALIC) != 0);
+                    piece.SetUnderline((glyph.mode & GlyphAttribute.ATTR_UNDERLINE) != 0);
+                    piece.SetStruck((glyph.mode & GlyphAttribute.ATTR_STRUCK) != 0);
+                    
+                    piece.isDefaultBG = this.term.DefaultBackgroundId == bgColorId;
 
-                string fgColor = this.term.GetColor(fgColorId, rgbFgColor);
-                string bgColor = this.term.GetColor(bgColorId, rgbBgColor);
+                    string fgColor = this.term.GetColor(fgColorId, rgbFgColor);
+                    string bgColor = this.term.GetColor(bgColorId, rgbBgColor);
 
 
-                piece.SetFGColor(fgColor);
-                piece.SetBGColor(bgColor);
+                    piece.SetFGColor(fgColor);
+                    piece.SetBGColor(bgColor);
+                }
 
                 bool isPrintable = glyph.character != '\0' && glyph.character != ' ';
                 bool isBackgroundColored = bgColorId != term.DefaultBackgroundId;
@@ -212,7 +215,7 @@ namespace UI.Terminal.SimpleTerminal
             bsb.Length = bgDirt;
             fsb.Length = fgDirt;
 
-            if (lastPrintable > 0)
+            if (lastPrintable >= 0)
             {
                 // Activate the text
                 bg.gameObject.SetActive(true);
