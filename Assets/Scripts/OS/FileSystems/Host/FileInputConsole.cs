@@ -14,6 +14,12 @@ namespace OS.FileSystems.Host
 		private readonly Stream fileStream;
 		private readonly StreamReader fileReader;
 
+		public bool SuppressInput
+		{
+			get => output.SuppressInput;
+			set => output.SuppressInput = value;
+		}
+		
 		public FileInputConsole(ITextConsole output, Stream fileStream)
 		{
 			this.output = output;

@@ -27,6 +27,12 @@ namespace UI.Terminal.SimpleTerminal
         private StringBuilder line = new StringBuilder();
         private int cursor;
 
+        public bool SuppressInput
+        {
+            get => term.SuppressInput;
+            set => term.SuppressInput = value;
+        }
+
         public SimpleTerminalSession(SimpleTerminal term, PseudoTerminal pty)
         {
             this.term = term;

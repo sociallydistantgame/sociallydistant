@@ -7,5 +7,6 @@ namespace OS.Devices
 		void ClearScreen();
 		void WriteText(string text);
 		bool TryDequeueSubmittedInput(out string input);
+		bool SuppressInput { get; set; }
 	}
 }

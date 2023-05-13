@@ -69,6 +69,8 @@ namespace UI.Terminal.SimpleTerminal
 		public int Rows => term.row;
 		public int Columns => term.col;
 
+		public bool SuppressInput { get; set; }
+		
 		public SimpleTerminalInputHelper Input => this.inputHelper;
 
 		public bool IsFocused => isFocused;
@@ -124,7 +126,7 @@ namespace UI.Terminal.SimpleTerminal
 			this.screen = screen;
 			this.minLatency = minLatency;
 			this.maxLatency = maxLatency;
-			this.inputHelper = new SimpleTerminalInputHelper(MasterWrite);
+			this.inputHelper = new SimpleTerminalInputHelper(this, MasterWrite);
 
 			TerminalNew(columns, rows);
 		}

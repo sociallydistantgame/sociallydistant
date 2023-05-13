@@ -9,6 +9,12 @@ namespace UI.Terminal
 	{
 		private readonly ITextConsole textConsole;
 
+		public bool SuppressInput
+		{
+			get => textConsole.SuppressInput;
+			set => textConsole.SuppressInput = value;
+		}
+		
 		public ConsoleWrapper(ITextConsole textConsole)
 		{
 			this.textConsole = textConsole;

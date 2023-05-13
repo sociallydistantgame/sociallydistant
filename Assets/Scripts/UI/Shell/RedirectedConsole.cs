@@ -7,6 +7,16 @@ namespace UI.Shell
 		private readonly ITextConsole input;
 		private readonly ITextConsole output;
 
+		public bool SuppressInput
+		{
+			get => input.SuppressInput && output.SuppressInput;
+			set
+			{
+				this.input.SuppressInput = value;
+				this.output.SuppressInput = value;
+			}
+		}
+		
 		public RedirectedConsole(ITextConsole input, ITextConsole output)
 		{
 			this.input = input;
