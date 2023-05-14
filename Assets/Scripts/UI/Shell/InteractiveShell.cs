@@ -30,14 +30,13 @@ namespace UI.Shell
 		private readonly Queue<ShellInstruction> pendingInstructions = new Queue<ShellInstruction>();
 		private ShellInstruction? currentInstruction = null;
 		private VirtualFileSystem vfs = null!;
-
+		private readonly List<string> commandCompletions = new List<string>();
 		private readonly string[] staticCompletions = new string[]
 		{
 			"cd",
 			"clear",
 			"exit",
-			"echo",
-			"ritchie"
+			"echo"
 		};
 
 		/// <inheritdoc />
@@ -92,6 +91,31 @@ namespace UI.Shell
 				this.process.Environment[name] = newValue;
 		}
 
+		private void UpdateCommandCompletions()
+		{
+			this.commandCompletions.Clear();
+
+			if (this.process == null)
+				return;
+			
+			string path = this.process.Environment["PATH"];
+
+			string[] directories = path.Split(':');
+
+			VirtualFileSystem fs = process.User.Computer.GetFileSystem(process.User);
+			foreach (string directory in directories)
+			{
+				if (!fs.DirectoryExists(directory))
+					return;
+
+				foreach (string file in fs.GetFiles(directory))
+				{
+					string filename = PathUtility.GetFileName(file);
+					commandCompletions.Add(filename);
+				}
+			}
+		}
+		
 		/// <inheritdoc />
 		public void Update()
 		{
@@ -113,6 +137,7 @@ namespace UI.Shell
 				{
 					case ShellState.Init:
 					{
+						UpdateCommandCompletions();
 						WritePrompt();
 						lineBuilder.Length = 0;
 						shellState = shellState = ShellState.Reading;
@@ -926,6 +951,10 @@ namespace UI.Shell
 			foreach (string staticCompletion in staticCompletions)
 				if (staticCompletion.StartsWith(token) && staticCompletion.Length > token.Length)
 					yield return staticCompletion;
+			
+			foreach (string completion in commandCompletions)
+				if (completion.Length > token.Length && completion.StartsWith(token))
+					yield return completion;
 		}
 
 		/// <inheritdoc />
