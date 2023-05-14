@@ -9,6 +9,7 @@ using Architecture;
 using OS.Devices;
 using OS.FileSystems;
 using OS.FileSystems.Host;
+using UnityEditor.Experimental.GraphView;
 using UnityEngine;
 using Utility;
 
@@ -16,7 +17,8 @@ namespace UI.Shell
 {
 	public class InteractiveShell :
 		ITerminalProcessController,
-		ICommandShell
+		ICommandShell,
+		IAutoCompleteSource
 	{
 		private ISystemProcess? process;
 		private ITextConsole? consoleDevice;
@@ -28,6 +30,15 @@ namespace UI.Shell
 		private readonly Queue<ShellInstruction> pendingInstructions = new Queue<ShellInstruction>();
 		private ShellInstruction? currentInstruction = null;
 		private VirtualFileSystem vfs = null!;
+
+		private readonly string[] staticCompletions = new string[]
+		{
+			"cd",
+			"clear",
+			"exit",
+			"echo",
+			"ritchie"
+		};
 
 		/// <inheritdoc />
 		public bool IsExecutionHalted => currentInstruction != null;
@@ -51,6 +62,9 @@ namespace UI.Shell
 			this.consoleDevice = consoleDevice;
 			this.vfs = process.User.Computer.GetFileSystem(process.User);
 
+			if (consoleDevice is IAutoCompletedConsole autocompleteConsole)
+				autocompleteConsole.AutoCompleteSource = this;
+			
 			initialized = true;
 			
 			// Execute the .shrc file if it exists. We don't really have support for scripts yet so
@@ -905,6 +919,29 @@ namespace UI.Shell
 				this.currentCommandProcess = null;
 				waiting = false;
 			}
+		}
+
+		private IEnumerable<string> GetAvailableCompletions(string token)
+		{
+			foreach (string staticCompletion in staticCompletions)
+				if (staticCompletion.StartsWith(token) && staticCompletion.Length > token.Length)
+					yield return staticCompletion;
+		}
+
+		/// <inheritdoc />
+		public IReadOnlyList<string> GetCompletions(StringBuilder text, out int insertionPoint)
+		{
+			insertionPoint = text.Length;
+
+			IEnumerable<ShellToken>? tokens = ShellUtility.IdentifyTokens(text)?.ToArray();
+
+			if (tokens == null || !tokens.Any())
+				return Array.Empty<string>();
+
+			ShellToken lastToken = tokens.Last();
+
+			insertionPoint = lastToken.Start;
+			return GetAvailableCompletions(lastToken.Text).ToArray();
 		}
 	}
 } 

@@ -11,6 +11,8 @@ namespace Architecture
 		private readonly TElementType[] collection;
 		private int index;
 
+		public int CurrentIndex => index;
+		
 		public bool EndOfArray => index >= collection.Length;
 
 		public TElementType Current
