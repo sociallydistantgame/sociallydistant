@@ -72,11 +72,12 @@ namespace UI.Terminal.SimpleTerminal
 			}
 		}
 
-		public string Wrap(StringBuilder sourceText, int slack, int startY, int maxWidth, int caret, out int caretX, out int caretY, out int height)
+		public string Wrap(StringBuilder sourceText, int slack, int startY, int maxWidth, int caret, out int caretX, out int caretY, out int height, out int lastLineWidth)
 		{
 			int x = slack;
 			int y = startY;
 
+			lastLineWidth = 0;
 			caretX = x;
 			caretY = y;
 			height = 1;
@@ -102,6 +103,7 @@ namespace UI.Terminal.SimpleTerminal
 
 				stringBuilder.Append(word);
 				x += word.Length;
+				lastLineWidth = x;
 
 				wordIndex++;
 			}
@@ -113,7 +115,10 @@ namespace UI.Terminal.SimpleTerminal
 				caretY++;
 
 				if (caretY > y)
+				{
 					height++;
+					lastLineWidth = 0;
+				}
 			}
 			
 			return stringBuilder.ToString();

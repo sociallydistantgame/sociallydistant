@@ -128,7 +128,7 @@ namespace Utility
 						wordList.Add(currentWord.ToString());
 						currentWord.Length = 0;
 					}
-
+					
 					continue;
 				}
 
@@ -150,10 +150,10 @@ namespace Utility
 						wordList.Add(currentWord.ToString());
 						currentWord.Length = 0;
 					}
-
+					
 					continue;
 				}
-
+				
 				currentWord.Append(character);
 			}
 
@@ -175,6 +175,8 @@ namespace Utility
 		
 		public static IEnumerable<ShellToken> IdentifyTokens(StringBuilder rawInput)
 		{
+			int lastTokenStart = 0;
+			
 			// Convert the string to a char array so we can create an ArrayView over it.
 			char[] characters = rawInput.ToString().ToCharArray();
 
@@ -191,7 +193,8 @@ namespace Utility
 			{
 				var tokenText = tokenBuilder.ToString();
 				tokenBuilder.Length = 0;
-				return new ShellToken(ShellTokenType.Text, tokenText);
+				return new ShellToken(ShellTokenType.Text, tokenText, lastTokenStart, (charView.CurrentIndex + 1) - lastTokenStart);
+				lastTokenStart = charView.CurrentIndex + 1;
 			}
 
 			var quoteStart = '\0';
@@ -256,7 +259,7 @@ namespace Utility
 					{
 						if (tokenBuilder.Length > 0)
 							yield return EndTextToken();
-
+						
 						break;
 					}
 
@@ -289,7 +292,7 @@ namespace Utility
 						if (tokenBuilder.Length > 0)
 							yield return EndTextToken();
 
-						yield return new ShellToken(ShellTokenType.SequentialExecute, charView.Current.ToString());
+						yield return new ShellToken(ShellTokenType.SequentialExecute, charView.Current.ToString(), charView.CurrentIndex, 1);
 						break;
 					}
 					
@@ -299,7 +302,7 @@ namespace Utility
 						if (tokenBuilder.Length > 0)
 							yield return EndTextToken();
 
-						yield return new ShellToken(ShellTokenType.ParallelExecute, charView.Current.ToString());
+						yield return new ShellToken(ShellTokenType.ParallelExecute, charView.Current.ToString(), charView.CurrentIndex, 1);
 						break;
 					}
 					
@@ -309,7 +312,7 @@ namespace Utility
 						if (tokenBuilder.Length > 0)
 							yield return EndTextToken();
 
-						yield return new ShellToken(ShellTokenType.AssignmentOperator, charView.Current.ToString());
+						yield return new ShellToken(ShellTokenType.AssignmentOperator, charView.Current.ToString(), charView.CurrentIndex, 1);
 						break;
 					}
 					
@@ -319,7 +322,7 @@ namespace Utility
 						if (tokenBuilder.Length > 0)
 							yield return EndTextToken();
 
-						yield return new ShellToken(ShellTokenType.Pipe, charView.Current.ToString());
+						yield return new ShellToken(ShellTokenType.Pipe, charView.Current.ToString(), charView.CurrentIndex, 1);
 						break;
 					}
 					
@@ -329,7 +332,7 @@ namespace Utility
 						if (tokenBuilder.Length > 0)
 							yield return EndTextToken();
 
-						yield return new ShellToken(ShellTokenType.Append, $"{charView.Current}{charView.Next}");
+						yield return new ShellToken(ShellTokenType.Append, $"{charView.Current}{charView.Next}", charView.CurrentIndex, 2);
 						charView.Advance();
 						break;
 					}
@@ -364,8 +367,8 @@ namespace Utility
 						// if next char is a closing curly, skip
 						if (charView.Next == '}')
 							charView.Advance();
-						
-						yield return new ShellToken(ShellTokenType.VariableAccess, tokenBuilder.ToString());
+
+						yield return new ShellToken(ShellTokenType.VariableAccess, tokenBuilder.ToString(), lastTokenStart, (charView.CurrentIndex + 1) - lastTokenStart);
 						tokenBuilder.Length = 0;
 						break;
 					}
@@ -376,7 +379,7 @@ namespace Utility
 						if (tokenBuilder.Length > 0)
 							yield return EndTextToken();
 
-						yield return new ShellToken(ShellTokenType.Overwrite, charView.Current.ToString());
+						yield return new ShellToken(ShellTokenType.Overwrite, charView.Current.ToString(), charView.CurrentIndex, 1);
 						break;
 					}
 					
@@ -386,13 +389,16 @@ namespace Utility
 						if (tokenBuilder.Length > 0)
 							yield return EndTextToken();
 
-						yield return new ShellToken(ShellTokenType.FileInput, charView.Current.ToString());
+						yield return new ShellToken(ShellTokenType.FileInput, charView.Current.ToString(), charView.CurrentIndex, 1);
 						break;
 					}
 
 					// ANYTHING else
 					default:
 					{
+						if (tokenBuilder.Length == 0)
+							lastTokenStart = charView.CurrentIndex;
+						
 						tokenBuilder.Append(charView.Current);
 						break;
 					}
@@ -410,11 +416,15 @@ namespace Utility
 	{
 		public ShellTokenType TokenType { get; set; }
 		public string Text { get; }
+		public int Start { get; }
+		public int Length { get; }
 
-		public ShellToken(ShellTokenType type, string text)
+		public ShellToken(ShellTokenType type, string text, int start, int length)
 		{
 			this.TokenType = type;
 			this.Text = text;
+			Start = start;
+			Length = length;
 		}
 	}
 

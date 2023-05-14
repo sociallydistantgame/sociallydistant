@@ -11,7 +11,7 @@ using static UI.Terminal.SimpleTerminal.Data.EmulatorConstants;
 
 namespace UI.Terminal.SimpleTerminal
 {
-    public class SimpleTerminalSession : ITextConsole
+    public class SimpleTerminalSession : IAutoCompletedConsole
     {
         private LineEditorState lineEditorState;
         private readonly SimpleTerminal term;
@@ -22,10 +22,25 @@ namespace UI.Terminal.SimpleTerminal
         private readonly Queue<string> lineQueue = new Queue<string>();
         private STREscape strescseq = new STREscape();
         private CSIEscape csiescseq = new CSIEscape();
+        private readonly List<string> completions = new List<string>();
 
         private int prevLineCount;
         private StringBuilder line = new StringBuilder();
         private int cursor;
+        private IAutoCompleteSource? autoCompleteSource;
+        private bool completionsAreDirty;
+        private int selectedCompletion;
+        private int completionInsertionPoint;
+
+        public IAutoCompleteSource? AutoCompleteSource
+        {
+            get => autoCompleteSource;
+            set
+            {
+                autoCompleteSource = value;
+                completionsAreDirty = true;
+            }
+        }
 
         public bool SuppressInput
         {
@@ -48,20 +63,34 @@ namespace UI.Terminal.SimpleTerminal
 
         private void InsertAutoComplete()
         {
-            // TODO
-            this.WriteText("\a");
+            if (completions.Count == 0)
+            {
+                this.WriteText("\a");
+                return;
+            }
+
+            completionsAreDirty = true;
+
+            string completion = completions[selectedCompletion];
+            line.Length = completionInsertionPoint;
+            line.Append(completion);
+            cursor = line.Length;
         }
 
         private void HandleCompletionsUp()
         {
-            // TODO: Scroll up the completions array
-            this.WriteText("\a");
+            if (selectedCompletion > 0)
+                selectedCompletion--;
+            else
+                this.WriteText("\a");
         }
 
         private void HandleCompletionsDown()
         {
-            // TODO: Scroll down the completions array
-            this.WriteText("\a");
+            if (completions != null && selectedCompletion < completions.Count - 1)
+                selectedCompletion++;
+            else
+                this.WriteText("\a");
         }
 
         private void HandleLeftArrow()
@@ -74,6 +103,12 @@ namespace UI.Terminal.SimpleTerminal
 
         private void HandleUpArrow()
         {
+            if (completions.Count > 0)
+            {
+                HandleCompletionsUp();
+                return;
+            }
+
             if (this.cursor > 0)
                 this.cursor = 0;
             else
@@ -83,6 +118,12 @@ namespace UI.Terminal.SimpleTerminal
 
         private void HandleDownArrow()
         {
+            if (completions.Count > 0)
+            {
+                HandleCompletionsDown();
+                return;
+            }
+            
             if (this.cursor < this.line.Length)
                 this.cursor = this.line.Length;
             else
@@ -300,6 +341,7 @@ namespace UI.Terminal.SimpleTerminal
 
                 this.line.Insert(this.cursor, (char)u);
                 this.cursor++;
+                this.completionsAreDirty = true;
             }
         }
 
@@ -313,6 +355,7 @@ namespace UI.Terminal.SimpleTerminal
                 case '\b': /* BS */
                     if (this.cursor > 0)
                     {
+                        this.completionsAreDirty = true;
                         this.cursor--;
                         this.line.Remove(this.cursor, 1);
                     }
@@ -326,6 +369,7 @@ namespace UI.Terminal.SimpleTerminal
                     this.lineQueue.Enqueue(this.line.ToString());
                     this.line.Length = 0;
                     this.cursor = 0;
+                    this.completionsAreDirty = true;
                     return;
                 case '\f': /* LF [IGNORED] */
                 case '\v': /* VT [IGNORED] */
@@ -352,7 +396,10 @@ namespace UI.Terminal.SimpleTerminal
                     break;
                 case 0x7f: /* DEL */
                     if (this.cursor < this.line.Length)
+                    {
+                        completionsAreDirty = true;
                         this.line.Remove(this.cursor, 1);
+                    }
                     else
                         this.WriteText("\a");
                     break;
@@ -579,14 +626,46 @@ namespace UI.Terminal.SimpleTerminal
 
             return true;
         }
+
+        private void UpdateCompletions()
+        {
+            if (!completionsAreDirty)
+                return;
+            
+            this.completions.Clear();
+            if (this.autoCompleteSource == null)
+                return;
+            
+            this.completions.AddRange(this.autoCompleteSource.GetCompletions(this.line, out completionInsertionPoint));
+            this.selectedCompletion = 0;
+            this.completionsAreDirty = false;
+        }
         
         private void RenderLineEditor()
         {
             if (!this.lineEditorState.isEditing)
                 return;
 
-            string wordWrapped = lineWrapper.Wrap(this.line, lineEditorState.firstLineColumn, lineEditorState.firstLineRow, term.Columns, this.cursor, out int cx, out int cy, out int lineCount);
+            UpdateCompletions();
             
+            string wordWrapped = lineWrapper.Wrap(this.line, lineEditorState.firstLineColumn, lineEditorState.firstLineRow, term.Columns, this.cursor, out int cx, out int cy, out int lineCount, out int lastLineWidth);
+            string completionIndicator = string.Empty;
+            var completionsOnNewLine = false;
+
+            if (cursor >= completionInsertionPoint && completions.Count > 0)
+            {
+                if (completions.Count > 1)
+                    completionIndicator = $"{completions[selectedCompletion].Substring(line.Length - completionInsertionPoint)} ({selectedCompletion + 1}/{completions.Count})";
+                else
+                    completionIndicator = completions[0].Substring(line.Length - completionInsertionPoint);
+
+                if (lastLineWidth + completionIndicator.Length >= term.Columns)
+                {
+                    lineCount++;
+                    completionsOnNewLine = true;
+                }
+            }
+
             // Determine if we need to scroll.
             int bottom = this.lineEditorState.firstLineRow + lineCount;
             int previousBottom = this.lineEditorState.firstLineRow + prevLineCount; 
@@ -618,6 +697,16 @@ namespace UI.Terminal.SimpleTerminal
             // Write each line
             this.WriteText(wordWrapped);
 
+            // Write the completions indicator
+            if (completionIndicator.Length > 0)
+            {
+                if (completionsOnNewLine)
+                    WriteText(Environment.NewLine);
+                WriteText("\x1b[2;3;90m");
+                WriteText(completionIndicator);
+                WriteText("\x1b[22;23;39m");
+            }
+            
             // Move cursor to where it should be in the line editor
             this.WriteText($"\x1b[{cy + 1};{cx + 1}H");
 
