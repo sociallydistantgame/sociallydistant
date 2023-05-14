@@ -113,7 +113,7 @@ namespace GameplaySystems.Hacking
 
 			file.Name = filename;
 			file.Exploit = Exploits.First(x => x.Name == subject.Exploit);
-			file.Payload = Payloads.FirstOrDefault(x => x.Name == subject.Exploit);
+			file.Payload = Payloads.FirstOrDefault(x => x.Name == subject.Payload);
 		}
 
 		private IComputer GetComputer(ObjectId computer)

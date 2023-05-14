@@ -5,11 +5,13 @@ using System.Text;
 using Core.Serialization.Binary;
 using OS.Network;
 using UnityEngine;
+using Random = UnityEngine.Random;
 
 namespace GameplaySystems.Networld
 {
 	public class Listener
 	{
+		private static readonly Dictionary<Guid, SharedConnectionState> sharedStates = new Dictionary<Guid, SharedConnectionState>();
 		private ListenerHandle handle;
 
 		private Dictionary<uint, ConnectionHandle> connections = new Dictionary<uint, ConnectionHandle>();
@@ -64,7 +66,17 @@ namespace GameplaySystems.Networld
 							return;
 						}
 
-						var connectionHandle = new ConnectionHandle(this, id.Value, packetEvent.Packet.SourceAddress, packetEvent.Packet.SourcePort);
+						// Generate shared state for the new connection. This state is for the hacking system to be able to
+						// interact with remote devices when a connection is made.
+						var stateId = Guid.NewGuid();
+						var connectionState = new SharedConnectionState
+						{
+							ServerInfo = this.ServerInfo
+						};
+
+						sharedStates.Add(stateId, connectionState);
+						
+						var connectionHandle = new ConnectionHandle(this, id.Value, packetEvent.Packet.SourceAddress, packetEvent.Packet.SourcePort, connectionState);
 						this.connections.Add(id.Value, connectionHandle);
 
 						this.pendingConnections.Enqueue(new Connection(connectionHandle));
@@ -73,10 +85,11 @@ namespace GameplaySystems.Networld
 						Packet response = packetEvent.Packet.Clone();
 						response.SwapSourceAndDestination();
 						response.PacketType = PacketType.ConnectAccept;
-						
+
 						// Encode the connection ID
 						var transmissionPacket = new TransmissionProtocolMessage();
 						transmissionPacket.ConnectionId = id.Value;
+						transmissionPacket.Data = stateId.ToByteArray();
 
 						using (var ms = new MemoryStream())
 						{
@@ -101,8 +114,18 @@ namespace GameplaySystems.Networld
 						var transmissionPacket = new TransmissionProtocolMessage();
 						transmissionPacket.Read(dataReader);
 
+						// We should have received the shared state ID in the packet. Decode it and find the state.
+						var sharedSTateId = new Guid(transmissionPacket.Data);
+						var sharedState = sharedStates[sharedSTateId];
+
+						// Store our client info.
+						sharedState.ClientInfo = this.ServerInfo;
+						
+						// Remove the state from the dictionary since handshake is done
+						sharedStates.Remove(sharedSTateId);
+						
 						// Create a new handle
-						var connectionHandle = new ConnectionHandle(this, transmissionPacket.ConnectionId, packetEvent.Packet.SourceAddress, packetEvent.Packet.SourcePort);
+						var connectionHandle = new ConnectionHandle(this, transmissionPacket.ConnectionId, packetEvent.Packet.SourceAddress, packetEvent.Packet.SourcePort, sharedState);
 						connections.Add(transmissionPacket.ConnectionId, connectionHandle);
 
 						this.pendingConnections.Enqueue(new Connection(connectionHandle));
@@ -149,18 +172,20 @@ namespace GameplaySystems.Networld
 			private uint remoteADdress;
 			private ushort remotePort;
 			private Queue<byte[]> receivedData = new Queue<byte[]>();
+			private SharedConnectionStateHandle sharedStateHandle;
 
-			public ServerInfo ServerInfo => listener.ServerInfo;
+			public ServerInfo ServerInfo => sharedStateHandle.ServerInfo;
 
 			public bool IsValid => listener != null
 			                       && listener.connections.ContainsKey(connectionId);
 			
-			public ConnectionHandle(Listener listener, uint connectionId, uint remoteAddress, ushort remotePort)
+			public ConnectionHandle(Listener listener, uint connectionId, uint remoteAddress, ushort remotePort, SharedConnectionState sharedState)
 			{
 				this.listener = listener;
 				this.connectionId = connectionId;
 				this.remoteADdress = remoteAddress;
 				this.remotePort = remotePort;
+				this.sharedStateHandle = new SharedConnectionStateHandle(sharedState);
 			}
 
 			public void EnqueueReceivedData(byte[] data)
@@ -206,5 +231,24 @@ namespace GameplaySystems.Networld
 				listener.handle.Send(actualPacket);
 			}
 		}
+	}
+
+	public class SharedConnectionState
+	{
+		public ServerInfo ClientInfo { get; set; }
+		public ServerInfo ServerInfo { get; set; }
+	}
+
+	public class SharedConnectionStateHandle
+	{
+		private readonly SharedConnectionState sharedState;
+
+		public SharedConnectionStateHandle(SharedConnectionState state)
+		{
+			this.sharedState = state;
+		}
+
+		public ServerInfo ServerInfo => sharedState.ServerInfo;
+		public ServerInfo ClientInfo => sharedState.ClientInfo;
 	}
 }
