@@ -26,7 +26,7 @@ namespace GameplaySystems.Networld
 		{
 			if (daemon == null)
 				return null;
-			
+
 			if (!exploit.CanAttack(serverType, SecurityLevel))
 				return null;
 			
