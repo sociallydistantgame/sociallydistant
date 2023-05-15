@@ -16,7 +16,9 @@ namespace Architecture
 	{
 		[SerializeField]
 		private SerializableKeyValuePair<string, string>[] environmentVariables = Array.Empty<SerializableKeyValuePair<string, string>>();
-		
+
+		public IEnumerable<string> Keys => environmentVariables.Select(x => x.Key);
+
 		/// <inheritdoc />
 		public string this[string key]
 		{

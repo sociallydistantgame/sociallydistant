@@ -3,6 +3,7 @@
 using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using System.Text;
 using Architecture;
@@ -955,6 +956,47 @@ namespace UI.Shell
 			foreach (string completion in commandCompletions)
 				if (completion.Length > token.Length && completion.StartsWith(token))
 					yield return completion;
+
+			if (process == null)
+				yield break;
+			
+			// Environment variables.
+			if (token.StartsWith("$"))
+			{
+				foreach (string key in process.Environment.Keys)
+				{
+					if (key.StartsWith("$" + token) && key.Length + 1 > token.Length)
+						yield return "$" + key;
+				}
+			}
+
+			VirtualFileSystem fs = process.User.Computer.GetFileSystem(process.User);
+
+			string fullPath = ShellUtility.MakeAbsolutePath(PathUtility.Combine(process.WorkingDirectory, token), process.User.Home);
+			string directory = PathUtility.GetDirectoryName(fullPath);
+
+			if (fs.DirectoryExists(fullPath))
+				directory = fullPath;
+			
+			if (!fs.DirectoryExists(directory))
+				yield break;
+			
+			foreach (string subdir in fs.GetDirectories(directory))
+			{
+				if (subdir.Length > fullPath.Length && subdir.StartsWith(fullPath))
+				{
+					yield return token + subdir.Substring(fullPath.Length);
+				}
+			}
+			
+			foreach (string subdir in fs.GetFiles(directory))
+			{
+				if (subdir.Length > fullPath.Length && subdir.StartsWith(fullPath))
+				{
+					yield return token + subdir.Substring(fullPath.Length);
+				}
+			}
+
 		}
 
 		/// <inheritdoc />
@@ -962,15 +1004,24 @@ namespace UI.Shell
 		{
 			insertionPoint = text.Length;
 
-			IEnumerable<ShellToken>? tokens = ShellUtility.IdentifyTokens(text)?.ToArray();
+			try
+			{
+				IEnumerable<ShellToken>? tokens = ShellUtility.IdentifyTokens(text)?.ToArray();
 
-			if (tokens == null || !tokens.Any())
+				if (tokens == null || !tokens.Any())
+					return Array.Empty<string>();
+
+				ShellToken lastToken = tokens.Last();
+
+				insertionPoint = lastToken.Start;
+				return GetAvailableCompletions(lastToken.Text).ToArray();
+			}
+			catch
+			{
+				// Likely a syntax error so assume there's no completions
+				insertionPoint = text.Length;
 				return Array.Empty<string>();
-
-			ShellToken lastToken = tokens.Last();
-
-			insertionPoint = lastToken.Start;
-			return GetAvailableCompletions(lastToken.Text).ToArray();
+			}
 		}
 	}
 } 

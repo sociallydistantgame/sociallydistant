@@ -9,6 +9,8 @@ namespace Architecture
 	{
 		private readonly Dictionary<string, string> envVariables = new Dictionary<string, string>();
 
+		public IEnumerable<string> Keys => envVariables.Keys;
+
 		/// <inheritdoc />
 		public string this[string key]
 		{
