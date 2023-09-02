@@ -141,6 +141,7 @@ namespace GameplaySystems.Networld
 		}
 
 		/// <inheritdoc />
+		/// 
 		public NetworkInterface NetworkInterface => deviceInterface;
 	}
 }

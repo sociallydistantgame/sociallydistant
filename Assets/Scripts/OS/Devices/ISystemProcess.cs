@@ -20,6 +20,7 @@ namespace OS.Devices
 		ISystemProcess Fork();
 		ISystemProcess ForkAsUser(IUser user);
 
+		
 		void Kill();
 	}
 }
