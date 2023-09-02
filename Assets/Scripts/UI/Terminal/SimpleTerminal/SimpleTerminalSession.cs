@@ -193,7 +193,8 @@ namespace UI.Terminal.SimpleTerminal
                 written = this.TerminalWrite(this.ttybuf, this.ttybuflen, false);
                 this.ttybuflen -= written;
 
-                if (this.ttybuflen > 0) Array.Copy(this.ttybuf, 0, this.ttybuf, written, this.ttybuflen);
+                if (this.ttybuflen > 0)
+                    Array.Copy(this.ttybuf, 0, this.ttybuf, written, this.ttybuflen);
             }
 
             return ret;

@@ -49,7 +49,7 @@ namespace GameplaySystems.Networld
 
 			// Send it to the net simulation node
 			this.deviceNode.EnqueuePacketForDelivery(pingPacket);
-			
+
 			// Event for handling Pong packets
 			PingResult pingResult = default;
 			var handled = false;
@@ -68,10 +68,10 @@ namespace GameplaySystems.Networld
 				pingResult = PingResult.Pong;
 				handled = true;
 			}
-			
+
 			// Subscribe to unhandled packet events
 			deviceNode.UnhandledPacketReceived += HandlePongPacket;
-			
+
 			// Wait.
 			float time = 0;
 			float timeout = (timeuotInSeconds == 0) ? 30 : timeuotInSeconds;
@@ -86,7 +86,7 @@ namespace GameplaySystems.Networld
 				yield return null;
 				time += Time.deltaTime;
 			}
-			
+
 			// Stop listening
 			deviceNode.UnhandledPacketReceived -= HandlePongPacket;
 			callback?.Invoke(pingResult);

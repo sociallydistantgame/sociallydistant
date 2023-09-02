@@ -1770,6 +1770,7 @@ namespace UI.Terminal.SimpleTerminal
 
 		private void DumpLine(int y)
 		{
+			
 		}
 
 		private void DumpSelection()
