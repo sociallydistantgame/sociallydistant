@@ -29,7 +29,7 @@ namespace UI.Terminal.SimpleTerminal
 		private const int RESIZEBUFFER = 1000;
 		private const int BUFSIZ = 16384;
 		public const int defaultbg = 258;
-		private const int defaultfg = 259;
+		public const int defaultfg = 259;
 
 		private readonly IClipboard clipboard;
 		private readonly int tabSpaces = 4;
