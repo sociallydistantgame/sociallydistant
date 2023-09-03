@@ -53,6 +53,7 @@ namespace UI.Terminal.SimpleTerminal
 
 
         public int DefaultBackgroundId => SimpleTerminal.defaultbg;
+        public int DefaultForegroundId => SimpleTerminal.defaultfg;
 
         private float ww;
         private float wh;

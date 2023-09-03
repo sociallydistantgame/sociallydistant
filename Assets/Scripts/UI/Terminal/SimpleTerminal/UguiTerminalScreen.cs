@@ -23,7 +23,8 @@ namespace UI.Terminal.SimpleTerminal
 		private readonly StringBuilder stringBuilder = new StringBuilder();
 
 		private ColorCell[] colorCells = Array.Empty<ColorCell>();
-		
+
+		public Color fgColor;
 		private Color bgColor;
 		private Texture2D? bgImage;
 		private TrixelAudioSource trixelAudio;
@@ -64,7 +65,8 @@ namespace UI.Terminal.SimpleTerminal
 		private Graphic backgroundGraphic;
 		
 		public int DefaultBackgroundId => term.DefaultBackgroundId;
-
+		public int DefaultForegroundId => term.DefaultForegroundId;
+		
 		public float LineHeight => lineHeight;
 		public float CharacterWidth => characterWidth;
 		public float UnscaledLineHeight { get; private set; }
@@ -249,6 +251,9 @@ namespace UI.Terminal.SimpleTerminal
 
 		private void UpdateBackgroundColor()
 		{
+			fgColor = this.colors[DefaultForegroundId];
+			textMeshPro.color = fgColor;
+			
 			if (showBackgroundColor)
 				bgColor = GetColor(DefaultBackgroundId, default);
 			else
@@ -304,7 +309,7 @@ namespace UI.Terminal.SimpleTerminal
 
 			this.stringBuilder.Length = 0;
 
-			Color color = default;
+			Color color = fgColor;
 			
 			for (int i = 0; i < colorCells.Length; i++)
 			{
@@ -343,13 +348,20 @@ namespace UI.Terminal.SimpleTerminal
 
 				if (color != newColor)
 				{
-					string hex = ColorUtility.ToHtmlStringRGB(newColor);
+					if (newColor == fgColor)
+					{
+						this.stringBuilder.Append("</color>");
+					}
+					else
+					{
+						string hex = ColorUtility.ToHtmlStringRGB(newColor);
 
-					this.stringBuilder.Append("<color=#");
-					this.stringBuilder.Append(hex);
-					this.stringBuilder.Append('>');
-					
-					color = newColor;
+						this.stringBuilder.Append("<color=#");
+						this.stringBuilder.Append(hex);
+						this.stringBuilder.Append('>');
+
+						color = newColor;
+					}
 				}
 				
 				if (isWhitespace)
