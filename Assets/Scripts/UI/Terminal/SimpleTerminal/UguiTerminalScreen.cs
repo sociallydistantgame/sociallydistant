@@ -41,10 +41,6 @@ namespace UI.Terminal.SimpleTerminal
 		[SerializeField]
 		private RectanglePlotter backgroundColorPlotter = null!;
 		
-		[SerializeField]
-		private RectanglePlotter foregroundColorPlotter = null!;
-		
-		
 		[Header("Text")]
 		[SerializeField]
 		private TMP_FontAsset font;
@@ -125,7 +121,7 @@ namespace UI.Terminal.SimpleTerminal
 				if (cell.Foreground != foregroundColor)
 				{
 					cell.Foreground = foregroundColor;
-					plottersAreDirty = true;
+					textIsDirty = true;
 				}
 				
 				if (cell.Background != backgroundColor)
@@ -275,8 +271,8 @@ namespace UI.Terminal.SimpleTerminal
 		/// <inheritdoc />
 		public void ScreenPointToCell(SimpleTerminal term, float x, float y, out int column, out int row)
 		{
-			column = (int)Math.Floor(x / this.characterWidth);
-			row = (term.Rows - 1) - (int)Math.Floor(y / this.lineHeight);
+			column = (int)Math.Floor(x / this.UnscaledCharacterWidth);
+			row = (term.Rows - 1) - (int)Math.Floor(y / this.UnscaledLineHeight);
 		}
 
 		/// <inheritdoc />
@@ -292,7 +288,6 @@ namespace UI.Terminal.SimpleTerminal
 				return;
 
 			UpdateBackgroundCells();
-			UpdateForegroundCells();
 			
 			plottersAreDirty = false;
 		}
@@ -308,6 +303,8 @@ namespace UI.Terminal.SimpleTerminal
 			int collectedWhitespace = 0;
 
 			this.stringBuilder.Length = 0;
+
+			Color color = default;
 			
 			for (int i = 0; i < colorCells.Length; i++)
 			{
@@ -323,6 +320,8 @@ namespace UI.Terminal.SimpleTerminal
 					this.stringBuilder.AppendLine();
 				}
 
+				Color newColor = cell.Foreground;
+				
 				bool isBold = cell.Bold;
 				bool isItalic = cell.Italic;
 				bool isUnderline = cell.Underline;
@@ -341,6 +340,17 @@ namespace UI.Terminal.SimpleTerminal
 					this.stringBuilder.Append(isBold ? "<s>" : "</s>");
 				
 				bool isWhitespace = char.IsWhiteSpace(cell.Character);
+
+				if (color != newColor)
+				{
+					string hex = ColorUtility.ToHtmlStringRGB(newColor);
+
+					this.stringBuilder.Append("<color=#");
+					this.stringBuilder.Append(hex);
+					this.stringBuilder.Append('>');
+					
+					color = newColor;
+				}
 				
 				if (isWhitespace)
 					collectedWhitespace++;
@@ -418,60 +428,7 @@ namespace UI.Terminal.SimpleTerminal
 
 			backgroundColorPlotter.Refresh();
 		}
-		
-		private void UpdateForegroundCells()
-		{
-			var currentRow = 0;
-			var currentColumn = 0;
-
-			Rect rect = default;
-			Color color = default;
-
-			rect.height = lineHeight;
-
-			foregroundColorPlotter.Clear();
-			
-			for (var i = 0; i <= colorCells.Length; i++)
-			{
-				// End of cells
-				if (i == colorCells.Length)
-				{
-					foregroundColorPlotter.Plot(rect, color);
-					break;
-				}
-				
-				ref ColorCell currentCell = ref colorCells[i];
-
-				int cellColumn = i % columnCount;
-				int cellRow = i / columnCount;
-
-				// End of a row.
-				if (cellRow > currentRow)
-				{
-					foregroundColorPlotter.Plot(rect, color);
-					rect.width = 0;
-					rect.y += lineHeight;
-					rect.x = 0;
-				}
-                
-				// Color has changed.
-				if (currentCell.Foreground != color)
-				{
-					foregroundColorPlotter.Plot(rect, color);
-					rect.width = 0;
-					rect.x = cellColumn * characterWidth;
-					color = currentCell.Foreground;
-				}
-
-				rect.width += characterWidth;
-
-				currentRow = cellRow;
-				currentColumn = cellColumn;
-			}
-
-			foregroundColorPlotter.Refresh();
-		}
-		
+        
 		private void CalculateTextSize()
 		{
 			char ch = '#';
@@ -495,8 +452,10 @@ namespace UI.Terminal.SimpleTerminal
 				character = font.characterLookupTable['?'];
 			float width = (character.glyph.metrics.horizontalAdvance * pointSizeScale +
 			               (styleSpacingAdjustment + normalSpacingAdjustment) * emScale);
-
+			
 			Vector3 scale = transform.lossyScale;
+
+			height = fs + font.faceInfo.underlineThickness;
 			
 			this.characterWidth = width / scale.x;
 			this.lineHeight = height / scale.y;
