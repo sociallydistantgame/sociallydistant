@@ -21,6 +21,7 @@ namespace UI.Terminal.SimpleTerminal
 	{
 		private readonly Dictionary<int, Color> colors = new Dictionary<int, Color>();
 		private readonly StringBuilder stringBuilder = new StringBuilder();
+		private readonly Dictionary<Color, string> hexColors = new Dictionary<Color, string>();
 
 		private ColorCell[] colorCells = Array.Empty<ColorCell>();
 
@@ -247,6 +248,21 @@ namespace UI.Terminal.SimpleTerminal
 			this.SetColor(259, "#e6e6e6");
 
 			this.UpdateBackgroundColor();
+			this.BuildHexLookups();
+		}
+
+		/// <summary>
+		///		Builds a lookup table translating Unity colors for the current palette to HTML color strings for use in TextMeshPro.
+		/// </summary>
+		private void BuildHexLookups()
+		{
+			this.hexColors.Clear();
+			
+			foreach (Color color in this.colors.Values)
+			{
+				if (!this.hexColors.ContainsKey(color))
+					this.hexColors.Add(color, ColorUtility.ToHtmlStringRGB(color));
+			}
 		}
 
 		private void UpdateBackgroundColor()
@@ -297,6 +313,17 @@ namespace UI.Terminal.SimpleTerminal
 			plottersAreDirty = false;
 		}
 
+		private string LookupHexColor(Color color)
+		{
+			if (!hexColors.TryGetValue(color, out string hex))
+			{
+				hex = ColorUtility.ToHtmlStringRGB(color);
+				this.hexColors.Add(color,hex);
+			}
+
+			return hex;
+		}
+		
 		private void UpdateText()
 		{
 			var bold = false;
@@ -354,7 +381,7 @@ namespace UI.Terminal.SimpleTerminal
 					}
 					else
 					{
-						string hex = ColorUtility.ToHtmlStringRGB(newColor);
+						string hex = LookupHexColor(newColor);
 
 						this.stringBuilder.Append("<color=#");
 						this.stringBuilder.Append(hex);
