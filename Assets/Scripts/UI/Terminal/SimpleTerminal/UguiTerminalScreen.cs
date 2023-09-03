@@ -2,6 +2,7 @@
 
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Text;
 using TMPro;
 using TrixelCreative.TrixelAudio;
@@ -257,11 +258,10 @@ namespace UI.Terminal.SimpleTerminal
 		private void BuildHexLookups()
 		{
 			this.hexColors.Clear();
-			
-			foreach (Color color in this.colors.Values)
+
+			foreach (Color color in this.colors.Values.Where(color => !this.hexColors.ContainsKey(color)))
 			{
-				if (!this.hexColors.ContainsKey(color))
-					this.hexColors.Add(color, ColorUtility.ToHtmlStringRGB(color));
+				this.hexColors.Add(color, ColorUtility.ToHtmlStringRGB(color));
 			}
 		}
 

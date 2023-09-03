@@ -342,6 +342,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 15c2cf89e30d4e29b737448c1c1abd5d, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  fgColor: {r: 0, g: 0, b: 0, a: 0}
   backgroundColorPlotter: {fileID: 3120867517983499152}
   font: {fileID: 11400000, guid: 01f7b1a20704caa4ea69a70de99e7999, type: 2}
   fontSize: 14
@@ -448,6 +449,7 @@ MonoBehaviour:
   m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []
+  renderDefaultGraphic: 0
 --- !u!114 &3665595881431410887
 MonoBehaviour:
   m_ObjectHideFlags: 0
