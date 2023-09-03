@@ -3,6 +3,7 @@ using GameplaySystems.Networld;
 using OS.Devices;
 using UI.Backdrop;
 using UI.Login;
+using UI.PlayerUI;
 using UI.Popovers;
 using UI.Shell;
 using UI.Windowing;
@@ -14,13 +15,10 @@ namespace Player
 	{
 		public IInitProcess OsInitProcess;
 		public PlayerComputer Computer;
+
+		public UiManager UiManager;
 		
 		public GameObject UiRoot;
-		public BackdropController BackdropController;
-		public Desktop Desktop;
-		public WindowManager WindowManager;
-		public LoginManager LoginManager;
-		public PopoverLayer PopoverLayer;
 		public PlayerFileOverrider FileOverrider;
 
 		public LocalAreaNetwork PlayerLan;

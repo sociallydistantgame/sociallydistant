@@ -33,7 +33,8 @@ namespace DevTools
 				if (!GUILayout.Button(program.WindowTitle))
 					continue;
 				
-				playerInstance.Value.Desktop.OpenProgram(program, Array.Empty<string>(), process, null);
+				if (this.playerInstance.Value.UiManager.Desktop != null)
+					playerInstance.Value.UiManager.Desktop.OpenProgram(program, Array.Empty<string>(), process, null);
 			}
 		}
 	}

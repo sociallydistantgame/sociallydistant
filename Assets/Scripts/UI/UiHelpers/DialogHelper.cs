@@ -28,7 +28,7 @@ namespace UI.UiHelpers
 
 		public void AskQuestion(string title, string message, IWindow? parentWindow, Action<bool>? callback)
 		{
-			IMessageDialog messageDialog = player.Value.WindowManager.CreateMessageDialog(title, parentWindow);
+			IMessageDialog messageDialog = player.Value.UiManager.WindowManager.CreateMessageDialog(title, parentWindow);
 			messageDialog.Title = title;
 			messageDialog.Message = message;
 			messageDialog.Icon = MessageDialogIcon.Question;

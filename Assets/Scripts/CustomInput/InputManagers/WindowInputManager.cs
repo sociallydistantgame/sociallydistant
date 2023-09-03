@@ -17,7 +17,7 @@ namespace CustomInput.InputManagers
 		/// <inheritdoc />
 		public bool HandleInputs(PlayerInstance playerInstance, GameControls gameControls, bool consumedByOtherSystem)
 		{
-			if (playerInstance.WindowManager == null)
+			if (playerInstance.UiManager.WindowManager == null)
 				return false;
 
 			return false;
