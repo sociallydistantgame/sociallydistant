@@ -1,0 +1,19 @@
+{
+    "name": "OSA.Utilities.Editor",
+    "references": [
+        "OSA.Utilities",
+        "OSA.Core.Editor",
+        "OSA.Core",
+        "Unity.TextMeshPro"
+    ],
+    "optionalUnityReferences": [],
+    "includePlatforms": [
+        "Editor"
+    ],
+    "excludePlatforms": [],
+    "allowUnsafeCode": false,
+    "overrideReferences": false,
+    "precompiledReferences": [],
+    "autoReferenced": true,
+    "defineConstraints": []
+}

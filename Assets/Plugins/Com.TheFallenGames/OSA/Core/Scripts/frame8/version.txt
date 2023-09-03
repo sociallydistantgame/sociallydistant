@@ -1,0 +1,4 @@
+1.0.0
+# frame8 is our internal library for Unity that's used in multiple projects. 
+# This file is an indicator of what version of the library we use. 
+# We cannot import the whole frame8 library because most of its files won't be used

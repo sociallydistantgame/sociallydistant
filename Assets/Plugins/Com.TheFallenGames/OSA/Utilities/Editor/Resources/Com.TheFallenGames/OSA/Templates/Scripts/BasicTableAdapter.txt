@@ -1,0 +1,250 @@
+﻿using System;
+using System.Collections;
+using System.Collections.Generic;
+using Com.TheFallenGames.OSA.CustomAdapters.TableView;
+using Com.TheFallenGames.OSA.CustomAdapters.TableView.Basic;
+using Com.TheFallenGames.OSA.Core;
+using Com.TheFallenGames.OSA.CustomAdapters.TableView.Extra;
+
+// You should modify the namespace to your own or - if you're sure there won't ever be conflicts - remove it altogether
+namespace Your.Namespace.Here.Tables
+{
+	/// <summary>
+	/// Template demonstrating the use of a <see cref="TableAdapter{TParams, TTupleViewsHolder, THeaderTupleViewsHolder}"/>.
+	/// </summary>
+	public class BasicTableAdapter : TableAdapter<TableParams, TupleViewsHolder, TupleViewsHolder>
+	{
+		string[] _RandomStrings = new string[]
+		{
+				"Lorem Ipsum is simply dummy text of the printing and typesetting industry",
+				"dummy text of the printing and typesetting industry",
+				"industry",
+				"and typesetting industry",
+				"Lorem Ipsum has been the industry's standard dummy text ever since the 1500s, " +
+					"when an unknown printer took a galley of type and scrambled it to make a type specimen book."
+		};
+
+
+		protected override void Start()
+		{
+			base.Start();
+
+			// Simply start loading when the adapter's Start is called.
+			// Uncomment whichever load method you want to test
+			
+			/*
+			LoadDataSync();
+			*/
+			LoadBufferedDataSync();
+			/*
+			LoadBufferedDataAsync();
+			*/
+		}
+
+		// Synchronously load full data (10k items is recommended as max)
+		public void LoadDataSync()
+		{
+			// Assigning the columns directly because ReadRandomTuples uses it
+			Columns = RetrieveColumns();
+			int tuplesCount = 500;
+			var tuples = new ITuple[tuplesCount];
+			ReadRandomTuples(tuples, 0, tuplesCount);
+			Tuples = new BasicTableData(Columns, tuples, true /*allow column sorting*/);
+
+			ResetTableWithCurrentData();
+		}
+
+		// Synchronously load large data on demand
+		public void LoadBufferedDataSync()
+		{
+			var columns = RetrieveColumns();
+			int tuplesCount = OSAConst.MAX_ITEMS;
+
+			// Setting a smaller chunk size, because we're accessing the values instantly. 
+			// If read from disk or similar, you'd probably want to experiment with bigger values to keep scrolling smooth and only have FPS drops on loading a new chunk
+			int chunkSize = 20;
+
+			var data = new BufferredTableData(Columns, tuplesCount, ReadRandomTuples, chunkSize, false);
+
+			ResetTable(columns, data);
+		}
+
+		// Asynchronously load large data on demand
+		public void LoadBufferedDataAsync()
+		{
+			var columns = RetrieveColumns();
+			int tuplesCount = OSAConst.MAX_ITEMS;
+
+			// Async data reading operations imply less frequent calls, but with larger data retrieved per call
+			int chunkSize = 500;
+
+			var data = new AsyncBufferredTableData<BasicTuple>(columns, tuplesCount, chunkSize, ReadDataFromServerInto);
+			//data.Source.ShowLogs = true;
+
+			// See the description of AsyncLoadingUIController inside its file for more info
+			var uiController = new AsyncLoadingUIController<BasicTuple>(this, data);
+
+			ResetTable(data.Columns, data);
+
+			uiController.BeginListeningForSelfDisposal();
+		}
+
+		ITableColumns RetrieveColumns()
+		{
+			var columnInfos = new List<BasicColumnInfo>();
+			for (int i = 0; i < 25; i++)
+			{
+				// For simplicity, we only create integer, bool and string columns, consecutively.
+				var columnType = i % 3 == 0 ? TableValueType.INT : (i % 3 == 1 ? TableValueType.BOOL : TableValueType.STRING);
+				columnInfos.Add(new BasicColumnInfo("Col " + i, columnType));
+				
+				// If you want to use TableValueType.ENUMERATION, pass the enum's System.Type to 
+				// the 3rd parameter of BasicColumnInfo's constructor 
+			}
+
+			return new BasicTableColumns(columnInfos);
+		}
+
+		#region Sample Data readers
+		void ReadDataFromServerInto(BasicTuple[] into, int firstItemIndex, int countToRead, Action onDone)
+		{
+			StartCoroutine(
+				SimulateReadDataFromServerIntoExistingTuples_Coroutine(
+					into, 
+					firstItemIndex, 
+					countToRead, 
+					onDone
+				)
+			);
+		}
+		
+		// Using a thread to defer work and wait until it's completed
+		// This would usually be your HTTP request or similar
+		IEnumerator SimulateReadDataFromServerIntoExistingTuples_Coroutine(BasicTuple[] into, int firstItemIndex, int countToRead, Action onDone)
+		{
+			yield return null;
+
+			var columns = Columns;
+			// WebGL doesn't support threads, so we simulate it directly through this coroutine (which is slower, but there's no other choice)
+#if UNITY_WEBGL
+			// If this mehtod is called from different threads, each thead needs its own random generator instance
+			var random = new System.Random((int)DateTime.Now.Ticks);
+			for (int i = 0; i < countToRead; i++)
+			{
+				if (i % 20 == 0)
+					yield return null; // wait 1 frame
+
+				var tuple = TableViewUtil.CreateTupleWithEmptyValues<BasicTuple>(columns.ColumnsCount);
+				ReadRandomValueIntoTuple(columns, firstItemIndex + i, tuple, random);
+				into[i] = tuple;
+			}
+#else
+			var adapter = this;
+			bool abort = false;
+			bool done = false;
+			new System.Threading.Thread(
+				() =>
+				{
+					System.Threading.Thread.Sleep(500); // simulate delay
+
+					// Abort if the adapter was disposed or changed its data externally
+					if (abort)
+						return;
+					ReadRandomTuples(into, firstItemIndex, countToRead);
+
+					// Abort if the adapter was disposed or changed its data externally
+					if (abort)
+						return;
+
+					// Here's the version where items are read ony by one and checking for abort is done on each step
+					// System.Random random = new System.Random((int)DateTime.Now.Ticks);
+					//for (int i = 0; i < countToRead; i++)
+					//{
+					//	var tuple = intoExistingTuples[i];
+
+					//	// Abort if the adapter was disposed or changed its data externally
+					//	if (abort)
+					//		break;
+
+					//	int currentItemIndex = firstItemIndex + i;
+					//	// Populate an already-created tuple with actual values for each column
+					//	ReadRandomValueIntoTuple(Columns, currentItemIndex, tuple, random);
+					//}
+
+					done = true;
+				}
+			).Start();
+
+			while (!done)
+			{
+				if (adapter == null || !adapter.IsInitialized) // adapter was disposed/destroyed => abort
+				{
+					abort = true;
+					yield break;
+				}
+
+				if (Columns != columns) // data was changed externally => abort
+				{
+					abort = true;
+					yield break;
+				}
+
+				// Wait a bit until next check
+				yield return new UnityEngine.WaitForSeconds(.2f);
+			}
+#endif
+
+			// onDone should be called on main thread. A coroutine is perfect for this
+			if (onDone != null)
+				onDone();
+		}
+
+		void ReadRandomTuples(ITuple[] into, int firstItemIndex, int numTuples)
+		{
+			// If this method is called from different threads, each thread needs its own random generator instance
+			var random = new System.Random((int)DateTime.Now.Ticks);
+
+			var columns = Columns;
+			for (int i = 0; i < numTuples; i++)
+			{
+				var tuple = TableViewUtil.CreateTupleWithEmptyValues<BasicTuple>(columns.ColumnsCount);
+				ReadRandomValueIntoTuple(columns, firstItemIndex + i, tuple, random);
+				into[i] = tuple;
+			}
+		}
+		
+		void ReadRandomValueIntoTuple(ITableColumns columnsModel, int itemIndex, ITuple tuple, System.Random random)
+		{
+			for (int i = 0; i < columnsModel.ColumnsCount; i++)
+			{
+				int randInt = random.Next();
+
+				if (randInt % 10 == 0) // add some null values
+				{
+					tuple.SetValue(i, null);
+					continue;
+				}
+
+				var columnState = columnsModel.GetColumnState(i);
+				object obj = null;
+
+				switch (columnState.Info.ValueType)
+				{
+					case TableValueType.STRING:
+						obj = _RandomStrings[Math.Max(0, randInt) % _RandomStrings.Length];
+						break;
+
+					case TableValueType.INT:
+						obj = randInt;
+						break;
+
+					case TableValueType.BOOL:
+						obj = randInt % 2 == 0;
+						break;
+				}
+				tuple.SetValue(i, obj);
+			}
+		}
+		#endregion
+	}
+}
