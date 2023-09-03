@@ -3,14 +3,13 @@ using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
-using GameplaySystems.GameManagement;
+using GamePlatform;
 using GameplaySystems.Networld;
 using OS.FileSystems;
 using OS.FileSystems.Host;
-using OS.Network;
 using Player;
+using UnityEngine;
 using UnityEngine.Assertions;
-using UnityEngine.UIElements;
 
 namespace OS.Devices
 {
@@ -29,7 +28,7 @@ namespace OS.Devices
 		private ISystemProcess? systemd;
 
 		/// <inheritdoc />
-		public string Name => gameManager.CurrentPlayerHostName;
+		public string Name => "ritchie-pc";
 		public PlayerUser PlayerUser => playerUser;
 		
 		public PlayerComputer(GameManager gameManager, LocalAreaNetwork playerLan, PlayerFileOverrider fileOverrider)
@@ -42,7 +41,7 @@ namespace OS.Devices
 			su = new SuperUser(this);
 			this.AddUser(su);
 
-			this.playerUser = new PlayerUser(this, gameManager.CurrentPlayerName);
+			this.playerUser = new PlayerUser(this, "ritchie");
 			this.AddUser(this.playerUser);
 
 			this.RebuildVfs();
@@ -50,7 +49,7 @@ namespace OS.Devices
 
 		public void RebuildVfs()
 		{
-			string homeParent = gameManager.CurrentGamePath ?? gameManager.GameDataDirectory;
+			string homeParent = Application.persistentDataPath;
 			string homePath = Path.Combine(homeParent, "home");
 			hostHomeDirectory = homePath;
 

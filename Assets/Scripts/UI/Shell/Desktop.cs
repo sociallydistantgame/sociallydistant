@@ -38,7 +38,7 @@ namespace UI.Shell
 		{
 			this.loginUser = this.playerHolder.Value.Computer.PlayerUser;
 			this.loginProcess = this.playerHolder.Value.OsInitProcess.CreateLoginProcess(this.loginUser);
-			this.currentWorkspace = playerHolder.Value.WindowManager.DefineWorkspace(this.workspaceArea); 
+			this.currentWorkspace = playerHolder.Value.UiManager.WindowManager.DefineWorkspace(this.workspaceArea); 
 		}
 
 		/// <inheritdoc />

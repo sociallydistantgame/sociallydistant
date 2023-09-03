@@ -1,9 +1,11 @@
-﻿using UnityEngine;
+﻿#nullable enable
+
+using UnityEngine;
 
 namespace Architecture
 {
     public abstract class Holder<T> : ScriptableObject
     {
-        public T Value { get; set; }
+        public T? Value { get; set; }
     }
 }

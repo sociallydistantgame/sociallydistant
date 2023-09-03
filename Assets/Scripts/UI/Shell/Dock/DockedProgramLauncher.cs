@@ -81,13 +81,13 @@ namespace UI.Shell.Dock
 			if (player == null)
 				return;
 
-			if (player.Value.Desktop == null)
+			if (player.Value.UiManager.Desktop == null)
 				return;
 
 			if (program == null)
 				return;
 
-			player.Value.Desktop.OpenProgram(program, arguments, null, null);
+			player.Value.UiManager.Desktop.OpenProgram(program, arguments, null, null);
 		}
 	}
 }
