@@ -15,16 +15,25 @@ namespace UI.CustomGraphics
 		/// <inheritdoc />
 		protected override void OnPopulateMesh(VertexHelper vh)
 		{
+			if (this.rectangles.Count == 0)
+			{
+				base.OnPopulateMesh(vh);
+				return;
+			}
+			
             vh.Clear();
 
             Vector3 scale = rectTransform.lossyScale;
             
             Rect pixelRect = GetPixelAdjustedRect();
 
-			if (pixelRect.width * pixelRect.height < 0)
-				return;
-			
-			for (var i = 0; i < rectangles.Count; i++)
+            if (pixelRect.width * pixelRect.height < 0)
+            {
+	            base.OnPopulateMesh(vh);
+	            return;
+            }
+
+            for (var i = 0; i < rectangles.Count; i++)
 			{
 				RectangleElement element = rectangles[i];
 
