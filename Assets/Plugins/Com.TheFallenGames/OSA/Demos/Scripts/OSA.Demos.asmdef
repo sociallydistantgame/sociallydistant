@@ -1,0 +1,9 @@
+{
+    "name": "OSA.Demos",
+    "references": [
+        "OSA.Core",
+        "OSA.Utilities"
+    ],
+    "includePlatforms": [],
+    "excludePlatforms": []
+}

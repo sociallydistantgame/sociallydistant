@@ -1,0 +1,38 @@
+(!) Important: No special setup is needed to use TMPro with OSA. This file only refers to using TMPro with InputFieldInScrollRectFixerTMPro.cs or TableView
+
+
+I. InputFieldInScrollRectFixerTMPro.cs 
+	- Depends on InputFieldInScrollRectFixerBase.cs from the Utilities.unitypackage
+
+This script contains code for using a TMPro InputField inside a ScrollRect (or OSA, of course). 
+Although you can attach this script when TMPro is not imported, it'll throw an exception at runtime. Make sure TMPro is imported before using it.
+Check the file for more info.
+This was initially needed for the TableView, but was included in the utils as a general extension of the original InputFieldInScrollRectFixer script
+
+
+II. TMPro in TableView
+	- Depends on TableView.unitypackage
+
+TableView's cells can work both with UnitEngine.UI.Text and TMPro.TextMeshProUGUI components. 
+Using it with TMPro requires you to import TableViewTMProSupport.unitypackage from /Extra/PluginSupport/TMPro.
+(!) But this shouldn't be the first thing you do. This is important, otherwise the OSA's TMPro will probably get corrupted and you'll need to delete your 
+Library folder to restore them, as even re-importing them from the package doesn't seem to work.
+Here are the steps:
+
+	1. Make sure you use version TMPro 1.0.56.0b1 or above, as that version was used to create the OSA's TMPro-specific prefabs.
+	2. (If not already done) Import TableView.unitypackage from /Extra.
+	3. Add OSA_TV_TMPRO to Scripting define symbols in Player settings. 
+	4. If you don't get any error, it means you're using a Unity+TMPro combo that allows TMPro to be seen by any code in your project. You can skip this step.
+	   Otherwise, depending on which Unity and TMPro version you're using, you'll need to do one of the following:
+	   a) Select OSA.Utilities.asmdef and add a reference to the TMPro assembly in its inspector (for ex., you may see "Unity.TextMeshPro" in the options). 
+	   If you don't see the TMPro assembly, but can create a TMPro Text object the scene, see b). If you cannot create a TMPro Text in the scene, it means 
+	   you didn't import TMPRo. Do it now and read the steps again.
+	   b) On some Unity+TMPro combos TMPro doesn't appear as an option in the "Assembly Definition References" section of OSA.Utilities.asmdef, nor in its 
+	   "Assembly references" section (i.e. your Unity version doesn't support that). In this case, not only OSA, but other plugins that use asmdefs 
+	   won't be able to see TMPro, and the only solution is to delete the asmdefs of that plugin. So this means deleting all OSA's '.asmdef' files.
+	   Final note: It's higly recommended to update your TMPro version and/or Unity version so that you can use option a) and have an easier upgrade 
+	   path to future OSA versions. If that's not possible, just keep in mind to repeat this step each time you update OSA, if you won't also update
+	   Unity and/or TMPro to use option a).
+	5. Now import the TableViewTMProSupport.unitypackage.
+	6. Restart Unity. This is needed because the TMPro prefabs on some Unity versions are incorrectly imported (Unknown cause).
+	7. Now when you create a TableView via OSA Wizard (right click on an UI element in hierarchy -> "UI/Optimized TableView (OSA)"), the TMPro prefabs will be used.

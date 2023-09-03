@@ -1,0 +1,10 @@
+{
+    "name": "OSA.Core.Editor",
+    "references": [
+        "OSA.Core"
+    ],
+    "includePlatforms": [
+        "Editor"
+    ],
+    "excludePlatforms": []
+}
