@@ -127,6 +127,7 @@ namespace UI.PlayerUI
 			{
 				case GameMode.OnDesktop:
                 case GameMode.InMission:
+                case GameMode.LockScreen: // NYI
 					ShowDesktop();
 					break;
                 default:

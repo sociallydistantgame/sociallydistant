@@ -117,10 +117,15 @@ namespace GamePlatform
 
 				memory.Seek(0, SeekOrigin.Begin);
 
-				using var binaryReader = new BinaryReader(memory, Encoding.UTF8);
-				using var worldReader = new BinaryDataReader(binaryReader);
-					
-				this.worldManager.Value.LoadWorld(worldReader);
+				this.worldManager.Value.WipeWorld();
+				
+				if (memory.Length > 0)
+				{
+					using var binaryReader = new BinaryReader(memory, Encoding.UTF8);
+					using var worldReader = new BinaryDataReader(binaryReader);
+
+					this.worldManager.Value.LoadWorld(worldReader);
+				}
 			}
 
 			this.currentGameData = gameToLoad;
