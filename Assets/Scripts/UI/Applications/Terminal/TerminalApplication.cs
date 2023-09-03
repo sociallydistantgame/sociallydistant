@@ -25,6 +25,7 @@ namespace UI.Applications.Terminal
 		private ITerminalProcessController? shell;
 		private DialogHelper dialogHelper = null!;
 		private bool isWaitingForInput;
+		private bool hasStartedShell;
 
 		private void Awake()
 		{
@@ -33,7 +34,7 @@ namespace UI.Applications.Terminal
 			this.MustGetComponent(out dialogHelper);
 		}
 
-		private void Start()
+		private void StartShell()
 		{
 			// Start the terminal session, this allows us to receive input
 			// and send characters to it.
@@ -61,6 +62,12 @@ namespace UI.Applications.Terminal
 
 		private void Update()
 		{
+			if (!hasStartedShell)
+			{
+				this.StartShell();
+				hasStartedShell = true;
+			}
+			
 			shell?.Update();
 		}
 

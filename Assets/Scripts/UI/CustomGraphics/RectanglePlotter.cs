@@ -7,24 +7,22 @@ using UnityEngine;
 
 namespace UI.CustomGraphics
 {
+	[RequireComponent(typeof(CanvasRenderer))]
 	public class RectanglePlotter : MaskableGraphic
 	{
 		private readonly List<RectangleElement> rectangles = new List<RectangleElement>();
-
-		/// <inheritdoc />
-		protected override void Awake()
-		{
-			Plot(new Rect(0, 0, 32, 32), Color.red);
-		}
-
+		
 		/// <inheritdoc />
 		protected override void OnPopulateMesh(VertexHelper vh)
 		{
-			vh.Clear();
+            vh.Clear();
 
-			const int vertCount = 4;
+            Vector3 scale = rectTransform.lossyScale;
+            
+            Rect pixelRect = GetPixelAdjustedRect();
 
-			Rect pixelRect = GetPixelAdjustedRect();
+			if (pixelRect.width * pixelRect.height < 0)
+				return;
 			
 			for (var i = 0; i < rectangles.Count; i++)
 			{
@@ -57,7 +55,7 @@ namespace UI.CustomGraphics
 				max.y *= pixelRect.height;
 				min.y *= pixelRect.height;
 				
-				int vertOffset = i * vertCount;
+				int vertOffset = vh.currentVertCount;
 				
 				vh.AddVert(new Vector2(min.x, min.y), rectColor, Vector4.zero);
 				vh.AddVert(new Vector2(max.x, min.y), rectColor, Vector4.zero);
@@ -69,14 +67,25 @@ namespace UI.CustomGraphics
 			}
 		}
 
+		public void Refresh()
+		{
+			this.UpdateGeometry();
+		}
+		
 		public void Clear()
 		{
 			rectangles.Clear();
-			this.UpdateGeometry();
 		}
 
 		public void Plot(Rect rect, Color color)
 		{
+			Vector3 scale = rectTransform.lossyScale;
+
+			rect.x *= scale.x;
+			rect.y *= scale.y;
+			rect.width *= scale.x;
+			rect.height *= scale.y;
+			
 			if (color.a == 0)
 				return;
 
@@ -93,7 +102,6 @@ namespace UI.CustomGraphics
 			};
 
 			this.rectangles.Add(element);
-			this.UpdateGeometry();
 		}
 
 		private struct RectangleElement

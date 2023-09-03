@@ -18,10 +18,8 @@ namespace UI.Terminal.SimpleTerminal
         private readonly UguiTerminalScreen term;
         private RectTransform rootTransform;
         private GameObject root;
-        private TextMeshProUGUI bg;
         private TextMeshProUGUI fg;
         private LayoutElement rootLayoutElement;
-        private StringBuilder bsb;
         private StringBuilder fsb;
 
         public Rect rect => this.rootTransform.rect;
@@ -35,8 +33,6 @@ namespace UI.Terminal.SimpleTerminal
 
         public void SetFont(TMP_FontAsset font, int fontSize)
         {
-            this.bg.font = font;
-            this.bg.fontSize = fontSize;
             this.fg.font = font;
             this.fg.fontSize = fontSize;
         }
@@ -65,17 +61,11 @@ namespace UI.Terminal.SimpleTerminal
             this.rootLayoutElement = root.AddComponent<LayoutElement>();
 
             // Create the Label elements for the background and foreground text.
-            var bgGameObject = new GameObject("Background");
             var fgGameObject = new GameObject("Foreground");
             this.fg = fgGameObject.AddComponent<TextMeshProUGUI>();
-            this.bg = bgGameObject.AddComponent<TextMeshProUGUI>();
 
             // Prevent word-wrapping because it's handled by the terminal
             this.fg.enableWordWrapping = false;
-            this.bg.enableWordWrapping = false;
-            
-            var bgLayoutElement = bgGameObject.AddComponent<LayoutElement>();
-            bgLayoutElement.ignoreLayout = true;
 
             var layoutGroup = root.AddComponent<VerticalLayoutGroup>();
             layoutGroup.childForceExpandHeight = false;
@@ -90,15 +80,7 @@ namespace UI.Terminal.SimpleTerminal
             //     BACKGROUND
             //     TEXT
             this.rootTransform.SetParent(this.term.transform);
-            bg.transform.SetParent(rootTransform);
             fg.transform.SetParent(rootTransform);
-
-            RectTransform bgRect = bg.transform as RectTransform;
-            bgRect.anchorMin = Vector2.zero;
-            bgRect.anchorMax = Vector2.one;
-            bgRect.pivot = Vector2.zero;
-            bgRect.anchoredPosition = Vector3.zero;
-            bgRect.sizeDelta = Vector2.zero;
 
             rootLayoutElement.minHeight = this.term.UnscaledLineHeight;
         }
@@ -108,16 +90,13 @@ namespace UI.Terminal.SimpleTerminal
             // Start by copying the bg and fg text into StringBuilders.
             // This is so that we can edit them without creating new strings
             // until we need to. Performance!
-            this.bsb ??= new StringBuilder(this.bg.text ?? string.Empty);
             this.fsb ??= new StringBuilder(this.fg.text ?? string.Empty);
 
             // Track if anything has actually changed
             var hasAnythingChanged = false;
 
             // Track where the change starts
-            int bgDirt = 0;
             int fgDirt = 0;
-            int bgClean = 0;
             int fgClean = 0;
             int renderstart = -1;
             int lastPrintable = -1;
@@ -164,8 +143,8 @@ namespace UI.Terminal.SimpleTerminal
                     
                     piece.isDefaultBG = this.term.DefaultBackgroundId == bgColorId;
 
-                    string fgColor = this.term.GetColor(fgColorId, rgbFgColor);
-                    string bgColor = this.term.GetColor(bgColorId, rgbBgColor);
+                    string fgColor = this.term.GetColorOld(fgColorId, rgbFgColor);
+                    string bgColor = this.term.GetColorOld(bgColorId, rgbBgColor);
 
 
                     piece.SetFGColor(fgColor);
@@ -186,7 +165,6 @@ namespace UI.Terminal.SimpleTerminal
                     
                     hasAnythingChanged = true;
 
-                    bgDirt = bgClean;
                     fgDirt = fgClean;
                     
                     piece.BGLength = 0;
@@ -201,7 +179,6 @@ namespace UI.Terminal.SimpleTerminal
                 }
                 else
                 {
-                    bgClean += piece.BGLength;
                     fgClean += piece.FGLength;
                 }
             }
@@ -212,13 +189,11 @@ namespace UI.Terminal.SimpleTerminal
                 return;
 
             // Nuke all the garbage
-            bsb.Length = bgDirt;
             fsb.Length = fgDirt;
 
             if (lastPrintable >= 0)
             {
                 // Activate the text
-                bg.gameObject.SetActive(true);
                 fg.gameObject.SetActive(true);
 
                 // Now we tell each piece to rebuild.
@@ -231,12 +206,12 @@ namespace UI.Terminal.SimpleTerminal
 
                     if (isFirst)
                     {
-                        current.UpdateText(ref current, true, isLast, this.bsb, this.fsb);
+                        current.UpdateText(ref current, true, isLast, this.fsb);
                     }
                     else
                     {
                         ref TextPiece prev = ref this.pieces[i - 1];
-                        current.UpdateText(ref prev, false, isLast, this.bsb, this.fsb);
+                        current.UpdateText(ref prev, false, isLast, this.fsb);
                     }
 
                     if (isLast)
@@ -245,13 +220,11 @@ namespace UI.Terminal.SimpleTerminal
             }
             else
             {
-                bg.gameObject.SetActive(false);
                 fg.gameObject.SetActive(false);                
             }
             
             rootLayoutElement.minHeight = this.term.UnscaledLineHeight;
-
-            this.bg.SetText(this.bsb);
+            
             this.fg.SetText(this.fsb);
         }
 
@@ -320,8 +293,7 @@ namespace UI.Terminal.SimpleTerminal
                 this.dirty = true;
             }
 
-            public void UpdateText(ref TextPiece previous, bool isFirst, bool isLast, StringBuilder bgBuilder,
-                StringBuilder fgBuilder)
+            public void UpdateText(ref TextPiece previous, bool isFirst, bool isLast,StringBuilder fgBuilder)
             {
                 this.__init();
 
@@ -360,54 +332,8 @@ namespace UI.Terminal.SimpleTerminal
                 // and character. Otherwise we'll crash trying to insert.
                 //
                 // This is how we'll track our new length
-                int bgLenold = bgBuilder.Length;
                 int fgLenOld = fgBuilder.Length;
                 
-                if (bgChanged)
-                {
-                    if (!isFirst)
-                        if (this.isDefaultBG)
-                            bgBuilder.Append("</mark>");
-                    
-                    if (isLast)
-                    {
-                        if (!this.isDefaultBG)
-                        {
-                            bgBuilder.Append("<mark=#");
-                            bgBuilder.Append(this.bgColor);
-                            bgBuilder.Append("ff>");
-                        }
-                        
-                        
-                        bgBuilder.Append("<color=#");
-                        bgBuilder.Append(this.bgColor);
-                        bgBuilder.Append(">_</color>");
-                        
-                        if (!this.isDefaultBG)
-                            bgBuilder.Append("</mark>");
-                    }
-                    else
-                    {
-                        if (!this.isDefaultBG)
-                        {
-                            bgBuilder.Append("<mark=#");
-                            bgBuilder.Append(this.bgColor);
-                            bgBuilder.Append("ff>");
-                        }
-                        
-                        bgBuilder.Append("<color=#");
-                        bgBuilder.Append(this.bgColor);
-                        bgBuilder.Append(">_");
-                    }
-                }
-                else
-                {
-                    if (this.isDefaultBG)
-                        bgBuilder.Append(' ');
-                    else
-                        bgBuilder.Append( '_');
-                }
-
                 // Color
                 if (fgChanged)
                 {
@@ -489,7 +415,6 @@ namespace UI.Terminal.SimpleTerminal
                 }
 
                 // Update our lengths
-                this.bgLen = Math.Max(bgBuilder.Length - bgLenold, 0);
                 this.fgLen = Math.Max(fgBuilder.Length - fgLenOld, 0);
             }
 
