@@ -10,6 +10,10 @@ namespace UI.CustomGraphics
 	[RequireComponent(typeof(CanvasRenderer))]
 	public class RectanglePlotter : MaskableGraphic
 	{
+		[Tooltip("Choose whether to render the default graphic when no rectangles are plotted.")]
+		[SerializeField]
+		private bool renderDefaultGraphic = false;
+		
 		private readonly List<RectangleElement> rectangles = new List<RectangleElement>();
 		
 		/// <inheritdoc />
@@ -17,7 +21,7 @@ namespace UI.CustomGraphics
 		{
 			if (this.rectangles.Count == 0)
 			{
-				base.OnPopulateMesh(vh);
+				RenderDefaultGraphic(vh);
 				return;
 			}
 			
@@ -29,7 +33,7 @@ namespace UI.CustomGraphics
 
             if (pixelRect.width * pixelRect.height < 0)
             {
-	            base.OnPopulateMesh(vh);
+	            RenderDefaultGraphic(vh);
 	            return;
             }
 
@@ -73,6 +77,22 @@ namespace UI.CustomGraphics
 				
 				vh.AddTriangle(vertOffset, vertOffset + 1, vertOffset + 2);
 				vh.AddTriangle(vertOffset + 2, vertOffset + 3, vertOffset + 1);
+			}
+		}
+
+		private void RenderDefaultGraphic(VertexHelper vh)
+		{
+			Color32 old = this.color;
+			if (!this.renderDefaultGraphic)
+			{
+				this.color = new Color32(0, 0, 0, 0);
+			}
+			
+			base.OnPopulateMesh(vh);
+
+			if (!renderDefaultGraphic)
+			{
+				this.color = old;
 			}
 		}
 
