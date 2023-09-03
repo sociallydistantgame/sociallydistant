@@ -109,7 +109,10 @@ namespace UI.Terminal.SimpleTerminal
             this.myCamera = Camera.main;
             
             this.transform.parent.MustGetComponent(out parentRectTransform);
+        }
 
+        private void Start()
+        {
             this.simpleTerminal = new SimpleTerminal(this, screen, minLatency, maxLatency, this.columnCount, this.rowCount);
             this.simpleTerminal.BlinkTimeout = blinkTimeout;
             this.simpleTerminal.DoubleClickTime = doubleClickTime;
@@ -118,7 +121,7 @@ namespace UI.Terminal.SimpleTerminal
             this.simpleTerminal.TerminalIdentifier = vtiden;
             this.simpleTerminal.AllowAltScreen = allowAltScreen;
         }
-        
+
         private void OnDestroy()
         {
             this.master.Close();
@@ -143,8 +146,8 @@ namespace UI.Terminal.SimpleTerminal
                 this.ww = nww;
                 this.wh = nwh;
 
-                float cw = screen.CharacterWidth;
-                float ch = screen.LineHeight;
+                float cw = screen.UnscaledCharacterWidth;
+                float ch = screen.UnscaledLineHeight;
 
                 int r = (int)Math.Ceiling(this.wh / ch) - 1;
                 int c = (int)Math.Ceiling(this.ww / cw) - 1;

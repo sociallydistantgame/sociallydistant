@@ -2634,6 +2634,8 @@ namespace UI.Terminal.SimpleTerminal
 
 			// if (ocx != term.ocx || ocy != term.ocy)
 			//    xximspot(term.ocx, term.ocy);
+
+			screen.AfterRender();
 		}
 
 		private void DrawRegion(int x1, int y1, int x2, int y2)

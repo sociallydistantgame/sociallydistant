@@ -11,5 +11,7 @@ namespace UI.Terminal.SimpleTerminal
 		void Bell();
 
 		void ScreenPointToCell(SimpleTerminal term, float x, float y, out int column, out int row);
+
+		void AfterRender();
 	}
 }
