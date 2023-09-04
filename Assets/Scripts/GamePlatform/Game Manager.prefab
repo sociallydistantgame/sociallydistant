@@ -45,3 +45,4 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   worldManager: {fileID: 11400000, guid: 6ddfb5183f8225440a5d156e7fb16747, type: 2}
+  infoPanelService: {fileID: 11400000, guid: e04c289c2acd7e44fbdc339b481d4594, type: 2}

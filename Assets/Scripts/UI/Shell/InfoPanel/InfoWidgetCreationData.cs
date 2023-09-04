@@ -6,5 +6,6 @@ namespace UI.Shell.InfoPanel
 		public string Icon;
 		public string Title;
 		public string Text;
+		public bool Closeable;
 	}
 }
