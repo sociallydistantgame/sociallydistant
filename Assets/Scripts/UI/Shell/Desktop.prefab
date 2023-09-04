@@ -1201,7 +1201,7 @@ RectTransform:
   m_AnchorMin: {x: 1, y: 1}
   m_AnchorMax: {x: 1, y: 1}
   m_AnchoredPosition: {x: -23, y: -33}
-  m_SizeDelta: {x: 235, y: 0}
+  m_SizeDelta: {x: 285, y: 0}
   m_Pivot: {x: 1, y: 1}
 --- !u!114 &8319984765575548049
 MonoBehaviour:
@@ -1313,6 +1313,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: f2255659f4234066becde0322b2d14a2, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  infoPanelService: {fileID: 11400000, guid: e04c289c2acd7e44fbdc339b481d4594, type: 2}
   widgetsArea: {fileID: 7477880860380938504}
 --- !u!1 &3099325860242547685
 GameObject:

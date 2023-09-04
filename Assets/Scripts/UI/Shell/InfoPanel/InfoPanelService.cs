@@ -1,8 +1,10 @@
 ﻿#nullable enable
 
+using System;
 using System.Collections.Generic;
 using Architecture;
 using Core.Systems;
+using UniRx;
 using UnityEngine;
 
 namespace UI.Shell.InfoPanel
@@ -11,67 +13,58 @@ namespace UI.Shell.InfoPanel
 	public class InfoPanelService : ScriptableObject
 	{
 		private readonly UniqueIntGenerator idGenerator = new UniqueIntGenerator();
-		private readonly ObservableList<InfoWidgetData> widgets = new ObservableList<InfoWidgetData>();
-		private readonly Dictionary<int, int> widgetIdMap = new Dictionary<int, int>();
+		private readonly ReactiveCollection<InfoWidgetData> widgets = new ReactiveCollection<InfoWidgetData>();
 
-		public IReadOnlyObservableList<InfoWidgetData> WidgetList => widgets;
+		public IReadOnlyReactiveCollection<InfoWidgetData> WidgetsObservable => widgets;
 
-		public void DeleteWidget(int id)
+		private void Awake()
 		{
-			if (!widgetIdMap.TryGetValue(id, out int index))
-				return;
-
-			widgets.Remove(widgets[index]);
-			widgetIdMap.Remove(id);
-			idGenerator.DeclareUnused(id);
+			this.widgets.Clear();
 		}
 
-		public void ModifyWidget(int id, InfoWidgetCreationData creationData)
+		public void ClearAllWidgets()
 		{
-			if (!widgetIdMap.TryGetValue(id, out int index))
-				return;
-
-			InfoWidgetData data = widgets[index];
-
-			widgets.Remove(data);
-			
-			data.CreationData = creationData;
-
-			foreach (int otherId in widgetIdMap.Keys)
+			this.widgets.Clear();
+		}
+		
+		public int CreateCloseableInfoWidget(string icon, string title, string message)
+		{
+			return AddWidgetInternal(new InfoWidgetCreationData()
 			{
-				if (otherId == id)
-					widgetIdMap[otherId] = widgets.Count;
-				else if (widgetIdMap[otherId] > index)
-					widgetIdMap[otherId] --;
-			}
-			
-			widgets.Add(data);
+				Title = title,
+				Icon = icon,
+				Text = message,
+				Closeable = true
+			});
 		}
-
-		public bool TryGetCreationData(int id, out InfoWidgetCreationData creationData)
+		
+		public int CreateStickyInfoWidget(string icon, string title, string message)
 		{
-			creationData = default;
-
-			if (!widgetIdMap.TryGetValue(id, out int index))
-				return false;
-
-			creationData = widgets[index].CreationData;
-			return true;
+			return AddWidgetInternal(new InfoWidgetCreationData()
+			{
+				Title = title,
+				Icon = icon,
+				Text = message,
+				Closeable = false
+			}, true);
 		}
-
-		public int Create(InfoWidgetCreationData creationData)
+        
+		private int AddWidgetInternal(InfoWidgetCreationData creationData, bool sticky = false)
 		{
-			int id = idGenerator.GetNextValue();
-			widgetIdMap.Add(id, widgets.Count);
+			int id = this.idGenerator.GetNextValue();
 
-			var widget = new InfoWidgetData
+			var widgetData = new InfoWidgetData()
 			{
 				Id = id,
 				CreationData = creationData
 			};
 
-			widgets.Add(widget);
-			return id;
+			if (sticky)
+				this.widgets.Insert(0, widgetData);
+			else
+				this.widgets.Add(widgetData);
+            
+            return id;
 		}
 	}
 }

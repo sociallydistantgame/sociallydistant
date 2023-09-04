@@ -5,15 +5,20 @@ using System.Collections.Generic;
 using UniRx.Triggers;
 using UnityEngine;
 using Utility;
+using UniRx;
 
 namespace UI.Shell.InfoPanel
 {
 	public class InfoPanelController : MonoBehaviour
 	{
-		private readonly List<InfoWidgetData> widgetList = new List<InfoWidgetData>();
+		[SerializeField]
+		private InfoPanelService infoPanelService = null!;
 		
 		[SerializeField]
 		private InfoWidgetsController widgetsArea = null!;
+		
+		private readonly List<InfoWidgetData> widgetList = new List<InfoWidgetData>();
+		private IDisposable? widgetsObserver;
 		
 		private void Awake()
 		{
@@ -23,6 +28,23 @@ namespace UI.Shell.InfoPanel
 		private IEnumerator Start()
 		{
 			yield return null;
+			this.widgetsArea.SetItems(this.widgetList);
+
+			widgetsObserver = infoPanelService.WidgetsObservable.ObserveCountChanged(true)
+				.Subscribe(OnWidgetCountChanged);
+		}
+
+		private void OnDestroy()
+		{
+			widgetsObserver?.Dispose();
+			widgetsObserver = null;
+		}
+
+		private void OnWidgetCountChanged(int newCount)
+		{
+			this.widgetList.Clear();
+			this.widgetList.AddRange(this.infoPanelService.WidgetsObservable);
+
 			this.widgetsArea.SetItems(this.widgetList);
 		}
 	}

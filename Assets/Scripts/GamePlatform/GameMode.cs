@@ -7,6 +7,7 @@ namespace GamePlatform
 		AtLoginScreen,
 		OnDesktop,
 		InMission,
-		LockScreen
+		LockScreen,
+		CharacterCreator
 	}
 }
