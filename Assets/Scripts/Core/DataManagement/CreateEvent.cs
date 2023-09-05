@@ -5,9 +5,6 @@ namespace Core.DataManagement
 {
 	public class CreateEvent
 	{
-		public delegate void CreateCallback<TDataElement>(TDataElement subject)
-			where TDataElement : struct;
-
 		private Dictionary<Type, List<object>> invocationLists = new Dictionary<Type, List<object>>();
 
 		public void AddCallback<TDataElement>(CreateCallback<TDataElement> callback)

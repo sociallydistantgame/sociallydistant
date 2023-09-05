@@ -5,9 +5,6 @@ namespace Core.DataManagement
 {
 	public class DeleteEvent
 	{
-		public delegate void DeleteCallback<TDataElement>(TDataElement subject)
-			where TDataElement : struct;
-
 		private Dictionary<Type, List<object>> invocationLists = new Dictionary<Type, List<object>>();
 
 		public void AddCallback<TDataElement>(DeleteCallback<TDataElement> callback)
