@@ -8,6 +8,7 @@ using UI.Terminal.SimpleTerminal;
 using UI.UiHelpers;
 using UI.Windowing;
 using UnityEngine;
+using UnityExtensions;
 using Utility;
 
 namespace UI.Applications.Terminal

@@ -4,6 +4,7 @@ using System.Collections.Generic;
 using Com.TheFallenGames.OSA.Core;
 using Com.TheFallenGames.OSA.CustomParams;
 using Com.TheFallenGames.OSA.DataHelpers;
+using Shell.InfoPanel;
 
 namespace UI.Shell.InfoPanel
 {

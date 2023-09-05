@@ -3,10 +3,11 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using ContentManagement;
 
 namespace GamePlatform.ContentManagement
 {
-	public class ContentManager
+	public class ContentManager : IContentManager
 	{
 		private readonly List<IGameContent> allContent = new List<IGameContent>();
 		private readonly List<IGameContentSource> contentSources = new List<IGameContentSource>();
@@ -32,7 +33,7 @@ namespace GamePlatform.ContentManagement
 		public IEnumerable<T> GetContentOfType<T>()
 			=> allContent.OfType<T>();
 
-		public async Task RefreshContentDatabase()
+		public async Task RefreshContentDatabaseAsync()
 		{
 			var builder = new ContentCollectionBuilder(this.allContent);
 			foreach (IGameContentSource source in contentSources)

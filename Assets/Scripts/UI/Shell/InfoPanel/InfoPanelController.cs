@@ -2,10 +2,12 @@
 using System;
 using System.Collections;
 using System.Collections.Generic;
+using Shell.InfoPanel;
 using UniRx.Triggers;
 using UnityEngine;
 using Utility;
 using UniRx;
+using UnityExtensions;
 
 namespace UI.Shell.InfoPanel
 {

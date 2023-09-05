@@ -9,6 +9,7 @@ using OS.Devices;
 using OS.FileSystems;
 using OS.Network;
 using UnityEngine;
+using UnityExtensions;
 using Utility;
 
 namespace GameplaySystems.NonPlayerComputers

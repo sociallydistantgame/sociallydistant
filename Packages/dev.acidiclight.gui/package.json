@@ -1,0 +1,13 @@
+﻿{
+  "name": "dev.acidiclight.gui",
+  "version": "1.0.0",
+  "displayName": "Acidic GUI Extensions",
+  "description": "Collection of components that make UGUI way less annoying and far more powerful to work with. This is the Socially Distant user interface's core.",
+  "dependencies": {
+    "dev.acidiclight.utils": ">=1.0.0"
+  },
+  "author": {
+    "name": "acidic light",
+    "url": "https://acidiclight.dev/"
+  }
+}

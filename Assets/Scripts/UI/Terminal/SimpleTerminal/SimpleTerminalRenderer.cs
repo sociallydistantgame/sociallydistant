@@ -12,6 +12,7 @@ using UnityEngine.Assertions;
 using UnityEngine.EventSystems;
 using UnityEngine.UI;
 using UnityEngine.UIElements;
+using UnityExtensions;
 using Utility;
 using static UI.Terminal.SimpleTerminal.Data.EmulatorConstants;
 using BinaryExpression = System.Linq.Expressions.BinaryExpression;

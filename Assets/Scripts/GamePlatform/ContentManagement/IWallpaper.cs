@@ -1,4 +1,5 @@
 ﻿using System.Threading.Tasks;
+using ContentManagement;
 using UnityEngine;
 
 namespace GamePlatform.ContentManagement

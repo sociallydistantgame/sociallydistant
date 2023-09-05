@@ -7,6 +7,7 @@ using Player;
 using UI.Windowing;
 using UnityEngine;
 using UnityEngine.Serialization;
+using UnityExtensions;
 using Utility;
 
 namespace CustomInput

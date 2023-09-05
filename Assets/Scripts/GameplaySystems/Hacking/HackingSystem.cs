@@ -10,6 +10,7 @@ using OS.FileSystems;
 using Player;
 using UI.Widgets;
 using UnityEngine;
+using UnityExtensions;
 using Utility;
 
 namespace GameplaySystems.Hacking

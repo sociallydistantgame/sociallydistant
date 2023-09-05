@@ -10,6 +10,7 @@ using TMPro;
 using UnityEngine;
 using Utility;
 using UnityEngine.UI;
+using UnityExtensions;
 
 namespace UI.Login
 {

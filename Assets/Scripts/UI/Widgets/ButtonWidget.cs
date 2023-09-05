@@ -4,6 +4,7 @@ using System;
 using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
+using UnityExtensions;
 using Utility;
 
 namespace UI.Widgets

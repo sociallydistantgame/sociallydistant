@@ -4,13 +4,17 @@ using System;
 using System.Collections.Generic;
 using Architecture;
 using Core.Systems;
+using Shell;
+using Shell.InfoPanel;
 using UniRx;
 using UnityEngine;
 
 namespace UI.Shell.InfoPanel
 {
 	[CreateAssetMenu(menuName = "ScriptableObject/Services/Info Panel Service")]
-	public class InfoPanelService : ScriptableObject
+	public class InfoPanelService : 
+		ScriptableObject,
+		IInfoPanelService
 	{
 		private readonly UniqueIntGenerator idGenerator = new UniqueIntGenerator();
 		private readonly ReactiveCollection<InfoWidgetData> widgets = new ReactiveCollection<InfoWidgetData>();
