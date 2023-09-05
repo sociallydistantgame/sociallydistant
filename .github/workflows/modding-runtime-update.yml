@@ -19,10 +19,12 @@ jobs:
           cp -R Packages/com.sociallydistant.framework/* system-runtime/
           mv git-temp system-runtime/.git
           cd system-runtime
-          git config user.name "Socially Distant [bot]"
-          git config user.email "github-actions-noreply@sociallydistantgame.com"
           if [[ 'git status --porcelain' ]]; then
+            git config user.name "Socially Distant [bot]"
+            git config user.email "github-actions-noreply@sociallydistantgame.com"
             git add .
             git commit -m "Runtime update [automated]"
             git push
+          else
+            echo "No run-time updates."
           fi
