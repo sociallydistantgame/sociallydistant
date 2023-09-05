@@ -1,5 +1,6 @@
 ﻿#nullable enable
 using ContentManagement;
+using Core;
 using Shell;
 using Shell.InfoPanel;
 
@@ -19,5 +20,10 @@ namespace Modules
 		///		Gets a reference to the Info Panel Service, which manages the state of the desktop's information panel widgets.
 		/// </summary>
 		IInfoPanelService InfoPanelService { get; }
+		
+		/// <summary>
+		///		Gets a reference to the world manager, which manages the state of the game's world.
+		/// </summary>
+		IWorldManager WorldManager { get; }
 	}
 }

@@ -2,7 +2,7 @@
 
 using Core.Serialization;
 
-namespace Core.DataManagement
+namespace Core
 {
 	public struct ObjectId : ISerializable
 	{

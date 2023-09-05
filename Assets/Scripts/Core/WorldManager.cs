@@ -9,7 +9,7 @@ using UnityEngine;
 
 namespace Core
 {
-    public class WorldManager
+    public class WorldManager : IWorldManager
     {
         private World world;
         private UniqueIntGenerator instanceIdGenerator;
