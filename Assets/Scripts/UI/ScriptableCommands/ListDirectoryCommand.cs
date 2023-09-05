@@ -1,6 +1,7 @@
 ﻿#nullable enable
 
 using Architecture;
+using Core;
 using UnityEngine;
 using Utility;
 

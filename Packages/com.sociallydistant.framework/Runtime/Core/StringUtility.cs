@@ -3,7 +3,7 @@
 using System;
 using System.Text;
 
-namespace Utility
+namespace Core
 {
 	public static class StringUtility
 	{
