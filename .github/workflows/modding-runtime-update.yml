@@ -17,7 +17,7 @@ jobs:
         run: |
           mv system-runtime/.git git-temp
           rm -rf system-runtime/*
-          cp -R Packages/com.sociallydistant.framework/* system-runtime/
+          cp -Ra Packages/com.sociallydistant.framework/* system-runtime/
           mv git-temp system-runtime/.git
           cd system-runtime
           if [[ 'git status --porcelain' ]]; then
