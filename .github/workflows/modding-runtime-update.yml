@@ -5,19 +5,12 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@master
-      - env:
-          GITHUB_TOKEN: ${{ secrets.AUTOMANAGING_TOKEN }}
-        run: |
-          git clone https://github.com/sociallydistantgame/system-runtime system-runtime; 
-          mv system-runtime/.git git-temp;
-          rm -rf system-runtime/*;
-          cp -R Packages/com.sociallydistant.framework/* system-runtime/;
-          mv git-temp system-runtime/.git;
-          cp .gitignore system-runtime/.gitignore;
-          cd system-runtime;
-          git add .;
-          git config --global user.name "Socially Distant [bot]";
-          git config --global user.email "github-actions-noreply@sociallydistantgame.com";
-          git commit -m "Runtime update";
-          git push;
-          echo ritchie;
+      - uses: dmnemec/copy_file_to_another_repo_action@main
+        env:
+          API_TOKEN_GITHUB: ${{ secrets.AUTOMANAGING_TOKEN }}
+        with:
+          source_folder: Packages/com.sociallydistant.framework
+          destination_repo: sociallydistantgame/system-runtime
+          user_name: "Socially Distant [bot]"
+          user_email: "github-actions-noreply@sociallydistantgame.com"
+          commit_message: "Runtime update [automatic]""
