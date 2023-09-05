@@ -1,10 +1,9 @@
 ﻿#nullable enable
 
-using System;
 using System.Collections.Generic;
 using System.Text;
 
-namespace Utility
+namespace Core
 {
 	public static class PathUtility
 	{
