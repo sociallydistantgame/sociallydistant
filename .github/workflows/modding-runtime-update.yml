@@ -14,7 +14,7 @@ jobs:
           cd system-runtime;
           git add .;
           git config --global user.name "Socially Distant [bot]";
-          git confog --global user.email "github-actions-noreply@sociallydistantgame.com";
+          git config --global user.email "github-actions-noreply@sociallydistantgame.com";
           git commit -m "Runtime update";
           git push;
           
