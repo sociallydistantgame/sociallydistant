@@ -6,7 +6,9 @@ using Networking;
 
 namespace Core.WorldData.Data
 {
-	public struct WorldHackableData : ISerializable<WorldRevision>, IDataWithId
+	public struct WorldHackableData : 
+		IWorldData,
+		IDataWithId
 	{
 		private ObjectId id;
 		private ObjectId computerId;
@@ -47,7 +49,7 @@ namespace Core.WorldData.Data
 		}
 		
 		/// <inheritdoc />
-		public void Serialize(IRevisionedSerializer<WorldRevision> serializer)
+		public void Serialize(IWorldSerializer serializer)
 		{
 			SerializationUtility.SerializeAtRevision(ref id, serializer, WorldRevision.AddedHackables, default);
 			SerializationUtility.SerializeAtRevision(ref computerId, serializer, WorldRevision.AddedHackables, default);

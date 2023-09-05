@@ -4,7 +4,8 @@ using Core.WorldData;
 
 namespace Core.Serialization.Binary
 {
-	public class WorldSerializer : IRevisionedSerializer<WorldRevision>
+	public class WorldSerializer : 
+		IWorldSerializer
 	{
 		private WorldRevisionComparer revisionComparer;
 		private IDataWriter? writer;

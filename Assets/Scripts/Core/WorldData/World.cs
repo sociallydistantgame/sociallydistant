@@ -9,33 +9,31 @@ namespace Core.WorldData
 {
 	public class World : IWorld
 	{
-		public readonly DataObject<WorldRevision, GlobalWorldData> GlobalWorldState;
-		public readonly DataObject<WorldRevision, WorldPlayerData> PlayerData;
-		public readonly DataTable<WorldComputerData, WorldRevision> Computers;
-		public readonly DataTable<WorldInternetServiceProviderData, WorldRevision> InternetProviders;
-		public readonly DataTable<WorldLocalNetworkData, WorldRevision> LocalAreaNetworks;
-		public readonly DataTable<WorldNetworkConnection, WorldRevision> NetworkConnections;
-		public readonly DataTable<WorldPortForwardingRule, WorldRevision> PortForwardingRules;
-		public readonly DataTable<WorldCraftedExploitData, WorldRevision> CraftedExploits;
-		public readonly DataTable<WorldHackableData, WorldRevision> Hackables;
-		
-
+		public readonly WorldDataObject<GlobalWorldData> GlobalWorldState;
+		public readonly WorldDataObject<WorldPlayerData> PlayerData;
+		public readonly WorldDataTable<WorldComputerData> Computers;
+		public readonly WorldDataTable<WorldInternetServiceProviderData> InternetProviders;
+		public readonly WorldDataTable<WorldLocalNetworkData> LocalAreaNetworks;
+		public readonly WorldDataTable<WorldNetworkConnection> NetworkConnections;
+		public readonly WorldDataTable<WorldPortForwardingRule> PortForwardingRules;
+		public readonly WorldDataTable<WorldCraftedExploitData> CraftedExploits;
+		public readonly WorldDataTable<WorldHackableData> Hackables;
 
 		public World(UniqueIntGenerator instanceIdGenerator, DataEventDispatcher eventDispatcher)
 		{
-			GlobalWorldState = new DataObject<WorldRevision, GlobalWorldData>(eventDispatcher);
-			PlayerData = new DataObject<WorldRevision, WorldPlayerData>(eventDispatcher);
-			Computers = new DataTable<WorldComputerData, WorldRevision>(instanceIdGenerator, eventDispatcher);
-			InternetProviders = new DataTable<WorldInternetServiceProviderData, WorldRevision>(instanceIdGenerator, eventDispatcher);
-			LocalAreaNetworks = new DataTable<WorldLocalNetworkData, WorldRevision>(instanceIdGenerator, eventDispatcher);
-			NetworkConnections = new DataTable<WorldNetworkConnection, WorldRevision>(instanceIdGenerator, eventDispatcher);
-			PortForwardingRules = new DataTable<WorldPortForwardingRule, WorldRevision>(instanceIdGenerator, eventDispatcher);
-			CraftedExploits = new DataTable<WorldCraftedExploitData, WorldRevision>(instanceIdGenerator, eventDispatcher);
-			Hackables = new DataTable<WorldHackableData, WorldRevision>(instanceIdGenerator, eventDispatcher);
+			GlobalWorldState = new WorldDataObject<GlobalWorldData>(eventDispatcher);
+			PlayerData = new WorldDataObject<WorldPlayerData>(eventDispatcher);
+			Computers = new WorldDataTable<WorldComputerData>(instanceIdGenerator, eventDispatcher);
+			InternetProviders = new WorldDataTable<WorldInternetServiceProviderData>(instanceIdGenerator, eventDispatcher);
+			LocalAreaNetworks = new WorldDataTable<WorldLocalNetworkData>(instanceIdGenerator, eventDispatcher);
+			NetworkConnections = new WorldDataTable<WorldNetworkConnection>(instanceIdGenerator, eventDispatcher);
+			PortForwardingRules = new WorldDataTable<WorldPortForwardingRule>(instanceIdGenerator, eventDispatcher);
+			CraftedExploits = new WorldDataTable<WorldCraftedExploitData>(instanceIdGenerator, eventDispatcher);
+			Hackables = new WorldDataTable<WorldHackableData>(instanceIdGenerator, eventDispatcher);
 			
 		}
 
-		public void Serialize(IRevisionedSerializer<WorldRevision> serializer)
+		public void Serialize(IWorldSerializer serializer)
 		{
 			GlobalWorldState.Serialize(serializer);
 			Computers.Serialize(serializer, WorldRevision.AddedComputers);

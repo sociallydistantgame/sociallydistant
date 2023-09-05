@@ -5,7 +5,9 @@ using UnityEngine.TextCore.LowLevel;
 
 namespace Core.WorldData.Data
 {
-	public struct WorldPortForwardingRule : ISerializable<WorldRevision>, IDataWithId
+	public struct WorldPortForwardingRule : 
+		IWorldData, 
+		IDataWithId
 	{
 		private ObjectId instanceId;
 		private ObjectId lanId;
@@ -45,7 +47,7 @@ namespace Core.WorldData.Data
 		}
 
 		/// <inheritdoc />
-		public void Serialize(IRevisionedSerializer<WorldRevision> serializer)
+		public void Serialize(IWorldSerializer serializer)
 		{
 			SerializationUtility.SerializeAtRevision(ref instanceId, serializer, WorldRevision.AddedPortForwarding, default);
 			SerializationUtility.SerializeAtRevision(ref lanId, serializer, WorldRevision.AddedPortForwarding, default);

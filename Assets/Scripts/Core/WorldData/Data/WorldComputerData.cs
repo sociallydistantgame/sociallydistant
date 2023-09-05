@@ -5,7 +5,9 @@ using Core.Serialization;
 
 namespace Core.WorldData.Data
 {
-	public struct WorldComputerData : ISerializable<WorldRevision>, IDataWithId
+	public struct WorldComputerData : 
+		IWorldData,
+		IDataWithId
 	{
 		private ObjectId id;
 		private string hostname;
@@ -31,7 +33,7 @@ namespace Core.WorldData.Data
 		}
 
 		/// <inheritdoc />
-		public void Serialize(IRevisionedSerializer<WorldRevision> serializer)
+		public void Serialize(IWorldSerializer serializer)
 		{
 			SerializationUtility.SerializeAtRevision(ref id, serializer, WorldRevision.AddedComputers, ObjectId.Invalid);
 			SerializationUtility.SerializeAtRevision(ref hostname, serializer, WorldRevision.AddedComputers, "localhost");
