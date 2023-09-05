@@ -18,6 +18,9 @@ namespace Core
 
         public World World => world;
         public DataCallbacks Callbacks => dataCallbacks;
+
+        /// <inheritdoc />
+        IWorld IWorldManager.World => this.world;
         
         public WorldManager()
         {

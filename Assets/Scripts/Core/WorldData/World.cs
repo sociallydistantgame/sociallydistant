@@ -7,7 +7,7 @@ using Core.WorldData.Data;
 
 namespace Core.WorldData
 {
-	public class World
+	public class World : IWorld
 	{
 		public readonly DataObject<WorldRevision, GlobalWorldData> GlobalWorldState;
 		public readonly DataObject<WorldRevision, WorldPlayerData> PlayerData;
