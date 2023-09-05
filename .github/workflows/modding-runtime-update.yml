@@ -9,7 +9,7 @@ jobs:
         env:
           API_TOKEN_GITHUB: ${{ secrets.AUTOMANAGING_TOKEN }}
         with:
-          source_folder: Packages/com.sociallydistant.framework
+          source_file: Packages/com.sociallydistant.framework
           destination_repo: sociallydistantgame/system-runtime
           user_name: "Socially Distant [bot]"
           user_email: "github-actions-noreply@sociallydistantgame.com"
