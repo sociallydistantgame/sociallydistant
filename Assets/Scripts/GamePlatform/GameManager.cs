@@ -48,6 +48,9 @@ namespace GamePlatform
 		public IContentManager ContentManager => this.contentManager;
 
 		public IInfoPanelService InfoPanelService => this.infoPanelService;
+
+		/// <inheritdoc />
+		public IWorldManager WorldManager => this.worldManager.Value!;
 		
 		private void Awake()
 		{
