@@ -9,7 +9,8 @@ jobs:
       - uses: actions/checkout@master
         with:
           name: sociallydistantgame/system-runtime
-      - run: cd ..;
+      - run: ls; 
+          cd ..;
           mv system-runtime/.git git-temp;
           rm -rf system-runtime/*;
           cp -R Packages/com.sociallydistant.framework/* system-runtime/;
