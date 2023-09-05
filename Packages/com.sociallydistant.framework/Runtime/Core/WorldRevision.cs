@@ -1,4 +1,4 @@
-﻿namespace Core.WorldData
+﻿namespace Core
 {
 	public enum WorldRevision
 	{

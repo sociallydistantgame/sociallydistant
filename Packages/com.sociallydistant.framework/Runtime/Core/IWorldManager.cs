@@ -10,12 +10,4 @@ namespace Core
 		
 		ObjectId GetNextObjectId();
 	}
-
-	/// <summary>
-	///		Represents a Socially Distant world.
-	/// </summary>
-	public interface IWorld
-	{
-		
-	}
 }

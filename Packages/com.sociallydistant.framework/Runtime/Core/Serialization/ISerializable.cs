@@ -10,8 +10,15 @@ namespace Core.Serialization
 	}
 
 #nullable restore
-	public interface ISerializable<TRevision> where TRevision : Enum
+	public interface ISerializable<TRevision, TSerializer> 
+		where TRevision : Enum
+		where TSerializer : IRevisionedSerializer<TRevision>
 	{
-		void Serialize(IRevisionedSerializer<TRevision> serializer);
+		void Serialize(TSerializer serializer);
+	}
+
+	public interface IWorldData : ISerializable<WorldRevision, IWorldSerializer>
+	{
+		
 	}
 }

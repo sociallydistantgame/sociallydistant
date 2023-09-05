@@ -4,7 +4,9 @@ using Core.Serialization;
 
 namespace Core.WorldData.Data
 {
-	public struct WorldInternetServiceProviderData : ISerializable<WorldRevision>, IDataWithId
+	public struct WorldInternetServiceProviderData : 
+		IWorldData, 
+		IDataWithId
 	{
 		private ObjectId instanceId;
 		private string name;
@@ -30,7 +32,7 @@ namespace Core.WorldData.Data
 		}
 		
 		/// <inheritdoc />
-		public void Serialize(IRevisionedSerializer<WorldRevision> serializer)
+		public void Serialize(IWorldSerializer serializer)
 		{
 			SerializationUtility.SerializeAtRevision(ref instanceId, serializer, WorldRevision.AddedInternetServiceProviders, default);
 			SerializationUtility.SerializeAtRevision(ref name, serializer, WorldRevision.AddedInternetServiceProviders, default);

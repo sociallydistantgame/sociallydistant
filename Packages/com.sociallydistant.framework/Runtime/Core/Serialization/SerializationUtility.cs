@@ -5,8 +5,9 @@ namespace Core.Serialization
 {
 	public static class SerializationUtility
 	{
-		public static void SerializeAtRevision<TRevision>(ref sbyte value, IRevisionedSerializer<TRevision> serializer,  TRevision revision, sbyte defaultValue)
+		public static void SerializeAtRevision<TRevision, TSerializer>(ref sbyte value, TSerializer serializer, TRevision revision, sbyte defaultValue)
 			where TRevision : Enum
+			where TSerializer : IRevisionedSerializer<TRevision>
 		{
 			if (serializer.IsReading)
 			{
@@ -20,8 +21,9 @@ namespace Core.Serialization
 			}
 		}
 
-		public static void SerializeAtRevision<TRevision>(ref byte value, IRevisionedSerializer<TRevision> serializer, TRevision revision, byte defaultValue)
+		public static void SerializeAtRevision<TRevision, TSerializer>(ref byte value, TSerializer serializer, TRevision revision, byte defaultValue)
 			where TRevision : Enum
+			where TSerializer : IRevisionedSerializer<TRevision>
 		{
 			if (serializer.IsReading)
 			{
@@ -35,8 +37,9 @@ namespace Core.Serialization
 			}
 		}
 
-		public static void SerializeAtRevision<TRevision>(ref short value, IRevisionedSerializer<TRevision> serializer,  TRevision revision, short defaultValue)
+		public static void SerializeAtRevision<TRevision, TSerializer>(ref short value, TSerializer serializer, TRevision revision, short defaultValue)
 			where TRevision : Enum
+			where TSerializer : IRevisionedSerializer<TRevision>
 		{
 			if (serializer.IsReading)
 			{
@@ -50,8 +53,9 @@ namespace Core.Serialization
 			}
 		}
 
-		public static void SerializeAtRevision<TRevision>(ref ushort value, IRevisionedSerializer<TRevision> serializer, TRevision revision, ushort defaultValue)
+		public static void SerializeAtRevision<TRevision, TSerializer>(ref ushort value, TSerializer serializer, TRevision revision, ushort defaultValue)
 			where TRevision : Enum
+			where TSerializer : IRevisionedSerializer<TRevision>
 		{
 			if (serializer.IsReading)
 			{
@@ -65,8 +69,9 @@ namespace Core.Serialization
 			}
 		}
 
-		public static void SerializeAtRevision<TRevision>(ref int value, IRevisionedSerializer<TRevision> serializer, TRevision revision, int defaultValue)
+		public static void SerializeAtRevision<TRevision, TSerializer>(ref int value, TSerializer serializer, TRevision revision, int defaultValue)
 			where TRevision : Enum
+			where TSerializer : IRevisionedSerializer<TRevision>
 		{
 			if (serializer.IsReading)
 			{
@@ -80,8 +85,9 @@ namespace Core.Serialization
 			}
 		}
 
-		public static void SerializeAtRevision<TRevision>(ref uint value, IRevisionedSerializer<TRevision> serializer, TRevision revision, uint defaultValue)
+		public static void SerializeAtRevision<TRevision, TSerializer>(ref uint value, TSerializer serializer, TRevision revision, uint defaultValue)
 			where TRevision : Enum
+			where TSerializer : IRevisionedSerializer<TRevision>
 		{
 			if (serializer.IsReading)
 			{
@@ -95,8 +101,9 @@ namespace Core.Serialization
 			}
 		}
 
-		public static void SerializeAtRevision<TRevision>(ref long value, IRevisionedSerializer<TRevision> serializer, TRevision revision, long defaultValue)
+		public static void SerializeAtRevision<TRevision, TSerializer>(ref long value, TSerializer serializer, TRevision revision, long defaultValue)
 			where TRevision : Enum
+			where TSerializer : IRevisionedSerializer<TRevision>
 		{
 			if (serializer.IsReading)
 			{
@@ -110,8 +117,9 @@ namespace Core.Serialization
 			}
 		}
 
-		public static void SerializeAtRevision<TRevision>(ref ulong value, IRevisionedSerializer<TRevision> serializer,  TRevision revision, ulong defaultValue)
+		public static void SerializeAtRevision<TRevision, TSerializer>(ref ulong value, TSerializer serializer, TRevision revision, ulong defaultValue)
 			where TRevision : Enum
+			where TSerializer : IRevisionedSerializer<TRevision>
 		{
 			if (serializer.IsReading)
 			{
@@ -125,8 +133,9 @@ namespace Core.Serialization
 			}
 		}
 
-		public static void SerializeAtRevision<TRevision>(ref bool value, IRevisionedSerializer<TRevision> serializer, TRevision revision, bool defaultValue)
+		public static void SerializeAtRevision<TRevision, TSerializer>(ref bool value, TSerializer serializer, TRevision revision, bool defaultValue)
 			where TRevision : Enum
+			where TSerializer : IRevisionedSerializer<TRevision>
 		{
 			if (serializer.IsReading)
 			{
@@ -140,8 +149,9 @@ namespace Core.Serialization
 			}
 		}
 
-		public static void SerializeAtRevision<TRevision>(ref float value, IRevisionedSerializer<TRevision> serializer,  TRevision revision, float defaultValue)
+		public static void SerializeAtRevision<TRevision, TSerializer>(ref float value, TSerializer serializer, TRevision revision, float defaultValue)
 			where TRevision : Enum
+			where TSerializer : IRevisionedSerializer<TRevision>
 		{
 			if (serializer.IsReading)
 			{
@@ -155,8 +165,9 @@ namespace Core.Serialization
 			}
 		}
 
-		public static void SerializeAtRevision<TRevision>(ref double value, IRevisionedSerializer<TRevision> serializer, TRevision revision, double defaultValue)
+		public static void SerializeAtRevision<TRevision, TSerializer>(ref double value, TSerializer serializer, TRevision revision, double defaultValue)
 			where TRevision : Enum
+			where TSerializer : IRevisionedSerializer<TRevision>
 		{
 			if (serializer.IsReading)
 			{
@@ -170,8 +181,9 @@ namespace Core.Serialization
 			}
 		}
 
-		public static void SerializeAtRevision<TRevision>(ref decimal value, IRevisionedSerializer<TRevision> serializer, TRevision revision, decimal defaultValue)
+		public static void SerializeAtRevision<TRevision, TSerializer>(ref decimal value, TSerializer serializer, TRevision revision, decimal defaultValue)
 			where TRevision : Enum
+			where TSerializer : IRevisionedSerializer<TRevision>
 		{
 			if (serializer.IsReading)
 			{
@@ -185,8 +197,9 @@ namespace Core.Serialization
 			}
 		}
 
-		public static void SerializeAtRevision<TRevision>(ref char value, IRevisionedSerializer<TRevision> serializer, TRevision revision, char defaultValue)
+		public static void SerializeAtRevision<TRevision, TSerializer>(ref char value, TSerializer serializer, TRevision revision, char defaultValue)
 			where TRevision : Enum
+			where TSerializer : IRevisionedSerializer<TRevision>
 		{
 			if (serializer.IsReading)
 			{
@@ -200,8 +213,9 @@ namespace Core.Serialization
 			}
 		}
 
-		public static void SerializeAtRevision<TRevision>(ref string value, IRevisionedSerializer<TRevision> serializer, TRevision revision, string defaultValue)
+		public static void SerializeAtRevision<TRevision, TSerializer>(ref string value, TSerializer serializer, TRevision revision, string defaultValue)
 			where TRevision : Enum
+			where TSerializer : IRevisionedSerializer<TRevision>
 		{
 			if (serializer.IsReading)
 			{
@@ -215,9 +229,10 @@ namespace Core.Serialization
 			}
 		}
 
-		public static void SerializeAtRevision<TRevision, TSerializable>(ref TSerializable value, IRevisionedSerializer<TRevision> serializer, TRevision revision)
+		public static void SerializeAtRevision<TRevision, TSerializable, TSerializer>(ref TSerializable value, TSerializer serializer, TRevision revision)
 			where TRevision : Enum
-			where TSerializable : struct, ISerializable<TRevision>
+			where TSerializer : IRevisionedSerializer<TRevision>
+			where TSerializable : struct, ISerializable<TRevision, TSerializer>
 		{
 			if (serializer.IsReading)
 			{
@@ -228,8 +243,9 @@ namespace Core.Serialization
 				value.Serialize(serializer);
 		}
 
-		public static void SerializeAtRevision<TRevision, TSerializable>(ref TSerializable value, IRevisionedSerializer<TRevision> serializer, TRevision revision, TSerializable defaultValue)
+		public static void SerializeAtRevision<TRevision, TSerializable, TSerializer>(ref TSerializable value, TSerializer serializer, TRevision revision, TSerializable defaultValue)
 			where TRevision : Enum
+			where TSerializer : IRevisionedSerializer<TRevision>
 			where TSerializable : struct, ISerializable
 		{
 			if (serializer.IsReading)
@@ -553,7 +569,7 @@ namespace Core.Serialization
 
 		public static bool IgnoreAfterRevision<TRevision, TSerializable>(IRevisionedSerializer<TRevision> serializer, TRevision revision, out TSerializable value)
 			where TRevision : Enum
-			where TSerializable : struct, ISerializable<TRevision>
+			where TSerializable : struct, ISerializable<TRevision, IRevisionedSerializer<TRevision>>
 		{
 			value = default;
 			if (serializer.IsWriting)

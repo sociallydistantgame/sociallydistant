@@ -5,9 +5,10 @@ using Core.Systems;
 
 namespace Core.DataManagement
 {
-	public class DataTable<TDataElement, TRevision> :
-		IWorldTable<TDataElement>
-		where TDataElement : struct, ISerializable<TRevision>, IDataWithId
+	public class DataTable<TDataElement, TRevision, TSerializer> :
+		ISerializableDataTable<TDataElement, TRevision, TSerializer>
+		where TSerializer : IRevisionedSerializer<TRevision>
+		where TDataElement : struct, ISerializable<TRevision, TSerializer>, IDataWithId
 		where TRevision : Enum
 	{
 		private UniqueIntGenerator instanceIdGenerator;
@@ -26,7 +27,7 @@ namespace Core.DataManagement
 			}
 		}
 
-		public DataTable(UniqueIntGenerator instanceIdgenerator, DataEventDispatcher eventDispatcher)
+		protected DataTable(UniqueIntGenerator instanceIdgenerator, DataEventDispatcher eventDispatcher)
 		{
 			this.instanceIdGenerator = instanceIdgenerator;
 			this.eventDispatcher = eventDispatcher;
@@ -76,7 +77,7 @@ namespace Core.DataManagement
 			}
 		}
 		
-		public void Serialize(IRevisionedSerializer<TRevision> serializer, TRevision revision)
+		public void Serialize(TSerializer serializer, TRevision revision)
 		{
 			// How many elements do we have in the data table?
 			int dataCount = dataElements.Count;
@@ -95,7 +96,7 @@ namespace Core.DataManagement
 			}
 		}
 
-		private void Write(IRevisionedSerializer<TRevision> serializer, int dataCount)
+		private void Write(TSerializer serializer, int dataCount)
 		{
 			for (var i = 0; i < dataCount; i++)
 			{
@@ -104,7 +105,7 @@ namespace Core.DataManagement
 			}
 		}
 		
-		private void Read(IRevisionedSerializer<TRevision> serializer, int dataCount)
+		private void Read(TSerializer serializer, int dataCount)
 		{
 			for (var i = 0; i < dataCount; i++)
 			{
