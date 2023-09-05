@@ -10,7 +10,7 @@ jobs:
           API_TOKEN_GITHUB: ${{ secrets.AUTOMANAGING_TOKEN }}
         with:
           source_file: Packages/com.sociallydistant.framework
-          destination_repo: sociallydistantgame/system-runtime
+          destination_repo: 'sociallydistantgame/system-runtime'
           user_name: "Socially Distant [bot]"
           user_email: "github-actions-noreply@sociallydistantgame.com"
           commit_message: "Runtime update [automatic]"
