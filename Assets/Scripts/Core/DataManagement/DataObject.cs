@@ -3,7 +3,9 @@ using Core.Serialization;
 
 namespace Core.DataManagement
 {
-	public class DataObject<TRevision, TDataElement> : ISerializable<TRevision>
+	public class DataObject<TRevision, TDataElement> : 
+		ISerializable<TRevision>,
+		IWorldObject<TDataElement>
 		where TRevision : Enum
 		where TDataElement : struct, ISerializable<TRevision>
 	{
