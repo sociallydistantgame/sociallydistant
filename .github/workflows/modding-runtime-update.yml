@@ -9,15 +9,15 @@ jobs:
       - uses: actions/checkout@master
         with:
           name: sociallydistantgame/system-runtime
-      - run: cd .. \
-          mv system-runtime/.git git-temp \
-          rm -rf system-runtime/* \
-          cp -R Packages/com.sociallydistant.framework/* system-runtime/ \
-          mv git-temp system-runtime/.git \
-          cp .gitignore system-runtime/.gitignore \
-          cd system-runtime \
-          git add . \
-          git commit -m "Runtime update" \
+      - run: cd ..
+          mv system-runtime/.git git-temp
+          rm -rf system-runtime/*
+          cp -R Packages/com.sociallydistant.framework/* system-runtime/
+          mv git-temp system-runtime/.git
+          cp .gitignore system-runtime/.gitignore
+          cd system-runtime
+          git add .
+          git commit -m "Runtime update"
           git push
           
           
