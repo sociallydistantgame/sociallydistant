@@ -5,9 +5,6 @@ namespace Core.DataManagement
 {
 	public class ModifyEvent
 	{
-		public delegate void ModifyCallback<TDataElement>(TDataElement subjectPrevious, TDataElement subjectNew)
-			where TDataElement : struct;
-
 		private Dictionary<Type, List<object>> invocationLists = new Dictionary<Type, List<object>>();
 
 		public void AddCallback<TDataElement>(ModifyCallback<TDataElement> callback)

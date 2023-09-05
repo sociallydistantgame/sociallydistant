@@ -6,6 +6,8 @@ namespace Core
 	{
 		IWorld World { get; }
 		
+		IWorldDataCallbacks Callbacks { get; }
+		
 		ObjectId GetNextObjectId();
 	}
 
