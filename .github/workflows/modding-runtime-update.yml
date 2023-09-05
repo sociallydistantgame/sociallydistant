@@ -10,6 +10,7 @@ jobs:
           repository: sociallydistantgame/system-runtime
           token: ${{ secrets.AUTOMANAGING_TOKEN }}
           path: system-runtime
+          ref: master
       - env:
           AUTOMANAGING_TOKEN: ${{ secrets.AUTOMANAGING_TOKEN }}
         run: |
