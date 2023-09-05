@@ -12,6 +12,7 @@ using Cysharp.Threading.Tasks;
 using GamePlatform.ContentManagement;
 using Modding;
 using Modules;
+using Shell;
 using Shell.InfoPanel;
 using UI.Shell.InfoPanel;
 using UniRx;
