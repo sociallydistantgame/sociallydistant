@@ -118,7 +118,7 @@ namespace Modding
 
 				try
 				{
-					Assembly modAssembly = AppDomain.CurrentDomain.Load(file);
+					Assembly modAssembly = Assembly.LoadFrom(file);
 					
 					// Find all non-abstract GameModule types
 					IEnumerable<Type> types = modAssembly.GetTypes()
