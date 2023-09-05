@@ -8,7 +8,7 @@ jobs:
       - env:
           AUTOMANAGING_TOKEN: ${{ secrets.AUTOMANAGING_TOKEN }}
         run: |
-          git clone "https://x-access-token:$AUTOMANAGING_TOKEN@github.com/sociallydistantgame/system-runtime" system-runtime
+          git clone https://x-access-token:$AUTOMANAGING_TOKEN@github.com/sociallydistantgame/system-runtime system-runtime
           mv system-runtime/.git git-temp
           rm -rf system-runtime/*
           cp -R Packages/com.sociallydistant.framework/* system-runtime/
