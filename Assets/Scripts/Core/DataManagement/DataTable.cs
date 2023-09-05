@@ -5,7 +5,8 @@ using Core.Systems;
 
 namespace Core.DataManagement
 {
-	public class DataTable<TDataElement, TRevision> 
+	public class DataTable<TDataElement, TRevision> :
+		IWorldTable<TDataElement>
 		where TDataElement : struct, ISerializable<TRevision>, IDataWithId
 		where TRevision : Enum
 	{

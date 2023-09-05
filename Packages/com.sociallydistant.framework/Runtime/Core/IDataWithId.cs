@@ -1,4 +1,4 @@
-﻿namespace Core.DataManagement
+﻿namespace Core
 {
 	public interface IDataWithId
 	{
