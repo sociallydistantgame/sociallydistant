@@ -5,6 +5,7 @@ using UI.Popovers;
 using UI.UiHelpers;
 using UnityEngine;
 using UnityEngine.UI;
+using UnityExtensions;
 using Utility;
 
 namespace UI.Shell.TrayActions

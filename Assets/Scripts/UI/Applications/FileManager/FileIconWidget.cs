@@ -7,6 +7,7 @@ using UnityEngine;
 using Utility;
 using OS.FileSystems;
 using UnityEngine.EventSystems;
+using UnityExtensions;
 
 namespace UI.Applications.FileManager
 {

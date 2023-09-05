@@ -7,6 +7,7 @@ using Core.WorldData.Data;
 using GameplaySystems.NonPlayerComputers;
 using Player;
 using UnityEngine;
+using UnityExtensions;
 using Utility;
 
 namespace GameplaySystems.Networld

@@ -3,6 +3,7 @@ using System;
 using GamePlatform;
 using Steamworks;
 using UnityEngine;
+using UnityExtensions;
 using Utility;
 
 namespace GameModes.Career.Scripts.GamePlatform.Steamworks

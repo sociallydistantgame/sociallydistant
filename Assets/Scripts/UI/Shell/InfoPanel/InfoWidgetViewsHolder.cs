@@ -1,5 +1,7 @@
 ﻿#nullable enable
 using Com.TheFallenGames.OSA.Core;
+using Shell.InfoPanel;
+using UnityExtensions;
 using Utility;
 
 namespace UI.Shell.InfoPanel

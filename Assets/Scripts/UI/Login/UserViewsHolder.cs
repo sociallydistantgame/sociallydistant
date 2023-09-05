@@ -3,6 +3,7 @@
 using Com.TheFallenGames.OSA.Core;
 using UI.Widgets;
 using UnityEngine.UI;
+using UnityExtensions;
 using Utility;
 
 namespace UI.Login

@@ -12,6 +12,7 @@ using UI.Terminal.SimpleTerminal.Data;
 using UnityEngine;
 using UnityEngine.Rendering;
 using UnityEngine.UI;
+using UnityExtensions;
 using Utility;
 
 namespace UI.Terminal.SimpleTerminal

@@ -1,8 +1,10 @@
 ﻿#nullable enable
 using System;
 using System.Text;
+using Shell.InfoPanel;
 using TMPro;
 using UnityEngine;
+using UnityExtensions;
 using Utility;
 
 namespace UI.Shell.InfoPanel

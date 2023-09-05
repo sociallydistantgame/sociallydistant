@@ -1,0 +1,13 @@
+﻿{
+  "name": "com.sociallydistant.framework",
+  "version": "1.0.0",
+  "displayName": "Socially Distant Framework",
+  "description": "The core framework of Socially Distant. This package can be used to mod the game by extending it with new scripts using the same core API the game itself is written against.",
+  "author": {
+    "name": "Socially Distant",
+    "url": "https://sociallydistantgame.com/"
+  },
+  "dependencies": {
+    "dev.acidiclight.gui": ">=1.0.0"
+  }
+}

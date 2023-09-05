@@ -7,6 +7,7 @@ using Core.DataManagement;
 using Core.WorldData.Data;
 using OS.FileSystems;
 using UnityEngine;
+using UnityExtensions;
 using Utility;
 
 namespace GameplaySystems.NonPlayerComputers

@@ -2,6 +2,7 @@
 using System;
 using TMPro;
 using UnityEngine;
+using UnityExtensions;
 using Utility;
 
 namespace UI.Widgets

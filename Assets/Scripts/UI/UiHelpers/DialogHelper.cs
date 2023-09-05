@@ -6,6 +6,7 @@ using System.Linq;
 using Player;
 using UI.Windowing;
 using UnityEngine;
+using UnityExtensions;
 using Utility;
 
 namespace UI.UiHelpers

@@ -7,6 +7,7 @@ using UI.Popovers;
 using UI.Widgets;
 using UnityEngine;
 using UnityEngine.UI;
+using UnityExtensions;
 using Utility;
 
 #if UNITY_EDITOR

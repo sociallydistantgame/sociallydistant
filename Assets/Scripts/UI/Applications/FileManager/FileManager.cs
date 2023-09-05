@@ -10,6 +10,7 @@ using OS.FileSystems;
 using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
+using UnityExtensions;
 using Utility;
 
 namespace UI.Applications.FileManager
