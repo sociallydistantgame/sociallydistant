@@ -2,8 +2,8 @@
 using System;
 using System.IO;
 using System.Text;
-using Core.MessageTransport;
 using Core.Serialization.Binary;
+using Networking.MessageTransport;
 using Utility;
 using Random = UnityEngine.Random;
 

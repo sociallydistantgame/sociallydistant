@@ -1,6 +1,6 @@
 ﻿using System.Linq;
 using System.Text;
-using Core.MessageTransport;
+using Networking.MessageTransport;
 using NUnit.Framework;
 
 namespace Tests.EditMode_Tests
