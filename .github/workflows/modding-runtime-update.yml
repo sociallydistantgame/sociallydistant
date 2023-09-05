@@ -13,4 +13,4 @@ jobs:
           destination_repo: sociallydistantgame/system-runtime
           user_name: "Socially Distant [bot]"
           user_email: "github-actions-noreply@sociallydistantgame.com"
-          commit_message: "Runtime update [automatic]""
+          commit_message: "Runtime update [automatic]"
