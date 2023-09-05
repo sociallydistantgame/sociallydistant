@@ -1,4 +1,4 @@
-﻿namespace GameplaySystems.Networld
+﻿namespace Networking
 {
 	public enum PingResult
 	{

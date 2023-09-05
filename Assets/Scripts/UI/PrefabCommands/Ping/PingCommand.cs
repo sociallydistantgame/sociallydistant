@@ -3,6 +3,7 @@ using System;
 using System.Collections;
 using Architecture;
 using GameplaySystems.Networld;
+using Networking;
 using Utility;
 
 namespace UI.PrefabCommands.Netcat

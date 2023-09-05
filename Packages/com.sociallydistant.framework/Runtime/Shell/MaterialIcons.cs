@@ -1,6 +1,6 @@
 ﻿#nullable enable
 
-namespace Utility
+namespace Shell
 {
 	/// <summary>
 	///		Constants representing Unicode codepoints that refer to icons in the
