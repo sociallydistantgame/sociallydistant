@@ -3,6 +3,7 @@ on: [push]
 jobs:
   Update-Modding-Runtime:
     runs-on: ubuntu-latest
+    continue-on-error: true
     steps:
       - uses: actions/checkout@master
       - uses: actions/checkout@master
