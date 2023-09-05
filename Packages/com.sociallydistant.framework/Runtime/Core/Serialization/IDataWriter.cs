@@ -21,10 +21,4 @@ namespace Core.Serialization
 		void Write(char value);
 		void Write(string value);
 	}
-
-	public interface ISerializable
-	{
-		void Write(IDataWriter writer);
-		void Read(IDataReader reader);
-	}
 }
