@@ -1,21 +1,7 @@
 ﻿using System;
 
-namespace GameplaySystems.Networld
+namespace Networking
 {
-	public enum ServerType
-	{
-		Netcat,
-		Shell,
-		FileTransfer,
-		Web,
-		WebSecured,
-		Database,
-		Desktop,
-		GameServer,
-		Email,
-		Chat
-	}
-
 	[Flags]
 	public enum ServerTypeFlags
 	{
