@@ -1,6 +1,7 @@
 ﻿#nullable enable
 using System.Runtime.InteropServices.ComTypes;
 using Core.WorldData;
+using Core.WorldData.Data;
 
 namespace Core
 {
@@ -9,5 +10,14 @@ namespace Core
 	/// </summary>
 	public interface IWorld
 	{
+		IWorldDataObject<GlobalWorldData> GlobalWorldState { get; }
+		IWorldDataObject<WorldPlayerData> PlayerData { get; }
+		IWorldTable<WorldComputerData> Computers { get; }
+		IWorldTable<WorldInternetServiceProviderData> InternetProviders { get; }
+		IWorldTable<WorldLocalNetworkData> LocalAreaNetworks { get; }
+		IWorldTable<WorldNetworkConnection> NetworkConnections { get; }
+		IWorldTable<WorldPortForwardingRule> PortForwardingRules { get; }
+		IWorldTable<WorldCraftedExploitData> CraftedExploits { get; }
+		IWorldTable<WorldHackableData> Hackables { get; }
 	}
 }
