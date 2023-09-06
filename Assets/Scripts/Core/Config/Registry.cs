@@ -4,6 +4,7 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using System.Runtime.CompilerServices;
 using UnityEngine;
 using Application = UnityEngine.Device.Application;
 
@@ -18,6 +19,19 @@ namespace Core.Config
 		
 		public static string GameDataPath => Application.persistentDataPath.Replace('/', Path.DirectorySeparatorChar);
 		public static string RegistryFilePath => Path.Combine(GameDataPath, "settings.json");
+		public static bool IsInitialized => initialized;
+
+		public static void Shutdown()
+		{
+			ThrowIfNotInitialized();
+
+			SaveRegistry();
+			
+			initialized = false;
+
+			currentRegistry.Clear();
+		}
+		
 		public static void Initialize()
 		{
 			ThrowIfInitialized();

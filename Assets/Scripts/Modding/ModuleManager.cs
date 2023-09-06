@@ -7,8 +7,10 @@ using System.Linq;
 using System.Reflection;
 using System.Runtime.CompilerServices;
 using System.Threading.Tasks;
+using Core.Config;
 using GamePlatform;
 using Modules;
+using PlasticGui;
 using UnityEngine;
 
 namespace Modding
@@ -19,10 +21,12 @@ namespace Modding
 		private readonly List<GameModule> allModules = new List<GameModule>();
 		private readonly Dictionary<string, GameModule> moduleIds = new Dictionary<string, GameModule>();
 		private readonly IGameContext gameContext;
+		private readonly ModdingSettings moddingSettings;
 
 		public ModuleManager(IGameContext context)
 		{
 			this.gameContext = context;
+			moddingSettings = this.gameContext.SettingsManager.FindSettings<ModdingSettings>() ?? new ModdingSettings(gameContext.SettingsManager);
 		}
 		
 		internal async Task LocateAllGameModules()
@@ -32,7 +36,9 @@ namespace Modding
 			// Us
 			this.allModules.Add(new SystemModule());
 
-			await Task.Run(LocateMods);
+			// We only locate mod DLLs if the player has accepted the legal waiver that lets us potentially load malware into RAM.
+			if (moddingSettings.AcceptLegalWaiver)
+				await Task.Run(LocateMods);
 
 			await InitializeModules();
 		}
@@ -69,6 +75,20 @@ namespace Modding
 			if (!couldLoadDependencies)
 				return false;
 
+			// If the player hasn't accepted the legal agreement for script mods, make sure we only load modules that have the [IgnoreModdingLegalWaiver] attribute.
+			// This effectively only allows the game to load modules that I wrote.
+			if (!moddingSettings.AcceptLegalWaiver)
+			{
+				Type moduleType = module.GetType();
+
+				IgnoreModdingLegalWaiverAttribute? attribute = moduleType.GetCustomAttributes(false)
+					.OfType<IgnoreModdingLegalWaiverAttribute>()
+					.FirstOrDefault();
+
+				if (attribute == null)
+					return false;
+			}
+			
 			try
 			{
 				await module.Initialize(this.gameContext);

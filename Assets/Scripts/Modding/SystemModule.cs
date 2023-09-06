@@ -2,6 +2,7 @@
 using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
+using Core.Config;
 using GamePlatform.ContentManagement;
 using Modules;
 using Shell;
@@ -13,6 +14,7 @@ namespace Modding
 	/// <summary>
 	///		The system module. This is Socially Distant itself.
 	/// </summary>
+	[IgnoreModdingLegalWaiver]
 	public class SystemModule : GameModule
 	{
 		/// <inheritdoc />
