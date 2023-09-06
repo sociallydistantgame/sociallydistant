@@ -7,6 +7,7 @@ using System.Text;
 using System.Threading.Tasks;
 using ContentManagement;
 using Core;
+using Core.Config;
 using Core.Serialization.Binary;
 using Cysharp.Threading.Tasks;
 using GamePlatform.ContentManagement;
@@ -36,14 +37,16 @@ namespace GamePlatform
 		[SerializeField]
 		private InfoPanelService infoPanelService = null!;
 
+		private GameMode currentGameMode;
+		private SettingsManager settingsManager;
 		private ModuleManager moduleManager;
 		private Subject<GameMode> gameMode = new Subject<GameMode>();
 		private ContentManager contentManager = new ContentManager();
 		private IGameData? currentGameData;
 		private PlayerInfo loadedPlayerInfo;
-		
-		public IObservable<GameMode> GameModeObservable => gameMode;
-		
+
+		public IObservable<GameMode> GameModeObservable { get; private set; }
+
 		public bool IsGameActive => false;
 		public IContentManager ContentManager => this.contentManager;
 
@@ -51,17 +54,34 @@ namespace GamePlatform
 
 		/// <inheritdoc />
 		public IWorldManager WorldManager => this.worldManager.Value!;
+
+		/// <inheritdoc />
+		public ISettingsManager SettingsManager => settingsManager;
 		
 		private void Awake()
 		{
-			// Set up ModuleManager with us as the context
-			this.moduleManager = new ModuleManager(this);
+			GameModeObservable = Observable.Create<GameMode>(observer =>
+			{
+				observer.OnNext(currentGameMode);
+				return gameMode.Subscribe(observer);
+			});
 			
 			// Default to loading
 			SetGameMode(GameMode.Loading);
 			
+			// Initialize the Registry.
+			settingsManager  = new SettingsManager();
+			
+			// Set up ModuleManager with us as the context
+			this.moduleManager = new ModuleManager(this);
+            
 			// Register mandatory content sources with ContentManager
 			contentManager.AddContentSource<LocalGameDataSource>(); // User profiles
+		}
+
+		private void OnDestroy()
+		{
+			settingsManager.Dispose();
 		}
 
 		private async UniTaskVoid Start()
@@ -72,7 +92,7 @@ namespace GamePlatform
 			
 			// Load mods.
 			await moduleManager.LocateAllGameModules();
-            
+			
 			// Initial ContentManager database rebuild.
 			await ContentManager.RefreshContentDatabaseAsync();
 			
@@ -185,7 +205,8 @@ namespace GamePlatform
 
 		private void SetGameMode(GameMode newGameMode)
 		{
-			this.gameMode.OnNext(newGameMode);
+			currentGameMode = newGameMode;
+			this.gameMode.OnNext(currentGameMode);
 		}
 
 		private InitializationFlow GetInitializationFlow()
