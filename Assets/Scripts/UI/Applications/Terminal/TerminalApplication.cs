@@ -1,6 +1,7 @@
 ﻿#nullable enable
 
 using System;
+using System.Threading.Tasks;
 using Architecture;
 using OS.Devices;
 using Shell.Windowing;
@@ -28,6 +29,7 @@ namespace UI.Applications.Terminal
 		private DialogHelper dialogHelper = null!;
 		private bool isWaitingForInput;
 		private bool hasStartedShell;
+		private Task? shellTask;
 
 		private void Awake()
 		{
@@ -36,7 +38,7 @@ namespace UI.Applications.Terminal
 			this.MustGetComponent(out dialogHelper);
 		}
 
-		private void StartShell()
+		private async Task StartShell()
 		{
 			// Start the terminal session, this allows us to receive input
 			// and send characters to it.
@@ -48,29 +50,25 @@ namespace UI.Applications.Terminal
 			// Fork a child process for the shell or specified command-line
 			// application to use.
 			this.shellProcess = this.process.Fork();
-			this.shellProcess.Killed += HandleShellKilled;
 			
 			// TODO: Command-line arguments to specify the shell
 			// Create a shell.
 			this.shell = new InteractiveShell(this);
 			shell.Setup(shellProcess, textConsole);
-		}
 
-		private void HandleShellKilled(ISystemProcess process)
-		{
-			process.Killed -= HandleShellKilled;
-			this.process.Kill();
+			await shell.Run();
 		}
 
 		private void Update()
 		{
-			if (!hasStartedShell)
+			if (shellTask == null)
 			{
-				this.StartShell();
+				shellTask = this.StartShell();
 				hasStartedShell = true;
 			}
-			
-			shell?.Update();
+
+			if (shellTask.IsCompleted)
+				this.process.Kill();
 		}
 
 		/// <inheritdoc />

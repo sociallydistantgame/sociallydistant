@@ -1,5 +1,5 @@
 ﻿#nullable enable
-namespace GamePlatform
+namespace Core
 {
 	public enum GameMode
 	{

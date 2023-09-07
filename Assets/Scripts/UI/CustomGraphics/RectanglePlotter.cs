@@ -81,18 +81,44 @@ namespace UI.CustomGraphics
 
 		private void RenderDefaultGraphic(VertexHelper vh)
 		{
-			Color32 old = this.color;
 			if (!this.renderDefaultGraphic)
 			{
-				this.color = new Color32(0, 0, 0, 0);
+				Rect rect = this.GetPixelAdjustedRect();
+				
+				var max = new Vector2(rect.xMax, rect.yMax);
+				var min = new Vector2(rect.xMin, rect.yMin);
+
+				max.x /= rect.width;
+				max.y /= rect.height;
+
+				min.x /= rect.width;
+				min.y /= rect.height;
+
+				Vector2 pivot = this.rectTransform.pivot;
+
+				max -= pivot;
+				min -= pivot;
+
+				max.x *= rect.width;
+				min.x *= rect.width;
+
+				max.y *= rect.height;
+				min.y *= rect.height;
+				
+				int vertOffset = vh.currentVertCount;
+				
+				vh.AddVert(new Vector2(min.x, min.y), default, Vector4.zero);
+				vh.AddVert(new Vector2(max.x, min.y), default, Vector4.zero);
+				vh.AddVert(new Vector2(min.x, max.y), default, Vector4.zero);
+				vh.AddVert(new Vector2(max.x, max.y), default, Vector4.zero);
+				
+				vh.AddTriangle(vertOffset, vertOffset + 1, vertOffset + 2);
+				vh.AddTriangle(vertOffset + 2, vertOffset + 3, vertOffset + 1);
+				
+				return;
 			}
 			
 			base.OnPopulateMesh(vh);
-
-			if (!renderDefaultGraphic)
-			{
-				this.color = old;
-			}
 		}
 
 		public void Refresh()

@@ -2,6 +2,7 @@
 using ContentManagement;
 using Core;
 using Core.Config;
+using OS;
 using Shell;
 using Shell.InfoPanel;
 
@@ -12,6 +13,18 @@ namespace Modules
 	/// </summary>
 	public interface IGameContext
 	{
+		GameMode CurrentGameMode { get; }
+		
+		/// <summary>
+		///		Gets a reference to the player kernel.
+		/// </summary>
+		IKernel Kernel { get; }
+		
+		/// <summary>
+		///		Gets a reference to the game's UI manager.
+		/// </summary>
+		IShellContext Shell { get; }
+		
 		/// <summary>
 		///		Gets an instance of the ContentManager.
 		/// </summary>

@@ -6,6 +6,7 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Text;
+using System.Threading.Tasks;
 using Architecture;
 using Core;
 using OS.Devices;
@@ -73,16 +74,7 @@ namespace UI.Shell
 			string shrcPath = PathUtility.Combine(homeFolder, ".shrc");
 			if (!vfs.FileExists(shrcPath))
 				return;
-
-			string shrcScriptText = vfs.ReadAllText(shrcPath);
-
-			foreach (string line in shrcScriptText.Split('\n'))
-			{
-				this.lineBuilder.Length = 0;
-				this.lineBuilder.Append(line);
-				ProcessTokens();
-			}
-
+            
 			shellState = ShellState.Executing;
 		}
 
@@ -116,9 +108,47 @@ namespace UI.Shell
 				}
 			}
 		}
+
+		private async Task<string> ReadLineFromConsole()
+		{
+			if (consoleDevice == null)
+				return string.Empty;
+
+			string text;
+			
+			while (!consoleDevice.TryDequeueSubmittedInput(out text))
+				await Task.Yield();
+
+			return text;
+		}
+		
+		private async Task<string> ReadLine()
+		{
+			var hasFullLine = false;
+			var tempTokenList = new List<string>();
+
+			while (!hasFullLine)
+			{
+				tempTokenList.Clear();
+				
+				string text = await ReadLineFromConsole();
+
+				lineBuilder.Append(text);
+
+				hasFullLine = ShellUtility.SimpleTokenize(lineBuilder, tempTokenList);
+
+				if (!hasFullLine)
+				{
+					lineBuilder.AppendLine();
+					consoleDevice?.WriteText(" --> ");
+				}
+			}
+
+			return lineBuilder.ToString();
+		} 
 		
 		/// <inheritdoc />
-		public void Update()
+		public async Task Run()
 		{
 			if (process == null)
 				return;
@@ -129,97 +159,37 @@ namespace UI.Shell
 			if (!initialized)
 				return;
 
-			// Probably a better way of handling errors but I'm not ready to find it yet.
-			// This is open-source for a reason, though.
-			// - Michael
-			try
+			while (process.IsAlive)
 			{
-				switch (shellState)
+				lineBuilder.Length = 0;
+				
+				UpdateCommandCompletions();
+				
+				WritePrompt();
+				string nextLineToExecute = await ReadLine();
+
+				if (string.IsNullOrWhiteSpace(nextLineToExecute))
+					continue;
+				
+				ProcessTokens(nextLineToExecute);
+
+				while (pendingInstructions.Count > 0)
 				{
-					case ShellState.Init:
+					ShellInstruction? nextInstruction = pendingInstructions.Dequeue();
+
+					try
 					{
-						UpdateCommandCompletions();
-						WritePrompt();
-						lineBuilder.Length = 0;
-						shellState = shellState = ShellState.Reading;
-						break;
+						await nextInstruction.RunAsync(this.process, this.consoleDevice);
 					}
-					case ShellState.Reading:
+					catch (Exception ex)
 					{
-						if (consoleDevice.TryDequeueSubmittedInput(out string nextLine))
-						{
-							lineBuilder.Append(nextLine);
-							shellState = ShellState.Processing;
-						}
-
-						break;
-					}
-					case ShellState.Processing:
-					{
-						// Clear the token list
-						tokenList.Clear();
-
-						// Tokenize the current input.
-						bool shouldExecute = ShellUtility.SimpleTokenize(lineBuilder, tokenList);
-
-						if (!shouldExecute)
-						{
-							lineBuilder.AppendLine();
-							consoleDevice.WriteText(" --> ");
-							shellState = ShellState.Reading;
-						}
-						else
-						{
-							ProcessTokens();
-
-							shellState = ShellState.Executing;
-						}
-
-						break;
-					}
-					case ShellState.Executing:
-					{
-						if (currentInstruction != null)
-						{
-							currentInstruction.Update();
-							if (!currentInstruction.IsComplete)
-								return;
-
-							currentInstruction = null;
-						}
-
-						if (pendingInstructions.Count > 0)
-						{
-							currentInstruction = pendingInstructions.Dequeue();
-							currentInstruction.Begin(this.process, this.consoleDevice);
-							return;
-						}
-
-						shellState = ShellState.Init;
-						break;
+						// log the full error to Unity
+						Debug.LogException(ex);
+						
+						// Log a partial error to the console
+						this.consoleDevice.WriteText(ex.Message + Environment.NewLine);
 					}
 				}
-			}
-			catch (Exception sex) // get your mind out of the gutter, it stands for "shell exception"
-			{
-				// stop execution of any current instruction
-				// and any child process
-				foreach (ISystemProcess childProcess in this.process.Children.ToArray())
-					childProcess.Kill();
-
-				currentInstruction = null;
-				
-				// clear pending instructions
-				pendingInstructions.Clear();
-				
-				// reinit the shell
-				shellState = ShellState.Init;
-				
-				// log the full error to Unity
-				Debug.LogException(sex);
-				
-				// Log a partial error to the console
-				this.consoleDevice.WriteText(sex.Message + Environment.NewLine);
 			}
 		}
 
@@ -228,8 +198,10 @@ namespace UI.Shell
 			return this.process?.Environment[name] ?? name;
 		}
 
-		private void ProcessTokens()
+		private void ProcessTokens(string nextLineToExecute)
 		{
+			var sb = new StringBuilder(nextLineToExecute);
+			
 			// The first tokenization pass we do, before executing this function,
 			// only deals with quotes and escape sequences. It also ignores comments,
 			// but it has no concept of the actual syntax of the shell language.
@@ -237,7 +209,7 @@ namespace UI.Shell
 			// As such, we must do a more advanced tokenization of the raw input.
 			
 			// So let's do it.
-			IEnumerable<ShellToken>? typedTokens = ShellUtility.IdentifyTokens(this.lineBuilder);
+			IEnumerable<ShellToken>? typedTokens = ShellUtility.IdentifyTokens(sb);
 			
 			// Create a view over this array that we can advance during parsing
 			var view = new ArrayView<ShellToken>(typedTokens.ToArray());
@@ -675,6 +647,8 @@ namespace UI.Shell
 
 			public abstract void Update();
 			public abstract void Begin(ISystemProcess process, ITextConsole consoleDevice);
+
+			public abstract Task RunAsync(ISystemProcess process, ITextConsole console);
 		}
 
 		public sealed class ParallelInstruction : ShellInstruction
@@ -698,6 +672,12 @@ namespace UI.Shell
 			{
 				first.Begin(process, consoleDevice);
 				next.Begin(process, consoleDevice);
+			}
+
+			/// <inheritdoc />
+			public override async Task RunAsync(ISystemProcess process, ITextConsole console)
+			{
+				await Task.WhenAll(first.RunAsync(process, console), next.RunAsync(process, console));
 			}
 
 			/// <inheritdoc />
@@ -736,6 +716,11 @@ namespace UI.Shell
 			/// <inheritdoc />
 			public override void Begin(ISystemProcess process, ITextConsole consoleDevice)
 			{
+			}
+
+			/// <inheritdoc />
+			public override async Task RunAsync(ISystemProcess process, ITextConsole console)
+			{
 				shellProcess = process;
 				
 				// Pipe instructions are weird.
@@ -767,22 +752,34 @@ namespace UI.Shell
 					if (pipeOut is PipeInstruction pipeInstruction)
 					{
 						// first command goes to our line list
-						pipeInConsole = new RedirectedConsole(consoleDevice, lineList);
+						pipeInConsole = new RedirectedConsole(console, lineList);
 						
 						// second command goes to whatever our output pipe says.
-						pipeOutConsole = pipeInstruction.CreateSlavePipe(lineList, consoleDevice);
+						pipeOutConsole = pipeInstruction.CreateSlavePipe(lineList, console);
 					}
 
 					// anything else
 					else
 					{
 						// redirect first command output into the line list
-						pipeInConsole = new RedirectedConsole(consoleDevice, lineList);
+						pipeInConsole = new RedirectedConsole(console, lineList);
 						
 						// redirect second command input to the line list
-						pipeOutConsole = new RedirectedConsole(lineList, consoleDevice);
+						pipeOutConsole = new RedirectedConsole(lineList, console);
 					}
 				}
+				
+				if (shellProcess == null)
+					return;
+				
+				if (pipeInConsole == null)
+					return;
+
+				if (pipeOutConsole == null)
+					return;
+
+				await pipeIn.RunAsync(shellProcess, pipeInConsole);
+				await pipeOut.RunAsync(shellProcess, pipeOutConsole);
 			}
 
 			private ITextConsole CreateSlavePipe(ITextConsole input, ITextConsole masterOutput)
@@ -806,32 +803,6 @@ namespace UI.Shell
 			/// <inheritdoc />
 			public override void Update()
 			{
-				if (shellProcess == null)
-					return;
-				
-				if (pipeInConsole == null)
-					return;
-
-				if (pipeOutConsole == null)
-					return;
-				
-				if (!hasInputStarted)
-				{
-					pipeIn.Begin(shellProcess, pipeInConsole);
-					hasInputStarted = true;
-				}
-
-				if (hasInputStarted)
-					pipeIn.Update();
-
-				if (pipeIn.IsComplete && !hasOutputStarted)
-				{
-					hasOutputStarted = true;
-					pipeOut.Begin(shellProcess, pipeOutConsole);
-				}
-
-				if (hasOutputStarted)
-					pipeOut.Update();
 			}
 		}
 
@@ -857,6 +828,15 @@ namespace UI.Shell
 				this.shellProcess = process;
 				this.console = consoleDevice;
 				this.currentInstruction = 0;
+			}
+
+			/// <inheritdoc />
+			public override async Task RunAsync(ISystemProcess process, ITextConsole console)
+			{
+				foreach (ShellInstruction instruction in instructions)
+				{
+					await instruction.RunAsync(process, console);
+				}
 			}
 
 			/// <inheritdoc />
@@ -913,6 +893,15 @@ namespace UI.Shell
 			}
 
 			/// <inheritdoc />
+			public override async Task RunAsync(ISystemProcess process, ITextConsole console)
+			{
+				this.currentCommandProcess = command.SpawnCommandProcess(process, console);
+
+				while (currentCommandProcess != null && currentCommandProcess.IsAlive)
+					await Task.Yield();
+			}
+
+			/// <inheritdoc />
 			public override void Update()
 			{
 				if (IsComplete)
@@ -926,8 +915,7 @@ namespace UI.Shell
 				
 				if (waiting)
 					return;
-
-				this.currentCommandProcess = command.SpawnCommandProcess(shellProcess, console);
+                
 				if (this.currentCommandProcess == null)
 				{
 					isCompleted = true;

@@ -7,11 +7,13 @@ using System.Linq;
 using System.Reflection;
 using System.Runtime.CompilerServices;
 using System.Threading.Tasks;
+using Core;
 using Core.Config;
 using GamePlatform;
 using Modules;
 using PlasticGui;
 using UnityEngine;
+using UniRx;
 
 namespace Modding
 {
@@ -22,11 +24,15 @@ namespace Modding
 		private readonly Dictionary<string, GameModule> moduleIds = new Dictionary<string, GameModule>();
 		private readonly IGameContext gameContext;
 		private readonly ModdingSettings moddingSettings;
+		private readonly IDisposable gameModeObserver;
 
-		public ModuleManager(IGameContext context)
+		private GameMode gameMode;
+		
+		public ModuleManager(GameManager context)
 		{
 			this.gameContext = context;
 			moddingSettings = this.gameContext.SettingsManager.FindSettings<ModdingSettings>() ?? new ModdingSettings(gameContext.SettingsManager);
+			this.gameModeObserver = context.GameModeObservable.Subscribe(OnGameModeChanged);
 		}
 		
 		internal async Task LocateAllGameModules()
@@ -59,6 +65,8 @@ namespace Modding
 
 			allModules.Clear();
 			moduleIds.Clear();
+
+			gameModeObserver.Dispose();
 		}
 		
 		private async Task InitializeModules()
@@ -165,6 +173,19 @@ namespace Modding
 					Debug.LogError("Cannot load mod at path " + file);
 					Debug.LogException(ex);
 				}
+			}
+		}
+
+		private void OnGameModeChanged(GameMode gameMode)
+		{
+			this.gameMode = gameMode;
+
+			foreach (GameModule module in allModules)
+			{
+				if (!module.IsInitialized)
+					continue;
+				
+				module.OnGameModeChanged(gameMode);
 			}
 		}
 	}

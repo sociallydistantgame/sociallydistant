@@ -1,4 +1,5 @@
 ﻿#nullable enable
+using System.Threading.Tasks;
 using OS.Devices;
 
 namespace UI.Shell
@@ -8,6 +9,7 @@ namespace UI.Shell
 		bool IsExecutionHalted { get; }
 		
 		void Setup(ISystemProcess process, ITextConsole consoleDevice);
-		void Update();
+
+		Task Run();
 	}
 }
