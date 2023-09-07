@@ -4,6 +4,7 @@ using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Text;
+using System.Threading.Tasks;
 using Architecture;
 using GameplaySystems.Networld;
 using OS.Network;
@@ -14,7 +15,7 @@ namespace UI.PrefabCommands.Netcat
 	public class NetcatCommand : CommandScript
 	{
 		/// <inheritdoc />
-		protected override void OnMain()
+		protected override async Task OnMain()
 		{
 			
 		}

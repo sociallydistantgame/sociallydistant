@@ -8,6 +8,8 @@ using UnityEngine;
 using Utility;
 using OS.FileSystems;
 using Shell;
+using Shell.Common;
+using UI.Shell.Common;
 using UnityEngine.EventSystems;
 using UnityExtensions;
 
@@ -49,7 +51,7 @@ namespace UI.Applications.FileManager
 			{
 				this.icon.Icon = new CompositeIcon
 				{
-					iconColor = Color.white,
+					iconColor = Color.white.ToShellColor(),
 					textIcon = MaterialIcons.Folder
 				};
 			}
@@ -57,7 +59,7 @@ namespace UI.Applications.FileManager
 			{
 				this.icon.Icon = new CompositeIcon
 				{
-					iconColor = Color.white,
+					iconColor = Color.white.ToShellColor(),
 					textIcon = MaterialIcons.AudioFile
 				};
 			}

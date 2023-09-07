@@ -1,6 +1,8 @@
 ﻿#nullable enable
 using Core;
 using OS.Devices;
+using Shell.Common;
+using Shell.Windowing;
 using UI.Shell;
 using UI.Windowing;
 using UnityEngine;

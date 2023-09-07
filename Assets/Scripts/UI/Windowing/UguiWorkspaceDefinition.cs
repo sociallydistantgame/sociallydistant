@@ -1,4 +1,6 @@
-﻿using Architecture;
+﻿using System.Collections.Generic;
+using Architecture;
+using Shell.Windowing;
 using UnityEngine;
 
 namespace UI.Windowing
@@ -7,12 +9,13 @@ namespace UI.Windowing
 	{
 		private readonly RectTransform workspaceArea;
 		private readonly UguiWindow windowPrefab;
+		private readonly ObservableList<IWindow> windows = new ObservableList<IWindow>();
 		
 		/// <inheritdoc />
 		public string Name { get; set; }
 
 		/// <inheritdoc />
-		public ObservableList<IWindow> WindowList { get; private set; } = new ObservableList<IWindow>();
+		public IReadOnlyList<IWindow> WindowList => windows;
 
 		/// <inheritdoc />
 		public UguiWindow CreateWindow(string title, RectTransform client)
@@ -24,7 +27,7 @@ namespace UI.Windowing
 			if (client != null)
 				newWindow.SetClient(client);
 
-			this.WindowList.Add(newWindow);
+			this.windows.Add(newWindow);
 			newWindow.WindowClosed += HandleWindowClosed;
 
 			return newWindow;
@@ -38,7 +41,7 @@ namespace UI.Windowing
 		private void HandleWindowClosed(IWindow win)
 		{
 			win.WindowClosed -= HandleWindowClosed;
-			this.WindowList.Remove(win);
+			this.windows.Remove(win);
 		}
 
 		public UguiWorkspaceDefinition(RectTransform workspaceArea, UguiWindow windowPrefab)

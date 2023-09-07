@@ -8,19 +8,39 @@ namespace Architecture
 {
 	public class ObservableList<T> :
 		IReadOnlyObservableList<T>,
-		ICollection<T>
+		IList<T>
 	{
 		private readonly List<T> underlyingList = new List<T>();
 
 		public event Action<T>? ItemAdded;
 		public event Action<T>? ItemRemoved;
 
-	
+
+		/// <inheritdoc />
+		public int IndexOf(T item)
+		{
+			return this.underlyingList.IndexOf(item);
+		}
+
+		/// <inheritdoc />
+		public void Insert(int index, T item)
+		{
+			throw new NotImplementedException();
+		}
+
+		/// <inheritdoc />
+		public void RemoveAt(int index)
+		{
+			throw new NotImplementedException();
+		}
+
+		/// <inheritdoc />
 		public T this[int index]
 		{
 			get => this.underlyingList[index];
+			set => throw new NotImplementedException();
 		}
-		
+
 		/// <inheritdoc />
 		public IEnumerator<T> GetEnumerator()
 		{

@@ -3,9 +3,14 @@
 using System;
 using System.Text.RegularExpressions;
 using Architecture;
+using Shell.Common;
 using TMPro;
+using UI.PlayerUI;
+using UI.Themes;
 using UnityEngine;
 using UnityEngine.UI;
+using UnityExtensions;
+using Shell;
 
 #if UNITY_EDITOR
 using UnityEditor;
@@ -25,6 +30,14 @@ namespace UI.Widgets
 
 		[SerializeField]
 		private Image? spriteIcon;
+
+		private UiManager uiManager = null!;
+
+		private void Awake()
+		{
+			this.AssertAllFieldsAreSerialized(typeof(CompositeIconWidget));
+			this.MustGetComponentInParent(out uiManager);
+		}
 
 		public CompositeIcon Icon
 		{
@@ -53,7 +66,7 @@ namespace UI.Widgets
 
 				if (spriteIcon != null)
 				{
-					spriteIcon.color = icon.iconColor;
+					spriteIcon.color = uiManager.ThemeService.GetColor(icon.iconColor).AsUnityColor();
 					spriteIcon.sprite = icon.spriteIcon;
 				}
 			}
@@ -61,7 +74,7 @@ namespace UI.Widgets
 			{
 				if (textIcon != null)
 				{
-					textIcon.color = icon.iconColor;
+					textIcon.color = uiManager.ThemeService.GetColor(icon.iconColor).AsUnityColor();
 					textIcon.SetText(Regex.Unescape(icon.textIcon));
 				}
 

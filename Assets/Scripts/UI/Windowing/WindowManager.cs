@@ -2,6 +2,7 @@
 
 using System.Collections.Generic;
 using Architecture;
+using Shell.Windowing;
 using UnityEngine;
 using UnityExtensions;
 using Utility;
@@ -11,6 +12,7 @@ namespace UI.Windowing
 	public class WindowManager : MonoBehaviour, IWindowManager<UguiWorkspaceDefinition, RectTransform>
 	{
 		private UguiWorkspaceDefinition fallbackWorkspace = null!;
+		private ObservableList<UguiWorkspaceDefinition> workspaces = new ObservableList<UguiWorkspaceDefinition>();
 		
 		[Header("Configuration")]
 		[SerializeField]
@@ -22,9 +24,9 @@ namespace UI.Windowing
 
 		[SerializeField]
 		private UguiMessageDialog messageDialogPrefab = null!;
-		
+
 		/// <inheritdoc />
-		public ObservableList<UguiWorkspaceDefinition> WorkspaceList { get; private set; } = new ObservableList<UguiWorkspaceDefinition>();
+		public IReadOnlyList<UguiWorkspaceDefinition> WorkspaceList => workspaces;
 
 		public UguiWorkspaceDefinition FallbackWorkspace => fallbackWorkspace;
 		
@@ -41,7 +43,7 @@ namespace UI.Windowing
 				creationParams = fallbackWorkspaceArea;
 
 			var workspace = new UguiWorkspaceDefinition(creationParams, windowPrefab);
-			this.WorkspaceList.Add(workspace);
+			this.workspaces.Add(workspace);
 
 			return workspace;
 		}

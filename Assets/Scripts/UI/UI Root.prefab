@@ -92,6 +92,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   gameManager: {fileID: 11400000, guid: 872374c25807361459f4e174bb460b2c, type: 2}
+  themeService: {fileID: 11400000, guid: 0261859824a581e40a24f72973b52394, type: 2}
   characterCreatorPrefab: {fileID: 2089658602290510733, guid: a5aceb7c7bd7f044ea19c9dfb04f2556, type: 3}
   desktopPrefab: {fileID: 94841126449236779, guid: 2d3bebba157bed94fa6fe837f5cbd2b8, type: 3}
   backdropPrefab: {fileID: 1876961014414637132, guid: 437971ffa9ad15844ab503f02119cf2b, type: 3}

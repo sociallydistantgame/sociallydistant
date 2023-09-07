@@ -1,4 +1,5 @@
 ﻿#nullable enable
+using System.Threading.Tasks;
 using GameplaySystems.Networld;
 using OS.Devices;
 using OS.FileSystems;
@@ -25,7 +26,7 @@ namespace Architecture
 		protected string CurrentWorkingDirectory => process.WorkingDirectory;
 		
 		/// <inheritdoc />
-		public override void Main(ISystemProcess process, ITextConsole console, string[] arguments)
+		public override async Task Main(ISystemProcess process, ITextConsole console, string[] arguments)
 		{
 			this.process = process;
 			

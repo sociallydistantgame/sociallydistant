@@ -1,5 +1,5 @@
 ﻿#nullable enable
-namespace UI.Windowing
+namespace Shell.Windowing
 {
 	public interface IClientWorkspaceDefinition<TWindowWithClient, TWindowClient> : IWorkspaceDefinition
 		where TWindowWithClient : IWindowWithClient<TWindowClient>, IWindow

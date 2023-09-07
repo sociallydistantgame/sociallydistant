@@ -1,4 +1,4 @@
-﻿namespace UI.Windowing
+﻿namespace Shell.Windowing
 {
 	public enum WindowState
 	{

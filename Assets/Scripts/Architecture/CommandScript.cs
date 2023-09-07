@@ -2,6 +2,7 @@
 
 using System;
 using System.Diagnostics;
+using System.Threading.Tasks;
 using GameplaySystems.Networld;
 using OS.Devices;
 using OS.Tasks;
@@ -32,7 +33,7 @@ namespace Architecture
 		public string ProcessName => proc.Name;
 		
 		/// <inheritdoc />
-		public void Main(ISystemProcess process, ITextConsole console, string[] arguments)
+		public async Task Main(ISystemProcess process, ITextConsole console, string[] arguments)
 		{
 			// Prevents stupid people from running this
 			if (mainGuard)
@@ -47,7 +48,7 @@ namespace Architecture
 
 			proc.Killed += HandleProcessKilled;
 
-			OnMain();
+			await OnMain();
 		}
 
 		private void HandleProcessKilled(ISystemProcess obj)
@@ -62,8 +63,9 @@ namespace Architecture
 			proc?.Kill();
 		}
 
-		protected virtual void OnMain()
+		protected virtual Task OnMain()
 		{
+			return Task.CompletedTask;
 		}
 
 		protected void EndProcess()

@@ -1,13 +1,13 @@
 ﻿#nullable enable
 
-using Architecture;
+using System.Collections.Generic;
 
-namespace UI.Windowing
+namespace Shell.Windowing
 {
 	public interface IWindowManager<TWorkspace, TWorkspaceCreationParameters>
 		where TWorkspace : IWorkspaceDefinition
 	{
-		ObservableList<TWorkspace> WorkspaceList { get; }
+		IReadOnlyList<TWorkspace> WorkspaceList { get; }
 		
 		TWorkspace FallbackWorkspace { get; }
 

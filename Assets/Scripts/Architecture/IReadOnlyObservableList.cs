@@ -5,7 +5,7 @@ using System;
 
 namespace Architecture
 {
-	public interface IReadOnlyObservableList<T> : IEnumerable<T>
+	public interface IReadOnlyObservableList<T> : IReadOnlyList<T>
 	{
 		event Action<T>? ItemAdded;
 		event Action<T>? ItemRemoved;

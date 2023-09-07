@@ -1,9 +1,9 @@
 ﻿#nullable enable
 
 using System;
-using Architecture;
+using System.Collections.Generic;
 
-namespace UI.Windowing
+namespace Shell.Windowing
 {
 	public interface IMessageDialog : ICloseable
 	{
@@ -11,7 +11,7 @@ namespace UI.Windowing
 		string Message { get; set; }
 		MessageDialogIcon Icon { get; set; }
 
-		ObservableList<MessageBoxButtonData> Buttons { get; }
+		IList<MessageBoxButtonData> Buttons { get; }
 
 		event Action<int>? ButtonPressed; 
 

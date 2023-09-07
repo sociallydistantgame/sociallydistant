@@ -2,11 +2,13 @@
 
 using System;
 using GamePlatform;
+using Shell;
 using UI.Backdrop;
 using UI.CharacterCreator;
 using UI.Login;
 using UI.Popovers;
 using UI.Shell;
+using UI.Themes;
 using UI.Windowing;
 using UnityEngine;
 using Utility;
@@ -21,6 +23,9 @@ namespace UI.PlayerUI
 		[SerializeField]
 		private GameManagerHolder gameManager = null!;
 
+		[SerializeField]
+		private ThemeService themeService = null!;
+		
 		[Header("Prefabs")]
 		[SerializeField]
 		private GameObject characterCreatorPrefab = null!;
@@ -39,13 +44,14 @@ namespace UI.PlayerUI
 
 		[SerializeField]
 		private GameObject popoverLayerPrefab = null!;
-
+        
 		private WindowManager windowManager = null!;
 		private PopoverLayer popoverLayer = null!;
 		private BackdropController backdrop = null!;
 		private GameMode gameMode;
 		private IDisposable? gameModeObserver;
 
+		public IThemeService ThemeService => themeService;
 		public BackdropController Backdrop => backdrop;
 		public PopoverLayer PopoverLayer => popoverLayer;
 		public WindowManager WindowManager => windowManager;

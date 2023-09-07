@@ -2,6 +2,8 @@
 using System;
 using System.Collections.Generic;
 using Architecture;
+using Shell.Common;
+using Shell.Windowing;
 using TMPro;
 using UI.Widgets;
 using UnityEngine;
