@@ -1,5 +1,5 @@
 ﻿#nullable enable
-namespace UI.Windowing
+namespace Shell.Windowing
 {
 	public struct MessageBoxButtonData
 	{

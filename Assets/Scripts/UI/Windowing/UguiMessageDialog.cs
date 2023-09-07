@@ -2,6 +2,7 @@
 using System;
 using System.Collections.Generic;
 using Architecture;
+using Shell.Windowing;
 using TMPro;
 using UI.Widgets;
 using UnityEngine;
@@ -69,7 +70,7 @@ namespace UI.Windowing
 		}
 
 		/// <inheritdoc />
-		public ObservableList<MessageBoxButtonData> Buttons => buttonsList;
+		public IList<MessageBoxButtonData> Buttons => buttonsList;
 
 		/// <inheritdoc />
 		public event Action<int>? ButtonPressed;

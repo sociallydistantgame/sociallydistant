@@ -1,4 +1,5 @@
 ﻿using OS.Devices;
+using Shell.Windowing;
 using UI.Windowing;
 
 namespace UI.Shell

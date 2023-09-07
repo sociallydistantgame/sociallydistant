@@ -1,9 +1,9 @@
 ﻿#nullable enable
 using System;
-using Architecture;
+using Shell.Common;
 using UnityEngine;
 
-namespace UI.Windowing
+namespace Shell.Windowing
 {
 	public interface IWindow : ICloseable
 	{

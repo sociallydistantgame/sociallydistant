@@ -3,6 +3,7 @@ using Core;
 using OS.Devices;
 using OS.Tasks;
 using UnityEngine;
+using System.Threading.Tasks;
 
 namespace Architecture
 {
@@ -18,6 +19,6 @@ namespace Architecture
 		public string Name => binaryName;
 
 		/// <inheritdoc />
-		public abstract void Main(ISystemProcess process, ITextConsole console, string[] arguments);
+		public abstract Task Main(ISystemProcess process, ITextConsole console, string[] arguments);
 	}
 }

@@ -1,12 +1,12 @@
-﻿using Architecture;
+﻿using System.Collections.Generic;
 
-namespace UI.Windowing
+namespace Shell.Windowing
 {
 	public interface IWorkspaceDefinition
 	{
 		string Name { get; set; }
 		
-		ObservableList<IWindow> WindowList { get; }
+		IReadOnlyList<IWindow> WindowList { get; }
 
 		IWindow CreateWindow(string title);
 	}

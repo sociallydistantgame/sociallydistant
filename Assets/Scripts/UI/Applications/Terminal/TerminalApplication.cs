@@ -3,6 +3,7 @@
 using System;
 using Architecture;
 using OS.Devices;
+using Shell.Windowing;
 using UI.Shell;
 using UI.Terminal.SimpleTerminal;
 using UI.UiHelpers;
