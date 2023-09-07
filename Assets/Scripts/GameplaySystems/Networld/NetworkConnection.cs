@@ -1,14 +1,14 @@
 ﻿using System;
 using System.Collections;
 using System.Collections.Generic;
-using Networking;
 using OS.Network;
 using UnityEngine;
 using Utility;
 
 namespace GameplaySystems.Networld
 {
-	public class NetworkConnection : INetworkInterfaceEnumerator
+	public class NetworkConnection : 
+		INetworkConnection
 	{
 		private DeviceNode deviceNode;
 		private const ushort MaximumOutboundConnections = 1024;
@@ -105,7 +105,7 @@ namespace GameplaySystems.Networld
 			return listener;
 		}
 		
-		public Listener Listen(ushort port, ServerType serverType = ServerType.Netcat, SecurityLevel secLevel = SecurityLevel.Open)
+		public IListener Listen(ushort port, ServerType serverType = ServerType.Netcat, SecurityLevel secLevel = SecurityLevel.Open)
 		{
 			if (port >= (ushort.MaxValue - MaximumOutboundConnections))
 				Debug.LogWarning("Creating a listener on port " + port + " for in-bound connections is generally not advised. You are taking up one of the " + MaximumOutboundConnections + " reserved ports for out-bound traffic.");

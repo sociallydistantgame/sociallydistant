@@ -1,6 +1,8 @@
-﻿namespace GameplaySystems.Networld
+﻿using OS.Network;
+
+namespace GameplaySystems.Networld
 {
-	public class Connection
+	public class Connection : IConnection
 	{
 		private Listener.ConnectionHandle handle;
 

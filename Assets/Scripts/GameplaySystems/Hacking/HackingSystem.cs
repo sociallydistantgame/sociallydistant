@@ -7,6 +7,7 @@ using GameplaySystems.Networld;
 using GameplaySystems.NonPlayerComputers;
 using OS.Devices;
 using OS.FileSystems;
+using OS.Network;
 using Player;
 using UI.Widgets;
 using UnityEngine;
@@ -17,7 +18,7 @@ namespace GameplaySystems.Hacking
 {
 	public class HackingSystem : MonoBehaviour
 	{
-		private readonly Dictionary<ObjectId, Listener> hackables = new Dictionary<ObjectId, Listener>();
+		private readonly Dictionary<ObjectId, IListener> hackables = new Dictionary<ObjectId, IListener>();
 		private readonly Dictionary<ObjectId, CraftedExploitFile> craftedExploits = new Dictionary<ObjectId, CraftedExploitFile>();
 
 		private ExploitAsset[] exploits;
@@ -69,7 +70,7 @@ namespace GameplaySystems.Hacking
 			if (computer.Network == null)
 				return;
 
-			if (!hackables.TryGetValue(subject.InstanceId, out Listener listener))
+			if (!hackables.TryGetValue(subject.InstanceId, out IListener listener))
 			{
 				listener = computer.Network.Listen(subject.Port, subject.ServerType, subject.SecurityLevel);
 				hackables.Add(subject.InstanceId, listener);

@@ -9,7 +9,7 @@ using Utility;
 
 namespace OS.FileSystems
 {
-	public class VirtualFileSystem
+	public class VirtualFileSystem : IVirtualFileSystem
 	{
 		private readonly IFileSystem rootfs;
 		private readonly IUser user;

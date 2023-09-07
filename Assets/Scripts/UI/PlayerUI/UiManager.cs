@@ -3,6 +3,7 @@
 using System;
 using GamePlatform;
 using UI.Backdrop;
+using UI.CharacterCreator;
 using UI.Login;
 using UI.Popovers;
 using UI.Shell;
@@ -21,6 +22,9 @@ namespace UI.PlayerUI
 		private GameManagerHolder gameManager = null!;
 
 		[Header("Prefabs")]
+		[SerializeField]
+		private GameObject characterCreatorPrefab = null!;
+		
 		[SerializeField]
 		private GameObject desktopPrefab = null!;
 
@@ -45,9 +49,11 @@ namespace UI.PlayerUI
 		public BackdropController Backdrop => backdrop;
 		public PopoverLayer PopoverLayer => popoverLayer;
 		public WindowManager WindowManager => windowManager;
+		private CharacterCreatorController? characterCreator;
 		
 		public Desktop? Desktop { get; private set; }
 		public LoginManager? LoginManager { get; private set; }
+		public CharacterCreatorController? CharacterCreator => characterCreator;
 		
 		private void Awake()
 		{
@@ -108,8 +114,24 @@ namespace UI.PlayerUI
 			Destroy(this.LoginManager.gameObject);
 			this.LoginManager = null;
 		}
-		
-		
+
+		private void OpenCharacterCreator()
+		{
+			if (CharacterCreator != null)
+				return;
+			
+			Instantiate(characterCreatorPrefab, this.transform)
+				.MustGetComponent(out characterCreator);
+		}
+
+		private void CloseCharacterCreator()
+		{
+			if (characterCreator == null)
+				return;
+			
+			Destroy(characterCreator.gameObject);
+			characterCreator = null;
+		}
 		
 		private void OnGameModeChanged(GameMode newGameMode)
 		{
@@ -122,6 +144,15 @@ namespace UI.PlayerUI
 			else
 			{
 				HideLoginScreen();
+			}
+
+			if (gameMode == GameMode.CharacterCreator)
+			{
+				OpenCharacterCreator();
+			}
+			else
+			{
+				CloseCharacterCreator();
 			}
 			
 			switch (this.gameMode)

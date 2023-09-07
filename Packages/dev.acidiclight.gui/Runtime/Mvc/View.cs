@@ -28,13 +28,23 @@ namespace AcidicGui.Mvc
 		/// <inheritdoc />
 		public void Show(Action? callback = null)
 		{
-			visibilityController.Show(callback);
+			visibilityController.Show(() => OnShow(callback));
 		}
 
 		/// <inheritdoc />
 		public void Hide(Action? callback = null)
 		{
-			visibilityController.Hide(callback);
+			visibilityController.Hide(() => OnHide(callback));
+		}
+
+		protected virtual void OnShow(Action? callback = null)
+		{
+			callback?.Invoke();
+		}
+
+		protected virtual void OnHide(Action? callback = null)
+		{
+			callback?.Invoke();
 		}
 	}
 }

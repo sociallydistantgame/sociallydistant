@@ -18,7 +18,7 @@ namespace UI.Applications.FileManager
 		IPointerClickHandler
 	{
 		private string currentPath;
-		private VirtualFileSystem vfs;
+		private IVirtualFileSystem vfs;
 		
 		[SerializeField]
 		private CompositeIconWidget icon = null!;
@@ -33,7 +33,7 @@ namespace UI.Applications.FileManager
 			this.AssertAllFieldsAreSerialized(typeof(FileIconWidget));
 		}
 
-		public void SetFilePath(VirtualFileSystem vfs, string path)
+		public void SetFilePath(IVirtualFileSystem vfs, string path)
 		{
 			this.vfs = vfs;
 			this.currentPath = path;

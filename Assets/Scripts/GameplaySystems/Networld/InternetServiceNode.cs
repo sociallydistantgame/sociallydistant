@@ -5,7 +5,7 @@ using Utility;
 
 namespace GameplaySystems.Networld
 {
-	public class InternetServiceNode : INetworkSwitch
+	public class InternetServiceNode : INetworkSwitch<NetworkInterface>
 	{
 		private readonly List<NetworkInterface> neighbourInterfaces = new List<NetworkInterface>();
 		private readonly List<LocalAreaNode> localAreaNodes = new List<LocalAreaNode>();

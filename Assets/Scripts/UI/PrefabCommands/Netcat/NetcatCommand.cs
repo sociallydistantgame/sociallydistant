@@ -6,6 +6,7 @@ using System.Collections.Generic;
 using System.Text;
 using Architecture;
 using GameplaySystems.Networld;
+using OS.Network;
 using Utility;
 
 namespace UI.PrefabCommands.Netcat
@@ -72,12 +73,12 @@ namespace UI.PrefabCommands.Netcat
 				StartCoroutine(ConnectionLoop(result.Connection));
 		}
 
-		private void ServerCallback(Connection connection)
+		private void ServerCallback(IConnection connection)
 		{
 			StartCoroutine(ConnectionLoop(connection));
 		}
 
-		private IEnumerator ConnectionLoop(Connection connection)
+		private IEnumerator ConnectionLoop(IConnection connection)
 		{
 			while (connection.Connected)
 			{
@@ -95,9 +96,9 @@ namespace UI.PrefabCommands.Netcat
 			}
 		}
 		
-		private IEnumerator WaitForConnection(Listener listener)
+		private IEnumerator WaitForConnection(IListener listener)
 		{
-			Connection? connection = null;
+			IConnection? connection = null;
 			while ((connection = listener.AcceptConnection()) == null)
 				yield return null;
 

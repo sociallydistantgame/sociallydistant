@@ -1,4 +1,5 @@
 ﻿#nullable enable
+using Core;
 using OS.Devices;
 using UI.Shell;
 using UI.Windowing;

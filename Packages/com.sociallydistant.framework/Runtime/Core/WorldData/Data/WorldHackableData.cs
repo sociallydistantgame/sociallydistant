@@ -1,7 +1,7 @@
 ﻿#nullable enable
 
 using Core.Serialization;
-using Networking;
+using OS.Network;
 
 namespace Core.WorldData.Data
 {

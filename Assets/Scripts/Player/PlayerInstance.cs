@@ -1,4 +1,5 @@
 ﻿#nullable enable
+using Core;
 using GameplaySystems.Networld;
 using OS.Devices;
 using UI.Backdrop;
@@ -22,5 +23,7 @@ namespace Player
 		public PlayerFileOverrider FileOverrider;
 
 		public LocalAreaNetwork PlayerLan;
+
+		public ISkillTree SkillTree;
 	}
 }

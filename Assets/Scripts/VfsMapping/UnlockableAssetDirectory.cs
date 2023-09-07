@@ -2,6 +2,7 @@
 using System;
 using System.Collections.Generic;
 using Architecture;
+using Core;
 using OS.Devices;
 using OS.FileSystems;
 using Player;
@@ -46,7 +47,7 @@ namespace VfsMapping
 		{
 			foreach (TAssetType asset in entries.Keys)
 			{
-				if (asset.IsUnlocked(player))
+				if (asset.IsUnlocked(player.Value.SkillTree))
 					yield return entries[asset];
 			}
 		}

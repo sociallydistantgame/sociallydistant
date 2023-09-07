@@ -24,7 +24,7 @@ namespace UI.Applications.FileManager
 		private readonly List<FileIconWidget> fileIcons = new List<FileIconWidget>();
 		private ISystemProcess process = null!;
 		private IWindow window = null!;
-		private VirtualFileSystem vfs = null!;
+		private IVirtualFileSystem vfs = null!;
 		private string currentDirectory = "/";
 		private Stack<string> history = new Stack<string>();
 		private Stack<string> future = new Stack<string>();
