@@ -9,7 +9,7 @@ using Random = UnityEngine.Random;
 
 namespace GameplaySystems.Networld
 {
-	public class Listener
+	public class Listener : IListener
 	{
 		private static readonly Dictionary<Guid, SharedConnectionState> sharedStates = new Dictionary<Guid, SharedConnectionState>();
 		private ListenerHandle handle;
@@ -25,7 +25,7 @@ namespace GameplaySystems.Networld
 			this.handle.PacketReceived += OnPacketReceived;
 		}
 
-		public Connection? AcceptConnection()
+		public IConnection? AcceptConnection()
 		{
 			if (this.pendingConnections.TryDequeue(out Connection connection))
 				return connection;

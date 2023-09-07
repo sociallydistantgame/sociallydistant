@@ -1,6 +1,8 @@
 ﻿#nullable enable
 using System;
 using Architecture;
+using Core;
+using Hacking;
 using OS.Devices;
 using Player;
 using UI.Terminal;
@@ -11,7 +13,7 @@ namespace GameplaySystems.Hacking
 	[CreateAssetMenu(menuName = "ScriptableObject/Assets/Payload")]
 	public class PayloadAsset : 
 		ScriptableObject,
-		IUnlockableAsset
+		IPayload
 	{
 		[SerializeField]
 		private string payloadName;
@@ -20,19 +22,19 @@ namespace GameplaySystems.Hacking
 		public string Name => payloadName;
 
 		/// <inheritdoc />
-		public bool IsUnlocked(PlayerInstanceHolder player)
+		public bool IsUnlocked(ISkillTree skills)
 		{
 			return true;
 		}
 
 		/// <inheritdoc />
-		public bool CanUnlock(PlayerInstanceHolder player)
+		public bool CanUnlock(ISkillTree skills)
 		{
 			throw new NotImplementedException();
 		}
 
 		/// <inheritdoc />
-		public bool Unlock(PlayerInstanceHolder player)
+		public bool Unlock(ISkillTree skills)
 		{
 			throw new NotImplementedException();
 		}

@@ -9,7 +9,7 @@ using Utility;
 namespace GameplaySystems.Networld
 {
 	public class DeviceNode : 
-		IDeviceWithNetworkInterface,
+		IDeviceWithNetworkInterface<NetworkInterface>,
 		INetworkNode
 	{
 		private NetworkInterface deviceInterface = new NetworkInterface();
@@ -141,7 +141,6 @@ namespace GameplaySystems.Networld
 		}
 
 		/// <inheritdoc />
-		/// 
 		public NetworkInterface NetworkInterface => deviceInterface;
 	}
 }

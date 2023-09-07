@@ -1,5 +1,6 @@
 ﻿#nullable enable
 using Architecture;
+using Core;
 using OS.FileSystems;
 
 namespace VfsMapping

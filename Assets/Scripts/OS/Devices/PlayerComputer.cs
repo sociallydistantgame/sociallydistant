@@ -7,6 +7,7 @@ using GamePlatform;
 using GameplaySystems.Networld;
 using OS.FileSystems;
 using OS.FileSystems.Host;
+using OS.Network;
 using Player;
 using UnityEngine;
 using UnityEngine.Assertions;
@@ -94,7 +95,7 @@ namespace OS.Devices
 		}
 
 		/// <inheritdoc />
-		public VirtualFileSystem GetFileSystem(IUser user)
+		public IVirtualFileSystem GetFileSystem(IUser user)
 		{
 			if (playerFileSystem == null)
 				RebuildVfs();
@@ -103,7 +104,7 @@ namespace OS.Devices
 		}
 
 		/// <inheritdoc />
-		public NetworkConnection Network { get; private set; }
+		public INetworkConnection Network { get; private set; }
 
 		/// <inheritdoc />
 		public ISystemProcess? CreateDaemonProcess(string name)

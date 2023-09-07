@@ -1,5 +1,6 @@
 ﻿using System;
 using OS.Devices;
+using OS.Network;
 
 namespace GameplaySystems.Networld
 {
@@ -45,12 +46,12 @@ namespace GameplaySystems.Networld
 			this.node.DeleteDevice(connection);
 		}
 
-		public ForwardingTableEntry GetForwardingRule(NetworkConnection connection, ushort insidePort, ushort outsidePort)
+		public ForwardingTableEntry GetForwardingRule(INetworkConnection connection, ushort insidePort, ushort outsidePort)
 		{
 			return this.node.GetForwardingRule(connection, insidePort, outsidePort);
 		}
 
-		public bool ContainsDevice(NetworkConnection connection)
+		public bool ContainsDevice(INetworkConnection connection)
 		{
 			return node.ContainsDevice(connection);
 		}

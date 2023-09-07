@@ -5,7 +5,7 @@ using Utility;
 
 namespace GameplaySystems.Networld
 {
-	public sealed class CoreRouter : IRouter
+	public sealed class CoreRouter : IRouter<NetworkInterface>
 	{
 		private readonly List<Subnet> localSubnetTemplates = new List<Subnet>();
 		private int templateIndex;

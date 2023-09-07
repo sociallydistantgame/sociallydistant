@@ -3,13 +3,14 @@ using System;
 using System.IO;
 using System.Text;
 using Core.Serialization.Binary;
-using Networking.MessageTransport;
+using OS.Network.MessageTransport;
 using Utility;
 using Random = UnityEngine.Random;
 
 namespace OS.Network
 {
-	public class NetworkInterface
+	public class NetworkInterface : 
+		ISimulationNetworkPort<NetworkInterface>
 	{
 		private Subnet subnet;
 		private uint address;

@@ -99,13 +99,13 @@ namespace GameplaySystems.NonPlayerComputers
 		}
 
 		/// <inheritdoc />
-		public VirtualFileSystem GetFileSystem(IUser user)
+		public IVirtualFileSystem GetFileSystem(IUser user)
 		{
 			return new VirtualFileSystem(this.fs, user, this.fileOverrider);
 		}
 
 		/// <inheritdoc />
-		public NetworkConnection? Network => networkConnection;
+		public INetworkConnection? Network => networkConnection;
 
 		/// <inheritdoc />
 		public ISystemProcess? CreateDaemonProcess(string name)

@@ -30,7 +30,7 @@ namespace UI.Shell
 		private readonly List<string> tokenList = new List<string>();
 		private readonly Queue<ShellInstruction> pendingInstructions = new Queue<ShellInstruction>();
 		private ShellInstruction? currentInstruction = null;
-		private VirtualFileSystem vfs = null!;
+		private IVirtualFileSystem vfs = null!;
 		private readonly List<string> commandCompletions = new List<string>();
 		private readonly string[] staticCompletions = new string[]
 		{
@@ -103,7 +103,7 @@ namespace UI.Shell
 
 			string[] directories = path.Split(':');
 
-			VirtualFileSystem fs = process.User.Computer.GetFileSystem(process.User);
+			IVirtualFileSystem fs = process.User.Computer.GetFileSystem(process.User);
 			foreach (string directory in directories)
 			{
 				if (!fs.DirectoryExists(directory))
@@ -597,7 +597,7 @@ namespace UI.Shell
 				string[] paths = pathEnvironmentVariable.Split(':', StringSplitOptions.RemoveEmptyEntries);
 				
 				// Try each program path, check if a full file exists at the given location. If it does, try executing it.
-				VirtualFileSystem fs = shellProcess.User.Computer.GetFileSystem(shellProcess.User);
+				IVirtualFileSystem fs = shellProcess.User.Computer.GetFileSystem(shellProcess.User);
 				foreach (string path in paths)
 				{
 					string fullPath = PathUtility.Combine(path, name);
@@ -970,7 +970,7 @@ namespace UI.Shell
 				}
 			}
 
-			VirtualFileSystem fs = process.User.Computer.GetFileSystem(process.User);
+			IVirtualFileSystem fs = process.User.Computer.GetFileSystem(process.User);
 
 			string fullPath = ShellUtility.MakeAbsolutePath(PathUtility.Combine(process.WorkingDirectory, token), process.User.Home);
 			string directory = PathUtility.GetDirectoryName(fullPath);

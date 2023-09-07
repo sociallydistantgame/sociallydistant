@@ -6,6 +6,7 @@ using GameplaySystems.Networld;
 using OS.Devices;
 using OS.Tasks;
 using OS.FileSystems;
+using OS.Network;
 using UI.Terminal;
 using UnityEngine;
 
@@ -23,8 +24,8 @@ namespace Architecture
 
 		protected string[] Arguments => args;
 		protected ConsoleWrapper Console => console;
-		protected NetworkConnection? Network => proc.User.Computer.Network;
-		protected VirtualFileSystem FileSystem { get; private set; }
+		protected INetworkConnection? Network => proc.User.Computer.Network;
+		protected IVirtualFileSystem FileSystem { get; private set; }
 		protected string WorkingDirectory => proc.WorkingDirectory;
 		protected string HomeDirectory => proc.User.Home;
 
