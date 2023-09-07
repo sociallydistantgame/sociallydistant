@@ -13,6 +13,8 @@ using Cysharp.Threading.Tasks;
 using GamePlatform.ContentManagement;
 using Modding;
 using Modules;
+using OS;
+using Player;
 using Shell;
 using Shell.InfoPanel;
 using UI.Shell.InfoPanel;
@@ -31,6 +33,9 @@ namespace GamePlatform
 		MonoBehaviour,
 		IGameContext
 	{
+		[SerializeField]
+		private PlayerInstanceHolder playerInstance = null!;
+		
 		[SerializeField]
 		private WorldManagerHolder worldManager = null!;
 
@@ -52,6 +57,15 @@ namespace GamePlatform
 
 		public IInfoPanelService InfoPanelService => this.infoPanelService;
 
+		/// <inheritdoc />
+		public IKernel Kernel => playerInstance;
+		
+		/// <inheritdoc />
+		public IShellContext Shell => playerInstance.Value.UiManager;
+        
+		/// <inheritdoc />
+		public GameMode CurrentGameMode => this.currentGameMode;
+		
 		/// <inheritdoc />
 		public IWorldManager WorldManager => this.worldManager.Value!;
 

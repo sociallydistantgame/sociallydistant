@@ -1,6 +1,7 @@
 ﻿#nullable enable
 
 using System;
+using Core;
 using GamePlatform;
 using Shell;
 using UI.Backdrop;
@@ -17,7 +18,9 @@ using UnityExtensions;
 
 namespace UI.PlayerUI
 {
-	public class UiManager : MonoBehaviour
+	public class UiManager : 
+		MonoBehaviour,
+		IShellContext
 	{
 		[Header("Dependencies")]
 		[SerializeField]

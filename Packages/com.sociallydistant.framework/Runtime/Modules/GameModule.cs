@@ -3,6 +3,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using Core;
 
 namespace Modules
 {
@@ -49,6 +50,8 @@ namespace Modules
 			this.Context = context;
 			await OnInitialize();
 			isInitialized = true;
+			
+			OnGameModeChanged(context.CurrentGameMode);
 		}
 		
 		/// <summary>
@@ -63,6 +66,11 @@ namespace Modules
 			this.Context = null!;
 			isInitialized = false;
 		}
-		
+
+		/// <summary>
+		///		Called when the current game mode changes. Use this to perform actions during certain game states.
+		/// </summary>
+		/// <param name="gameMode">The new game mode</param>
+		public virtual void OnGameModeChanged(GameMode gameMode) { }
 	}
 }

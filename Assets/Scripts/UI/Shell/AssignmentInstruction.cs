@@ -1,5 +1,6 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
+using System.Threading.Tasks;
 using OS.Devices;
 
 namespace UI.Shell
@@ -38,6 +39,21 @@ namespace UI.Shell
 			shell.SetVariableValue(identifier, newValue);
 				
 			isComplete = true;
+		}
+
+		/// <inheritdoc />
+		public override Task RunAsync(ISystemProcess process, ITextConsole console)
+		{
+			// TODO: Async argument evaluation, e.g. command substitution
+			
+			// Evaluate the argument list
+			string[] args = argumentList.Select(x => x.GetArgumentText(shell))
+				.ToArray();
+
+			string newValue = string.Join(string.Empty, args);
+			shell.SetVariableValue(identifier, newValue);
+
+			return Task.CompletedTask;
 		}
 	}
 }
