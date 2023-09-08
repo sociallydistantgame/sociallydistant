@@ -1,11 +1,13 @@
 ﻿#nullable enable
 using System;
 using System.Text;
+using Com.TheFallenGames.OSA.Util;
 using Shell.InfoPanel;
 using TMPro;
 using UnityEngine;
 using UnityExtensions;
 using Utility;
+using UnityEngine.UI;
 
 namespace UI.Shell.InfoPanel
 {
@@ -13,16 +15,28 @@ namespace UI.Shell.InfoPanel
 	{
 		private InfoWidgetData data;
 
+		[Header("Dependencies")]
+		[SerializeField]
+		private InfoPanelService infoPanelService = null!;
+		
 		[Header("UI")]
 		[SerializeField]
 		private TextMeshProUGUI textIcon = null!;
 
 		[SerializeField]
 		private TextMeshProUGUI text = null!;
+
+		[SerializeField]
+		private Button closeButton = null!;
 		
 		private void Awake()
 		{
 			this.AssertAllFieldsAreSerialized(typeof(InfoWidgetController));
+		}
+
+		private void Start()
+		{
+			closeButton.onClick.AddListener(OnClose);
 		}
 
 		public void SetData(InfoWidgetData data)
@@ -52,6 +66,13 @@ namespace UI.Shell.InfoPanel
 			}
 			
 			this.text.SetText(sb);
+
+			closeButton.gameObject.SetActive(data.CreationData.Closeable);
+		}
+
+		private void OnClose()
+		{
+			infoPanelService.CloseWidget(data.Id);
 		}
 	}
 }

@@ -30,6 +30,17 @@ namespace UI.Shell.InfoPanel
 		{
 			this.widgets.Clear();
 		}
+
+		public void CloseWidget(int widgetId)
+		{
+			for (var i = 0; i < this.widgets.Count; i++)
+			{
+				if (widgets[i].Id != widgetId) 
+					continue;
+				
+				widgets.RemoveAt(i);
+			}
+		}
 		
 		public int CreateCloseableInfoWidget(string icon, string title, string message)
 		{
