@@ -1,12 +1,12 @@
 ﻿#nullable enable
-using Com.TheFallenGames.OSA.Core;
 using Shell.InfoPanel;
+using UnityEngine.UI;
 using UnityExtensions;
 using Utility;
 
 namespace UI.Shell.InfoPanel
 {
-	public class InfoWidgetViewsHolder : BaseItemViewsHolder
+	public class InfoWidgetViewsHolder : AutoSizedItemsViewsHolder
 	{
 		private InfoWidgetController view;
 		
