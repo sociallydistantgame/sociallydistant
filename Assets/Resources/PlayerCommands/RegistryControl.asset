@@ -14,3 +14,4 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   binaryName: registryctl
   autoKillOnComplete: 1
+  gameManagerHolder: {fileID: 11400000, guid: 872374c25807361459f4e174bb460b2c, type: 2}

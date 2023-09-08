@@ -1,5 +1,9 @@
 ﻿#nullable enable
 
+using System;
+using System.Collections;
+using System.Collections.Generic;
+
 namespace Core.Config
 {
 	public interface ISettingsManager
@@ -10,6 +14,8 @@ namespace Core.Config
 		SettingsCategory? FindSettingsByKey(string key);
 		T? FindSettings<T>() where T : SettingsCategory;
 
+		IEnumerable<string> Keys { get; }
+		
 		bool GetBool(string key, bool defaultValue = false);
 		string? GetString(string key, string? defaultValue = null);
 		float GetFloat(string key, float defaultValue = 0);
@@ -29,5 +35,7 @@ namespace Core.Config
 		void Load();
 		void ResetKey(string key);
 		bool HasKey(string key);
+
+		IDisposable ObserveChanges(Action<ISettingsManager> onUpdate);
 	}
 }

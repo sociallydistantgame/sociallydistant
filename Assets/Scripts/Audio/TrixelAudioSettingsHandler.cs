@@ -2,35 +2,68 @@
 
 using System;
 using Core.Config;
+using GamePlatform;
+using TrixelCreative.TrixelAudio;
+using TrixelCreative.TrixelAudio.Core;
 using UnityEngine;
 using UnityExtensions;
 using Utility;
+using UniRx;
+using UnityEngine.PlayerLoop;
 
 namespace Audio
 {
 	public class TrixelAudioSettingsHandler : MonoBehaviour
 	{
+		[Header("Dependencies")]
+		[SerializeField]
+		private GameManagerHolder gameManager = null!;
+		
 		private float sfxVolume;
 		private float bgmVolume;
 		private float dialogueVolume;
+		private IDisposable? settingsObserver;
+		private TrixelAudioCore trixelAudio;
 		
 		
 		private void Awake()
 		{
 			this.AssertAllFieldsAreSerialized(typeof(TrixelAudioSettingsHandler));
-			Registry.Updated += UpdateAudioSettings;
+			this.MustGetComponent(out trixelAudio);
+		}
+
+		private void OnEnable()
+		{
+			if (gameManager.Value == null)
+				return;
+
+			settingsObserver = gameManager.Value.SettingsManager.ObserveChanges(OnSettingsChanged);
+		}
+
+		private void OnDisable()
+		{
+			settingsObserver?.Dispose();
+			settingsObserver = null;
 		}
 
 		private void UpdateAudioSettings()
 		{
-			Registry.GetValueOrSetDefault("trixel.audio.sfxVolume", 1, out sfxVolume);
-			Registry.GetValueOrSetDefault("trixel.audio.bgmVolume", 1, out bgmVolume);
-			Registry.GetValueOrSetDefault("trixel.audio.dialogueVolume", 1, out dialogueVolume);
+			trixelAudio.Configuration.MusicMixer.audioMixer.SetFloat("MusicVolume", AudioUtility.PercentageToDb(bgmVolume));
+			trixelAudio.Configuration.SoundEffectsMixer.audioMixer.SetFloat("GuiVolume", AudioUtility.PercentageToDb(sfxVolume));
+			
 		}
 
-		private void Start()
+		private void OnSettingsChanged(ISettingsManager settings)
 		{
-			UpdateAudioSettings();
+			var audioSettings = settings.FindSettings<AudioSettings>();
+
+			if (audioSettings == null)
+				return;
+            
+			this.sfxVolume = audioSettings.SfxVolume;
+			this.bgmVolume = audioSettings.MusicVolume;
+
+			this.UpdateAudioSettings();
 		}
 	}
 }
