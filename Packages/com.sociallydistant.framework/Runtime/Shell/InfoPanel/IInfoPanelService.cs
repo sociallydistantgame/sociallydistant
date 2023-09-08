@@ -7,5 +7,7 @@ namespace Shell.InfoPanel
 		int CreateCloseableInfoWidget(string icon, string title, string message);
 
 		int CreateStickyInfoWidget(string icon, string title, string message);
+
+		void CloseWidget(int widgetId);
 	}
 }
