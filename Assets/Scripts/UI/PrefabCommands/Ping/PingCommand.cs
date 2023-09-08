@@ -1,16 +1,15 @@
 #nullable enable
-using System;
 using System.Collections;
+using System.Threading.Tasks;
 using Architecture;
-using GameplaySystems.Networld;
 using OS.Network;
-using Utility;
 
-namespace UI.PrefabCommands.Netcat
+namespace UI.PrefabCommands.Ping
 {
 	public class PingCommand : CommandScript
 	{
-		private void Start()
+		/// <inheritdoc />
+		protected override async Task OnMain()
 		{
 			if (Network == null)
 			{
@@ -34,10 +33,10 @@ namespace UI.PrefabCommands.Netcat
 				return;
 			}
 
-			StartCoroutine(Ping(address, 32));
+			await Ping(address, 32);
 		}
 
-		private IEnumerator Ping(uint address, int amountToPing)
+		private async Task Ping(uint address, int amountToPing)
 		{
 			for (var i = 0; i < amountToPing; i++)
 			{
@@ -45,21 +44,20 @@ namespace UI.PrefabCommands.Netcat
 				{
 					Console.WriteLine("No network connection");
 					EndProcess();
-					yield break;
+					return;
 				}
-				
-				yield return StartCoroutine(Network.Ping(address, 30, (result) =>
+
+				var result = await Network.Ping(address, 30);
+
+				switch (result)
 				{
-					switch (result)
-					{
-						case PingResult.TimedOut:
-							Console.WriteLine("Request timed out");
-							break;
-						case PingResult.Pong:
-							Console.WriteLine($"Reply from {NetUtility.GetNetworkAddressString(address)}");
-							break;
-					}
-				}));
+					case PingResult.TimedOut:
+						Console.WriteLine("Request timed out");
+						break;
+					case PingResult.Pong:
+						Console.WriteLine($"Reply from {NetUtility.GetNetworkAddressString(address)}");
+						break;
+				}
 			}
 		}
 	}

@@ -2,16 +2,17 @@
 
 using System;
 using System.Collections;
+using System.Threading.Tasks;
 
 namespace OS.Network
 {
 	public interface INetworkConnection : INetworkInterfaceEnumerator
 	{
         // restitch-needed: This is a Unity coroutine and can't be called by mods. Switch to a Task<PingResult> instead.
-		IEnumerator Ping(uint address, float timeout, Action<PingResult> callback);
+		Task<PingResult> Ping(uint address, float timeout);
 
 		// restitch-needed: This is a Unity coroutine and can't be called by mods. Switch to a Task<PingResult> instead.
-		IEnumerator Connect(uint remoteAddress, ushort remotePort, Action<ConnectionResult> callback);
+		Task<ConnectionResult> Connect(uint remoteAddress, ushort remotePort);
 		
 		IListener Listen(ushort port, ServerType serverType = ServerType.Netcat, SecurityLevel secLevel = SecurityLevel.Open);
 	}
