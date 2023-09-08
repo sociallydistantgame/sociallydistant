@@ -37,5 +37,8 @@ namespace Core.Config
 		bool HasKey(string key);
 
 		IDisposable ObserveChanges(Action<ISettingsManager> onUpdate);
+
+		T RegisterSettingsCategory<T>() where T : SettingsCategory;
+		void UnregisterSettingsCategory(SettingsCategory category);
 	}
 }
