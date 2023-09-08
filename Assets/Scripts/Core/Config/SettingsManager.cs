@@ -45,6 +45,74 @@ namespace Core.Config
 		}
 
 		/// <inheritdoc />
+		public bool GetBool(string key, bool defaultValue = false)
+		{
+			return defaultValue;
+		}
+
+		/// <inheritdoc />
+		public string? GetString(string key, string? defaultValue = null)
+		{
+			return defaultValue;
+		}
+
+		/// <inheritdoc />
+		public float GetFloat(string key, float defaultValue = 0)
+		{
+			return defaultValue;
+		}
+
+		/// <inheritdoc />
+		public int GetInt(string key, int defaultValue = 0)
+		{
+			return defaultValue;
+		}
+
+		/// <inheritdoc />
+		public bool IsBool(string key)
+		{
+			return false;
+		}
+
+		/// <inheritdoc />
+		public bool IsString(string key)
+		{
+			return false;
+		}
+
+		/// <inheritdoc />
+		public bool IsFloat(string key)
+		{
+			return false;
+		}
+
+		/// <inheritdoc />
+		public bool IsInt(string key)
+		{
+			return false;
+		}
+
+		/// <inheritdoc />
+		public void SetFloat(string key, float value)
+		{
+		}
+
+		/// <inheritdoc />
+		public void SetString(string key, string value)
+		{
+		}
+
+		/// <inheritdoc />
+		public void SetInt(string key, int value)
+		{
+		}
+
+		/// <inheritdoc />
+		public void SetBool(string key, bool value)
+		{
+		}
+
+		/// <inheritdoc />
 		public void Save()
 		{
 			Registry.SaveRegistry();
@@ -67,32 +135,6 @@ namespace Core.Config
 		{
 			return Registry.HasKey(key);
 		}
-
-		/// <inheritdoc />
-		public bool HasValue<T>(string key)
-		{
-			return Registry.HasValue<T>(key);
-		}
-
-		/// <inheritdoc />
-		public void SetValue<T>(string key, T value)
-		{
-			Registry.SetValue(key, value);
-		}
-
-		/// <inheritdoc />
-		public bool TryGetValue<T>(string key, out T? value)
-		{
-			return Registry.TryGetValue(key, out value);
-		}
-
-		/// <inheritdoc />
-		public void GetValueOrDefault<T>(string key, T defaultValue, out T? value)
-		{
-			Registry.GetValueOrSetDefault(key, defaultValue, out value);
-		}
-		
-		
 	}
 
 	[SettingsCategory("com.sociallydistant.modding", "Mod settings")]

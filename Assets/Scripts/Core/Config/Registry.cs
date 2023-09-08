@@ -121,8 +121,7 @@ namespace Core.Config
 				if (value is not null)
 					currentRegistry.Add(key, Variant.FromObject(value));
 			}
-
-			SaveRegistry();
+            
 			Updated?.Invoke();
 		}
 

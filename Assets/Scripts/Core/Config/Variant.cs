@@ -22,7 +22,7 @@ namespace Core.Config
 	{
 		private TValue value;
 
-		public bool Is<T>() => typeof(T) == typeof(TValue);
+		public bool Is<T>() => value is T;
 		public object Value => value;
 
 		public VariantValue(TValue value)
