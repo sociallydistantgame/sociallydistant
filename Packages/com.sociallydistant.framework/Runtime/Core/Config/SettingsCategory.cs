@@ -19,15 +19,44 @@ namespace Core.Config
 			this.LocateCategoryAttribute();
 		}
 
-		protected void SetValue<T>(string name, T value)
+		protected void SetValue(string name, bool value)
 		{
-			settingsManager.SetValue(GetFullyQualifiedSettingsKey(name), value);
+			settingsManager.SetBool(GetFullyQualifiedSettingsKey(name), value);
+		}
+		
+		protected void SetValue(string name, string value)
+		{
+			settingsManager.SetString(GetFullyQualifiedSettingsKey(name), value);
+		}
+		
+		protected void SetValue(string name, int value)
+		{
+			settingsManager.SetInt(GetFullyQualifiedSettingsKey(name), value);
+		}
+		
+		protected void SetValue(string name, float value)
+		{
+			settingsManager.SetFloat(GetFullyQualifiedSettingsKey(name), value);
 		}
 
-		protected T GetValue<T>(string key, T defaultValue)
+		protected bool GetValue(string key, bool defaultValue)
 		{
-			settingsManager.GetValueOrDefault(GetFullyQualifiedSettingsKey(key), defaultValue, out T value);
-			return value;
+			return settingsManager.GetBool(GetFullyQualifiedSettingsKey(key), defaultValue);
+		}
+		
+		protected string GetValue(string key, string defaultValue)
+		{
+			return settingsManager.GetString(GetFullyQualifiedSettingsKey(key), defaultValue);
+		}
+		
+		protected float GetValue(string key, float defaultValue)
+		{
+			return settingsManager.GetFloat(GetFullyQualifiedSettingsKey(key), defaultValue);
+		}
+		
+		protected int GetValue(string key, int defaultValue)
+		{
+			return settingsManager.GetInt(GetFullyQualifiedSettingsKey(key), defaultValue);
 		}
 
 		private void LocateCategoryAttribute()
