@@ -24,6 +24,7 @@ namespace Audio
 		private float dialogueVolume;
 		private IDisposable? settingsObserver;
 		private TrixelAudioCore trixelAudio;
+		private AudioSettings? audioSettings;
 		
 		
 		private void Awake()
@@ -37,6 +38,7 @@ namespace Audio
 			if (gameManager.Value == null)
 				return;
 
+			audioSettings = gameManager.Value.SettingsManager.RegisterSettingsCategory<AudioSettings>();
 			settingsObserver = gameManager.Value.SettingsManager.ObserveChanges(OnSettingsChanged);
 		}
 
@@ -44,6 +46,15 @@ namespace Audio
 		{
 			settingsObserver?.Dispose();
 			settingsObserver = null;
+
+			if (gameManager.Value == null)
+				return;
+
+			if (audioSettings == null)
+				return;
+			
+			gameManager.Value.SettingsManager.UnregisterSettingsCategory(audioSettings);
+			audioSettings = null;
 		}
 
 		private void UpdateAudioSettings()
@@ -55,8 +66,6 @@ namespace Audio
 
 		private void OnSettingsChanged(ISettingsManager settings)
 		{
-			var audioSettings = settings.FindSettings<AudioSettings>();
-
 			if (audioSettings == null)
 				return;
             

@@ -209,6 +209,38 @@ namespace Core.Config
 			}).Subscribe(onUpdate);
 		}
 
+		/// <inheritdoc />
+		public T RegisterSettingsCategory<T>() where T : SettingsCategory
+		{
+			T? created = Activator.CreateInstance(typeof(T), new object[] { this }) as T;
+
+			if (created == null)
+				throw new InvalidOperationException($"Could not construct object of type {typeof(T).FullName}. Please ensure it has a public constructor taking a single argument of type {nameof(ISettingsManager)}, and that the object you are attempting to register with the Settings Manager is not abstract.");
+
+			string key = created.CategoryKey;
+
+			if (this.categories.ContainsKey(key))
+				throw new InvalidOperationException($"Cannot register the {typeof(T).FullName} settings category with the Settings Manager, because it has the same category key as another already-registered category. Duplicate category key is \"{key}\".");
+			
+			this.categories.Add(key, created);
+
+			return created;
+		}
+
+		/// <inheritdoc />
+		public void UnregisterSettingsCategory(SettingsCategory category)
+		{
+			string key = category.CategoryKey;
+
+			if (!categories.ContainsKey(key))
+				return;
+
+			if (categories[key] != category)
+				return;
+
+			categories.Remove(key);
+		}
+
 		private void LoadSettings()
 		{
 			allSettings.Clear();
