@@ -1,6 +1,8 @@
 ﻿using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.Threading.Tasks;
+using Cysharp.Threading.Tasks;
 using OS.Network;
 using UnityEngine;
 using Utility;
@@ -39,8 +41,11 @@ namespace GameplaySystems.Networld
 			yield return mainInfo;
 		}
 
-		public IEnumerator Ping(uint address, float timeuotInSeconds, Action<PingResult> callback)
+		public Task<PingResult> Ping(uint address, float timeuotInSeconds)
 		{
+			// Completion source for the ping result
+			var completionSource = new TaskCompletionSource<PingResult>();
+			
 			// Create the ping packet
 			var pingPacket = new Packet
 			{
@@ -50,12 +55,15 @@ namespace GameplaySystems.Networld
 
 			// Send it to the net simulation node
 			this.deviceNode.EnqueuePacketForDelivery(pingPacket);
-
+			
 			// Event for handling Pong packets
 			PingResult pingResult = default;
 			var handled = false;
 			void HandlePongPacket(PacketEvent packetEvent)
 			{
+				if (handled)
+					return;
+				
 				// Packet was already handled
 				if (packetEvent.Handled)
 					return;
@@ -68,29 +76,27 @@ namespace GameplaySystems.Networld
 				packetEvent.Handle();
 				pingResult = PingResult.Pong;
 				handled = true;
+				
+				completionSource.SetResult(pingResult);
+				deviceNode.UnhandledPacketReceived -= HandlePongPacket;
 			}
 
 			// Subscribe to unhandled packet events
 			deviceNode.UnhandledPacketReceived += HandlePongPacket;
 
-			// Wait.
-			float time = 0;
-			float timeout = (timeuotInSeconds == 0) ? 30 : timeuotInSeconds;
-			while (!handled)
+			Task.Run(async () =>
 			{
-				if (time >= timeout)
+				await Task.Delay((int) Mathf.Round(timeuotInSeconds * 1000));
+				if (!handled)
 				{
 					pingResult = PingResult.TimedOut;
 					handled = true;
+					completionSource.SetResult(pingResult);
+					deviceNode.UnhandledPacketReceived -= HandlePongPacket;
 				}
-				
-				yield return null;
-				time += Time.deltaTime;
-			}
+			});
 
-			// Stop listening
-			deviceNode.UnhandledPacketReceived -= HandlePongPacket;
-			callback?.Invoke(pingResult);
+			return completionSource.Task;
 		}
 
 		private Listener ListenInternal(ushort port, ServerType serverType, SecurityLevel secLevel)
@@ -113,7 +119,7 @@ namespace GameplaySystems.Networld
 			return ListenInternal(port, serverType, secLevel);
 		}
 
-		public IEnumerator Connect(uint remoteAddress, ushort port, Action<ConnectionResult> callback)
+		public async Task<ConnectionResult> Connect(uint remoteAddress, ushort port)
 		{
 			ConnectionResult result = default;
 			
@@ -134,8 +140,7 @@ namespace GameplaySystems.Networld
 			if (localListener == null)
 			{
 				result.Result = ConnectionResultType.MaximumConnectionsReached;
-				callback?.Invoke(result);
-				yield break;
+				return result;
 			}
 			
 			// Send a connect packet
@@ -156,11 +161,11 @@ namespace GameplaySystems.Networld
 				if (result.Connection != null)
 				{
 					result.Result = ConnectionResultType.Connected;
-					break;
+					return result;
 				}
 
-				yield return null;
 				timeout -= Time.deltaTime;
+				await UniTask.DelayFrame(1);
 			}
 
 			if (result.Connection == null)
@@ -169,7 +174,7 @@ namespace GameplaySystems.Networld
 				localListener.Close();
 			}
 
-			callback?.Invoke(result);
+			return result;
 		}
 	}
 }

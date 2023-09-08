@@ -17,11 +17,6 @@ namespace UI.PrefabCommands.Netcat
 		/// <inheritdoc />
 		protected override async Task OnMain()
 		{
-			
-		}
-
-		private void Start()
-		{
 			// We don't have an options parser yet so this is a hack
 			string usage = "Usage: nc <host> <port>" + Environment.NewLine +
 			               "       nc -l <port>";
@@ -59,27 +54,28 @@ namespace UI.PrefabCommands.Netcat
 
 			if (isNetworkAddress)
 			{
-				StartCoroutine(Network.Connect(address, port, ClientCallback));
+				ConnectionResult result = await Network.Connect(address, port);
+				await ClientCallback(result);
 			}
 			else
 			{
 				// We're a listener
-				StartCoroutine(WaitForConnection(Network.Listen(port)));
+				await WaitForConnection(Network.Listen(port));
 			}
 		}
 
-		private void ClientCallback(ConnectionResult result)
+		private async Task ClientCallback(ConnectionResult result)
 		{
 			if (result.Result == ConnectionResultType.Connected && result.Connection != null)
-				StartCoroutine(ConnectionLoop(result.Connection));
+				await ConnectionLoop(result.Connection);
 		}
 
-		private void ServerCallback(IConnection connection)
+		private async Task ServerCallback(IConnection connection)
 		{
-			StartCoroutine(ConnectionLoop(connection));
+			await ConnectionLoop(connection);
 		}
 
-		private IEnumerator ConnectionLoop(IConnection connection)
+		private async Task ConnectionLoop(IConnection connection)
 		{
 			while (connection.Connected)
 			{
@@ -92,16 +88,16 @@ namespace UI.PrefabCommands.Netcat
 				{
 					connection.Send(Encoding.UTF8.GetBytes(text));
 				}
-				
-				yield return null;
+
+				await Task.Yield();
 			}
 		}
 		
-		private IEnumerator WaitForConnection(IListener listener)
+		private async Task WaitForConnection(IListener listener)
 		{
 			IConnection? connection = null;
 			while ((connection = listener.AcceptConnection()) == null)
-				yield return null;
+				await Task.Yield();
 
 			ServerCallback(connection);
 		}
