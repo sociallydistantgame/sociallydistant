@@ -29,7 +29,7 @@ namespace UI.Shell.InfoPanel
 		{
 			var viewsHolder = new InfoWidgetViewsHolder();
 			
-			viewsHolder.Init(_Params.ItemPrefab, _Params.Content, itemIndex, false);
+			viewsHolder.Init(_Params.ItemPrefab, _Params.Content, itemIndex);
 
 			return viewsHolder;
 		}
@@ -40,6 +40,10 @@ namespace UI.Shell.InfoPanel
 			InfoWidgetData data = this.widgets[newOrRecycled.ItemIndex];
 
 			newOrRecycled.SetInfo(data);
+
+			// THANK you, Restitched, for having implemented an OSA controller with auto-sizing elements.
+			// My god, this was annoying to debug.
+			ScheduleComputeVisibilityTwinPass();
 		}
 	}
 }
