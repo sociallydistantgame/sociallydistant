@@ -4,6 +4,7 @@ using System;
 using Core;
 using GamePlatform;
 using Shell;
+using Shell.Windowing;
 using UI.Backdrop;
 using UI.CharacterCreator;
 using UI.Login;
@@ -47,7 +48,12 @@ namespace UI.PlayerUI
 
 		[SerializeField]
 		private GameObject popoverLayerPrefab = null!;
-        
+
+		[SerializeField]
+		private GameObject systemSettingsPrefab = null!;
+		
+		private UguiWindow? settingsWindow;
+		private OverlayWorkspace? overlayWorkspace;
 		private WindowManager windowManager = null!;
 		private PopoverLayer popoverLayer = null!;
 		private BackdropController backdrop = null!;
@@ -124,6 +130,41 @@ namespace UI.PlayerUI
 			this.LoginManager = null;
 		}
 
+		private void OpenOverlay()
+		{
+			if (overlayWorkspace != null)
+				return;
+
+			overlayWorkspace = this.windowManager.CreateSystemOverlay();
+			overlayWorkspace.Closed += OverlayClosed;
+		}
+
+		private void OverlayClosed()
+		{
+			this.overlayWorkspace = null;
+		}
+
+		public void OpenSettings()
+		{
+			if (settingsWindow != null)
+				return;
+
+			OpenOverlay();
+			settingsWindow = this.overlayWorkspace?.CreateWindow("System Settings", null);
+
+			if (settingsWindow == null)
+				return;
+
+			settingsWindow.WindowClosed += SettingsClosed;
+
+			Instantiate(systemSettingsPrefab, settingsWindow.ClientArea);
+		}
+
+		private void SettingsClosed(IWindow win)
+		{
+			this.settingsWindow = null;
+		}
+		
 		private void OpenCharacterCreator()
 		{
 			if (CharacterCreator != null)

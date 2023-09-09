@@ -13,8 +13,11 @@ namespace Core.Config
 
 		SettingsCategory? FindSettingsByKey(string key);
 		T? FindSettings<T>() where T : SettingsCategory;
-
+        
+		IEnumerable<string> SectionTitles { get; }
 		IEnumerable<string> Keys { get; }
+
+		IEnumerable<SettingsCategory> GetCategoriesInSection(string sectionTitle);
 		
 		bool GetBool(string key, bool defaultValue = false);
 		string? GetString(string key, string? defaultValue = null);

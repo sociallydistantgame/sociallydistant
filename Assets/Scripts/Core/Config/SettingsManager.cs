@@ -59,6 +59,15 @@ namespace Core.Config
 		}
 
 		/// <inheritdoc />
+		public IEnumerable<string> SectionTitles => this.categories.Values.Select(x => "Uncategorized").Distinct();
+
+		/// <inheritdoc />
+		public IEnumerable<SettingsCategory> GetCategoriesInSection(string sectionTitle)
+		{
+			return this.categories.Values;
+		}
+
+		/// <inheritdoc />
 		public bool GetBool(string key, bool defaultValue = false)
 		{
 			if (!IsBool(key))

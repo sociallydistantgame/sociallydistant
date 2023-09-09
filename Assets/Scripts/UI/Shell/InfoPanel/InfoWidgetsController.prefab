@@ -337,6 +337,7 @@ GameObject:
   - component: {fileID: 2242858788664724577}
   - component: {fileID: 2067789303527346518}
   - component: {fileID: 2003899603707259397}
+  - component: {fileID: 1489756992864513233}
   m_Layer: 5
   m_Name: InfoWidgetsController
   m_TagString: Untagged
@@ -474,6 +475,26 @@ MonoBehaviour:
     _ItemPrefab: {fileID: 473945571560783155, guid: 36369f4b568ca844b90a4d483a894529, type: 3}
     _PrefabControlsDefaultItemSize: 0
     _AlsoControlItemTransversalSize: 0
+--- !u!114 &1489756992864513233
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 8363747642744712228}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 306cc8c2b49d7114eaa3623786fc2126, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  m_IgnoreLayout: 0
+  m_MinWidth: -1
+  m_MinHeight: -1
+  m_PreferredWidth: -1
+  m_PreferredHeight: -1
+  m_FlexibleWidth: -1
+  m_FlexibleHeight: -1
+  m_LayoutPriority: 1
 --- !u!1 &8375674343312666615
 GameObject:
   m_ObjectHideFlags: 0

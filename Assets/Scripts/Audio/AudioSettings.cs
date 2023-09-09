@@ -23,5 +23,28 @@ namespace Audio
 		/// <inheritdoc />
 		public AudioSettings(ISettingsManager settingsManager) : base(settingsManager)
 		{ }
+
+		/// <inheritdoc />
+		public override void BuildSettingsUi(ISettingsUiBuilder uiBuilder)
+		{
+			uiBuilder.AddSection(CommonSettingsSections.Volume, out int volume)
+				.WithSlider(
+					"UI sounds",
+					null,
+					this.SfxVolume,
+					0,
+					1,
+					x => SfxVolume = x,
+					volume
+				).WithSlider(
+					"Background music",
+					null,
+					MusicVolume,
+					0,
+					1,
+					x => MusicVolume = x,
+					volume
+				);
+		}
 	}
 }

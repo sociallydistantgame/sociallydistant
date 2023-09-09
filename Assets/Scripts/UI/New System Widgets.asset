@@ -1,0 +1,17 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 77e43103068e0be4481965e7fb3e470e, type: 3}
+  m_Name: New System Widgets
+  m_EditorClassIdentifier: 
+  sectionPrefab: {fileID: 7258264901073273995, guid: cd3552cc3eb1df94395fbdc8234506b8, type: 3}
+  labelPrefab: {fileID: 1787395834357078882, guid: 11bccdfeec91a454296b84ecb9b5d2d6, type: 3}
+  sliderPrefab: {fileID: 1092210373394877385, guid: c0739b69b8f54c241a8590d32d99b3e8, type: 3}

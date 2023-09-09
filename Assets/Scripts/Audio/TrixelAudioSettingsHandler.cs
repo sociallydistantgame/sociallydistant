@@ -33,7 +33,7 @@ namespace Audio
 			this.MustGetComponent(out trixelAudio);
 		}
 
-		private void OnEnable()
+		private void Start()
 		{
 			if (gameManager.Value == null)
 				return;
@@ -42,7 +42,7 @@ namespace Audio
 			settingsObserver = gameManager.Value.SettingsManager.ObserveChanges(OnSettingsChanged);
 		}
 
-		private void OnDisable()
+		private void OnDestroy()
 		{
 			settingsObserver?.Dispose();
 			settingsObserver = null;

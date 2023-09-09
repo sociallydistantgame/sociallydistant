@@ -4,12 +4,15 @@ using System.Collections.Generic;
 using Architecture;
 using Shell.Windowing;
 using UnityEngine;
+using UnityEngine.UI;
 using UnityExtensions;
 using Utility;
 
 namespace UI.Windowing
 {
-	public class WindowManager : MonoBehaviour, IWindowManager<UguiWorkspaceDefinition, RectTransform>
+	public class WindowManager : 
+		MonoBehaviour, 
+		IWindowManager<UguiWorkspaceDefinition, RectTransform>
 	{
 		private UguiWorkspaceDefinition fallbackWorkspace = null!;
 		private ObservableList<UguiWorkspaceDefinition> workspaces = new ObservableList<UguiWorkspaceDefinition>();
@@ -48,6 +51,32 @@ namespace UI.Windowing
 			return workspace;
 		}
 
+		public OverlayWorkspace CreateSystemOverlay()
+		{
+			var go = new GameObject("Overlay workspace");
+
+			var rt = go.AddComponent<RectTransform>();
+
+			rt.SetParent(this.transform);
+			
+			rt.anchorMin = new Vector2(0, 0);
+			rt.anchorMax = new Vector2(1, 1);
+			rt.pivot = Vector2.zero;
+			rt.sizeDelta = Vector2.zero;
+			rt.anchoredPosition = Vector3.zero;
+			rt.localScale = Vector3.one;
+
+			go.AddComponent<CanvasRenderer>();
+
+			var image = go.AddComponent<Image>();
+
+			image.color = new Color(0, 0, 0, 0.75f);
+
+			UguiWorkspaceDefinition workspace = DefineWorkspace(rt);
+
+			return new OverlayWorkspace(go, workspace);
+		}
+		
 		/// <inheritdoc />
 		public IMessageDialog CreateMessageDialog(string title, IWindow? parent = null)
 		{

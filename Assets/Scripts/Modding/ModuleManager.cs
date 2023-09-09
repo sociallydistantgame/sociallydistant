@@ -31,7 +31,7 @@ namespace Modding
 		public ModuleManager(GameManager context)
 		{
 			this.gameContext = context;
-			moddingSettings = this.gameContext.SettingsManager.FindSettings<ModdingSettings>() ?? new ModdingSettings(gameContext.SettingsManager);
+			moddingSettings = this.gameContext.SettingsManager.RegisterSettingsCategory<ModdingSettings>();
 			this.gameModeObserver = context.GameModeObservable.Subscribe(OnGameModeChanged);
 		}
 		

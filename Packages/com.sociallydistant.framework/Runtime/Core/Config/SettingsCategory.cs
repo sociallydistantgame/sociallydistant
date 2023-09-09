@@ -1,5 +1,8 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Linq;
+using System.Reflection;
+using PlasticGui.WorkspaceWindow.Diff;
 
 namespace Core.Config
 {
@@ -77,5 +80,8 @@ namespace Core.Config
 		{
 			return $"{CategoryKey}.{valueName}";
 		}
+
+		public virtual void BuildSettingsUi(ISettingsUiBuilder uiBuilder)
+		{}
 	}
 }

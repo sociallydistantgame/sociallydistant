@@ -49,6 +49,23 @@ namespace UI.UiHelpers
 			openDialogs.Add(messageDialog);
 		}
 
+		public void ShowMessage(string title, string message, IWindow? parentWindow, Action callback)
+		{
+			IMessageDialog messageDialog = player.Value.UiManager.WindowManager.CreateMessageDialog(title, parentWindow);
+			messageDialog.Title = title;
+			messageDialog.Message = message;
+			messageDialog.Icon = MessageDialogIcon.Information;
+
+			messageDialog.Buttons.Add("OK");
+            
+			messageDialog.ButtonPressed += _ =>
+			{
+				callback?.Invoke();
+			};
+			
+			openDialogs.Add(messageDialog);
+		}
+		
 		/// <inheritdoc />
 		public bool CheckCanClose()
 		{

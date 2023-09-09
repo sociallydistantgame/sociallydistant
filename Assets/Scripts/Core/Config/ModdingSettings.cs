@@ -14,5 +14,20 @@
 		/// <inheritdoc />
 		public ModdingSettings(ISettingsManager settingsManager) : base(settingsManager)
 		{ }
+
+		/// <inheritdoc />
+		public override void BuildSettingsUi(ISettingsUiBuilder uiBuilder)
+		{
+			uiBuilder.AddSection(CommonSettingsSections.ScriptMods, out int scriptMods)
+				.WithToggle(
+					"Enable script mods",
+					"Allow loading and execution of script mods.",
+					AcceptLegalWaiver,
+					x => AcceptLegalWaiver = x,
+					scriptMods
+				)
+				.AddSection(CommonSettingsSections.Legal, out int legal)
+				.WithLabel("By enabling script mods, you accept the risk associated with the execution of un-trusted code. You agree that Socially Distant's development team is neither responsible nor liable for damage caused to your device as a result of executing script mods.", legal);
+		}
 	}
 }
