@@ -22,20 +22,6 @@ namespace UI.Windowing
 		IPointerDownHandler,
 		IWindowWithClient<RectTransform>
 	{
-		private static UguiWindow? firstWindow = null!;
-		private bool isFirstWindow = false;
-		private GameObject? eventSystemFocusedGameObject;
-		private WindowState currentWindowState;
-		private LayoutElement layoutElement = null!;
-		private RectTransform currentClient = null!;
-		private RectTransform rectTransform = null!;
-		private Vector2 positionBackup;
-		private ContentSizeFitter contentSizeFitter = null!;
-		private Vector2 anchorMinBackup;
-		private Vector2 anchorMaxBackup;
-		private Vector2 alignmentBackup;
-		private readonly List<IWindowCloseBlocker> closeBlockers = new List<IWindowCloseBlocker>();
-
 		[FormerlySerializedAs("dragService")]
 		[Header("Dependencies")]
 		[SerializeField]
@@ -60,6 +46,20 @@ namespace UI.Windowing
 		[SerializeField]
 		private Button minimizeButton = null!;
 
+		private static UguiWindow? firstWindow = null!;
+		private bool isFirstWindow = false;
+		private GameObject? eventSystemFocusedGameObject;
+		private WindowState currentWindowState;
+		private LayoutElement layoutElement = null!;
+		private RectTransform currentClient = null!;
+		private RectTransform rectTransform = null!;
+		private Vector2 positionBackup;
+		private ContentSizeFitter contentSizeFitter = null!;
+		private Vector2 anchorMinBackup;
+		private Vector2 anchorMaxBackup;
+		private Vector2 alignmentBackup;
+		private readonly List<IWindowCloseBlocker> closeBlockers = new List<IWindowCloseBlocker>();
+		
 		public WindowFocusService FocusService => focusService;
 
 		/// <inheritdoc />
@@ -143,6 +143,8 @@ namespace UI.Windowing
 
 		public RectTransform RectTransform => rectTransform;
 
+		public RectTransform ClientArea => this.clientArea;
+		
 		private void Awake()
 		{
 			this.AssertAllFieldsAreSerialized(typeof(UguiWindow));

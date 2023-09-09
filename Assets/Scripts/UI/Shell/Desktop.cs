@@ -5,8 +5,10 @@ using Architecture;
 using OS.Devices;
 using Player;
 using Shell.Windowing;
+using UI.PlayerUI;
 using UI.Windowing;
 using UnityEngine;
+using UnityEngine.UI;
 using UnityExtensions;
 using Utility;
 
@@ -17,30 +19,36 @@ namespace UI.Shell
 		IProgramOpener<RectTransform>,
 		IDesktop
 	{
-		private IWorkspaceDefinition currentWorkspace = null!;
-		private ISystemProcess loginProcess = null!;
-		private IUser loginUser = null!;
-
 		[Header("Dependencies")]
 		[SerializeField]
 		private PlayerInstanceHolder playerHolder = null!;
 
 		[Header("UI")]
 		[SerializeField]
+		private Button systemSettingsButton = null!;
+		
+		[SerializeField]
 		private RectTransform workspaceArea = null!;
+        
+		private IWorkspaceDefinition currentWorkspace = null!;
+		private ISystemProcess loginProcess = null!;
+		private IUser loginUser = null!;
+		private UiManager uiManager = null!;
 
 		public IWorkspaceDefinition CurrentWorkspace => currentWorkspace;
-
+		
 		private void Awake()
 		{
 			this.AssertAllFieldsAreSerialized(typeof(Desktop));
+			this.MustGetComponentInParent(out uiManager);
 		}
 
 		private void Start()
 		{
 			this.loginUser = this.playerHolder.Value.Computer.PlayerUser;
 			this.loginProcess = this.playerHolder.Value.OsInitProcess.CreateLoginProcess(this.loginUser);
-			this.currentWorkspace = playerHolder.Value.UiManager.WindowManager.DefineWorkspace(this.workspaceArea); 
+			this.currentWorkspace = playerHolder.Value.UiManager.WindowManager.DefineWorkspace(this.workspaceArea);
+			this.systemSettingsButton.onClick.AddListener(uiManager.OpenSettings);
 		}
 
 		/// <inheritdoc />

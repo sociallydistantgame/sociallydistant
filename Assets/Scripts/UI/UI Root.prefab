@@ -99,3 +99,4 @@ MonoBehaviour:
   loginScreenPrefab: {fileID: 382556335856030820, guid: 0d4c43eb512fdf94ea7bc6c152a5fa7c, type: 3}
   windowManagerPrefab: {fileID: 3873711479734453863, guid: 180479df6586f3f41aa4d32d884cd9e5, type: 3}
   popoverLayerPrefab: {fileID: 6738298882049385100, guid: 1976ad0fb0713fe438182c366418dcc7, type: 3}
+  systemSettingsPrefab: {fileID: 5073933947700500511, guid: 5ed3dab1604879f4db5fbaa04429d19b, type: 3}
