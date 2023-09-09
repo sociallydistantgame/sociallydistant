@@ -121,6 +121,14 @@ namespace UI.SystemSettings
 		/// <inheritdoc />
 		public ISettingsUiBuilder WithToggle(string title, string? description, bool value, Action<bool> changeCallback, int sectionId)
 		{
+			this.widgets.AddWidget(new SettingsToggleWidget
+			{
+				Title = title,
+				Description = description,
+				CurrentValue = value,
+				Callback = changeCallback
+			}, sectionMap[sectionId]);
+			
 			return this;
 		}
 
@@ -159,6 +167,14 @@ namespace UI.SystemSettings
 		/// <inheritdoc />
 		public ISettingsUiBuilder WithTextField(string title, string? description, string? currentValue, Action<string?> changeCallbac, int sectionId)
 		{
+			widgets.AddWidget(new SettingsInputFieldWidget
+			{
+				Title = title,
+				Description = description,
+				CurrentValue = currentValue,
+				Callback = changeCallbac
+			}, sectionMap[sectionId]);
+			
 			return this;
 		}
 	}

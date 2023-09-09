@@ -22,6 +22,12 @@ namespace UI.Widgets
 		[Header("Settings widgets")]
 		[SerializeField]
 		private SettingsSliderWidgetController sliderPrefab = null!;
+
+		[SerializeField]
+		private SettingsToggleWidgetController settingsTogglePrefab = null!;
+
+		[SerializeField]
+		private SettingsInputFieldController settingsInputFieldPrefab = null!;
 		
 		/// <inheritdoc />
 		public WidgetRecycleBin RecycleBin
@@ -50,6 +56,16 @@ namespace UI.Widgets
 		public SettingsSliderWidgetController GetSettingsSlider(RectTransform destination)
 		{
 			return RecycleOrInstantiate(this.sliderPrefab, destination);
+		}
+		
+		public SettingsToggleWidgetController GetSettingsToggle(RectTransform destination)
+		{
+			return RecycleOrInstantiate(this.settingsTogglePrefab, destination);
+		}
+
+		public SettingsInputFieldController GetSettingsInputField(RectTransform destination)
+		{
+			return RecycleOrInstantiate(this.settingsInputFieldPrefab, destination);
 		}
 		
 		private T RecycleOrInstantiate<T>(T prefabToInstantiate, RectTransform rectTransform)
