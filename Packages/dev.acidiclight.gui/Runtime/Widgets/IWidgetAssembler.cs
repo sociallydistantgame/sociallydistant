@@ -1,4 +1,6 @@
-﻿using UnityEngine;
+﻿#nullable enable
+
+using UnityEngine;
 
 namespace AcidicGui.Widgets
 {
@@ -9,5 +11,8 @@ namespace AcidicGui.Widgets
 		SectionWidgetController GetSectionWidget(RectTransform destination);
 
 		LabelWidgetController GetLabel(RectTransform destination);
+
+		ImageWidgetController GetImage(RectTransform destination);
+		RawImageWidgetController GetRawImage(RectTransform destination);
 	}
 }

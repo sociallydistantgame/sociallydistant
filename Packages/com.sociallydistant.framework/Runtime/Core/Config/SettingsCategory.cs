@@ -13,6 +13,7 @@ namespace Core.Config
 
 		public string CategoryKey => reflectionAttribute.Key;
 		public string Name => reflectionAttribute.DisplayName;
+		public string SectionName => reflectionAttribute.SectionName;
 		public bool Hidden => reflectionAttribute.Hidden;
 		
 		protected SettingsCategory(ISettingsManager settingsManager)
@@ -71,7 +72,7 @@ namespace Core.Config
 				.FirstOrDefault();
 
 			if (attribute == null)
-				attribute = new SettingsCategoryAttribute($"com.sociallydistant.{type.Name}", type.Name, hidden: true);
+				attribute = new SettingsCategoryAttribute($"com.sociallydistant.{type.Name}", type.Name, CommonSettingsCategorySections.Unknown, hidden: true);
 
 			this.reflectionAttribute = attribute;
 		}

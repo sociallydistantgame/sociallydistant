@@ -4,8 +4,7 @@ using UnityEngine;
 
 namespace Audio
 {
-	[SystemSettings("Hardware")]
-	[SettingsCategory("audio", "Audio")]
+	[SettingsCategory("audio", "Audio", CommonSettingsCategorySections.Hardware)]
 	public class AudioSettings : SettingsCategory
 	{
 		public float SfxVolume

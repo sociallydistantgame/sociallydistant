@@ -1,8 +1,10 @@
 ﻿#nullable enable
+using System;
 using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
 using Core.Config;
+using Core.Config.SystemConfigCategories;
 using GamePlatform.ContentManagement;
 using Modules;
 using Shell;
@@ -17,6 +19,10 @@ namespace Modding
 	[IgnoreModdingLegalWaiver]
 	public class SystemModule : GameModule
 	{
+		private GraphicsSettings? graphicsSettings;
+		private AccessibilitySettings? a11ySettings;
+		private IDisposable? settingsObservable;
+		
 		/// <inheritdoc />
 		public override bool IsCoreModule => true;
 
@@ -26,6 +32,13 @@ namespace Modding
 		/// <inheritdoc />
 		protected override async Task OnInitialize()
 		{
+			// System settings modules
+			graphicsSettings = Context.SettingsManager.RegisterSettingsCategory<GraphicsSettings>();
+			a11ySettings = Context.SettingsManager.RegisterSettingsCategory<AccessibilitySettings>();
+			
+			// Watch system settings
+			settingsObservable = Context.SettingsManager.ObserveChanges(OnSettingsUpdated);
+			
 			// Find Restitched save data. If we do, the player gets a little gift from the lead programmer of the game - who.......created this game as well? <3
 			FindRestitchedDataAndRegisterRestitchedContent();
 		}
@@ -33,6 +46,19 @@ namespace Modding
 		/// <inheritdoc />
 		protected override async Task OnShutdown()
 		{
+			if (graphicsSettings != null)
+				Context.SettingsManager.UnregisterSettingsCategory(graphicsSettings);
+
+			if (a11ySettings != null)
+				Context.SettingsManager.UnregisterSettingsCategory(a11ySettings);
+			
+			settingsObservable?.Dispose();
+			settingsObservable = null;
+		}
+
+		private void OnSettingsUpdated(ISettingsManager settings)
+		{
+			
 		}
 		
 		private void FindRestitchedDataAndRegisterRestitchedContent()
