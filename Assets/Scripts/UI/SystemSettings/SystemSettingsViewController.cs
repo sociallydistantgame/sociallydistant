@@ -177,5 +177,20 @@ namespace UI.SystemSettings
 			
 			return this;
 		}
+
+		/// <inheritdoc />
+		public ISettingsUiBuilder WithStringDropdown(string title, string? description, int currentIndex, string[] choices, Action<int> changeCallback, int sectionId)
+		{
+			widgets.AddWidget(new SettingsDropdownWidget
+			{
+				Title = title,
+				Description = description,
+				Choices = choices,
+				CurrentIndex = currentIndex,
+				Callback = changeCallback
+			}, sectionMap[sectionId]);
+			
+			return this;
+		}
 	}
 }
