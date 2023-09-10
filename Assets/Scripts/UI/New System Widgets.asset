@@ -17,3 +17,4 @@ MonoBehaviour:
   sliderPrefab: {fileID: 1092210373394877385, guid: 3beab19a1c9aac640827fa3dd4f46792, type: 3}
   settingsTogglePrefab: {fileID: 3968563554417441650, guid: c0739b69b8f54c241a8590d32d99b3e8, type: 3}
   settingsInputFieldPrefab: {fileID: 767981811626094765, guid: 292921eedf312fe42be2dc9ac78d7e7b, type: 3}
+  settingsDropdownPrefab: {fileID: 8154968038530493323, guid: 7e11dfcc31eb89b4da5f7066eb49d113, type: 3}

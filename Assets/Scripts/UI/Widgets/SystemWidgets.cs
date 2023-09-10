@@ -28,6 +28,9 @@ namespace UI.Widgets
 
 		[SerializeField]
 		private SettingsInputFieldController settingsInputFieldPrefab = null!;
+
+		[SerializeField]
+		private SettingsDropdownWidgetController settingsDropdownPrefab = null!;
 		
 		/// <inheritdoc />
 		public WidgetRecycleBin RecycleBin
@@ -67,6 +70,13 @@ namespace UI.Widgets
 		{
 			return RecycleOrInstantiate(this.settingsInputFieldPrefab, destination);
 		}
+		
+		public SettingsDropdownWidgetController GetSettingsDropdown(RectTransform destination)
+		{
+			return RecycleOrInstantiate(this.settingsDropdownPrefab, destination);
+		}
+		
+		
 		
 		private T RecycleOrInstantiate<T>(T prefabToInstantiate, RectTransform rectTransform)
 			where T : WidgetController
