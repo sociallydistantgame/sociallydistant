@@ -1,6 +1,8 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using UnityEditor.Graphs;
+using UnityEngine;
 
 namespace AcidicGui.Widgets
 {
@@ -79,6 +81,24 @@ namespace AcidicGui.Widgets
 			widgetList.Add(widget);
 
 			return this;
+		}
+
+		public WidgetBuilder AddImage(Texture2D texture, Color color, SectionWidget? section = null)
+		{
+			return AddWidget(new RawImageWidget
+			{
+				Texture = texture,
+				Color = color
+			}, section);
+		}
+
+		public WidgetBuilder AddImage(Sprite sprite, Color color, SectionWidget? section = null)
+		{
+			return AddWidget(new ImageWidget
+			{
+				Sprite = sprite,
+				Color = color
+			}, section);
 		}
 
 		public IList<IWidget> Build()

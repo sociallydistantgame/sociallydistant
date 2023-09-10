@@ -59,12 +59,19 @@ namespace Core.Config
 		}
 
 		/// <inheritdoc />
-		public IEnumerable<string> SectionTitles => this.categories.Values.Select(x => "Uncategorized").Distinct();
+		public IEnumerable<string> SectionTitles => this.categories.Values
+			.Where(x=>!x.Hidden)
+			.OrderBy(x=>x.SectionName)
+			.Select(x => x.SectionName)
+			.Distinct();
 
 		/// <inheritdoc />
 		public IEnumerable<SettingsCategory> GetCategoriesInSection(string sectionTitle)
 		{
-			return this.categories.Values;
+			return this.categories.Values
+				.Where(x => !x.Hidden)
+				.Where(x => x.SectionName == sectionTitle)
+				.OrderBy(x => x.Name);
 		}
 
 		/// <inheritdoc />

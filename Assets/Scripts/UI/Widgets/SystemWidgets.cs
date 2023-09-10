@@ -19,6 +19,12 @@ namespace UI.Widgets
 		[SerializeField]
 		private LabelWidgetController labelPrefab = null!;
 
+		[SerializeField]
+		private ImageWidgetController imagePrefab = null!;
+
+		[SerializeField]
+		private RawImageWidgetController rawImagePrefab = null!;
+		
 		[Header("Settings widgets")]
 		[SerializeField]
 		private SettingsSliderWidgetController sliderPrefab = null!;
@@ -54,6 +60,18 @@ namespace UI.Widgets
 		public LabelWidgetController GetLabel(RectTransform destination)
 		{
 			return RecycleOrInstantiate(this.labelPrefab, destination);
+		}
+
+		/// <inheritdoc />
+		public ImageWidgetController GetImage(RectTransform destination)
+		{
+			return RecycleOrInstantiate(imagePrefab, destination);
+		}
+
+		/// <inheritdoc />
+		public RawImageWidgetController GetRawImage(RectTransform destination)
+		{
+			return RecycleOrInstantiate(rawImagePrefab, destination);
 		}
 
 		public SettingsSliderWidgetController GetSettingsSlider(RectTransform destination)
