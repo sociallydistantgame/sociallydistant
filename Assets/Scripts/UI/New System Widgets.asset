@@ -14,6 +14,8 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   sectionPrefab: {fileID: 7258264901073273995, guid: cd3552cc3eb1df94395fbdc8234506b8, type: 3}
   labelPrefab: {fileID: 1787395834357078882, guid: 11bccdfeec91a454296b84ecb9b5d2d6, type: 3}
+  imagePrefab: {fileID: 9215911326621265759, guid: d23c6204f904aed49be500f30588435d, type: 3}
+  rawImagePrefab: {fileID: 1948280717191958765, guid: 486d0c32d3124c14a985ac6f3c3f9037, type: 3}
   sliderPrefab: {fileID: 1092210373394877385, guid: 3beab19a1c9aac640827fa3dd4f46792, type: 3}
   settingsTogglePrefab: {fileID: 3968563554417441650, guid: c0739b69b8f54c241a8590d32d99b3e8, type: 3}
   settingsInputFieldPrefab: {fileID: 767981811626094765, guid: 292921eedf312fe42be2dc9ac78d7e7b, type: 3}
