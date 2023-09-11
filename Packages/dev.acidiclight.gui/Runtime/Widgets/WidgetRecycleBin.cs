@@ -29,7 +29,10 @@ namespace AcidicGui.Widgets
 			if (stack.Count == 0)
 				recycleBin.Remove(typeof(T));
 			
-			desiredWidget.transform.SetParent(destination);
+			Vector3 scale = desiredWidget.transform.localScale;
+			
+			desiredWidget.transform.SetParent(destination, false);
+			desiredWidget.transform.localScale = scale;
 			desiredWidget.gameObject.SetActive(true);
 			return desiredWidget;
 		}
@@ -41,8 +44,12 @@ namespace AcidicGui.Widgets
 			widget.gameObject.SetActive(false);
 
 			Type type = widget.GetType();
+
+			Vector3 scale = widget.transform.localScale;
 			
 			widget.transform.SetParent(recycleBinRoot.transform, false);
+
+			widget.transform.localScale = scale;
 
 			if (!recycleBin.TryGetValue(type, out Stack<WidgetController>? stack))
 			{
