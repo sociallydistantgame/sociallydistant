@@ -20,7 +20,7 @@ namespace UI.SystemSettings
 			this.model = data;
 
 			this.controller.ShowHeader = model.ShowTitleArea;
-			this.controller.CategoryTitle = this.model.Title;
+			this.controller.CategoryTitle = $"{this.model.Category?.SectionName ?? "Settings"} > {model.Title}";
 
 			if (this.model.Category == null)
 			{
