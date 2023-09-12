@@ -3,6 +3,7 @@
 using System;
 using Shell;
 using Shell.Common;
+using UI.Theming;
 using UniRx;
 using UnityEngine;
 
@@ -22,6 +23,8 @@ namespace UI.Themes
 			set => darkMode.Value = value;
 		}
 
+		public OperatingSystemTheme? UserTheme { get; set; }
+		
 		public IObservable<bool> DarkModeObservable => darkMode;
 		
 		/// <inheritdoc />
