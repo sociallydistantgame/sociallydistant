@@ -91,6 +91,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 0423c1d1693449748a0503911040900f, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  acidicGuiSettings: {fileID: 11400000, guid: 736af5b49d1afe548b65ab894401a75f, type: 2}
+  defaultTheme: {fileID: 11400000, guid: 95354615bfedb1040a08e68f1d5693bb, type: 2}
   gameManager: {fileID: 11400000, guid: 872374c25807361459f4e174bb460b2c, type: 2}
   themeService: {fileID: 11400000, guid: 0261859824a581e40a24f72973b52394, type: 2}
   characterCreatorPrefab: {fileID: 2089658602290510733, guid: a5aceb7c7bd7f044ea19c9dfb04f2556, type: 3}

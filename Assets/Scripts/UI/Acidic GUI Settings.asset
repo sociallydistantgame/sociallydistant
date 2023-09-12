@@ -1,0 +1,15 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 663a7d23be8842f6a8510af45317ba48, type: 3}
+  m_Name: Acidic GUI Settings
+  m_EditorClassIdentifier: 
+  themeSettings: {fileID: 11400000, guid: 3297fc89cf28fea4592bcf87bedb3b75, type: 2}

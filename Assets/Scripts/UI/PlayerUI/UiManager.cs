@@ -1,6 +1,7 @@
 ﻿#nullable enable
 
 using System;
+using AcidicGui.Theming;
 using Core;
 using GamePlatform;
 using Shell;
@@ -11,6 +12,7 @@ using UI.Login;
 using UI.Popovers;
 using UI.Shell;
 using UI.Themes;
+using UI.Theming;
 using UI.Windowing;
 using UnityEngine;
 using Utility;
@@ -20,9 +22,13 @@ using UnityExtensions;
 namespace UI.PlayerUI
 {
 	public class UiManager : 
-		MonoBehaviour,
+		ThemeProviderComponent<OperatingSystemTheme, OperatingSystemThemeEngine>,
 		IShellContext
 	{
+		[Header("Theme")]
+		[SerializeField]
+		private OperatingSystemTheme? defaultTheme = null!;
+		
 		[Header("Dependencies")]
 		[SerializeField]
 		private GameManagerHolder gameManager = null!;
@@ -216,6 +222,25 @@ namespace UI.PlayerUI
 	                HideDesktop();
 	                break;
 			}
+		}
+
+		/// <inheritdoc />
+		protected override OperatingSystemTheme? GetMyTheme()
+		{
+			if (themeService != null && themeService.UserTheme != null)
+				return themeService.UserTheme;
+
+			return defaultTheme;
+		}
+
+		/// <inheritdoc />
+		protected override bool OnChangeTheme(OperatingSystemTheme newTheme)
+		{
+			if (themeService == null)
+				return false;
+
+			themeService.UserTheme = newTheme;
+			return true;
 		}
 	}
 }
