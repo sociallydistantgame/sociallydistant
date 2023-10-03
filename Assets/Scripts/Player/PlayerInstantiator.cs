@@ -10,6 +10,7 @@ using OS.FileSystems;
 using UI.Backdrop;
 using UI.PlayerUI;
 using UnityEngine;
+using UnityEngine.EventSystems;
 using UnityExtensions;
 using Utility;
 
@@ -84,7 +85,7 @@ namespace Player
             
 			this.playerInstanceHolder.Value = player;
 		}
-        
+		
 		private void OnDestroy()
 		{
 			PlayerInstance player = playerInstanceHolder.Value;

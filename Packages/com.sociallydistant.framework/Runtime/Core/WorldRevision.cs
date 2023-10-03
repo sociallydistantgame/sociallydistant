@@ -10,6 +10,7 @@
 		AddedPortForwarding = 5,
 		AddedExploitCrafting = 6,
 		AddedHackables = 7,
+		Lifepaths = 8,
 
 		Latest
 	}

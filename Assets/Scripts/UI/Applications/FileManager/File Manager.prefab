@@ -228,7 +228,12 @@ MonoBehaviour:
   icon:
     textIcon: 
     spriteIcon: {fileID: 0}
-    iconColor: {r: 0, g: 0, b: 0, a: 0}
+    iconColor:
+      name: 0
+      r: 0
+      g: 0
+      b: 0
+      a: 0
   textIcon: {fileID: 5608120684467533}
   spriteIcon: {fileID: 6321334348280503604}
 --- !u!222 &6703381469025481238

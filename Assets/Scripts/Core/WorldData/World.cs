@@ -1,5 +1,7 @@
 ﻿#nullable enable
 
+using System;
+using Architecture;
 using Core.DataManagement;
 using Core.Serialization;
 using Core.Systems;
@@ -9,6 +11,7 @@ namespace Core.WorldData
 {
 	public class World : IWorld
 	{
+		private readonly WorldDataObject<ProtectedWorldState> protectedWorldState;
 		private readonly WorldDataObject<GlobalWorldData> globalWorldState;
 		private readonly WorldDataObject<WorldPlayerData> playerData;
 		private readonly WorldDataTable<WorldComputerData> computers;
@@ -49,6 +52,7 @@ namespace Core.WorldData
 		
 		public World(UniqueIntGenerator instanceIdGenerator, DataEventDispatcher eventDispatcher)
 		{
+			protectedWorldState = new WorldDataObject<ProtectedWorldState>(eventDispatcher);
 			globalWorldState = new WorldDataObject<GlobalWorldData>(eventDispatcher);
 			playerData = new WorldDataObject<WorldPlayerData>(eventDispatcher);
 			computers = new WorldDataTable<WorldComputerData>(instanceIdGenerator, eventDispatcher);
@@ -63,6 +67,7 @@ namespace Core.WorldData
 
 		public void Serialize(IWorldSerializer serializer)
 		{
+			protectedWorldState.Serialize(serializer);
 			globalWorldState.Serialize(serializer);
 			computers.Serialize(serializer, WorldRevision.AddedComputers);
 			internetProviders.Serialize(serializer, WorldRevision.AddedInternetServiceProviders);
@@ -91,6 +96,19 @@ namespace Core.WorldData
 			this.internetProviders.Clear();
 			this.computers.Clear();
 			this.globalWorldState.Value = default;
+			this.protectedWorldState.Value = default;
+		}
+
+		public void ChangePlayerLifepath(LifepathAsset asset)
+		{
+			ProtectedWorldState protectedState = this.protectedWorldState.Value;
+
+			if (!string.IsNullOrWhiteSpace(protectedState.LifepathId))
+				throw new InvalidOperationException("Changing the player's lifepath isn't possible, because a lifepath has already been chosen in this world. Updating the lifepath would disturb the space-time continuum.");
+
+			protectedState.LifepathId = asset.Name;
+
+			this.protectedWorldState.Value = protectedState;
 		}
 	}
 }

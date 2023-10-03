@@ -1,13 +1,10 @@
 ﻿namespace UI.CharacterCreator
 {
-	public class WelcomeScreen : CharacterCreatorView
+	public class ComputerCreationScreen : CharacterCreatorView
 	{
-		private CharacterCreatorState state;
-		
 		/// <inheritdoc />
 		public override void SetData(CharacterCreatorState data)
 		{
-			this.state = state;
 		}
 	}
 }
