@@ -10,7 +10,7 @@ namespace Core.WorldData.Data
 	{
 		private long dateData;
 		private float timeScale;
-
+		
 		public DateTime Now
 		{
 			get => DateTime.FromBinary(dateData);
