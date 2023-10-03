@@ -23,7 +23,12 @@ namespace AcidicGui
 
 		#region Editor-only code for ProjectSettings
 #if UNITY_EDITOR
-		private static readonly string SettingsPath = Path.Combine(Path.GetDirectoryName(Application.dataPath)!, "ProjectSettings", "AcidicGUI.json");
+		private static string SettingsPath;
+
+		private void OnEnable()
+		{
+			SettingsPath = Path.Combine(Path.GetDirectoryName(Application.dataPath)!, "ProjectSettings", "AcidicGUI.json");
+		}
 
 		[Serializable]
 		private class AcidicGuiJson
