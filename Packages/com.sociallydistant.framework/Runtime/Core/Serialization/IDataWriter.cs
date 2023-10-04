@@ -20,5 +20,6 @@ namespace Core.Serialization
 		void Write(decimal value);
 		void Write(char value);
 		void Write(string value);
+		void Write(DateTime dateTime);
 	}
 }

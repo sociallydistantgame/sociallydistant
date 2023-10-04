@@ -11,6 +11,7 @@
 		AddedExploitCrafting = 6,
 		AddedHackables = 7,
 		Lifepaths = 8,
+		ChatAndSocialMedia = 9,
 
 		Latest
 	}

@@ -18,5 +18,6 @@ namespace Core.Serialization
 		decimal Read_decimal();
 		char Read_char();
 		string Read_string();
+		DateTime ReadDateTime();
 	}
 }

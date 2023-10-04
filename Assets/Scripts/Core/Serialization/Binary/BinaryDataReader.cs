@@ -1,5 +1,6 @@
 ﻿#nullable enable
 
+using System;
 using System.IO;
 
 namespace Core.Serialization.Binary
@@ -101,6 +102,12 @@ namespace Core.Serialization.Binary
 		public string Read_string()
 		{
 			return binaryReader.ReadString();
+		}
+
+		/// <inheritdoc />
+		public DateTime ReadDateTime()
+		{
+			return DateTime.FromBinary(Read_long());
 		}
 	}
 }

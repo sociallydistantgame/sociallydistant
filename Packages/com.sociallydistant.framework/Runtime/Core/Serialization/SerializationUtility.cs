@@ -229,6 +229,22 @@ namespace Core.Serialization
 			}
 		}
 
+		public static void SerializeAtRevision<TRevision, TSerializer>(ref DateTime value, TSerializer serializer, TRevision revision, DateTime defaultValue)
+			where TRevision : Enum
+			where TSerializer : IRevisionedSerializer<TRevision>
+		{
+			if (serializer.IsReading)
+			{
+				if (serializer.RevisionComparer.IsOlder(revision))
+					value = defaultValue;
+				else serializer.Serialize(ref value);
+			}
+			else if (serializer.IsWriting)
+			{
+				serializer.Serialize(ref value);
+			}
+		}
+		
 		public static void SerializeAtRevision<TRevision, TSerializable, TSerializer>(ref TSerializable value, TSerializer serializer, TRevision revision)
 			where TRevision : Enum
 			where TSerializer : IRevisionedSerializer<TRevision>
@@ -242,8 +258,28 @@ namespace Core.Serialization
 			else
 				value.Serialize(serializer);
 		}
-
+        
 		public static void SerializeAtRevision<TRevision, TSerializable, TSerializer>(ref TSerializable value, TSerializer serializer, TRevision revision, TSerializable defaultValue)
+			where TRevision : Enum
+			where TSerializer : IRevisionedSerializer<TRevision>
+			where TSerializable : struct, ISerializable<TRevision, TSerializer>
+		{
+			if (serializer.IsReading)
+			{
+				if (serializer.RevisionComparer.IsOlder(revision))
+					value = defaultValue;
+				else
+				{
+					value.Serialize(serializer);
+				}
+			}
+			else
+			{
+				value.Serialize(serializer);
+			}
+		}
+		
+		public static void SerializeAtRevision<TRevision, TSerializer, TSerializable>(ref TSerializable value, TSerializer serializer, TRevision revision, TSerializable defaultValue)
 			where TRevision : Enum
 			where TSerializer : IRevisionedSerializer<TRevision>
 			where TSerializable : struct, ISerializable
@@ -1036,9 +1072,10 @@ namespace Core.Serialization
 			}
 		}
 		
-		public static void SerializeCollectionAtRevision<TSerializable, TRevision>(ref IReadOnlyList<TSerializable> collection, IRevisionedSerializer<TRevision> serializer, TRevision revision)
+		public static void SerializeCollectionAtRevision<TSerializable, TRevision, TSerializer>(ref IReadOnlyList<TSerializable> collection, TSerializer serializer, TRevision revision)
 			where TRevision : Enum
-			where TSerializable : struct, ISerializable
+			where TSerializable : struct, ISerializable<TRevision, TSerializer>
+			where TSerializer : IRevisionedSerializer<TRevision>
 		{
 			if (serializer.IsReading)
 			{

@@ -47,6 +47,15 @@ namespace Core.Serialization.Binary
 		}
 
 		/// <inheritdoc />
+		public void Serialize(ref DateTime value)
+		{
+			if (IsReading)
+				value = reader.ReadDateTime();
+			else
+				writer.Write(value);
+		}
+
+		/// <inheritdoc />
 		public void Serialize(ref sbyte value)
 		{
 			if (IsReading)
