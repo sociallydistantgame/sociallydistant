@@ -21,7 +21,13 @@ namespace Core.WorldData
 		private readonly WorldDataTable<WorldPortForwardingRule> portForwardingRules;
 		private readonly WorldDataTable<WorldCraftedExploitData> craftedExploits;
 		private readonly WorldDataTable<WorldHackableData> hackables;
-
+		private readonly WorldDataTable<WorldProfileData> profiles;
+		private readonly WorldDataTable<WorldPostData> posts;
+		private readonly WorldDataTable<WorldMessageData> messages;
+		private readonly WorldDataTable<WorldChannelData> channels;
+		private readonly WorldDataTable<WorldGuildData> guilds;
+		private readonly WorldDataTable<WorldMemberData> members;
+		private readonly WorldDataTable<WorldRelationshipData> relationships;
 		
         /// <inheritdoc />
         public IWorldDataObject<GlobalWorldData> GlobalWorldState => globalWorldState;
@@ -49,8 +55,29 @@ namespace Core.WorldData
 		
         /// <inheritdoc />
         public IWorldTable<WorldHackableData> Hackables => hackables;
-		
-		public World(UniqueIntGenerator instanceIdGenerator, DataEventDispatcher eventDispatcher)
+
+        /// <inheritdoc />
+        public IWorldTable<WorldProfileData> Profiles => profiles;
+
+        /// <inheritdoc />
+        public IWorldTable<WorldPostData> Posts => posts;
+
+        /// <inheritdoc />
+        public IWorldTable<WorldMessageData> Messages => messages;
+
+        /// <inheritdoc />
+        public IWorldTable<WorldChannelData> Channels => channels;
+
+        /// <inheritdoc />
+        public IWorldTable<WorldGuildData> Guilds => guilds;
+
+        /// <inheritdoc />
+        public IWorldTable<WorldMemberData> Members => members;
+
+        /// <inheritdoc />
+        public IWorldTable<WorldRelationshipData> Relationships => relationships;
+        
+        public World(UniqueIntGenerator instanceIdGenerator, DataEventDispatcher eventDispatcher)
 		{
 			protectedWorldState = new WorldDataObject<ProtectedWorldState>(eventDispatcher);
 			globalWorldState = new WorldDataObject<GlobalWorldData>(eventDispatcher);
@@ -62,7 +89,13 @@ namespace Core.WorldData
 			portForwardingRules = new WorldDataTable<WorldPortForwardingRule>(instanceIdGenerator, eventDispatcher);
 			craftedExploits = new WorldDataTable<WorldCraftedExploitData>(instanceIdGenerator, eventDispatcher);
 			hackables = new WorldDataTable<WorldHackableData>(instanceIdGenerator, eventDispatcher);
-			
+        	profiles = new WorldDataTable<WorldProfileData>(instanceIdGenerator, eventDispatcher);
+        	posts = new WorldDataTable<WorldPostData>(instanceIdGenerator, eventDispatcher);
+        	messages = new WorldDataTable<WorldMessageData>(instanceIdGenerator, eventDispatcher);
+        	channels = new WorldDataTable<WorldChannelData>(instanceIdGenerator, eventDispatcher);
+        	guilds = new WorldDataTable<WorldGuildData>(instanceIdGenerator, eventDispatcher);
+			members = new WorldDataTable<WorldMemberData>(instanceIdGenerator, eventDispatcher);
+			relationships = new WorldDataTable<WorldRelationshipData>(instanceIdGenerator, eventDispatcher);
 		}
 
 		public void Serialize(IWorldSerializer serializer)
@@ -81,12 +114,27 @@ namespace Core.WorldData
 			portForwardingRules.Serialize(serializer, WorldRevision.AddedPortForwarding);
 			
 			craftedExploits.Serialize(serializer, WorldRevision.AddedExploitCrafting);
+			
+			profiles.Serialize(serializer, WorldRevision.ChatAndSocialMedia);
+			posts.Serialize(serializer, WorldRevision.ChatAndSocialMedia);
+			messages.Serialize(serializer, WorldRevision.ChatAndSocialMedia);
+			channels.Serialize(serializer, WorldRevision.ChatAndSocialMedia);
+			guilds.Serialize(serializer, WorldRevision.ChatAndSocialMedia);
+			members.Serialize(serializer, WorldRevision.ChatAndSocialMedia);
+			relationships.Serialize(serializer, WorldRevision.ChatAndSocialMedia);
 		}
 
 		public void Wipe()
 		{
 			// You must wipe the world in reverse order of how you would create or serialize it.
 			// This ensures proper handling of deleting objects that depend on other objects.
+			relationships.Clear();
+			members.Clear();
+			guilds.Clear();
+			channels.Clear();
+			messages.Clear();
+			posts.Clear();
+			profiles.Clear();
 			this.craftedExploits.Clear();
 			this.portForwardingRules.Clear();
 			this.hackables.Clear();

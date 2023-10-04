@@ -9,6 +9,7 @@ namespace Core.Serialization
 		bool IsWriting { get; }
 		bool IsReading { get; }
 
+		void Serialize(ref DateTime value);
 		void Serialize(ref sbyte value);
 		void Serialize(ref byte value);
 		void Serialize(ref short value);

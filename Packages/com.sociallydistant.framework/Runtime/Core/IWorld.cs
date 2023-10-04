@@ -19,5 +19,12 @@ namespace Core
 		IWorldTable<WorldPortForwardingRule> PortForwardingRules { get; }
 		IWorldTable<WorldCraftedExploitData> CraftedExploits { get; }
 		IWorldTable<WorldHackableData> Hackables { get; }
+		IWorldTable<WorldProfileData> Profiles { get; }
+		IWorldTable<WorldPostData> Posts { get; }
+		IWorldTable<WorldMessageData> Messages { get; }
+		IWorldTable<WorldChannelData> Channels { get; }
+		IWorldTable<WorldGuildData> Guilds { get; }
+		IWorldTable<WorldMemberData> Members { get; }
+		IWorldTable<WorldRelationshipData> Relationships { get; }
 	}
 }

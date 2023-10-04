@@ -8,17 +8,11 @@ namespace Core.Serialization
 		void Write(IDataWriter writer);
 		void Read(IDataReader reader);
 	}
-
-#nullable restore
-	public interface ISerializable<TRevision, TSerializer> 
+    
+	public interface ISerializable<TRevision, in TSerializer> 
 		where TRevision : Enum
 		where TSerializer : IRevisionedSerializer<TRevision>
 	{
 		void Serialize(TSerializer serializer);
-	}
-
-	public interface IWorldData : ISerializable<WorldRevision, IWorldSerializer>
-	{
-		
 	}
 }

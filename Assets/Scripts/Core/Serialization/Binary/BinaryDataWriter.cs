@@ -1,4 +1,5 @@
 ﻿#nullable enable
+using System;
 using System.IO;
 
 namespace Core.Serialization.Binary
@@ -73,5 +74,11 @@ namespace Core.Serialization.Binary
 		/// <inheritdoc />
 		public void Write(string value)
 			=> binaryWriter.Write(value ?? string.Empty);
+
+		/// <inheritdoc />
+		public void Write(DateTime dateTime)
+		{
+			Write(dateTime.ToBinary());
+		}
 	}
 }
