@@ -1,6 +1,7 @@
 ﻿#nullable enable
 using System;
 using System.Linq;
+using System.Text;
 using System.Xml;
 using UnityEngine;
 using UnityEngine.Analytics;
@@ -22,22 +23,22 @@ namespace GamePlatform
 
 			XmlElement root = document.CreateElement(nameof(PlayerInfo));
 
-			XmlElement name = document.CreateElement(nameof(Name));
+			XmlText name = document.CreateTextNode(nameof(Name));
 			name.Value = Name;
 			
-			XmlElement userName = document.CreateElement(nameof(UserName));
+			XmlText userName = document.CreateTextNode(nameof(UserName));
 			userName.Value = UserName;
 			
-			XmlElement hostName = document.CreateElement(nameof(HostName));
+			XmlText hostName = document.CreateTextNode(nameof(HostName));
 			hostName.Value = HostName;
 			
-			XmlElement comment = document.CreateElement(nameof(Comment));
+			XmlText comment = document.CreateTextNode(nameof(Comment));
 			comment.Value = Comment;
 			
-			XmlElement gender = document.CreateElement(nameof(Gender));
+			XmlText gender = document.CreateTextNode(nameof(Gender));
 			gender.Value = PlayerGender.ToString();
 			
-			XmlElement lastPlayed = document.CreateElement(nameof(LastPlayed));
+			XmlText lastPlayed = document.CreateTextNode(nameof(LastPlayed));
 			lastPlayed.Value = LastPlayed.ToString();
 
 			root.AppendChild(name);
@@ -46,8 +47,17 @@ namespace GamePlatform
 			root.AppendChild(comment);
 			root.AppendChild(gender);
 			root.AppendChild(lastPlayed);
+			document.AppendChild(root);
+
+			var sb = new StringBuilder();
+			using var writer = XmlWriter.Create(sb, new XmlWriterSettings()
+			{
+				Indent = true
+			});
+
+			document.WriteTo(writer);
 			
-			return document.ToString();
+			return sb.ToString();
 		}
 		
 		public static bool TryGetFromXML(string xml, out PlayerInfo info)
@@ -103,8 +113,8 @@ namespace GamePlatform
 				.OfType<XmlElement>()
 				.FirstOrDefault(x => x.Name == elemName);
 
-			if (child != null)
-				field = Enum.Parse<Gender>(child.Value);
+			if (child != null && Enum.TryParse<Gender>(child.Value, out Gender gender))
+				field = gender;
 			else
 				field = Gender.Unknown;
 		}

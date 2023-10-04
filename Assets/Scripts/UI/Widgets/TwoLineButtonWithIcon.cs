@@ -18,7 +18,19 @@ namespace UI.Widgets
 		
 		[SerializeField]
 		private TextMeshProUGUI icon = null!;
-        
+
+		public string FirstLine
+		{
+			get => title.text;
+			set => title.SetText(value);
+		}
+
+		public string SecondLine
+		{
+			get => text.text;
+			set => text.SetText(value);
+		}
+		
 		private void Awake()
 		{
 			this.AssertAllFieldsAreSerialized(typeof(TwoLineButtonWithIcon));

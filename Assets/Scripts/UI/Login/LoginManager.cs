@@ -60,6 +60,8 @@ namespace UI.Login
 			settingsButton.onClick.AddListener(OnSettings);
 			manageUsersButton.onClick.AddListener(OnManageUsers);
 			startGameButton.onClick.AddListener(OnLogin);
+
+			this.userListController.GameDataSelected += OnGameDataSelected;
 			
 			yield return null;
 			RefreshUserList();
@@ -141,6 +143,12 @@ namespace UI.Login
 		private void OnQuit()
 		{
 			
+		}
+
+		private void OnGameDataSelected(IGameData? data)
+		{
+			gameToLoad = data;
+			RefreshMainArea();
 		}
 	}
 }

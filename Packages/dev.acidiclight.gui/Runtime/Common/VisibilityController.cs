@@ -19,7 +19,7 @@ namespace AcidicGui.Common
 		
 		/// <inheritdoc />
 		public override bool IsVisible => isVisible;
-
+		
 		private void Awake()
 		{
 			this.MustGetComponent(out canvasGroup);
@@ -30,6 +30,7 @@ namespace AcidicGui.Common
 		{
 			canvasGroup.alpha = 1;
 			canvasGroup.interactable = true;
+			canvasGroup.blocksRaycasts = true;
 			callback?.Invoke();
 		}
 
@@ -38,6 +39,7 @@ namespace AcidicGui.Common
 		{
 			canvasGroup.alpha = 0;
 			canvasGroup.interactable = false;
+			canvasGroup.blocksRaycasts = false;
 			callback?.Invoke();
 		}
 		
