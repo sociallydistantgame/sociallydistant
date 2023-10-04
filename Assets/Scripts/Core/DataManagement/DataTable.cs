@@ -1,5 +1,7 @@
 ﻿using System;
+using System.Collections;
 using System.Collections.Generic;
+using System.Linq;
 using Core.Serialization;
 using Core.Systems;
 
@@ -126,6 +128,24 @@ namespace Core.DataManagement
 		public TDataElement[] ToArray()
 		{
 			return this.dataElements.ToArray();
+		}
+
+		/// <inheritdoc />
+		public bool ContainsId(ObjectId id)
+		{
+			return dataIndexMap.ContainsKey(id);
+		}
+
+		/// <inheritdoc />
+		public IEnumerator<TDataElement> GetEnumerator()
+		{
+			return this.dataElements.GetEnumerator();
+		}
+
+		/// <inheritdoc />
+		IEnumerator IEnumerable.GetEnumerator()
+		{
+			return GetEnumerator();
 		}
 	}
 }

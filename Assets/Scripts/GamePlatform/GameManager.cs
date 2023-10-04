@@ -9,14 +9,18 @@ using ContentManagement;
 using Core;
 using Core.Config;
 using Core.Serialization.Binary;
+using Core.WorldData.Data;
 using Cysharp.Threading.Tasks;
 using GamePlatform.ContentManagement;
+using GameplaySystems.Social;
+using log4net.ObjectRenderer;
 using Modding;
 using Modules;
 using OS;
 using Player;
 using Shell;
 using Shell.InfoPanel;
+using Social;
 using UI.Shell.InfoPanel;
 using UniRx;
 using UnityEngine;
@@ -42,6 +46,9 @@ namespace GamePlatform
 		[SerializeField]
 		private InfoPanelService infoPanelService = null!;
 
+		[SerializeField]
+		private SocialServiceHolder socialHolder = null!;
+
 		private GameMode currentGameMode;
 		private SettingsManager settingsManager;
 		private ModuleManager moduleManager;
@@ -56,6 +63,9 @@ namespace GamePlatform
 		public IContentManager ContentManager => this.contentManager;
 
 		public IInfoPanelService InfoPanelService => this.infoPanelService;
+
+		/// <inheritdoc />
+		public ISocialService SocialService => socialHolder.Value!;
 
 		/// <inheritdoc />
 		public IKernel Kernel => playerInstance;
@@ -195,10 +205,45 @@ namespace GamePlatform
 
 					this.worldManager.Value.LoadWorld(worldReader);
 				}
+				
+				// Create player profile data if it's missing
+				WorldPlayerData playerData = this.worldManager.Value.World.PlayerData.Value;
+
+				var modify = false;
+				WorldProfileData profile = default;
+				if (worldManager.Value.World.Profiles.ContainsId(playerData.PlayerProfile))
+				{
+					profile = worldManager.Value.World.Profiles[playerData.PlayerProfile];
+					modify = true;
+				}
+				else
+				{
+					profile.InstanceId = worldManager.Value.GetNextObjectId();
+					playerData.PlayerProfile = profile.InstanceId;
+				}
+				
+				// Sync the profile data with the save's metadata
+				// We only sync the gender and full names.
+				profile.Gender = this.loadedPlayerInfo.PlayerGender;
+				profile.SocialName = this.loadedPlayerInfo.Name;
+				profile.ChatName = this.loadedPlayerInfo.Name;
+				profile.MailName = this.loadedPlayerInfo.Name;
+
+				if (modify)
+				{
+					worldManager.Value.World.Profiles.Modify(profile);
+				}
+				else
+				{
+					worldManager.Value.World.Profiles.Add(profile);
+					worldManager.Value.World.PlayerData.Value = playerData;
+				}
 			}
 
 			this.currentGameData = gameToLoad;
-
+			
+			
+			
 			SetGameMode(GameMode.LockScreen);
 		}
 		
