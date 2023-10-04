@@ -3,13 +3,16 @@ using System.Collections.Generic;
 using Com.TheFallenGames.OSA.Core;
 using Com.TheFallenGames.OSA.CustomParams;
 using Com.TheFallenGames.OSA.DataHelpers;
+using GamePlatform;
 
 namespace UI.Login
 {
 	public class UserListController : OSA<BaseParamsWithPrefab, UserViewsHolder>
 	{
 		private SimpleDataHelper<UserListItemModel> users;
-        
+
+		public event Action<IGameData?>? GameDataSelected; 
+		
 		/// <inheritdoc />
 		protected override void Awake()
 		{
@@ -37,6 +40,15 @@ namespace UI.Login
 		{
 			UserListItemModel model = users[newOrRecycled.ItemIndex];
 			newOrRecycled.UpdateView(model);
+
+			newOrRecycled.Callback = OnClickCallback;
+			
+			ScheduleComputeVisibilityTwinPass();
+		}
+
+		private void OnClickCallback(IGameData? gameData)
+		{
+			GameDataSelected?.Invoke(gameData);
 		}
 	}
 }

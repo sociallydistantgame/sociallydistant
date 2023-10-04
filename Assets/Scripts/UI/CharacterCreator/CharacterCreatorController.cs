@@ -7,6 +7,9 @@ using UnityEngine;
 using UnityEngine.Serialization;
 using UnityExtensions;
 using System.Threading.Tasks;
+using Architecture;
+using Core;
+using GamePlatform;
 using TMPro;
 using UnityEngine.UI;
 #pragma warning disable CS4014 // Because this call is not awaited, execution of the current method continues before the call is completed
@@ -15,6 +18,13 @@ namespace UI.CharacterCreator
 {
 	public class CharacterCreatorController : Controller<CharacterCreatorView>
 	{
+		[Header("Dependencies")]
+		[SerializeField]
+		private GameManagerHolder gameManager = null!;
+
+		[SerializeField]
+		private WorldManagerHolder worldManager = null!;
+		
 		[Header("UI")]
 		[SerializeField]
 		private TextMeshProUGUI titleText = null!;
@@ -50,11 +60,21 @@ namespace UI.CharacterCreator
 			if (this.screens.Length == 0)
 				return;
 
+			await Task.Yield();
+			
 			this.backButton.onClick.AddListener(OnBackButtonClicked);
 			this.forwardButton.onClick.AddListener(OnForwardButtonClicked);
 			
 			UpdateUI();
 			await ShowScreenAtIndex(0);
+		}
+
+		private void Update()
+		{
+			if (CurrentView == null)
+				return;
+
+			this.forwardButton.enabled = CurrentView.CanGoForward;
 		}
 
 		private async Task ShowScreenAtIndex(int index)
@@ -100,9 +120,56 @@ namespace UI.CharacterCreator
 			this.ShowScreenAtIndex(this.screenIndex - 1);
 		}
 
-		private void OnForwardButtonClicked()
+		private async void OnForwardButtonClicked()
 		{
-			this.ShowScreenAtIndex(this.screenIndex + 1);
+			if (CurrentView != null)
+			{
+				bool shouldContinue = await CurrentView.ConfirmNextPage();
+
+				if (!shouldContinue)
+					return;
+			}
+
+			if (screenIndex + 1 < screens.Length)
+				await ShowScreenAtIndex(screenIndex + 1);
+			else
+				await StartGame();
+		}
+
+		private async Task StartGame()
+		{
+			// Hide the screen
+			await GoBackAsync();
+			
+			// Make us non-interactible
+			canvasGroup.interactable = false;
+
+			if (gameManager.Value == null)
+				return;
+
+			if (worldManager.Value == null)
+				return;
+
+			// Create PlayerInfo structure needed by LocalGameData
+			var playerInfo = new PlayerInfo
+			{
+				UserName = state.UserName!,
+				PlayerGender = state.ChosenGender,
+				HostName = state.HostName!,
+				Name = state.PlayerName!
+			};
+			
+			// Other info is stored in the world. Create an empty WorldManager to save the data to.
+			var world = new WorldManager();
+		
+			// Set the lifepath
+			world.World.ChangePlayerLifepath(state.Lifepath!);
+			
+			// Save the world and player data.
+			var gameData = await LocalGameData.CreateNewGame(playerInfo, world);
+			
+			// Start the game!
+			await gameManager.Value.StartGame(gameData);
 		}
 	}
 }
