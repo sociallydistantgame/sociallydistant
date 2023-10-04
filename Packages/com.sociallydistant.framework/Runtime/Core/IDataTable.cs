@@ -1,7 +1,10 @@
 ﻿#nullable enable
+using System.Collections.Generic;
+
 namespace Core
 {
-	public interface IDataTable<TDataElement>
+	public interface IDataTable<TDataElement> :
+		IEnumerable<TDataElement>
 		where TDataElement : struct, IDataWithId
 	{
 		TDataElement this[ObjectId id] { get; }
@@ -13,5 +16,7 @@ namespace Core
 		void Modify(TDataElement data);
 
 		TDataElement[] ToArray();
+
+		bool ContainsId(ObjectId id);
 	}
 }

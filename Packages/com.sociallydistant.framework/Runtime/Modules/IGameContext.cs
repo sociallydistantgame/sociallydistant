@@ -5,6 +5,7 @@ using Core.Config;
 using OS;
 using Shell;
 using Shell.InfoPanel;
+using Social;
 
 namespace Modules
 {
@@ -14,6 +15,8 @@ namespace Modules
 	public interface IGameContext
 	{
 		GameMode CurrentGameMode { get; }
+		
+		ISocialService SocialService { get; }
 		
 		/// <summary>
 		///		Gets a reference to the player kernel.
