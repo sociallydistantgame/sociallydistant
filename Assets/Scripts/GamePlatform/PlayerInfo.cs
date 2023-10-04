@@ -1,5 +1,6 @@
 ﻿#nullable enable
 using System;
+using System.Globalization;
 using System.Linq;
 using System.Text;
 using System.Xml;
@@ -23,31 +24,35 @@ namespace GamePlatform
 
 			XmlElement root = document.CreateElement(nameof(PlayerInfo));
 
-			XmlText name = document.CreateTextNode(nameof(Name));
-			name.Value = Name;
+			XmlText nameText = document.CreateTextNode(Name);
+			XmlText userNameText = document.CreateTextNode(UserName);
+			XmlText hostNameText = document.CreateTextNode(HostName);
+			XmlText commentText = document.CreateTextNode(Comment);
+			XmlText genderText = document.CreateTextNode(PlayerGender.ToString());
+			XmlText lastPlayedText = document.CreateTextNode(LastPlayed.ToString(CultureInfo.InvariantCulture));
+                
+			XmlElement name = document.CreateElement(nameof(Name));
+			XmlElement userName = document.CreateElement(nameof(UserName));
+			XmlElement hostName = document.CreateElement(nameof(HostName));
+			XmlElement comment = document.CreateElement(nameof(Comment));
+			XmlElement gender = document.CreateElement(nameof(PlayerGender));
+			XmlElement lastPlayed = document.CreateElement(nameof(LastPlayed));
 			
-			XmlText userName = document.CreateTextNode(nameof(UserName));
-			userName.Value = UserName;
+			name.AppendChild(nameText);
+			userName.AppendChild(userNameText);
+			hostName.AppendChild(hostNameText);
+			comment.AppendChild(commentText);
+			gender.AppendChild(genderText);
+			lastPlayed.AppendChild(lastPlayedText);
 			
-			XmlText hostName = document.CreateTextNode(nameof(HostName));
-			hostName.Value = HostName;
+			document.AppendChild(root);
 			
-			XmlText comment = document.CreateTextNode(nameof(Comment));
-			comment.Value = Comment;
-			
-			XmlText gender = document.CreateTextNode(nameof(Gender));
-			gender.Value = PlayerGender.ToString();
-			
-			XmlText lastPlayed = document.CreateTextNode(nameof(LastPlayed));
-			lastPlayed.Value = LastPlayed.ToString();
-
 			root.AppendChild(name);
 			root.AppendChild(userName);
 			root.AppendChild(hostName);
 			root.AppendChild(comment);
 			root.AppendChild(gender);
 			root.AppendChild(lastPlayed);
-			document.AppendChild(root);
 
 			var sb = new StringBuilder();
 			using var writer = XmlWriter.Create(sb, new XmlWriterSettings()
@@ -56,6 +61,8 @@ namespace GamePlatform
 			});
 
 			document.WriteTo(writer);
+
+			writer.Flush();
 			
 			return sb.ToString();
 		}
@@ -102,7 +109,7 @@ namespace GamePlatform
 				.FirstOrDefault(x => x.Name == elemName);
 
 			if (child != null)
-				field = child.Value;
+				field = child.InnerText;
 			else
 				field = string.Empty;
 		}
@@ -113,7 +120,7 @@ namespace GamePlatform
 				.OfType<XmlElement>()
 				.FirstOrDefault(x => x.Name == elemName);
 
-			if (child != null && Enum.TryParse<Gender>(child.Value, out Gender gender))
+			if (child != null && Enum.TryParse<Gender>(child.InnerText, out Gender gender))
 				field = gender;
 			else
 				field = Gender.Unknown;
@@ -126,7 +133,7 @@ namespace GamePlatform
 				.FirstOrDefault(x => x.Name == elemName);
 
 			if (child != null)
-				field = DateTime.Parse(child.Value);
+				field = DateTime.Parse(child.InnerText);
 			else
 				field = DateTime.UtcNow;
 		}
