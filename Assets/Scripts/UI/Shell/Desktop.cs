@@ -5,6 +5,7 @@ using Architecture;
 using OS.Devices;
 using Player;
 using Shell.Windowing;
+using TMPro;
 using UI.PlayerUI;
 using UI.Windowing;
 using UnityEngine;
@@ -29,7 +30,10 @@ namespace UI.Shell
 		
 		[SerializeField]
 		private RectTransform workspaceArea = null!;
-        
+
+		[SerializeField]
+		private TextMeshProUGUI shellUserDisplayTText = null!;
+		
 		private IWorkspaceDefinition currentWorkspace = null!;
 		private ISystemProcess loginProcess = null!;
 		private IUser loginUser = null!;
@@ -49,6 +53,8 @@ namespace UI.Shell
 			this.loginProcess = this.playerHolder.Value.OsInitProcess.CreateLoginProcess(this.loginUser);
 			this.currentWorkspace = playerHolder.Value.UiManager.WindowManager.DefineWorkspace(this.workspaceArea);
 			this.systemSettingsButton.onClick.AddListener(uiManager.OpenSettings);
+
+			this.UpdateUserDisplay();
 		}
 
 		/// <inheritdoc />
@@ -65,6 +71,14 @@ namespace UI.Shell
 			// Spawn the program
 			program.InstantiateIntoWindow(windowProcess, win, console);
 			return windowProcess;
+		}
+
+		private void UpdateUserDisplay()
+		{
+			string username = this.loginUser.UserName;
+			string hostname = this.loginUser.Computer.Name;
+			
+			this.shellUserDisplayTText.SetText($"{username}@{hostname}");
 		}
 	}
 }
