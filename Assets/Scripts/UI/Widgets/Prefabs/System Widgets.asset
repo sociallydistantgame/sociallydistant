@@ -10,14 +10,17 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 77e43103068e0be4481965e7fb3e470e, type: 3}
-  m_Name: New System Widgets
+  m_Name: System Widgets
   m_EditorClassIdentifier: 
   sectionPrefab: {fileID: 7258264901073273995, guid: cd3552cc3eb1df94395fbdc8234506b8, type: 3}
   labelPrefab: {fileID: 1787395834357078882, guid: 11bccdfeec91a454296b84ecb9b5d2d6, type: 3}
   imagePrefab: {fileID: 9215911326621265759, guid: d23c6204f904aed49be500f30588435d, type: 3}
   rawImagePrefab: {fileID: 1948280717191958765, guid: 486d0c32d3124c14a985ac6f3c3f9037, type: 3}
+  listPrefab: {fileID: 6633251190611711521, guid: 68746f5bbf9e09d4f80d69e554df1fc4, type: 3}
+  listItemPrefab: {fileID: 75139562703977583, guid: 3aed1b4342f7bdb4985b4602d3c22fae, type: 3}
   sliderPrefab: {fileID: 1092210373394877385, guid: 3beab19a1c9aac640827fa3dd4f46792, type: 3}
   settingsTogglePrefab: {fileID: 3968563554417441650, guid: c0739b69b8f54c241a8590d32d99b3e8, type: 3}
   settingsInputFieldPrefab: {fileID: 767981811626094765, guid: 292921eedf312fe42be2dc9ac78d7e7b, type: 3}
   settingsDropdownPrefab: {fileID: 8154968038530493323, guid: 7e11dfcc31eb89b4da5f7066eb49d113, type: 3}
   chatBubblePrefab: {fileID: 5867963846945013883, guid: 0627e72c88acf9e46b9d462d5712d6e4, type: 3}
+  guildHeaderPrefab: {fileID: 974673030172451270, guid: 9edbfc59a6222b94793011113aa03516, type: 3}
