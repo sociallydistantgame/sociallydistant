@@ -21,19 +21,17 @@ namespace UI.Widgets
 		{
 			base.Awake();
 			this.AssertAllFieldsAreSerialized(typeof(WidgetList));
+			widgets = new SimpleDataHelper<IWidget>(this);
 
 			recycleBin = this.systemWidgets.RecycleBin;
 		}
 
 		/// <inheritdoc />
-		protected override void Start()
-		{
-			widgets = new SimpleDataHelper<IWidget>(this);
-			base.Start();
-		}
-
 		public void SetItems(IList<IWidget> widgetList)
 		{
+			if (!IsInitialized)
+				Init();
+			
 			this.widgets.ResetItems(widgetList);
 		}
 		

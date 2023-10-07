@@ -15,14 +15,11 @@ namespace AcidicGui.Widgets
 		{
 			if (this.List == null)
 				throw new InvalidOperationException("Cannot build this ListItemWidget, because it is not assigned to a ListWidget.");
-
-			if (this.List.ToggleGroup == null)
-				throw new InvalidOperationException("Cannot build this ListItemWidget because the assigned ListWidget doesn't have a ToggleGroup yet. Ensure that the ListWidget is in the same section as the ListItemWidget, and that the ListWidget is added before any of its ListItemWidgets.");
-			
+            
 			ListItemWidgetController controller = assembler.GetListItem(destination);
 
 			controller.Title = this.Title;
-			controller.Group = this.List.ToggleGroup;
+			controller.List = this.List;
 			controller.Callback = OnSelect;
 			
 			return controller;
