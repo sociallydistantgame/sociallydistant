@@ -13,7 +13,7 @@ namespace AcidicGui.Widgets
 		[SerializeField]
 		private TextMeshProUGUI label = null!;
 		
-		public ToggleGroup? Group { get; set; }
+		public ListWidget List { get; set; }
 		public Action? Callback { get; set; }
 		public string? Title { get; set; }
 		
@@ -22,8 +22,20 @@ namespace AcidicGui.Widgets
 		{
 			label.SetText(Title);
 			
-			toggle.group = Group;
+			toggle.group = List?.ToggleGroup;
 			toggle.onValueChanged.AddListener(OnValueChanged);
+		}
+
+		private void Update()
+		{
+			// We do this here because we can't guarantee the toggle group will be instantiated by the time we
+			// get built/removed from recycling.
+			//
+			// Cases where that's an issue:
+			// - The user's using OSA (like in Socially Distant)
+			// - The list is in a different widget section
+			// - The list is further in the widget list than this list item
+			this.toggle.group = List?.ToggleGroup;
 		}
 
 		private void OnValueChanged(bool newValue)
@@ -41,7 +53,7 @@ namespace AcidicGui.Widgets
 			
 			toggle.group = null;
 			Callback = null;
-			this.Group = null;
+			this.List = null;
 		}
 	}
 }

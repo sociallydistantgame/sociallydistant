@@ -150,6 +150,8 @@ namespace UI.Applications.Chat
 			homeButton.SetIsOnWithoutNotify(true);
 
 			this.serverMembers.IsVisible = false;
+			
+			this.channelList.SetItems(BuilDDirectMessageList());
 		}
 		
 		private void OnHomeButtonToggle(bool isOn)
@@ -337,6 +339,50 @@ namespace UI.Applications.Chat
 			this.messageInputField.SetTextWithoutNotify(string.Empty);
 
 			messageInputField.ActivateInputField();
+		}
+
+		private IList<IWidget> BuilDDirectMessageList()
+		{
+			var builder = new WidgetBuilder();
+
+			builder.Begin();
+			
+			builder.AddSection("Conversations", out SectionWidget section);
+
+			var conversationCount = 0;
+			ListWidget? list = null;
+
+			foreach (IDirectConversation? channel in socialService.Value.GetDirectConversations(socialService.Value.PlayerProfile))
+			{
+				if (list == null)
+				{
+					list = new ListWidget
+					{
+						AllowSelectNone = false
+					};
+
+					builder.AddWidget(list, section);
+				}
+
+				builder.AddWidget(new ListItemWidget<IChatChannel>
+				{
+					List = list,
+					Data = channel,
+					Callback = ShowChannel
+				}, section);
+				
+				conversationCount++;
+			}
+			
+			if (conversationCount == 0)
+			{
+				builder.AddWidget(new LabelWidget()
+				{
+					Text = "You do not have any active conversations. When you receive a direct message, it will appear here."
+				}, section);
+			}
+
+			return builder.Build();
 		}
 	}
 }

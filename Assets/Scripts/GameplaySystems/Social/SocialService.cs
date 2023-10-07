@@ -195,7 +195,7 @@ namespace GameplaySystems.Social
 		/// <inheritdoc />
 		public IEnumerable<IDirectConversation> GetDirectConversations(IProfile user)
 		{
-			throw new System.NotImplementedException();
+			yield break;
 		}
 
 		/// <inheritdoc />

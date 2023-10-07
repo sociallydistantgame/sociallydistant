@@ -64,6 +64,7 @@ GameObject:
   - component: {fileID: 7028941916879305301}
   - component: {fileID: 5284153436212334771}
   - component: {fileID: 1971098324746896306}
+  - component: {fileID: 716815957652965080}
   m_Layer: 0
   m_Name: Guild List
   m_TagString: Untagged
@@ -207,6 +208,20 @@ MonoBehaviour:
     _ItemPrefab: {fileID: 6107338004705535320, guid: 31a2ca1f669de9a4486fda9787defbda, type: 3}
     _PrefabControlsDefaultItemSize: 0
     _AlsoControlItemTransversalSize: 0
+--- !u!114 &716815957652965080
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 595305280440089224}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 3312d7739989d2b4e91e6319e9a96d76, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  m_Padding: {x: 0, y: 0, z: 0, w: 0}
+  m_Softness: {x: 0, y: 0}
 --- !u!1 &671769881396372477
 GameObject:
   m_ObjectHideFlags: 0
@@ -862,6 +877,7 @@ GameObject:
   m_Component:
   - component: {fileID: 6429650903934854074}
   - component: {fileID: 5634954954880388606}
+  - component: {fileID: 2240664386055020409}
   m_Layer: 0
   m_Name: MessagesView
   m_TagString: Untagged
@@ -985,6 +1001,20 @@ MonoBehaviour:
     _ItemPrefab: {fileID: 6184124950646531058, guid: 1bbefae9099e41d48a713861786ea4a5, type: 3}
     _PrefabControlsDefaultItemSize: 0
     _AlsoControlItemTransversalSize: 0
+--- !u!114 &2240664386055020409
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 4188965766059674024}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 3312d7739989d2b4e91e6319e9a96d76, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  m_Padding: {x: 0, y: 0, z: 0, w: 0}
+  m_Softness: {x: 0, y: 0}
 --- !u!1 &4521335874541112189
 GameObject:
   m_ObjectHideFlags: 0
@@ -2174,6 +2204,20 @@ Canvas:
   m_SortingLayerID: 0
   m_SortingOrder: 0
   m_TargetDisplay: 0
+--- !u!114 &6662206955603718445
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2759521506117338588}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 3312d7739989d2b4e91e6319e9a96d76, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  m_Padding: {x: 0, y: 0, z: 0, w: 0}
+  m_Softness: {x: 0, y: 0}
 --- !u!114 &7289204288282389128 stripped
 MonoBehaviour:
   m_CorrespondingSourceObject: {fileID: 3644575525760997082, guid: cee1e0e49629e184f9702732994780b8, type: 3}
