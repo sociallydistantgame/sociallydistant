@@ -1,6 +1,7 @@
 ﻿#nullable enable
 
 using AcidicGui.Widgets;
+using UI.Applications.Chat;
 using UI.Widgets.Settings;
 using UnityEngine;
 
@@ -37,6 +38,9 @@ namespace UI.Widgets
 
 		[SerializeField]
 		private SettingsDropdownWidgetController settingsDropdownPrefab = null!;
+
+		[SerializeField]
+		private ChatBubbleWidgetController chatBubblePrefab = null!;
 		
 		/// <inheritdoc />
 		public WidgetRecycleBin RecycleBin
@@ -92,6 +96,11 @@ namespace UI.Widgets
 		public SettingsDropdownWidgetController GetSettingsDropdown(RectTransform destination)
 		{
 			return RecycleOrInstantiate(this.settingsDropdownPrefab, destination);
+		}
+		
+		public ChatBubbleWidgetController GetChatBubble(RectTransform destination)
+		{
+			return RecycleOrInstantiate(this.chatBubblePrefab, destination);
 		}
 		
 		

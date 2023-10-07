@@ -246,6 +246,17 @@ namespace GamePlatform
 			
 			SetGameMode(GameMode.LockScreen);
 		}
+
+		public async Task QuitVM()
+		{
+			// Put the game into loading state
+			SetGameMode(GameMode.Loading);
+			
+			// Save and end the current game
+			await EndCurrentGame();
+
+			PlatformHelper.QuitToDesktop();
+		}
 		
 		public async Task SaveCurrentGame()
 		{
@@ -253,6 +264,7 @@ namespace GamePlatform
 				return;
 
 			await currentGameData.UpdatePlayerInfo(loadedPlayerInfo);
+			await currentGameData.SaveWorld(worldManager.Value);
 		}
 
 		public async Task EndCurrentGame()

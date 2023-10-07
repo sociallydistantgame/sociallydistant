@@ -1,6 +1,5 @@
 ﻿#nullable enable
 
-using System;
 using System.Collections.Generic;
 using Core;
 using Core.WorldData.Data;
@@ -25,6 +24,8 @@ namespace GameplaySystems.Social
 		private Dictionary<ObjectId, Profile> profiles = new Dictionary<ObjectId, Profile>();
 		private ObjectId playerProfileId;
 		private EmptyProfile unloadedPlayerProfile = new EmptyProfile();
+		private ChatMemberManager memberManager;
+		private GuildList masterGuildList;
 
 		/// <inheritdoc />
 		public IProfile PlayerProfile
@@ -48,11 +49,19 @@ namespace GameplaySystems.Social
 			if (worldManager.Value == null)
 				return;
 
+			memberManager = new ChatMemberManager(this, worldManager.Value);
+			masterGuildList = new GuildList(memberManager, worldManager.Value);
 			worldManager.Value.Callbacks.AddModifyCallback<WorldPlayerData>(OnPlayerDataUpdated);
 			
 			worldManager.Value.Callbacks.AddCreateCallback<WorldProfileData>(OnProfileCreated);
 			worldManager.Value.Callbacks.AddModifyCallback<WorldProfileData>(OnProfileModified);
 			worldManager.Value.Callbacks.AddDeleteCallback<WorldProfileData>(OnProfileDeleted);
+		}
+
+		private void OnDestroy()
+		{
+			masterGuildList.Dispose();
+			masterGuildList = null;
 		}
 
 		private void OnPlayerDataUpdated(WorldPlayerData subjectprevious, WorldPlayerData subjectnew)
@@ -174,9 +183,9 @@ namespace GameplaySystems.Social
 		}
 
 		/// <inheritdoc />
-		public IEnumerable<IGuild> GetGuilds(IProfile user)
+		public IGuildList GetGuilds()
 		{
-			throw new System.NotImplementedException();
+			return masterGuildList;
 		}
 
 		/// <inheritdoc />
@@ -195,6 +204,12 @@ namespace GameplaySystems.Social
 		public IEnumerable<IUserMessage> GetTimeline(IProfile profile)
 		{
 			throw new System.NotImplementedException();
+		}
+
+		/// <inheritdoc />
+		public IProfile GetProfileById(ObjectId id)
+		{
+			return profiles[id];
 		}
 	}
 }

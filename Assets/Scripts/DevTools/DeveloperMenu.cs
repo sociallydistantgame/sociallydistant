@@ -1,5 +1,6 @@
 ﻿#nullable enable
 
+using System;
 using System.Collections.Generic;
 using Architecture;
 using Core;
@@ -10,6 +11,7 @@ using UnityEngine;
 using UnityEngine.InputSystem;
 using UnityExtensions;
 using Utility;
+using DevTools.Social;
 
 namespace DevTools
 {
@@ -46,12 +48,23 @@ namespace DevTools
 			this.AssertAllFieldsAreSerialized(typeof(DeveloperMenu));
 		}
 
+		private Texture2D overlay;
+
 		private void Start()
 		{
 			menus.Insert(0, new GameManagerDebug(gameManager));
 			menus.Insert(1, new NetworldDebug(world.Value, networkSimulation.Value, playerInstance));
 			menus.Insert(2, new GodModeMenu(deviceCoordinator, playerInstance));
 			menus.Insert(3, new HackablesMenu(world));
+			menus.Insert(4, new SocialDebug(world));
+
+			overlay = new Texture2D(1, 1);
+			overlay.SetPixel(0, 0, Color.black);
+		}
+
+		private void OnDestroy()
+		{
+			Destroy(overlay);
 		}
 
 		private Rect GetScreenRect()
@@ -76,7 +89,13 @@ namespace DevTools
 			if (!showDevTools)
 				return;
 
-			GUILayout.BeginArea(GetScreenRect());
+			Rect screenRect = GetScreenRect();
+
+			GUI.color = Color.black;
+			GUI.DrawTexture(screenRect, overlay);
+			GUI.color = Color.white;
+			
+			GUILayout.BeginArea(screenRect);
 			GUILayout.Label("Socially Distant Dev Tools");
 
 			scrollPosition = GUILayout.BeginScrollView(scrollPosition, false, false);

@@ -1,6 +1,7 @@
 ﻿#nullable enable
 
 using System.Collections.Generic;
+using Core;
 
 namespace Social
 {
@@ -13,10 +14,12 @@ namespace Social
 		IEnumerable<IProfile> GetFollowing(IProfile user);
 		IEnumerable<IProfile> GetBlockedProfiles(IProfile user);
 
-		IEnumerable<IGuild> GetGuilds(IProfile user);
+		IGuildList GetGuilds();
 		IEnumerable<IDirectConversation> GetDirectConversations(IProfile user);
 
 		IEnumerable<IUserMessage> GetSocialPosts(IProfile profile);
 		IEnumerable<IUserMessage> GetTimeline(IProfile profile);
+
+		IProfile GetProfileById(ObjectId id);
 	}
 }

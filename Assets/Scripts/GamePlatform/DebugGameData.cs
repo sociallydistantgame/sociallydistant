@@ -2,6 +2,7 @@
 using System;
 using System.IO;
 using System.Threading.Tasks;
+using Core;
 using UnityEngine;
 
 namespace GamePlatform
@@ -34,6 +35,13 @@ namespace GamePlatform
 		{
 			this.PlayerInfo = newPlayerInfo;
 			return Task.FromResult(true);
+		}
+
+		/// <inheritdoc />
+		public Task SaveWorld(WorldManager world)
+		{
+			Debug.Log("If you were in an actual game, we'd be saving the world to disk right now. But this is the debug world, so we're not.");
+			return Task.CompletedTask;
 		}
 	}
 }

@@ -20,3 +20,4 @@ MonoBehaviour:
   settingsTogglePrefab: {fileID: 3968563554417441650, guid: c0739b69b8f54c241a8590d32d99b3e8, type: 3}
   settingsInputFieldPrefab: {fileID: 767981811626094765, guid: 292921eedf312fe42be2dc9ac78d7e7b, type: 3}
   settingsDropdownPrefab: {fileID: 8154968038530493323, guid: 7e11dfcc31eb89b4da5f7066eb49d113, type: 3}
+  chatBubblePrefab: {fileID: 5867963846945013883, guid: 0627e72c88acf9e46b9d462d5712d6e4, type: 3}

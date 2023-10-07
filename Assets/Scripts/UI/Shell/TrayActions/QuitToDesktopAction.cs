@@ -1,6 +1,7 @@
 ﻿#nullable enable
 
 using System;
+using GamePlatform;
 using UI.Popovers;
 using UI.UiHelpers;
 using UnityEngine;
@@ -14,6 +15,10 @@ namespace UI.Shell.TrayActions
 	[RequireComponent(typeof(DialogHelper))]
 	public class QuitToDesktopAction : MonoBehaviour
 	{
+		[Header("Dependencies")]
+		[SerializeField]
+		private GameManagerHolder gameManager = null!;
+		
 		private Button button = null!;
 		private DialogHelper dialogHelper = null!;
 
@@ -47,7 +52,13 @@ namespace UI.Shell.TrayActions
 			if (!yes)
 				return;
 
-			PlatformHelper.QuitToDesktop();
+			if (this.gameManager.Value == null)
+			{
+				PlatformHelper.QuitToDesktop();
+				return;
+			}
+
+			gameManager.Value.QuitVM();
 		}
 	}
 }

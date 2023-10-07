@@ -32,5 +32,11 @@ namespace GameplaySystems.Social
 
 		/// <inheritdoc />
 		public bool IsPrivate => data.IsSocialPrivate;
+
+		/// <inheritdoc />
+		public string ChatName => data.ChatName;
+
+		/// <inheritdoc />
+		public string ChatUsername => data.ChatUsername;
 	}
 }
