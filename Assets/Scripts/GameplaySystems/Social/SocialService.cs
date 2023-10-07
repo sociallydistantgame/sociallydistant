@@ -26,6 +26,8 @@ namespace GameplaySystems.Social
 		private EmptyProfile unloadedPlayerProfile = new EmptyProfile();
 		private ChatMemberManager memberManager;
 		private GuildList masterGuildList;
+		private ChatChannelManager channelManager;
+		private MessageManager messageManager;
 
 		/// <inheritdoc />
 		public IProfile PlayerProfile
@@ -49,8 +51,10 @@ namespace GameplaySystems.Social
 			if (worldManager.Value == null)
 				return;
 
+			messageManager = new MessageManager(worldManager.Value, this);
+			channelManager = new ChatChannelManager(this.worldManager.Value, messageManager);
 			memberManager = new ChatMemberManager(this, worldManager.Value);
-			masterGuildList = new GuildList(memberManager, worldManager.Value);
+			masterGuildList = new GuildList(channelManager, memberManager, worldManager.Value);
 			worldManager.Value.Callbacks.AddModifyCallback<WorldPlayerData>(OnPlayerDataUpdated);
 			
 			worldManager.Value.Callbacks.AddCreateCallback<WorldProfileData>(OnProfileCreated);

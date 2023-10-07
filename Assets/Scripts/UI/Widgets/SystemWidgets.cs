@@ -25,6 +25,12 @@ namespace UI.Widgets
 
 		[SerializeField]
 		private RawImageWidgetController rawImagePrefab = null!;
+
+		[SerializeField]
+		private ListWidgetController listPrefab = null!;
+
+		[SerializeField]
+		private ListItemWidgetController listItemPrefab = null!;
 		
 		[Header("Settings widgets")]
 		[SerializeField]
@@ -39,8 +45,12 @@ namespace UI.Widgets
 		[SerializeField]
 		private SettingsDropdownWidgetController settingsDropdownPrefab = null!;
 
+		[Header("Chat")]
 		[SerializeField]
 		private ChatBubbleWidgetController chatBubblePrefab = null!;
+
+		[SerializeField]
+		private GuildHeaderWidgetController guildHeaderPrefab = null!;
 		
 		/// <inheritdoc />
 		public WidgetRecycleBin RecycleBin
@@ -78,6 +88,18 @@ namespace UI.Widgets
 			return RecycleOrInstantiate(rawImagePrefab, destination);
 		}
 
+		/// <inheritdoc />
+		public ListWidgetController GetList(RectTransform destination)
+		{
+			return RecycleOrInstantiate(listPrefab, destination);
+		}
+
+		/// <inheritdoc />
+		public ListItemWidgetController GetListItem(RectTransform destination)
+		{
+			return RecycleOrInstantiate(listItemPrefab, destination);
+		}
+
 		public SettingsSliderWidgetController GetSettingsSlider(RectTransform destination)
 		{
 			return RecycleOrInstantiate(this.sliderPrefab, destination);
@@ -103,7 +125,10 @@ namespace UI.Widgets
 			return RecycleOrInstantiate(this.chatBubblePrefab, destination);
 		}
 		
-		
+		public GuildHeaderWidgetController GetGuildHeader(RectTransform destination)
+		{
+			return RecycleOrInstantiate(this.guildHeaderPrefab, destination);
+		}
 		
 		private T RecycleOrInstantiate<T>(T prefabToInstantiate, RectTransform rectTransform)
 			where T : WidgetController

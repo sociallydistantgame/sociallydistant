@@ -17,12 +17,14 @@ namespace GameplaySystems.Social
 		private readonly Subject<IGuild> deleteObservable = new Subject<IGuild>();
 		private readonly Dictionary<ObjectId, Guild> guilds = new Dictionary<ObjectId, Guild>();
 		private readonly ChatMemberManager memberManager;
+		private readonly ChatChannelManager channelManager;
 		
 
-		public GuildList(ChatMemberManager memberManager, WorldManager world)
+		public GuildList(ChatChannelManager channelManager, ChatMemberManager memberManager, WorldManager world)
 		{
 			this.world = world;
 			this.memberManager = memberManager;
+			this.channelManager = channelManager;
 			
 			world.Callbacks.AddCreateCallback<WorldGuildData>(OnCreateGuild);
 			world.Callbacks.AddDeleteCallback<WorldGuildData>(OnDeleteGuild);
@@ -108,7 +110,7 @@ namespace GameplaySystems.Social
 			var notify = false;
 			if (!guilds.TryGetValue(subject.InstanceId, out Guild guild))
 			{
-				guild = new Guild(memberManager);
+				guild = new Guild(memberManager, channelManager);
 				guilds.Add(subject.InstanceId, guild);
 				notify = true;
 			}
