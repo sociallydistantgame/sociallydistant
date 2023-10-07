@@ -2,6 +2,7 @@
 using System.IO;
 using System.Threading.Tasks;
 using ContentManagement;
+using Core;
 using GamePlatform.ContentManagement;
 using UnityEngine;
 
@@ -20,5 +21,6 @@ namespace GamePlatform
 		Task<bool> ExtractWorldData(Stream destinationStream);
 
 		Task UpdatePlayerInfo(PlayerInfo newPlayerInfo);
+		Task SaveWorld(WorldManager world);
 	}
 }

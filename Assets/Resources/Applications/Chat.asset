@@ -14,8 +14,13 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   binaryName: chat
   windowTitle: Chat
-  programGuiPrefab: {fileID: 536731253686827546, guid: cbfa175b53c5a7d44a0088de659735be, type: 3}
+  programGuiPrefab: {fileID: 8448064589030672947, guid: 6a7401bd90eb8894da476b7d6a6b8aba, type: 3}
   programIcon:
     textIcon: \ue0b7
     spriteIcon: {fileID: 0}
-    iconColor: {r: 1, g: 1, b: 1, a: 1}
+    iconColor:
+      name: 0
+      r: 1
+      g: 1
+      b: 1
+      a: 1

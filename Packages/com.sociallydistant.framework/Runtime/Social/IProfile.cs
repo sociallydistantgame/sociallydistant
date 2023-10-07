@@ -11,5 +11,8 @@ namespace Social
 		string Bio { get; }
 		
 		bool IsPrivate { get; }
+		
+		string ChatName { get; }
+		string ChatUsername { get; }
 	}
 }
