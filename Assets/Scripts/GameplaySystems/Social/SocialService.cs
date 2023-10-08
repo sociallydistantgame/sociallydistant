@@ -1,6 +1,7 @@
 ﻿#nullable enable
 
 using System.Collections.Generic;
+using System.Linq;
 using Core;
 using Core.WorldData.Data;
 using Player;
@@ -110,13 +111,15 @@ namespace GameplaySystems.Social
 
 			foreach (WorldRelationshipData relationship in worldManager.Value.World.Relationships)
 			{
-				if (relationship.Source != user.ProfileId)
-					continue;
-
 				if (relationship.Type != RelationshipType.Friend)
 					continue;
 
-				if (!profiles.TryGetValue(relationship.Target, out Profile target))
+				if (relationship.Source != user.ProfileId && relationship.Target != user.ProfileId)
+					continue;
+
+				ObjectId friendId = relationship.Source == user.ProfileId ? relationship.Target : relationship.Source;
+                
+				if (!profiles.TryGetValue(friendId, out Profile target))
 					continue;
 
 				yield return target;
@@ -195,7 +198,77 @@ namespace GameplaySystems.Social
 		/// <inheritdoc />
 		public IEnumerable<IDirectConversation> GetDirectConversations(IProfile user)
 		{
-			yield break;
+			if (worldManager.Value == null)
+				yield break;
+			
+			// Find all of the user's friends.
+			foreach (IProfile? friend in GetFriends(user))
+			{
+				// Find a DM channel where:
+				// - there are two members
+				// - one member is the user
+				// - the other member is the friend
+				// If we can't, we must create the channel.
+
+				var foundChannel = false;
+				IEnumerable<IChatChannel> channels = channelManager.GetDirectMessageChannels();
+				foreach (IChatChannel channel in channels)
+				{
+					WorldMemberData[] members = worldManager.Value.World.Members.Where(x => x.GroupId == channel.Id && x.GroupType == MemberGroupType.GroupDirectMessage).ToArray();
+					if (members.Length != 2)
+						continue;
+
+					if (!members.All(x => x.ProfileId == user.ProfileId || x.ProfileId == friend.ProfileId))
+						continue;
+
+					foundChannel = true;
+				}
+
+				if (!foundChannel)
+				{
+					var newChannel = new WorldChannelData
+					{
+						InstanceId = worldManager.Value.GetNextObjectId(),
+						ChannelType = MessageChannelType.DirectMessage,
+						Name = $"__DMChannel__",
+						Description = "This is a DM channel"
+					};
+					
+					worldManager.Value.World.Channels.Add(newChannel);
+
+					worldManager.Value.World.Members.Add(new WorldMemberData()
+					{
+						InstanceId = worldManager.Value.GetNextObjectId(),
+						GroupId = newChannel.InstanceId,
+						GroupType = MemberGroupType.GroupDirectMessage,
+						ProfileId = user.ProfileId
+					});
+					
+					worldManager.Value.World.Members.Add(new WorldMemberData()
+					{
+						InstanceId = worldManager.Value.GetNextObjectId(),
+						GroupId = newChannel.InstanceId,
+						GroupType = MemberGroupType.GroupDirectMessage,
+						ProfileId = friend.ProfileId
+					});
+				}
+			}
+			
+			// Now, find all world member data for DM channels where the member is the user we're searching for.
+			foreach (WorldMemberData memberData in worldManager.Value.World.Members)
+			{
+				if (memberData.GroupType != MemberGroupType.GroupDirectMessage)
+					continue;
+
+				if (memberData.ProfileId != user.ProfileId)
+					continue;
+
+				// Find the channel.
+				IChatChannel? channel = channelManager.FindChannelById(memberData.GroupId, MessageChannelType.DirectMessage);
+
+				if (channel != null)
+					yield return new DirectMessageChannel(memberManager, channel, user);
+			}
 		}
 
 		/// <inheritdoc />
