@@ -13,6 +13,8 @@ namespace AcidicGui.Mvc
 	{
 		private readonly List<TView> viewsList = new List<TView>();
 
+		protected int ViewsListCount => viewsList.Count;
+		
 		/// <summary>
 		///		Gets a reference to the currently-visible view. If no view is visible, this will be null.
 		/// </summary>

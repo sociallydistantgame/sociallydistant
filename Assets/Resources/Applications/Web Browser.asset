@@ -14,8 +14,13 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   binaryName: airhawk
   windowTitle: Airhawk Web Browser
-  programGuiPrefab: {fileID: 536731253686827546, guid: cbfa175b53c5a7d44a0088de659735be, type: 3}
+  programGuiPrefab: {fileID: 480238177846311317, guid: 00ef2dc5a9c942148ab96681b91194a5, type: 3}
   programIcon:
     textIcon: \ue051
     spriteIcon: {fileID: 0}
-    iconColor: {r: 1, g: 1, b: 1, a: 1}
+    iconColor:
+      name: 0
+      r: 1
+      g: 1
+      b: 1
+      a: 1
