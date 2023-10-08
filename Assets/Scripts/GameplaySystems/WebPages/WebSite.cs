@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using AcidicGui.Mvc;
+using Codice.CM.WorkspaceServer.Tree;
 using UnityExtensions;
 
 namespace GameplaySystems.WebPages
@@ -25,6 +26,9 @@ namespace GameplaySystems.WebPages
 
 				string baseUrl = myAsset.HostName;
 
+				if (baseUrl.StartsWith("about:"))
+					return baseUrl;
+				
 				var pagePath = "/";
 
 				if (this.CurrentView != null)
