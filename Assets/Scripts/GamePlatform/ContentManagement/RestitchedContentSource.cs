@@ -10,6 +10,8 @@ namespace GamePlatform.ContentManagement
 		/// <inheritdoc />
 		public Task LoadAllContent(ContentCollectionBuilder builder)
 		{
+			return Task.CompletedTask;
+			
 			// Wallpapers
 			builder.AddContent(new WallpaperFromResources("RestitchedContent/ShellBackgrounds/RestitchedBlueprint"));
 			builder.AddContent(new WallpaperFromResources("RestitchedContent/ShellBackgrounds/BlueprintProps"));

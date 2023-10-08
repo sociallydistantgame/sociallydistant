@@ -6,6 +6,7 @@ using System.Threading.Tasks;
 using Core.Config;
 using Core.Config.SystemConfigCategories;
 using GamePlatform.ContentManagement;
+using GameplaySystems.WebPages;
 using Modules;
 using Shell;
 using UnityEngine;
@@ -19,6 +20,7 @@ namespace Modding
 	[IgnoreModdingLegalWaiver]
 	public class SystemModule : GameModule
 	{
+		private readonly WebSiteContentManager websites = new();
 		private GraphicsSettings? graphicsSettings;
 		private AccessibilitySettings? a11ySettings;
 		private IDisposable? settingsObservable;
@@ -38,14 +40,19 @@ namespace Modding
 			
 			// Watch system settings
 			settingsObservable = Context.SettingsManager.ObserveChanges(OnSettingsUpdated);
-			
+		
+			// Websites
+			Context.ContentManager.AddContentSource(websites);
+
 			// Find Restitched save data. If we do, the player gets a little gift from the lead programmer of the game - who.......created this game as well? <3
-			FindRestitchedDataAndRegisterRestitchedContent();
+			// FindRestitchedDataAndRegisterRestitchedContent();
 		}
 
 		/// <inheritdoc />
 		protected override async Task OnShutdown()
 		{
+			Context.ContentManager.RemoveContentSource(websites);
+			
 			if (graphicsSettings != null)
 				Context.SettingsManager.UnregisterSettingsCategory(graphicsSettings);
 
@@ -63,6 +70,8 @@ namespace Modding
 		
 		private void FindRestitchedDataAndRegisterRestitchedContent()
 		{
+			return;
+			
 			const string restitchedDetectionFlag = "dev.acidiclight.sociallydistant.specialContentFlags.foundRestitchedGameData";
 			
 			// Check the flag in PlayerPrefs to see if we've already located Restitched on this device before
