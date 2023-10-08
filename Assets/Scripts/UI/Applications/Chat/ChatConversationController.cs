@@ -19,7 +19,8 @@ namespace UI.Applications.Chat
 		public void SetMessageList(IList<ChatMessageModel> messageList)
 		{
 			this.listView.SetItems(messageList);
-			this.listView.ScrollTo(messageList.Count - 1, 0);
+			if (messageList.Count > 0)
+				this.listView.ScrollTo(messageList.Count - 1, 0);
 		}
 	}
 }

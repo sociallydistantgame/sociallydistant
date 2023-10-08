@@ -67,5 +67,21 @@ namespace GameplaySystems.Social
 			
 			channel.SetData(subject);
 		}
+
+		public IEnumerable<IChatChannel> GetDirectMessageChannels()
+		{
+			return this.channels.Values.Where(x => x.ChannelType == MessageChannelType.DirectMessage);
+		}
+
+		public IChatChannel? FindChannelById(ObjectId id, MessageChannelType type)
+		{
+			if (!channels.TryGetValue(id, out ChatChannel channel))
+				return null;
+
+			if (channel.ChannelType != type)
+				return null;
+
+			return channel;
+		}
 	}
 }

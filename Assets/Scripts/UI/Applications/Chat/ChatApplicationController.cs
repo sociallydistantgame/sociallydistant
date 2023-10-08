@@ -367,6 +367,7 @@ namespace UI.Applications.Chat
 				builder.AddWidget(new ListItemWidget<IChatChannel>
 				{
 					List = list,
+					Title = $"<b>{channel.Name}</b>{Environment.NewLine}{channel.Description}",
 					Data = channel,
 					Callback = ShowChannel
 				}, section);
