@@ -84,13 +84,16 @@ namespace UI.Applications.WebBrowser
 				if (current.CanGoBack)
 				{
 					current.GoBack();
+					UpdateUI();
 					return;
 				}
 
 				Destroy(current.gameObject);
 			}
-            
-			// TODO: History
+
+			future.Push(CurrentUrl);
+
+			NavigateTo(history.Pop(), false);
 		}
 
 		private void GoForward()
@@ -100,18 +103,20 @@ namespace UI.Applications.WebBrowser
 				if (current.CanGoForward)
 				{
 					current.GoForward();
+					UpdateUI();
 					return;
 				}
 
 				Destroy(current.gameObject);
 			}
-            
-			// TODO: History
+
+			history.Push(CurrentUrl);
+			NavigateTo(future.Pop(), false);
 		}
 
 		private void GoHome()
 		{
-			NavigateTo(homepage);
+			NavigateTo(homepage, null, true);
 		}
 
 		private void Navigate()
@@ -126,12 +131,17 @@ namespace UI.Applications.WebBrowser
 			
             return Uri.TryCreate("https://" + text, UriKind.Absolute, out uri);
 		}
-		
+
 		private void NavigateTo(string urlOrSearchQuery)
+		{
+			NavigateTo(urlOrSearchQuery, true);
+		}
+		
+		private void NavigateTo(string urlOrSearchQuery, bool addToHistory)
 		{
 			if (!ParseUrl(urlOrSearchQuery, out Uri uri))
 			{
-				Search(urlOrSearchQuery);
+				Search(urlOrSearchQuery, addToHistory);
 				return;
 			}
 
@@ -147,12 +157,31 @@ namespace UI.Applications.WebBrowser
 			if (asset == null)
 				return;
 			
-			NavigateTo(asset, uri.PathAndQuery, true);
+			NavigateTo(asset, uri.PathAndQuery, addToHistory);
 		}
 
-		private void Search(string searchQuery)
+		private void Search(string searchQuery, bool addToHistory)
 		{
-			// TODO: Search engine
+			if (searchQuery == homepage.HostName)
+			{
+				GoHome();
+				return;
+			}
+
+			if (searchQuery == "about:blank")
+			{
+				if (addToHistory)
+				{
+					future.Clear();
+					history.Push(CurrentUrl);
+				}
+				
+				if (current != null)
+					Destroy(current.gameObject);
+
+				current = null;
+				return;
+			}
 		}
 
 		private void NavigateTo(WebPageAsset asset, string? path = null, bool pushHistory = false)
