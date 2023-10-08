@@ -23,18 +23,14 @@ namespace UI.Widgets.Settings
 		public Action<int>? Callback { get; set; }
 
 		/// <inheritdoc />
-		public override void Setup(SettingsDropdownWidget widget)
-		{
-			this.Title = widget.Title;
-			this.Description = widget.Description;
-			this.CurrentIndex = widget.CurrentIndex;
-			this.Choices = widget.Choices;
-			this.Callback = widget.Callback;
-		}
-
-		/// <inheritdoc />
 		public override void UpdateUI()
 		{
+			this.Title = Widget.Title;
+			this.Description = Widget.Description;
+			this.CurrentIndex = Widget.CurrentIndex;
+			this.Choices = Widget.Choices;
+			this.Callback = Widget.Callback;
+			
 			this.titleText.SetText(Title);
 			this.descriptionText.SetText(Description);
 
@@ -42,7 +38,7 @@ namespace UI.Widgets.Settings
 
 			this.dropdown.options.AddRange(Choices.Select(x => new TMP_Dropdown.OptionData(x)));
 
-			this.dropdown.value = CurrentIndex;
+			this.dropdown.SetValueWithoutNotify(CurrentIndex);
 			
 			this.dropdown.onValueChanged.AddListener(OnValueChanged);
 		}

@@ -16,18 +16,14 @@ namespace UI.Applications.Chat
 		private string? guildName;
 		private int memberCount;
 		private int channelCount;
-		
-		/// <inheritdoc />
-		public override void Setup(GuildHeaderWidget widget)
-		{
-			guildName = widget.Name;
-			memberCount = widget.MemberCount;
-			channelCount = widget.ChannelCount;
-		}
 
 		/// <inheritdoc />
 		public override void UpdateUI()
 		{
+			guildName = Widget.Name;
+			memberCount = Widget.MemberCount;
+			channelCount = Widget.ChannelCount;
+			
 			guildNameText.SetText(guildName);
 			serverStatsText.SetText($"<b>{memberCount}</b> members  <b>{channelCount}</b> channels");
 		}

@@ -24,21 +24,17 @@ namespace UI.Widgets.Settings
 		private float maxValue;
 		private float value;
 		private Action<float>? callback;
-		
-		/// <inheritdoc />
-		public override void Setup(SettingsSliderWidget widget)
-		{
-			title = widget.Label;
-			description = widget.Description;
-			minValue = widget.MinimumValue;
-			maxValue = widget.MaximumValue;
-			value = widget.Value;
-			callback = widget.Callback;
-		}
 
 		/// <inheritdoc />
 		public override void UpdateUI()
 		{
+			title = Widget.Label;
+			description = Widget.Description;
+			minValue = Widget.MinimumValue;
+			maxValue = Widget.MaximumValue;
+			value = Widget.Value;
+			callback = Widget.Callback;
+			
 			titleText.SetText(title);
 			descriptionText.SetText(description);
 

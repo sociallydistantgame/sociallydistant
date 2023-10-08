@@ -1,4 +1,6 @@
 ﻿using System.Collections.Generic;
+using System.Collections.ObjectModel;
+using System.Linq;
 using Core;
 using Core.WorldData.Data;
 using UnityEngine;
@@ -111,6 +113,9 @@ namespace DevTools.Social
 				GUILayout.EndHorizontal();
 			}
 
+			if (GUILayout.Button("Add member to guild"))
+				devMenu.PushMenu(new AddGuildMember(world, guildId, members));
+
 			if (!playerInGuild && GUILayout.Button("Join Player to Guild"))
 			{
 				world.World.Members.Add(new WorldMemberData
@@ -148,6 +153,46 @@ namespace DevTools.Social
 				newChannel.GuildId = guild.InstanceId;
 
 				world.World.Channels.Add(newChannel);
+			}
+		}
+	}
+
+	public class AddGuildMember : IDevMenu
+	{
+		private readonly WorldManager world;
+		private readonly ObjectId guild;
+		private readonly IReadOnlyList<ObjectId> membersBlocked;
+
+		public AddGuildMember(WorldManager world, ObjectId guild, IReadOnlyList<WorldMemberData> members)
+		{
+			this.world = world;
+			this.guild = guild;
+			this.membersBlocked = members.Select(x => x.ProfileId).ToList();
+		}
+
+		/// <inheritdoc />
+		public string Name => "Add member to guild";
+
+		/// <inheritdoc />
+		public void OnMenuGUI(DeveloperMenu devMenu)
+		{
+			foreach (WorldProfileData profile in world.World.Profiles)
+			{
+				if (membersBlocked.Contains(profile.InstanceId))
+					continue;
+
+				if (GUILayout.Button($"{profile.InstanceId}: {profile.ChatName} (@{profile.ChatUsername})"))
+				{
+					world.World.Members.Add(new WorldMemberData
+					{
+						InstanceId = world.GetNextObjectId(),
+						ProfileId = profile.InstanceId,
+						GroupId = guild,
+						GroupType = MemberGroupType.Guild
+					});
+
+					devMenu.PopMenu();
+				}
 			}
 		}
 	}

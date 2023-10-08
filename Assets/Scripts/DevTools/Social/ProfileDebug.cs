@@ -1,4 +1,6 @@
 ﻿using Core;
+using Core.WorldData;
+using UnityEngine;
 
 namespace DevTools.Social
 {
@@ -17,6 +19,26 @@ namespace DevTools.Social
 		/// <inheritdoc />
 		public void OnMenuGUI(DeveloperMenu devMenu)
 		{
+			GUILayout.Label("General Actions");
+			if (GUILayout.Button("Create New Profile"))
+				devMenu.PushMenu(new CreateProfileMenu(world));
+			
+			ObjectId playerId = world.World.PlayerData.Value.PlayerProfile;
+
+			if (world.World.Profiles.ContainsId(playerId))
+			{
+				GUILayout.Label("Player");;
+				if (GUILayout.Button("Player Profile"))
+					devMenu.PushMenu(new ProfileViewer(world, playerId));
+			}
+            
+			GUILayout.Label("All Profiles");
+			
+			foreach (var profile in world.World.Profiles)
+			{
+				if (GUILayout.Button($"{profile.InstanceId}: {profile.SocialName}"))
+					devMenu.PushMenu(new ProfileViewer(world, profile.InstanceId));
+			}
 		}
 	}
 }

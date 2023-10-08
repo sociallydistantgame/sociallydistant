@@ -20,19 +20,15 @@ namespace UI.Widgets.Settings
 		public string? Description { get; set; }
 		public bool CurrentValue { get; set; }
 		public Action<bool>? Callback { get; set; }
-		
-		/// <inheritdoc />
-		public override void Setup(SettingsToggleWidget widget)
-		{
-			this.Title = widget.Title;
-			this.Description = widget.Description;
-			this.CurrentValue = widget.CurrentValue;
-			this.Callback = widget.Callback;
-		}
 
 		/// <inheritdoc />
 		public override void UpdateUI()
 		{
+			this.Title = Widget.Title;
+			this.Description = Widget.Description;
+			this.CurrentValue = Widget.CurrentValue;
+			this.Callback = Widget.Callback;
+			
 			this.titleText.SetText(this.Title);
 			this.descriptionText.SetText(this.Description);
 			this.actualToggle.isOn = this.CurrentValue;
