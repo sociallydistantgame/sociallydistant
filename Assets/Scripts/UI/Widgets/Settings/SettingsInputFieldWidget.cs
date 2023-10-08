@@ -14,13 +14,8 @@ namespace UI.Widgets.Settings
 		/// <inheritdoc />
 		public override WidgetController BuildSettingsWidget(SystemWidgets assembler, RectTransform destination)
 		{
-			var inputField = assembler.GetSettingsInputField(destination);
-
-			inputField.Title = Title;
-			inputField.Description = Description;
-			inputField.CurrentValue = CurrentValue;
-			inputField.Callback = Callback;
-
+			SettingsInputFieldController inputField = assembler.GetSettingsInputField(destination);
+            inputField.Setup(this);
 			return inputField;
 		}
 	}

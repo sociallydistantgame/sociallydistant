@@ -208,33 +208,20 @@ namespace GamePlatform
 				
 				// Create player profile data if it's missing
 				WorldPlayerData playerData = this.worldManager.Value.World.PlayerData.Value;
-
-				var modify = false;
+                
 				WorldProfileData profile = default;
-				if (worldManager.Value.World.Profiles.ContainsId(playerData.PlayerProfile))
-				{
-					profile = worldManager.Value.World.Profiles[playerData.PlayerProfile];
-					modify = true;
-				}
-				else
+				if (!worldManager.Value.World.Profiles.ContainsId(playerData.PlayerProfile))
 				{
 					profile.InstanceId = worldManager.Value.GetNextObjectId();
 					playerData.PlayerProfile = profile.InstanceId;
-				}
-				
-				// Sync the profile data with the save's metadata
-				// We only sync the gender and full names.
-				profile.Gender = this.loadedPlayerInfo.PlayerGender;
-				profile.SocialName = this.loadedPlayerInfo.Name;
-				profile.ChatName = this.loadedPlayerInfo.Name;
-				profile.MailName = this.loadedPlayerInfo.Name;
-
-				if (modify)
-				{
-					worldManager.Value.World.Profiles.Modify(profile);
-				}
-				else
-				{
+					
+					// Sync the profile data with the save's metadata
+					// We only sync the gender and full names.
+					profile.Gender = this.loadedPlayerInfo.PlayerGender;
+					profile.SocialName = this.loadedPlayerInfo.Name;
+					profile.ChatName = this.loadedPlayerInfo.Name;
+					profile.MailName = this.loadedPlayerInfo.Name;
+					
 					worldManager.Value.World.Profiles.Add(profile);
 					worldManager.Value.World.PlayerData.Value = playerData;
 				}

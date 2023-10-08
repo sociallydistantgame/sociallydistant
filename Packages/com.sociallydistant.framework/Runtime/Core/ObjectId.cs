@@ -56,5 +56,14 @@ namespace Core
 
 		public static bool operator !=(ObjectId left, ObjectId right)
 			=> !(left == right);
+
+		/// <inheritdoc />
+		public override string ToString()
+		{
+			if (IsInvalid)
+				return "Invalid";
+
+			return Id.ToString();
+		}
 	}
 }

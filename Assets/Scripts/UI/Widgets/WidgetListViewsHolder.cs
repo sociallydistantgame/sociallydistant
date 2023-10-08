@@ -14,6 +14,7 @@ namespace UI.Widgets
 
 		public RectTransform ViewRoot => customView.ViewsRect;
 		
+		public IWidget? Widget { get; set; }
 		public GameObject? RecyclableWidget { get; set; }
 		public WidgetController? WidgetController { get; set; }
 		

@@ -21,28 +21,25 @@ namespace UI.Widgets.Settings
 		public string? Description { get; set; }
 		public string? CurrentValue { get; set; }
 		public Action<string>? Callback { get; set; }
-		
-		/// <inheritdoc />
-		public override void Setup(SettingsInputFieldWidget widget)
-		{
-			this.Title = widget.Title;
-			this.Description = widget.Description;
-			this.CurrentValue = widget.CurrentValue;
-			this.Callback = widget.Callback;
-		}
 
 		/// <inheritdoc />
 		public override void UpdateUI()
 		{
+			Title = Widget.Title;
+			Description = Widget.Description;
+			CurrentValue = Widget.CurrentValue;
+			Callback = Widget.Callback;
+			
 			titleText.SetText(Title);
 			descriptionText.SetText(Description);
-			inputField.text = CurrentValue;
+			inputField.SetTextWithoutNotify(CurrentValue);
 			inputField.onValueChanged.AddListener(OnValueChanged);
 		}
 
 		private void OnValueChanged(string newValue)
 		{
 			this.CurrentValue = newValue;
+			Widget.CurrentValue = newValue;
 			Callback?.Invoke(newValue);
 		}
 

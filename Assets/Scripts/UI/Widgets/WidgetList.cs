@@ -50,12 +50,24 @@ namespace UI.Widgets
 		{
 			IWidget widget = widgets[newOrRecycled.ItemIndex];
 
-            WidgetController controller = widget.Build(this.systemWidgets, newOrRecycled.ViewRoot);
+			if (newOrRecycled.Widget != widget || newOrRecycled.WidgetController == null)
+			{
+				if (newOrRecycled.RecyclableWidget != null && newOrRecycled.WidgetController != null)
+				{
+					recycleBin.Recycle(newOrRecycled.WidgetController);
 
-            newOrRecycled.RecyclableWidget = controller.gameObject;
-            newOrRecycled.WidgetController = controller;
+					newOrRecycled.WidgetController = null;
+					newOrRecycled.RecyclableWidget = null;
+				}
+				
+				newOrRecycled.WidgetController = widget.Build(this.systemWidgets, newOrRecycled.ViewRoot);
+			}
 
-            controller.UpdateUI();
+            newOrRecycled.RecyclableWidget = newOrRecycled.WidgetController.gameObject;
+            newOrRecycled.WidgetController = newOrRecycled.WidgetController;
+            newOrRecycled.Widget = widget;
+
+            newOrRecycled.WidgetController.UpdateUI();
             
 			ScheduleComputeVisibilityTwinPass();
 		}

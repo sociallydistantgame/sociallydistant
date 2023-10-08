@@ -18,10 +18,7 @@ namespace UI.Widgets.Settings
 		{
 			SettingsToggleWidgetController toggle = assembler.GetSettingsToggle(destination);
 
-			toggle.Title = Title;
-			toggle.Description = Description;
-			toggle.CurrentValue = this.CurrentValue;
-			toggle.Callback = Callback;
+			toggle.Setup(this);
 			
 			return toggle;
 		}

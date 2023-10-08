@@ -15,17 +15,13 @@ namespace UI.Applications.Chat
 		
 		private string? text;
 		private bool usePlayerColor;
-		
-		/// <inheritdoc />
-		public override void Setup(ChatBubbleWidget widget)
-		{
-			text = widget.Text;
-			usePlayerColor = widget.UsePlayerColor;
-		}
 
 		/// <inheritdoc />
 		public override void UpdateUI()
 		{
+			text = Widget.Text;
+			usePlayerColor = Widget.UsePlayerColor;
+			
 			label.SetText(text);
 
 			bubble.color = usePlayerColor ? Color.black : Color.gray;
