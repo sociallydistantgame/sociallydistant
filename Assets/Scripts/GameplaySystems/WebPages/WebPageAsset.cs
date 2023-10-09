@@ -32,6 +32,8 @@ namespace GameplaySystems.WebPages
 
 			website.NavigateToPath(path);
 			
+			this.webSitePrefab.gameObject.SetActive(true);
+			
 			return website;
 		}
 	}

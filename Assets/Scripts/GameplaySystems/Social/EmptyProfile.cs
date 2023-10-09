@@ -11,6 +11,9 @@ namespace GameplaySystems.Social
 		public ObjectId ProfileId => ObjectId.Invalid;
 
 		/// <inheritdoc />
+		public string SocialHandle { get; }
+
+		/// <inheritdoc />
 		public Gender Gender { get; }
 
 		/// <inheritdoc />
