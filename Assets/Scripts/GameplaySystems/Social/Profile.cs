@@ -25,6 +25,9 @@ namespace GameplaySystems.Social
 		public ObjectId ProfileId => data.InstanceId;
 
 		/// <inheritdoc />
+		public string SocialHandle => data.SocialUsername;
+
+		/// <inheritdoc />
 		public Gender Gender => data.Gender;
 
 		/// <inheritdoc />

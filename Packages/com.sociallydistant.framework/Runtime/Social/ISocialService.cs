@@ -17,6 +17,8 @@ namespace Social
 		IGuildList GetGuilds();
 		IEnumerable<IDirectConversation> GetDirectConversations(IProfile user);
 
+		IEnumerable<IProfile> Profiles { get; }
+		
 		IEnumerable<IUserMessage> GetSocialPosts(IProfile profile);
 		IEnumerable<IUserMessage> GetTimeline(IProfile profile);
 

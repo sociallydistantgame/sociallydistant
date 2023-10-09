@@ -272,6 +272,9 @@ namespace GameplaySystems.Social
 		}
 
 		/// <inheritdoc />
+		public IEnumerable<IProfile> Profiles => profiles.Values;
+
+		/// <inheritdoc />
 		public IEnumerable<IUserMessage> GetSocialPosts(IProfile profile)
 		{
 			throw new System.NotImplementedException();

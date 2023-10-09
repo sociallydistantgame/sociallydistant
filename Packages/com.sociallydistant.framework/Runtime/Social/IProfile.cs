@@ -7,6 +7,8 @@ namespace Social
 	{
 		ObjectId ProfileId { get; }
 		
+		string SocialHandle { get; }
+		
 		Gender Gender { get; }
 		string Bio { get; }
 		
