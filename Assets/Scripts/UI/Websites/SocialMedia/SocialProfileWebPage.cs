@@ -25,6 +25,9 @@ namespace UI.Websites.SocialMedia
 
 		[SerializeField]
 		private WidgetList sidebar = null!;
+
+		[SerializeField]
+		private SocialPostListView listView = null!;
 		
 		private IProfile? profile = null;
 		
