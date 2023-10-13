@@ -8,6 +8,7 @@ using GameplaySystems.WebPages;
 using Social;
 using UI.Social;
 using UI.Widgets;
+using UniRx;
 using UnityEngine;
 using UnityExtensions;
 
@@ -28,6 +29,8 @@ namespace UI.Websites.SocialMedia
 
 		[SerializeField]
 		private SocialPostListView listView = null!;
+
+		private readonly ReactiveCollection<SocialPostModel> uiPosts = new ReactiveCollection<SocialPostModel>();
 		
 		private IProfile? profile = null;
 		
@@ -36,6 +39,14 @@ namespace UI.Websites.SocialMedia
 		{
 			this.AssertAllFieldsAreSerialized(typeof(SocialProfileWebPage));
 			base.Awake();
+		}
+
+		/// <inheritdoc />
+		protected override void Start()
+		{
+			base.Start();
+
+			uiPosts.ObserveCountChanged(true).Subscribe(OnUiPostsChanged);
 		}
 
 		public void ShowProfile(IProfile profile)
@@ -77,8 +88,30 @@ namespace UI.Websites.SocialMedia
 			profileInfo.ShowPronoun = !isBlockedOrPrivate;
 			
 			sidebar.SetItems(BuildRelationships(isBlockedOrPrivate));
+
+			SetupInitialFeed(isBlockedOrPrivate);
 		}
 
+		private void SetupInitialFeed(bool isBlockedOrPrivate)
+		{
+			this.uiPosts.Clear();
+
+			if (isBlockedOrPrivate)
+				return;
+
+			if (socialService.Value == null)
+				return;
+
+			if (this.profile == null)
+				return;
+
+			foreach (IUserMessage post in socialService.Value.GetSocialPosts(this.profile))
+			{
+				uiPosts.Add(ConvertPost(post));
+			}
+
+		}
+		
 		private IList<IWidget> BuildRelationships(bool isBlockedOrPrivate)
 		{
 			var builder = new WidgetBuilder();
@@ -137,6 +170,21 @@ namespace UI.Websites.SocialMedia
 				}, following);
 			
 			return builder.Build();
+		}
+
+		private SocialPostModel ConvertPost(IUserMessage message)
+		{
+			return new SocialPostModel
+			{
+				Document = message.GetDocumentData(),
+				Name = message.Author.ChatName,
+				Handle = message.Author.SocialHandle
+			};
+		}
+
+		private void OnUiPostsChanged(int count)
+		{
+			this.listView.SetItems(uiPosts);
 		}
 	}
 }
