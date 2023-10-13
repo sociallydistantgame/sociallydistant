@@ -2,8 +2,10 @@
 
 using System.Collections.Generic;
 using System.Linq;
+using System.Runtime.CompilerServices;
 using Core;
 using Core.WorldData.Data;
+using PlasticPipe.PlasticProtocol.Messages;
 using Player;
 using Social;
 using UnityEngine;
@@ -29,6 +31,7 @@ namespace GameplaySystems.Social
 		private GuildList masterGuildList;
 		private ChatChannelManager channelManager;
 		private MessageManager messageManager;
+		private SocialPostManager socialPostManager;
 
 		/// <inheritdoc />
 		public IProfile PlayerProfile
@@ -56,6 +59,8 @@ namespace GameplaySystems.Social
 			channelManager = new ChatChannelManager(this.worldManager.Value, messageManager);
 			memberManager = new ChatMemberManager(this, worldManager.Value);
 			masterGuildList = new GuildList(channelManager, memberManager, worldManager.Value);
+			socialPostManager = new SocialPostManager(this, worldManager.Value);
+			
 			worldManager.Value.Callbacks.AddModifyCallback<WorldPlayerData>(OnPlayerDataUpdated);
 			
 			worldManager.Value.Callbacks.AddCreateCallback<WorldProfileData>(OnProfileCreated);
@@ -65,6 +70,7 @@ namespace GameplaySystems.Social
 
 		private void OnDestroy()
 		{
+			socialPostManager.Dispose();
 			masterGuildList.Dispose();
 			masterGuildList = null;
 		}
@@ -277,13 +283,25 @@ namespace GameplaySystems.Social
 		/// <inheritdoc />
 		public IEnumerable<IUserMessage> GetSocialPosts(IProfile profile)
 		{
-			throw new System.NotImplementedException();
+			return socialPostManager.GetPostsByUser(profile);
 		}
 
 		/// <inheritdoc />
 		public IEnumerable<IUserMessage> GetTimeline(IProfile profile)
 		{
-			throw new System.NotImplementedException();
+			return GetTimelineInternal(profile).OrderByDescending(x => x.Date);
+		}
+
+		private IEnumerable<IUserMessage> GetTimelineInternal(IProfile profile)
+		{
+			foreach (IUserMessage ownPost in GetSocialPosts(profile))
+				yield return ownPost;
+			
+			foreach (IProfile follow in GetFollowing(profile))
+			{
+				foreach (IUserMessage post in GetSocialPosts(follow))
+					yield return post;
+			}
 		}
 
 		/// <inheritdoc />
