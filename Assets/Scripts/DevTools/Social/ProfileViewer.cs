@@ -1,5 +1,7 @@
 ﻿#nullable  enable
+using System;
 using System.Collections.Generic;
+using System.Linq.Expressions;
 using Core;
 using Core.WorldData.Data;
 using UnityEngine;
@@ -97,6 +99,9 @@ namespace DevTools.Social
 				devMenu.PushMenu(new AddRelationshipMenu(world, profileId, relationships));
             
 			
+			if (GUILayout.Button("Create Social Post"))
+				devMenu.PushMenu(new CreateSocialPost(world, profileId));
+			
 			if (profileId != world.World.PlayerData.Value.PlayerProfile)
 			{
 				if (GUILayout.Button("Possess"))
@@ -115,6 +120,51 @@ namespace DevTools.Social
 			else
 			{
 				GUILayout.Label("Deleting the player profile isn't a good idea, even for a developer. Action blocked.");
+			}
+		}
+	}
+
+	public class CreateSocialPost : IDevMenu
+	{
+		private readonly WorldManager worldManager;
+		private readonly ObjectId profile;
+		private WorldPostData post;
+		private string text = string.Empty;
+
+		public CreateSocialPost(WorldManager world, ObjectId profile)
+		{
+			this.worldManager = world;
+			this.profile = profile;
+		}
+
+		/// <inheritdoc />
+		public string Name => "Create Social Post";
+
+		/// <inheritdoc />
+		public void OnMenuGUI(DeveloperMenu devMenu)
+		{
+			GUILayout.Label($"Profile: {profile}");
+			GUILayout.Label("Post Content");
+
+			text = GUILayout.TextArea(text);
+
+			if (GUILayout.Button("Create"))
+			{
+				post.InstanceId = worldManager.GetNextObjectId();
+				post.Author = profile;
+				post.Date = DateTime.UtcNow;
+				post.DocumentElements = new DocumentElement[]
+				{
+					new DocumentElement
+					{
+						ElementType = DocumentElementType.Text,
+						Data = text
+					}
+				};
+
+				worldManager.World.Posts.Add(post);
+				
+				devMenu.PopMenu();
 			}
 		}
 	}
