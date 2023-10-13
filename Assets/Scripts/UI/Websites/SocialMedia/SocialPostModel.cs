@@ -6,7 +6,7 @@ namespace UI.Websites.SocialMedia
 {
 	public class SocialPostModel
 	{
-		public Texture2D? Author { get; set; }
+		public Texture2D? Avatar { get; set; }
 		public string Name { get; set; } = string.Empty;
 		public string Handle { get; set; } = string.Empty;
 		public int LikeCount { get; set; }
