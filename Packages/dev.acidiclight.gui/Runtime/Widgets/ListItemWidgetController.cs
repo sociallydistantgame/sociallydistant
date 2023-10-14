@@ -13,6 +13,7 @@ namespace AcidicGui.Widgets
 		[SerializeField]
 		private TextMeshProUGUI label = null!;
 		
+		public bool Selected { get; set; }
 		public ListWidget List { get; set; }
 		public Action? Callback { get; set; }
 		public string? Title { get; set; }
@@ -21,8 +22,9 @@ namespace AcidicGui.Widgets
 		public override void UpdateUI()
 		{
 			label.SetText(Title);
-			
+            
 			toggle.group = List?.ToggleGroup;
+			toggle.SetIsOnWithoutNotify(Selected);
 			toggle.onValueChanged.AddListener(OnValueChanged);
 		}
 

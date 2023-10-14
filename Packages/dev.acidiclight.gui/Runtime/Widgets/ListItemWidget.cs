@@ -9,6 +9,7 @@ namespace AcidicGui.Widgets
 		public string? Title { get; set; }
 		public TData Data { get; set; }
 		public Action<TData>? Callback { get; set; }
+		public bool Selected { get; set; }
 		
 		/// <inheritdoc />
 		public WidgetController Build(IWidgetAssembler assembler, RectTransform destination)
@@ -21,6 +22,7 @@ namespace AcidicGui.Widgets
 			controller.Title = this.Title;
 			controller.List = this.List;
 			controller.Callback = OnSelect;
+			controller.Selected = Selected;
 			
 			return controller;
 		}

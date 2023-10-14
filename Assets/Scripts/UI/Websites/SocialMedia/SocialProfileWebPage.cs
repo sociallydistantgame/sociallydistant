@@ -149,7 +149,8 @@ namespace UI.Websites.SocialMedia
 					List = list,
 					Data = follower,
 					Title = $"{follower.ChatName}{Environment.NewLine}@{follower.SocialHandle}",
-					Callback = ShowProfile
+					Callback = ShowProfile,
+					Selected = false
 				}, followers);
 
 				followerCount++;
@@ -169,7 +170,8 @@ namespace UI.Websites.SocialMedia
 					List = list,
 					Data = follower,
 					Title = $"{follower.ChatName}{Environment.NewLine}@{follower.SocialHandle}",
-					Callback = ShowProfile
+					Callback = ShowProfile,
+					Selected = false
 				}, following);
 
 				followingCount++;
