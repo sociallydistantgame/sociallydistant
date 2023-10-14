@@ -4,6 +4,7 @@ using System;
 using System.Linq;
 using GameplaySystems.Social;
 using GameplaySystems.WebPages;
+using JetBrains.Annotations;
 using Social;
 using UnityEngine;
 using UnityEngine.UI;
@@ -16,8 +17,11 @@ namespace UI.Websites.SocialMedia
 		[Header("Dependencies")]
 		[SerializeField]
 		private SocialServiceHolder socialService = null!;
-		
+
 		[Header("UI")]
+		[SerializeField]
+		private SocialTimelineWebPage timelineWebPage = null!;
+		
 		[SerializeField]
 		private SocialProfileWebPage profileView = null!;
 
@@ -40,7 +44,14 @@ namespace UI.Websites.SocialMedia
 			playerProfileToggle.onValueChanged.AddListener(OnPlayerProfileToggle);
 		}
 
+		/// <inheritdoc />
+		protected override void GoToIndex()
+		{
+			NavigateTo(timelineWebPage);
+		}
+
 		[WebPage("profile", ":username")]
+		[UsedImplicitly]
 		private void ShowProfile(string username)
 		{
 			if (socialService.Value == null)
