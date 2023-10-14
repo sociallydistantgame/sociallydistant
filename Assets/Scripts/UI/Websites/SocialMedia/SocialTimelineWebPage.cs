@@ -109,7 +109,13 @@ namespace UI.Websites.SocialMedia
 						List = list,
 						Data = profile,
 						Title = $"<b>{profile.ChatName}</b>{Environment.NewLine}@{profile.SocialHandle}",
-						Callback = website.ShowProfile
+						Callback = (data) =>
+						{
+							website.SetHistoryState($"/profile/{data.SocialHandle}", () =>
+							{
+								website.ShowProfile(data);
+							});
+						}
 					}, people);
 
 					knownUserCount++;

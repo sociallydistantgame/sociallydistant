@@ -29,7 +29,7 @@ namespace GameplaySystems.WebPages
 
 			website.Init(this);
 			website.gameObject.SetActive(true);
-
+			
 			website.NavigateToPath(path);
 			
 			this.webSitePrefab.gameObject.SetActive(true);
