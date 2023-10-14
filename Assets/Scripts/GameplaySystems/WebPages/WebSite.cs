@@ -4,18 +4,23 @@ using System.Linq;
 using System.Reflection;
 using AcidicGui.Mvc;
 using Codice.CM.WorkspaceServer.Tree;
+using UniRx;
 using UnityExtensions;
 
 namespace GameplaySystems.WebPages
 {
 	public abstract class WebSite : Controller<WebPage>
 	{
-		private readonly Stack<WebPage> future = new Stack<WebPage>();
-		
-		public bool CanGoBack => ViewsListCount > 1;
-		public bool CanGoForward => future.Count > 0;
+		private readonly Stack<SavedState> history = new Stack<SavedState>();
+		private readonly Stack<SavedState> future = new Stack<SavedState>();
+		private readonly Subject<string> urlSubject = new Subject<string>();
 
+		public bool CanGoBack => history.Count > 0;
+		public bool CanGoForward => future.Count > 0;
+		public IObservable<string> UrlObservable => urlSubject;
+		
 		private WebPageAsset myAsset;
+		private SavedState? currentState;
 
 		public WebPageAsset WebSiteAsset => myAsset;
 		
@@ -33,8 +38,8 @@ namespace GameplaySystems.WebPages
 				
 				var pagePath = "/";
 
-				if (this.CurrentView != null)
-					pagePath = CurrentView.Path;
+				if (this.currentState != null)
+					pagePath = currentState.Path;
 
 				return $"https://{baseUrl}{pagePath}";
 			}
@@ -49,14 +54,36 @@ namespace GameplaySystems.WebPages
 
 		public void GoBack()
 		{
-			if (CanGoBack)
-				base.GoBack(null);
+			if (!CanGoBack)
+				return;
+			
+			if (currentState != null)
+				future.Push(currentState);
+
+			currentState = history.Pop();
+
+			if (currentState != null)
+			{
+				currentState.Method?.Invoke();
+				urlSubject.OnNext(this.Url);
+			}
 		}
 
 		public void GoForward()
 		{
-			if (CanGoForward)
-				NavigateTo(future.Pop());
+			if (!CanGoForward)
+				return;
+            
+			if (currentState != null)
+				history.Push(currentState);
+
+			currentState = future.Pop();
+
+			if (currentState != null)
+			{
+				currentState.Method?.Invoke();
+				urlSubject.OnNext(Url);
+			}
 		}
 
 		public void Init(WebPageAsset asset)
@@ -81,7 +108,7 @@ namespace GameplaySystems.WebPages
 			
 			if (string.IsNullOrWhiteSpace(path) || path == "/")
 			{
-				GoToIndex();
+				SetHistoryState(pathAndQuery, GoToIndex);
 				return true;
 			}
 			
@@ -124,7 +151,10 @@ namespace GameplaySystems.WebPages
 					}
 				}
 
-				method.Invoke(this, paramList.ToArray());
+				SetHistoryState(pathAndQuery, () =>
+				{
+					method.Invoke(this, paramList.ToArray());
+				});
 				return true;
 			}
 
@@ -135,5 +165,28 @@ namespace GameplaySystems.WebPages
 		{
 			
 		}
-	}
+
+		public void SetHistoryState(string url, Action methodToExecute)
+		{
+			if (currentState != null)
+				history.Push(currentState);
+
+			future.Clear();
+
+			currentState = new SavedState()
+			{
+				Path = url,
+				Method = methodToExecute
+			};
+
+			currentState.Method.Invoke();
+			urlSubject.OnNext(Url);
+		}
+		
+		private class SavedState
+		{
+			public string Path { get; set; } = string.Empty;
+			public Action? Method { get; set; }
+		}
+    }
 }

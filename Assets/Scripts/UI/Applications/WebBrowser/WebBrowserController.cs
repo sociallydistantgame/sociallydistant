@@ -9,6 +9,7 @@ using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
 using UnityExtensions;
+using UniRx;
 
 namespace UI.Applications.WebBrowser
 {
@@ -42,7 +43,8 @@ namespace UI.Applications.WebBrowser
 		private WebPageAsset homepage = null!;
 
 		public string CurrentUrl => addressBar.text;
-		
+
+		private IDisposable? websitePathObserver;
 		private readonly Stack<string> future = new Stack<string>();
 		private readonly Stack<string> history = new Stack<string>();
 		private WebSite? current;
@@ -61,6 +63,11 @@ namespace UI.Applications.WebBrowser
 			addressBar.onSubmit.AddListener(NavigateTo);
 
 			NavigateTo(homepage, null, false);
+		}
+
+		private void OnDestroy()
+		{
+			websitePathObserver?.Dispose();
 		}
 
 		private void UpdateUI()
@@ -199,9 +206,18 @@ namespace UI.Applications.WebBrowser
 				Destroy(current.gameObject);
 				current = null;
 			}
-			
+
+			websitePathObserver?.Dispose();
+            
 			current = asset.InstantiateWebSite(pageArea, path);
+
+			websitePathObserver = current.UrlObservable.Subscribe(OnWebsitePathChanged);
 			
+			UpdateUI();
+		}
+
+		private void OnWebsitePathChanged(string url)
+		{
 			UpdateUI();
 		}
 	}

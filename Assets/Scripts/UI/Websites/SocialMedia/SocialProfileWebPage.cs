@@ -113,6 +113,14 @@ namespace UI.Websites.SocialMedia
 			}
 
 		}
+
+		private void ShowProfileWithHistory(IProfile profile)
+		{
+			website.SetHistoryState($"/profile/{profile.SocialHandle}", () =>
+			{
+				ShowProfile(profile);
+			});
+		}
 		
 		private IList<IWidget> BuildRelationships(bool isBlockedOrPrivate)
 		{
@@ -149,7 +157,7 @@ namespace UI.Websites.SocialMedia
 					List = list,
 					Data = follower,
 					Title = $"{follower.ChatName}{Environment.NewLine}@{follower.SocialHandle}",
-					Callback = ShowProfile,
+					Callback = ShowProfileWithHistory,
 					Selected = false
 				}, followers);
 
@@ -170,7 +178,7 @@ namespace UI.Websites.SocialMedia
 					List = list,
 					Data = follower,
 					Title = $"{follower.ChatName}{Environment.NewLine}@{follower.SocialHandle}",
-					Callback = ShowProfile,
+					Callback = ShowProfileWithHistory,
 					Selected = false
 				}, following);
 
