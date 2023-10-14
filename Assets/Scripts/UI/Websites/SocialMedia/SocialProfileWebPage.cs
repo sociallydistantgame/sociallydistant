@@ -31,13 +31,15 @@ namespace UI.Websites.SocialMedia
 		private SocialPostListView listView = null!;
 
 		private readonly ReactiveCollection<SocialPostModel> uiPosts = new ReactiveCollection<SocialPostModel>();
-		
+
+		private SocialMediaWebsite website;
 		private IProfile? profile = null;
 		
 		/// <inheritdoc />
 		protected override void Awake()
 		{
 			this.AssertAllFieldsAreSerialized(typeof(SocialProfileWebPage));
+			this.MustGetComponentInParent(out website);
 			base.Awake();
 		}
 
@@ -132,25 +134,41 @@ namespace UI.Websites.SocialMedia
 
 			var followerCount = 0;
 			var followingCount = 0;
-			
+
+			ListWidget? list = null;
 			foreach (IProfile follower in socialService.Value.GetFollowers(profile))
 			{
+				if (list == null)
+				{
+					list = new ListWidget { AllowSelectNone = true };
+					builder.AddWidget(list, followers);
+				}
+				
 				builder.AddWidget(new ListItemWidget<IProfile>()
 				{
+					List = list,
 					Data = follower,
-					Title = $"{profile.ChatName}{Environment.NewLine}@{profile.SocialHandle}",
+					Title = $"{follower.ChatName}{Environment.NewLine}@{follower.SocialHandle}",
 					Callback = ShowProfile
 				}, followers);
 
 				followerCount++;
 			}
-			
+
+			list = null;
 			foreach (IProfile follower in socialService.Value.GetFollowing(profile))
 			{
+				if (list == null)
+				{
+					list = new ListWidget { AllowSelectNone = true };
+					builder.AddWidget(list, following);
+				}
+				
 				builder.AddWidget(new ListItemWidget<IProfile>()
 				{
+					List = list,
 					Data = follower,
-					Title = $"{profile.ChatName}{Environment.NewLine}@{profile.SocialHandle}",
+					Title = $"{follower.ChatName}{Environment.NewLine}@{follower.SocialHandle}",
 					Callback = ShowProfile
 				}, following);
 
