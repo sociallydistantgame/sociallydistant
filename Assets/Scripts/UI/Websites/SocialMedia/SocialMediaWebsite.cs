@@ -66,7 +66,7 @@ namespace UI.Websites.SocialMedia
 			ShowProfile(user);
 		}
 
-		private void ShowProfile(IProfile profile)
+		public void ShowProfile(IProfile profile)
 		{
 			if (socialService.Value != null && profile == socialService.Value.PlayerProfile)
 			{

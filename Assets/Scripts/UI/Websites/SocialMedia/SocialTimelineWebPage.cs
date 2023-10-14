@@ -25,13 +25,15 @@ namespace UI.Websites.SocialMedia
 
 		[SerializeField]
 		private WidgetList sidebar = null!;
-		
+        
 		private readonly ReactiveCollection<SocialPostModel> uiPosts = new ReactiveCollection<SocialPostModel>();
+		private SocialMediaWebsite website;
 		
 		/// <inheritdoc />
 		protected override void Awake()
 		{
 			this.AssertAllFieldsAreSerialized(typeof(SocialTimelineWebPage));
+			this.MustGetComponentInParent(out website);
 			base.Awake();
 		}
 
@@ -90,12 +92,24 @@ namespace UI.Websites.SocialMedia
 			// People who the player follows are prioritized.
 			if (socialService.Value != null)
 			{
+				ListWidget? list = null;
 				foreach (IProfile profile in socialService.Value.GetFollowing(socialService.Value.PlayerProfile))
 				{
+					if (list == null)
+					{
+						list = new ListWidget
+						{
+							AllowSelectNone = true
+						};
+						builder.AddWidget(list, people);
+					}
+					
 					builder.AddWidget(new ListItemWidget<IProfile>
 					{
+						List = list,
 						Data = profile,
-						Title = $"<b>{profile.ChatName}</b>{Environment.NewLine}@{profile.SocialHandle}"
+						Title = $"<b>{profile.ChatName}</b>{Environment.NewLine}@{profile.SocialHandle}",
+						Callback = website.ShowProfile
 					}, people);
 
 					knownUserCount++;
