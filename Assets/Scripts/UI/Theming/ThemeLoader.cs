@@ -232,6 +232,29 @@ namespace UI.Theming
 
 			return ExtractTextureResource(entry);
 		}
+
+		public async Task<ThemeMetadata> ExtractMetadataAsync()
+		{
+			OperatingSystemTheme.ThemeEditor editor = OperatingSystemTheme.CreateEmpty(false, false);
+
+			await Task.Run(() =>
+			{
+				LoadMetadata(editor);
+			});
+
+			string name = editor.Name;
+			string author = editor.LocalAuthor;
+			string description = editor.Description;
+			
+			UnityEngine.Object.Destroy(editor.Theme);
+
+			return new ThemeMetadata()
+			{
+				Name = name,
+				LocalAuthorName = author,
+				Description = description
+			};
+		}
 		
 		public async Task<Texture2D?> ExtractPreviewImageAsync()
 		{

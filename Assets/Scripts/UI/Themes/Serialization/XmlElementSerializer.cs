@@ -2,6 +2,7 @@
 using System;
 using System.Linq;
 using System.Xml;
+using UnityEngine.AI;
 
 namespace UI.Themes.Serialization
 {
@@ -105,7 +106,11 @@ namespace UI.Themes.Serialization
 			if (!isReading)
 				throw new InvalidOperationException("You cannot iterate through an XML element collection when the serializer is in write mode.");
 
-			throw new NotImplementedException();
+			XmlElement? collection = element.ChildNodes
+				.OfType<XmlElement>()
+				.FirstOrDefault(x => x.Name == elementName);
+
+			return new XmlElementIterator(document, collection, itemName);
 		}
 
 		private bool TryGetElementText(string name, out string text)
