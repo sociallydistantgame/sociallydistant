@@ -35,8 +35,11 @@ namespace UI.PlayerUI
 
 		[SerializeField]
 		private ThemeService themeService = null!;
-		
+
 		[Header("Prefabs")]
+		[SerializeField]
+		private GameObject themeEditorPrefab = null!;
+		
 		[SerializeField]
 		private GameObject characterCreatorPrefab = null!;
 		
@@ -57,7 +60,8 @@ namespace UI.PlayerUI
 
 		[SerializeField]
 		private GameObject systemSettingsPrefab = null!;
-		
+
+		private GameObject? themeEditor;
 		private UguiWindow? settingsWindow;
 		private OverlayWorkspace? overlayWorkspace;
 		private WindowManager windowManager = null!;
@@ -188,6 +192,23 @@ namespace UI.PlayerUI
 			Destroy(characterCreator.gameObject);
 			characterCreator = null;
 		}
+
+		private void StartThemeEditor()
+		{
+			if (this.themeEditor != null)
+				return;
+
+			this.themeEditor = Instantiate(this.themeEditorPrefab, this.transform);
+		}
+
+		private void StopThemeEditor()
+		{
+			if (this.themeEditor == null)
+				return;
+			
+			Destroy(this.themeEditor);
+			themeEditor = null;
+		}
 		
 		private void OnGameModeChanged(GameMode newGameMode)
 		{
@@ -209,6 +230,15 @@ namespace UI.PlayerUI
 			else
 			{
 				CloseCharacterCreator();
+			}
+
+			if (this.gameMode == GameMode.ThemeCreator)
+			{
+				StartThemeEditor();
+			}
+			else
+			{
+				StopThemeEditor();
 			}
 			
 			switch (this.gameMode)

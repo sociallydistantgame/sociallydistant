@@ -55,7 +55,11 @@ namespace UI.Theming
 		
 		private readonly OperatingSystemThemeEngine engine = new OperatingSystemThemeEngine();
 
-		private ThemeMetadata metadata;
+		public bool CanEdit => allowUserEditing;
+		public bool CanCopy => allowUserCopying;
+		public string Name => this.themeName;
+		public string Author => this.author;
+		public string Description => this.description;
 		
 		/// <inheritdoc />
 		public Color GetAccentColor(SystemAccentColor accentColorName)

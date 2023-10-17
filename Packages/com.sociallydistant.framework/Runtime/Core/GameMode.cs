@@ -8,6 +8,7 @@ namespace Core
 		OnDesktop,
 		InMission,
 		LockScreen,
-		CharacterCreator
+		CharacterCreator,
+        ThemeCreator
 	}
 }
