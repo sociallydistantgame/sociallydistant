@@ -1,6 +1,6 @@
 ﻿#nullable enable
 
-using ContentManagement;
+using System;
 using UI.Themes.ThemeData;
 using UnityEngine;
 using System.Threading.Tasks;
@@ -11,7 +11,7 @@ namespace UI.Theming
 	public class OperatingSystemTheme :
 		ScriptableObject,
 		IOperatingSystemTheme,
-		IGameContent
+		IThemeAsset
 	{
 		[Header("Editor Settings")]
 		[SerializeField]
@@ -60,6 +60,23 @@ namespace UI.Theming
 		public string Name => this.themeName;
 		public string Author => this.author;
 		public string Description => this.description;
+
+		/// <inheritdoc />
+		public Texture2D? PreviewImage => previewImage;
+
+		/// <inheritdoc />
+		public Task<OperatingSystemTheme> LoadAsync()
+		{
+			return Task.FromResult(this);
+		}
+
+		public ThemeEditor GetUserEditor()
+		{
+			if (!CanEdit)
+				throw new InvalidOperationException("This theme cannot be edited.");
+
+			return new ThemeEditor(this);
+		}
 		
 		/// <inheritdoc />
 		public Color GetAccentColor(SystemAccentColor accentColorName)

@@ -3,9 +3,12 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Text;
 using AcidicGui.Common;
 using AcidicGui.Widgets;
 using GamePlatform;
+using Modding;
+using TMPro;
 using UI.Theming;
 using UI.Widgets;
 using UnityEngine;
@@ -30,13 +33,28 @@ namespace UI.Editors.ThemeEditor
 		[SerializeField]
 		private Button createEmptyButton = null!;
 
+		[SerializeField]
+		private TextMeshProUGUI cloneTitle = null!;
+		
+		[SerializeField]
+		private TextMeshProUGUI cloneDescription = null!;
+
+		[SerializeField]
+		private RawImage cloneImage = null!;
+		
+		[SerializeField]
+		private Button cloneThemeButton = null!;
+		
 		[Header("Pages")]
 		[SerializeField]
 		private VisibilityController newThemePage = null!;
+
+		[SerializeField]
+		private VisibilityController cloneThemePage = null!;
 		
 		private OperatingSystemTheme.ThemeEditor? themeEditor = null;
 		private EditorMode editorMode;
-		private OperatingSystemTheme? themeToClone;
+		private IThemeAsset? themeToClone;
 		
 		private void Awake()
 		{
@@ -46,12 +64,37 @@ namespace UI.Editors.ThemeEditor
 		private void Start()
 		{
 			createEmptyButton.onClick.AddListener(CreateEmptyTheme);
+			cloneThemeButton.onClick.AddListener(CreateEmptyTheme);
+			
 			SetEditorMode(EditorMode.NewTheme);
 		}
 
-		private void CreateEmptyTheme()
+		private async void CreateEmptyTheme()
 		{
-			themeEditor = OperatingSystemTheme.CreateEmpty(true, true);
+			if (themeToClone == null)
+			{
+				themeEditor = OperatingSystemTheme.CreateEmpty(true, true);
+			}
+			else
+			{
+				// Load the theme
+				OperatingSystemTheme theme = await themeToClone.LoadAsync();
+
+				// This is where we must save the copied theme
+				string themePath = UserThemeSource.GetNewThemePath(theme.Name);
+                
+				// Extract the theme to the new path. We don't want to edit the existing theme
+				await theme.ExportAsync(themePath);
+				
+				// Now we can load the new theme and it'll be editable!
+				var storage = new BasicThemeResourceStorage();
+				using ThemeLoader loader = ThemeLoader.FromFile(themePath, true, true);
+
+				OperatingSystemTheme newTheme = await loader.LoadThemeAsync(storage);
+
+				this.themeEditor = newTheme.GetUserEditor();
+			}
+
 			SetEditorMode(EditorMode.ThemeInfo);
 		}
 		
@@ -68,14 +111,38 @@ namespace UI.Editors.ThemeEditor
 			RefreshPreview();
 		}
 
+		private void UpdateClonePage()
+		{
+			if (themeToClone == null)
+				return;
+
+			cloneImage.texture = themeToClone.PreviewImage;
+			cloneTitle.SetText(themeToClone.Name);
+
+			var sb = new StringBuilder();
+
+			sb.Append("<b>Theme author:</b> ");
+			sb.AppendLine(themeToClone.Author);
+			sb.AppendLine();
+
+			sb.Append(themeToClone.Description);
+			
+			this.cloneDescription.SetText(sb);
+		}
+		
 		private void RefreshPreview()
 		{
 			newThemePage.Hide();
+			cloneThemePage.Hide();
 
 			switch (editorMode)
 			{
 				case EditorMode.NewTheme when themeToClone == null:
 					newThemePage.Show();
+					break;
+				case EditorMode.NewTheme when themeToClone != null:
+					cloneThemePage.Show();
+					UpdateClonePage();
 					break;
 				case EditorMode.OpenTheme:
 					break;
@@ -132,7 +199,7 @@ namespace UI.Editors.ThemeEditor
 
 			var list = new ListWidget
 			{
-				AllowSelectNone = true
+				AllowSelectNone = false
 			};
 			
 			builder.AddWidget(list, section);
@@ -155,23 +222,11 @@ namespace UI.Editors.ThemeEditor
 			}, section);
 
 			builder.AddSection("Clone existing theme", out SectionWidget themeSection);
-
-			ListWidget? themes = null;
-
+            
 			var themeCount = 0;
-			foreach (OperatingSystemTheme theme in GetThemes().Where(x => x.CanCopy))
+			foreach (IThemeAsset theme in GetThemes().Where(x => x.CanCopy))
 			{
-				if (themes == null)
-				{
-					themes = new ListWidget
-					{
-						AllowSelectNone = true
-					};
-					
-					builder.AddWidget(themes, themeSection);
-				}
-
-				builder.AddWidget(new ListItemWidget<OperatingSystemTheme>()
+				builder.AddWidget(new ListItemWidget<IThemeAsset>()
 				{
 					Data = theme,
 					Selected = themeToClone == theme,
@@ -181,7 +236,7 @@ namespace UI.Editors.ThemeEditor
 						RefreshPreview();
 					},
 					Title = theme.Name,
-					List = themes
+					List = list
 				}, themeSection);
 				
 				themeCount++;
@@ -242,14 +297,15 @@ namespace UI.Editors.ThemeEditor
 			categoryWidgetList.SetItems(builder.Build());
 		}
 
-		private IEnumerable<OperatingSystemTheme> GetThemes()
+		private IEnumerable<IThemeAsset> GetThemes()
 		{
 			if (gameManager.Value == null)
 				yield break;
 
-			foreach (OperatingSystemTheme theme in gameManager.Value.ContentManager.GetContentOfType<OperatingSystemTheme>())
+			foreach (IThemeAsset theme in gameManager.Value.ContentManager.GetContentOfType<IThemeAsset>())
 				yield return theme;
 		}
+		
 		
 		private enum EditorMode
 		{
