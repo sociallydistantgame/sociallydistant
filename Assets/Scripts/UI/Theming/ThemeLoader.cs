@@ -316,11 +316,7 @@ namespace UI.Theming
 			if (storage.TryGetTexture(textureName, out Texture2D? texture))
 				return Texture2D.blackTexture;
 
-			ZipArchiveEntry? assetsDirectory = archive.GetEntry(ThemeFileConstants.AssetsDirectoryName);
-			if (assetsDirectory == null)
-				return null;
-
-			ZipArchiveEntry? assetEntry = archive.GetEntry($"{ThemeFileConstants.AssetsDirectoryName}/{textureName}");
+			ZipArchiveEntry? assetEntry = archive.GetEntry($"{ThemeFileConstants.AssetsDirectoryName}{textureName}");
 			if (assetEntry == null)
 				return null;
 
@@ -345,11 +341,7 @@ namespace UI.Theming
 			if (storage.TryGetTexture(textureName, out Texture2D? texture))
 				return Texture2D.blackTexture;
 
-			ZipArchiveEntry? assetsDirectory = archive.GetEntry(ThemeFileConstants.AssetsDirectoryName);
-			if (assetsDirectory == null)
-				return null;
-
-			ZipArchiveEntry? assetEntry = archive.GetEntry($"{ThemeFileConstants.AssetsDirectoryName}/{textureName}");
+			ZipArchiveEntry? assetEntry = archive.GetEntry($"{ThemeFileConstants.AssetsDirectoryName}{textureName}");
 			if (assetEntry == null)
 				return null;
 
@@ -495,9 +487,9 @@ namespace UI.Theming
 
 			private async Task LoadRequest(TextureRequest request)
 			{
-				if (!storage.TryGetTexture(request.name, out Texture2D? texture))
+				if (storage.TryGetTexture(request.name, out Texture2D? texture))
 				{
-					request.callback?.Invoke(null);
+					request.callback?.Invoke(texture);
 					return;
 				}
 

@@ -12,6 +12,7 @@ GameObject:
   - component: {fileID: 3368631877458362448}
   - component: {fileID: 7884398169161428897}
   - component: {fileID: 6535055903319226498}
+  - component: {fileID: 994447856181209830}
   m_Layer: 5
   m_Name: Backdrop Canvas
   m_TagString: Untagged
@@ -84,7 +85,7 @@ MonoBehaviour:
   m_FallbackScreenDPI: 96
   m_DefaultSpriteDPI: 96
   m_DynamicPixelsPerUnit: 1
-  m_PresetInfoIsWorld: 0
+  m_PresetInfoIsWorld: 1
 --- !u!114 &6535055903319226498
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -99,6 +100,20 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   backdropImage: {fileID: 2058267638155457184}
   temporaryBackdropImage: {fileID: 7111387157718348996}
+--- !u!114 &994447856181209830
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1876961014414637132}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: e45c7e47d556318449867f667129aa21, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  gameManager: {fileID: 11400000, guid: 872374c25807361459f4e174bb460b2c, type: 2}
+  worldManager: {fileID: 11400000, guid: 6ddfb5183f8225440a5d156e7fb16747, type: 2}
 --- !u!1 &1950767313297915128
 GameObject:
   m_ObjectHideFlags: 0

@@ -1,11 +1,17 @@
 ﻿#nullable enable
 using System;
+using UI.Themes.ThemeData;
 using UnityEngine;
 
 namespace UI.Theming
 {
 	public partial class OperatingSystemTheme
 	{
+		public Color TranslateColor(ThemeColor themeColor, bool dark)
+		{
+			return this.colors.TranslateColor(themeColor, dark);
+		}
+		
 		public Color GetGraphicColor(GraphicColor graphicColor, bool dark)
 		{
 			if (graphicColor == GraphicColor.Transparent)

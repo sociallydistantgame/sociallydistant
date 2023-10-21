@@ -20,6 +20,9 @@ namespace UI.Themes.ThemeData
 
 		[SerializeField]
 		private Texture2D? texture;
+
+		public ThemeColor Color => color;
+		public Texture2D? Texture => this.texture;
 		
 		/// <inheritdoc />
 		public void Serialize(IElementSerializer serializer, ThemeAssets assets)

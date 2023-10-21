@@ -58,6 +58,8 @@ namespace UI.Theming
 		
 		private readonly OperatingSystemThemeEngine engine = new OperatingSystemThemeEngine();
 
+		public BackdropStyle BackdropStyle => backdropStyle;
+		
 		/// <inheritdoc />
 		public string Id => name;
 		public bool CanEdit => allowUserEditing;

@@ -14,6 +14,9 @@ namespace UI.Themes.ThemeData
 		
 		[SerializeField]
 		private ThemeGraphic nightTimeBackdrop = new ThemeGraphic();
+
+		public ThemeGraphic DayTime => dayTimeBackdrop;
+		public ThemeGraphic NightTime => nightTimeBackdrop;
 		
 		/// <inheritdoc />
 		public void Serialize(IElementSerializer serializer, ThemeAssets assets)
