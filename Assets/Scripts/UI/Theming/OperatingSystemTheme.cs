@@ -8,7 +8,7 @@ using System.Threading.Tasks;
 namespace UI.Theming
 {
 	[CreateAssetMenu(menuName = "ScriptableObject/OS Theme")]
-	public class OperatingSystemTheme :
+	public partial class OperatingSystemTheme :
 		ScriptableObject,
 		IOperatingSystemTheme,
 		IThemeAsset
@@ -19,8 +19,11 @@ namespace UI.Theming
 
 		[SerializeField]
 		private bool allowUserCopying = false;
-		
+
 		[Header("Metadata")]
+		[SerializeField]
+		private string? filePath;
+		
 		[SerializeField]
 		private string themeName = string.Empty;
 
@@ -55,12 +58,17 @@ namespace UI.Theming
 		
 		private readonly OperatingSystemThemeEngine engine = new OperatingSystemThemeEngine();
 
+		/// <inheritdoc />
+		public string Id => name;
 		public bool CanEdit => allowUserEditing;
 		public bool CanCopy => allowUserCopying;
 		public string Name => this.themeName;
 		public string Author => this.author;
 		public string Description => this.description;
 
+		/// <inheritdoc />
+		public string? FilePath => filePath;
+		
 		/// <inheritdoc />
 		public Texture2D? PreviewImage => previewImage;
 
@@ -109,6 +117,12 @@ namespace UI.Theming
 
 			public NamedColorTable Colors => theme.colors;
 
+			public string? FilePath
+			{
+				get => theme.filePath;
+				set => theme.filePath = value;
+			}
+			
 			public string Name
 			{
 				get => theme.themeName;

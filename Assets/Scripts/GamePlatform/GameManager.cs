@@ -120,6 +120,9 @@ namespace GamePlatform
 			// Initial ContentManager database rebuild.
 			await ContentManager.RefreshContentDatabaseAsync();
 			
+			// Settings refresh, in case anything relies on content manager
+			settingsManager.ForceChangeNotify();
+			
 			// Determine initialization flow.
 			InitializationFlow flow = GetInitializationFlow();
 

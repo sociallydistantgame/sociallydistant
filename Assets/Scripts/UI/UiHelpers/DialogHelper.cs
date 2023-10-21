@@ -28,6 +28,42 @@ namespace UI.UiHelpers
 			this.AssertAllFieldsAreSerialized(typeof(DialogHelper));
 		}
 
+		public void AskYesNoCancel(string title, string message, IWindow? parentWindow, Action<bool?> callback)
+		{
+			IMessageDialog messageDialog = player.Value.UiManager.WindowManager.CreateMessageDialog(title, parentWindow);
+			messageDialog.Title = title;
+			messageDialog.Message = message;
+			messageDialog.Icon = MessageDialogIcon.Question;
+
+			messageDialog.Buttons.Add("Yes");
+			messageDialog.Buttons.Add("No");
+			messageDialog.Buttons.Add("Cancel");
+
+
+			messageDialog.ButtonPressed += FireCallback;
+			
+			openDialogs.Add(messageDialog);
+			return;
+
+			void FireCallback(int buttonId)
+			{
+				messageDialog.ButtonPressed -= FireCallback;
+
+				switch (buttonId)
+				{
+					case 0:
+						callback?.Invoke(true);
+						break;
+					case 1:
+						callback?.Invoke(false);
+						return;
+					default:
+						callback?.Invoke(null);
+						return;
+				}
+			}
+		}
+		
 		public void AskQuestion(string title, string message, IWindow? parentWindow, Action<bool>? callback)
 		{
 			IMessageDialog messageDialog = player.Value.UiManager.WindowManager.CreateMessageDialog(title, parentWindow);

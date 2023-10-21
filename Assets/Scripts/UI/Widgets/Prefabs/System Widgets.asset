@@ -13,6 +13,7 @@ MonoBehaviour:
   m_Name: System Widgets
   m_EditorClassIdentifier: 
   sectionPrefab: {fileID: 7258264901073273995, guid: cd3552cc3eb1df94395fbdc8234506b8, type: 3}
+  buttonPrefab: {fileID: 8588621401459660450, guid: 59d576e67f6bb23469f681c58a40f53e, type: 3}
   labelPrefab: {fileID: 1787395834357078882, guid: 11bccdfeec91a454296b84ecb9b5d2d6, type: 3}
   imagePrefab: {fileID: 9215911326621265759, guid: d23c6204f904aed49be500f30588435d, type: 3}
   rawImagePrefab: {fileID: 1948280717191958765, guid: 486d0c32d3124c14a985ac6f3c3f9037, type: 3}
@@ -24,3 +25,5 @@ MonoBehaviour:
   settingsDropdownPrefab: {fileID: 8154968038530493323, guid: 7e11dfcc31eb89b4da5f7066eb49d113, type: 3}
   chatBubblePrefab: {fileID: 5867963846945013883, guid: 0627e72c88acf9e46b9d462d5712d6e4, type: 3}
   guildHeaderPrefab: {fileID: 974673030172451270, guid: 9edbfc59a6222b94793011113aa03516, type: 3}
+  namedColorEntryPrefab: {fileID: 372323778729819762, guid: 7fa2c6fc079f7774bbbb5eb774ffcdba, type: 3}
+  themeColorSelectPrefab: {fileID: 3644990918997757952, guid: b46f450b1ea376d4794b1e30903a4c54, type: 3}

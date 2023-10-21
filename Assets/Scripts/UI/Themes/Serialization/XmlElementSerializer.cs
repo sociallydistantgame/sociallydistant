@@ -24,7 +24,7 @@ namespace UI.Themes.Serialization
 		{
 			if (isReading)
 			{
-				if (!TryGetElementText(name, out string textValue) && !int.TryParse(textValue, out value))
+				if (!TryGetElementText(name, out string textValue) || !int.TryParse(textValue, out value))
 					value = defaultValue;
 			}
 			else
@@ -38,7 +38,7 @@ namespace UI.Themes.Serialization
 		{
 			if (isReading)
 			{
-				if (!TryGetElementText(name, out string textValue) && !float.TryParse(textValue, out value))
+				if (!TryGetElementText(name, out string textValue) || !float.TryParse(textValue, out value))
 					value = defaultValue;
 			}
 			else
@@ -52,7 +52,7 @@ namespace UI.Themes.Serialization
 		{
 			if (isReading)
 			{
-				if (!TryGetElementText(name, out string textValue) && !bool.TryParse(textValue, out value))
+				if (!TryGetElementText(name, out string textValue) || !bool.TryParse(textValue, out value))
 					value = defaultValue;
 			}
 			else
@@ -91,7 +91,9 @@ namespace UI.Themes.Serialization
 			if (isReading && child == null)
 				return null;
 
-			if (child == null)
+			// If we're writing, then any call to GetChildElement() should create a new child even if one with the same name exists.
+			// This allows us to serialize collections.
+			if (!isReading)
 			{
 				child = document.CreateElement(elementName);
 				element.AppendChild(child);
@@ -137,11 +139,6 @@ namespace UI.Themes.Serialization
 			child.AppendChild(text);
 			this.element.AppendChild(child);
 		}
-	}
-
-	public interface IThemeData
-	{
-		void Serialize(IElementSerializer serializer, ThemeAssets assets);
 	}
 
 	public static class ThemeDataUtility

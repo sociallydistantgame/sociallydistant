@@ -147,6 +147,8 @@ GameObject:
   - component: {fileID: 525020229380438117}
   - component: {fileID: 9035542577945435731}
   - component: {fileID: 75139562703977583}
+  - component: {fileID: 7077684822319071256}
+  - component: {fileID: 6337482724248958046}
   m_Layer: 0
   m_Name: ListItemWidget
   m_TagString: Untagged
@@ -264,6 +266,30 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   toggle: {fileID: 525020229380438117}
   label: {fileID: 4324349667034286782}
+--- !u!114 &7077684822319071256
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 706579216658696922}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: e882821b1e9f5244ba2c1eda7f3a5e0b, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+--- !u!114 &6337482724248958046
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 706579216658696922}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 207b6ffb263bcfd4eade96041380141c, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
 --- !u!1 &6202912889197591699
 GameObject:
   m_ObjectHideFlags: 0
