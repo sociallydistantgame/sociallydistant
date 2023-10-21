@@ -46,6 +46,13 @@ namespace UI.Windowing
 		[SerializeField]
 		private Button minimizeButton = null!;
 
+		[Header("Settings")]
+		[SerializeField]
+		private bool allowClosing = true;
+
+		[SerializeField]
+		private bool allowMinimizing = true;
+
 		private static UguiWindow? firstWindow = null!;
 		private bool isFirstWindow = false;
 		private GameObject? eventSystemFocusedGameObject;
@@ -211,6 +218,9 @@ namespace UI.Windowing
 
 		public void Close()
 		{
+			if (!allowClosing)
+				return;
+			
 			foreach (IWindowCloseBlocker closeBlocker in closeBlockers)
 				if (!closeBlocker.CheckCanClose())
 					return;
@@ -226,6 +236,9 @@ namespace UI.Windowing
 		
 		public void Minimize()
 		{
+			if (!allowMinimizing)
+				return;
+			
 			WindowState = WindowState.Minimized;
 		}
 
