@@ -929,5 +929,26 @@ namespace UI.Editors.ThemeEditor
 			return namedColors.Select(x => x.name)
 				.ToArray()!;
 		}
+
+		/// <inheritdoc />
+		public IEnumerable<string> GetGraphicNames()
+		{
+			if (themeEditor == null)
+				return Enumerable.Empty<string>();
+
+			return themeEditor.GetGraphicNames();
+		}
+
+		/// <inheritdoc />
+		public Texture2D? GetGraphic(string graphicName)
+		{
+			return themeEditor?.GetGraphic(graphicName);
+		}
+
+		/// <inheritdoc />
+		public void SetGraphic(string name, Texture2D? texture)
+		{
+			themeEditor?.SetGraphic(name, texture);
+		}
 	}
 }

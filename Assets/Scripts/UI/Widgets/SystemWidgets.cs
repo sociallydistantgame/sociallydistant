@@ -57,6 +57,9 @@ namespace UI.Widgets
 
 		[Header("Steam Workshop Editors")]
 		[SerializeField]
+		private GraphicPickerWidgetController graphicPickerPrefab = null!;
+		
+		[SerializeField]
 		private NamedColorEntryController namedColorEntryPrefab = null!;
 
 		[SerializeField]
@@ -154,6 +157,11 @@ namespace UI.Widgets
 		public ThemeColorSelectWidgetController GetThemeColorSelect(RectTransform destination)
 		{
 			return RecycleOrInstantiate(this.themeColorSelectPrefab, destination);
+		}
+
+		public GraphicPickerWidgetController GetGraphicPicker(RectTransform destination)
+		{
+			return RecycleOrInstantiate(this.graphicPickerPrefab, destination);
 		}
 		
 		private T RecycleOrInstantiate<T>(T prefabToInstantiate, RectTransform rectTransform)

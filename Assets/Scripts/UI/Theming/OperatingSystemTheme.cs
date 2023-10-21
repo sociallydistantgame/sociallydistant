@@ -1,9 +1,11 @@
 ﻿#nullable enable
 
 using System;
+using System.Collections.Generic;
 using UI.Themes.ThemeData;
 using UnityEngine;
 using System.Threading.Tasks;
+using UI.Widgets;
 
 namespace UI.Theming
 {
@@ -38,6 +40,9 @@ namespace UI.Theming
 		private Texture2D? previewImage;
 
 		[Header("Theme Data")]
+		[SerializeField]
+		private TextureDictionary assets = new TextureDictionary();
+		
 		[SerializeField]
 		private ShellStyle shellStyle = new ShellStyle();
 
@@ -111,7 +116,7 @@ namespace UI.Theming
 			await themeSaver.SaveAsync();
 		}
 		
-		public class ThemeEditor
+		public class ThemeEditor : IGraphicPickerSource
 		{
 			private readonly OperatingSystemTheme theme;
 
@@ -158,6 +163,44 @@ namespace UI.Theming
 			internal ThemeEditor(OperatingSystemTheme theme)
 			{
 				this.theme = theme;
+			}
+
+			public void BuildResourceMap(IThemeResourceStorage storage)
+			{
+				theme.assets.Clear();
+
+				foreach (string textureName in storage.TextureNames)
+				{
+					if (!storage.TryGetTexture(textureName, out Texture2D? texture))
+						continue;
+
+					if (texture == null)
+						continue;
+					
+					theme.assets[textureName] = texture;
+				}
+			}
+
+			/// <inheritdoc />
+			public IEnumerable<string> GetGraphicNames()
+			{
+				return theme.assets.Keys;
+			}
+
+			/// <inheritdoc />
+			public Texture2D? GetGraphic(string graphicName)
+			{
+				theme.assets.TryGetValue(graphicName, out Texture2D? result);
+				return result;
+			}
+
+			/// <inheritdoc />
+			public void SetGraphic(string name, Texture2D? texture)
+			{
+				if (texture == null && theme.assets.ContainsKey(name))
+					theme.assets.Remove(name);
+				else if (texture != null)
+					theme.assets[name] = texture;
 			}
 		}
 		
