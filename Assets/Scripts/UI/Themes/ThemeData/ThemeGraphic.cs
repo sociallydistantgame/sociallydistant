@@ -2,6 +2,7 @@
 using System;
 using AcidicGui.Widgets;
 using UI.Themes.Serialization;
+using UI.Widgets;
 using UnityEngine;
 
 namespace UI.Themes.ThemeData
@@ -49,6 +50,18 @@ namespace UI.Themes.ThemeData
 		{
 			builder.AddLabel("Graphic");
 
+			builder.AddWidget(new GraphicPickerWidget
+			{
+				GraphicName = graphicName,
+				Callback = (nameof, tex) =>
+				{
+					this.graphicName = nameof;
+					this.texture = tex;
+					markDirtyAction?.Invoke();
+				},
+				GraphicSource = editContext
+			});
+			
 			builder.Name = "Graphic color";
 			builder.Description = string.Empty;
 			color.BuildWidgets(builder, markDirtyAction, editContext);

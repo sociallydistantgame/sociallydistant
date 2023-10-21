@@ -25,5 +25,6 @@ MonoBehaviour:
   settingsDropdownPrefab: {fileID: 8154968038530493323, guid: 7e11dfcc31eb89b4da5f7066eb49d113, type: 3}
   chatBubblePrefab: {fileID: 5867963846945013883, guid: 0627e72c88acf9e46b9d462d5712d6e4, type: 3}
   guildHeaderPrefab: {fileID: 974673030172451270, guid: 9edbfc59a6222b94793011113aa03516, type: 3}
+  graphicPickerPrefab: {fileID: 897584996054935340, guid: 1448f15c7e977d745af24903005e9853, type: 3}
   namedColorEntryPrefab: {fileID: 372323778729819762, guid: 7fa2c6fc079f7774bbbb5eb774ffcdba, type: 3}
   themeColorSelectPrefab: {fileID: 3644990918997757952, guid: b46f450b1ea376d4794b1e30903a4c54, type: 3}

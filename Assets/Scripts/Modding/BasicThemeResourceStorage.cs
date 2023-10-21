@@ -26,5 +26,8 @@ namespace Modding
 		{
 			textures[textureName] = texture;
 		}
+
+		/// <inheritdoc />
+		public IEnumerable<string> TextureNames => textures.Keys;
 	}
 }

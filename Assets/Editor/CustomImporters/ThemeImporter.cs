@@ -76,6 +76,9 @@ namespace Editor.CustomImporters
 				textures.Add(textureName, texture);
                 ctx.AddObjectToAsset(textureName, texture);
 			}
+
+			/// <inheritdoc />
+			public IEnumerable<string> TextureNames => textures.Keys;
 		}
 	}
 }

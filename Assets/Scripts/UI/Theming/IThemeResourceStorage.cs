@@ -1,4 +1,5 @@
-﻿using UnityEngine;
+﻿using System.Collections.Generic;
+using UnityEngine;
 
 namespace UI.Theming
 {
@@ -7,5 +8,7 @@ namespace UI.Theming
 		void SetTheme(OperatingSystemTheme theme);
 		bool TryGetTexture(string textureName, out Texture2D? texture);
 		void AddTexture(string textureName, Texture2D texture);
+		
+		IEnumerable<string> TextureNames { get; }
 	}
 }

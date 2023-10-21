@@ -1,9 +1,10 @@
 ﻿#nullable enable
+using UI.Widgets;
 using UnityEngine;
 
 namespace UI.Themes.Serialization
 {
-	public interface IThemeEditContext
+	public interface IThemeEditContext : IGraphicPickerSource
 	{
 		bool UseDarkMode { get; set; }
 		

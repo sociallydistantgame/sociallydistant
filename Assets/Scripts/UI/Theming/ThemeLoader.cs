@@ -49,6 +49,7 @@ namespace UI.Theming
 			LoadShellStyle(themeEditor, assets);
 			LoadTerminalStyle(themeEditor, assets);
 			
+			themeEditor.BuildResourceMap(storage);
 			storage.SetTheme(themeEditor.Theme);
 			
 			return themeEditor.Theme;
@@ -83,9 +84,10 @@ namespace UI.Theming
 			
 			// Load all assets!
 			await assets.Load();
-			
-			storage.SetTheme(themeEditor.Theme);
 
+			themeEditor.BuildResourceMap(storage);
+			storage.SetTheme(themeEditor.Theme);
+			
 			return themeEditor.Theme;
 		}
 
