@@ -84,6 +84,12 @@ namespace UI.Editors.ThemeEditor
 
 		[SerializeField]
 		private VisibilityController backdropPage = null!;
+
+		[SerializeField]
+		private VisibilityController desktopPreview = null!;
+
+		[SerializeField]
+		private VisibilityController windowPreview = null!;
 		
 		private readonly List<EditableNamedColor> namedColors = new List<EditableNamedColor>();
 
@@ -263,6 +269,8 @@ namespace UI.Editors.ThemeEditor
 			newThemePage.Hide();
 			cloneThemePage.Hide();
 			backdropPage.Hide();
+			desktopPreview.Hide();
+			windowPreview.Hide();
 
 			switch (editorMode)
 			{
@@ -284,9 +292,11 @@ namespace UI.Editors.ThemeEditor
 					break;
 				case EditorMode.Shell:
 					backdropPage.Show();
+					desktopPreview.Show();
 					break;
 				case EditorMode.Windows:
 					backdropPage.Show();
+					windowPreview.Show();
 					break;
 				case EditorMode.Widgets:
 					break;
