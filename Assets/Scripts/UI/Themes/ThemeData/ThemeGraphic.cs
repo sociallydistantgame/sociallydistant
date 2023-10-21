@@ -1,5 +1,6 @@
 ﻿#nullable enable
 using System;
+using AcidicGui.Widgets;
 using UI.Themes.Serialization;
 using UnityEngine;
 
@@ -12,7 +13,7 @@ namespace UI.Themes.ThemeData
 		private ThemeColor color = new ThemeColor();
 
 		[SerializeField]
-		private ThemeMargins spriteMargins;
+		private ThemeMargins spriteMargins = new ThemeMargins();
 
 		[SerializeField]
 		private string graphicName = string.Empty;
@@ -24,7 +25,7 @@ namespace UI.Themes.ThemeData
 		public void Serialize(IElementSerializer serializer, ThemeAssets assets)
 		{
 			serializer.Serialize(color, assets, nameof(color));
-			serializer.Serialize(ref spriteMargins, assets, nameof(spriteMargins));
+			serializer.Serialize(spriteMargins, assets, nameof(spriteMargins));
             serializer.Serialize(ref graphicName, nameof(graphicName), string.Empty);
 
             if (serializer.IsReading)
@@ -38,6 +39,19 @@ namespace UI.Themes.ThemeData
             {
 	            assets.SaveTexture(graphicName, texture);
             }
+		}
+
+		/// <inheritdoc />
+		public void BuildWidgets(WidgetBuilder builder, Action markDirtyAction, IThemeEditContext editContext)
+		{
+			builder.AddLabel("Graphic");
+
+			builder.Name = "Graphic color";
+			builder.Description = string.Empty;
+			color.BuildWidgets(builder, markDirtyAction, editContext);
+			
+			builder.AddLabel("Sprite margins");
+			spriteMargins.BuildWidgets(builder, markDirtyAction, editContext);
 		}
 	}
 }

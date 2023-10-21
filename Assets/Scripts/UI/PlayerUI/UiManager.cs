@@ -1,8 +1,11 @@
 ﻿#nullable enable
 
 using System;
+using System.Linq;
 using AcidicGui.Theming;
 using Core;
+using Core.Config;
+using Core.Config.SystemConfigCategories;
 using GamePlatform;
 using Shell;
 using Shell.Windowing;
@@ -12,6 +15,7 @@ using UI.Login;
 using UI.Popovers;
 using UI.Shell;
 using UI.Themes;
+using UI.Themes.ThemedElements;
 using UI.Theming;
 using UI.Windowing;
 using UnityEngine;
@@ -22,7 +26,7 @@ using UnityExtensions;
 namespace UI.PlayerUI
 {
 	public class UiManager : 
-		ThemeProviderComponent<OperatingSystemTheme, OperatingSystemThemeEngine>,
+		OperatingSystemThemeProvider,
 		IShellContext
 	{
 		[Header("Theme")]
@@ -61,6 +65,7 @@ namespace UI.PlayerUI
 		[SerializeField]
 		private GameObject systemSettingsPrefab = null!;
 
+		private string? lastThemeName;
 		private GameObject? themeEditor;
 		private UguiWindow? settingsWindow;
 		private OverlayWorkspace? overlayWorkspace;
@@ -69,7 +74,9 @@ namespace UI.PlayerUI
 		private BackdropController backdrop = null!;
 		private GameMode gameMode;
 		private IDisposable? gameModeObserver;
+		private IDisposable? settingsObserver;
 
+		public override bool UseDarkMode => this.themeService.DarkMode;
 		public IThemeService ThemeService => themeService;
 		public BackdropController Backdrop => backdrop;
 		public PopoverLayer PopoverLayer => popoverLayer;
@@ -93,13 +100,16 @@ namespace UI.PlayerUI
 		{
 			if (gameManager.Value == null)
 				return;
-
+			
 			gameModeObserver = gameManager.Value.GameModeObservable.Subscribe(OnGameModeChanged);
+			settingsObserver = gameManager.Value.SettingsManager.ObserveChanges(OnSettingsUpdated);
 		}
 
 		private void OnDisable()
 		{
+			settingsObserver?.Dispose();
 			gameModeObserver?.Dispose();
+			settingsObserver = null;
 			gameModeObserver = null;
 		}
 
@@ -271,6 +281,46 @@ namespace UI.PlayerUI
 
 			themeService.UserTheme = newTheme;
 			return true;
+		}
+
+		private async void LoadTheme(string newThemeName)
+		{
+			if (newThemeName == lastThemeName)
+				return;
+
+			if (string.IsNullOrWhiteSpace(newThemeName))
+				newThemeName = "default";
+
+			IThemeAsset? theme = null;
+
+			if (gameManager.Value != null)
+			{
+				theme = gameManager.Value.ContentManager.GetContentOfType<IThemeAsset>()
+					.FirstOrDefault(x => x.Id == newThemeName);
+			}
+
+			if (theme == null)
+			{
+                newThemeName = "default";
+				theme = defaultTheme!;
+			}
+
+			OperatingSystemTheme actualTheme = await theme.LoadAsync();
+            
+			ChangeTheme(actualTheme);
+
+			lastThemeName = newThemeName;
+		}
+		
+		private void OnSettingsUpdated(ISettingsManager settingsManager)
+		{
+			AccessibilitySettings accessibility = settingsManager.FindSettings<AccessibilitySettings>() ?? new AccessibilitySettings(settingsManager);
+			UiSettings? gui = settingsManager.FindSettings<UiSettings>() ?? new UiSettings(settingsManager);
+            
+			this.themeService.DarkMode = gui?.DarkMode == true;
+
+			string themeName = gui?.ThemeName ?? "default";
+			LoadTheme(themeName);
 		}
 	}
 }

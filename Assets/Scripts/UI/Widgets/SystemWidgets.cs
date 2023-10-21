@@ -16,7 +16,10 @@ namespace UI.Widgets
 
 		[SerializeField]
 		private SectionWidgetController sectionPrefab = null!;
-		
+
+		[SerializeField]
+		private ButtonWidgetController buttonPrefab = null!;
+        
 		[SerializeField]
 		private LabelWidgetController labelPrefab = null!;
 
@@ -51,6 +54,13 @@ namespace UI.Widgets
 
 		[SerializeField]
 		private GuildHeaderWidgetController guildHeaderPrefab = null!;
+
+		[Header("Steam Workshop Editors")]
+		[SerializeField]
+		private NamedColorEntryController namedColorEntryPrefab = null!;
+
+		[SerializeField]
+		private ThemeColorSelectWidgetController themeColorSelectPrefab = null!;
 		
 		/// <inheritdoc />
 		public WidgetRecycleBin RecycleBin
@@ -74,6 +84,12 @@ namespace UI.Widgets
 		public LabelWidgetController GetLabel(RectTransform destination)
 		{
 			return RecycleOrInstantiate(this.labelPrefab, destination);
+		}
+
+		/// <inheritdoc />
+		public ButtonWidgetController GetButtonWidget(RectTransform destination)
+		{
+			return RecycleOrInstantiate(this.buttonPrefab, destination);
 		}
 
 		/// <inheritdoc />
@@ -128,6 +144,16 @@ namespace UI.Widgets
 		public GuildHeaderWidgetController GetGuildHeader(RectTransform destination)
 		{
 			return RecycleOrInstantiate(this.guildHeaderPrefab, destination);
+		}
+
+		public NamedColorEntryController GetNamedColorEntry(RectTransform destination)
+		{
+			return RecycleOrInstantiate(this.namedColorEntryPrefab, destination);
+		}
+
+		public ThemeColorSelectWidgetController GetThemeColorSelect(RectTransform destination)
+		{
+			return RecycleOrInstantiate(this.themeColorSelectPrefab, destination);
 		}
 		
 		private T RecycleOrInstantiate<T>(T prefabToInstantiate, RectTransform rectTransform)

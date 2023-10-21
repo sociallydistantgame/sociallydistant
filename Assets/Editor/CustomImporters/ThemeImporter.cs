@@ -20,6 +20,14 @@ namespace Editor.CustomImporters
 		{
 			using ThemeLoader loader = ThemeLoader.FromFile(ctx.assetPath, false, settings.allowUserCopying);
 
+			// Default behaviour is for the theme loader to store the original file path of the theme in with the
+			// theme's data. This allows the in-game theme editor to know where to save changes when opening
+			// an existing theme.
+			//
+			// But in this case, we don't want that - because the path will be referring to somewhere in the game's
+			// source assets which won't be available in a release build.
+			loader.TrackFilePath = false;
+
 			Texture2D? previewImage = loader.ExtractPreviewImage();
 
 			if (previewImage != null)

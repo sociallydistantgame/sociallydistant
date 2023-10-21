@@ -9,6 +9,7 @@ using GamePlatform.ContentManagement;
 using GameplaySystems.WebPages;
 using Modules;
 using Shell;
+using UI.PlayerUI;
 using UnityEngine;
 using Utility;
 
@@ -23,6 +24,7 @@ namespace Modding
 		private readonly WebSiteContentManager websites = new();
 		private GraphicsSettings? graphicsSettings;
 		private AccessibilitySettings? a11ySettings;
+		private UiSettings uiSettings;
 		private IDisposable? settingsObservable;
 		private UserThemeSource userThemeSource = new UserThemeSource();
 		
@@ -38,6 +40,7 @@ namespace Modding
 			// System settings modules
 			graphicsSettings = Context.SettingsManager.RegisterSettingsCategory<GraphicsSettings>();
 			a11ySettings = Context.SettingsManager.RegisterSettingsCategory<AccessibilitySettings>();
+			uiSettings = Context.SettingsManager.RegisterSettingsCategory<UiSettings>();
 			
 			// Watch system settings
 			settingsObservable = Context.SettingsManager.ObserveChanges(OnSettingsUpdated);

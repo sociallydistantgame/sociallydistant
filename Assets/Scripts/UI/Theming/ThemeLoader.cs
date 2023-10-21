@@ -20,6 +20,9 @@ namespace UI.Theming
 		private readonly ZipArchive archive;
 		private readonly bool canUserEdit;
 		private readonly bool canUserCopy;
+		private string? filePath;
+
+		public bool TrackFilePath { get; set; } = true;
 		
 		private ThemeLoader(Stream stream, bool canEdit, bool canCopy)
 		{
@@ -33,6 +36,9 @@ namespace UI.Theming
 		{
 			OperatingSystemTheme.ThemeEditor themeEditor = OperatingSystemTheme.CreateEmpty(canUserEdit, canUserCopy);
 
+			if (TrackFilePath)
+				themeEditor.FilePath = filePath;
+			
 			var assets = new LoadThemeAssets(this, storage);
 			
 			LoadMetadata(themeEditor);
@@ -52,7 +58,15 @@ namespace UI.Theming
 		{
 			OperatingSystemTheme.ThemeEditor themeEditor = OperatingSystemTheme.CreateEmpty(canUserEdit, canUserCopy);
 
+			if (TrackFilePath)
+				themeEditor.FilePath = filePath;
+			
 			var assets = new LoadThemeAssetsAsync(this, storage);
+			
+			// This has to block, because Unity is a stupid game engine that
+			// *requires* HTML colors to be parsed on the main thread. :)
+			// ...Fuck my life.
+			LoadColors(themeEditor);
 			
 			// The XML serialization is done on a background thread and we wait for it.
 			// This is because LoadThemeAssetsAsync will not immediately load assets,
@@ -60,7 +74,6 @@ namespace UI.Theming
 			await Task.Run(() =>
 			{
 				LoadMetadata(themeEditor);
-				LoadColors(themeEditor);
 				LoadBackdrop(themeEditor, assets);
 				LoadWidgetStyle(themeEditor, assets);
 				LoadShellStyle(themeEditor, assets);
@@ -210,6 +223,12 @@ namespace UI.Theming
 				item.Serialize(ref lightHex, nameof(lightHex), string.Empty);
 				item.Serialize(ref darkHex, nameof(darkHex), lightHex);
 
+				if (!lightHex.StartsWith("#"))
+					lightHex = "#" + lightHex;
+
+				if (!darkHex.StartsWith("#"))
+					darkHex = "#" + darkHex;
+                
 				if (!ColorUtility.TryParseHtmlString(lightHex, out Color lightColor))
 					continue;
 
@@ -269,12 +288,15 @@ namespace UI.Theming
 		public void Dispose()
 		{
 			archive.Dispose();
+			stream.Close();
 			stream.Dispose();
 		}
 		
 		public static ThemeLoader FromFile(string path, bool canUserEdit, bool canUserCopy)
 		{
-			return FromStream(File.OpenRead(path), canUserEdit, canUserCopy);
+			ThemeLoader result =  FromStream(File.OpenRead(path), canUserEdit, canUserCopy);
+			result.filePath = path;
+			return result;
 		}
 
 		public static ThemeLoader FromStream(Stream stream, bool canUserEdit, bool canUserCopy)

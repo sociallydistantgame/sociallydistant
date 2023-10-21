@@ -10,8 +10,12 @@ namespace AcidicGui.Widgets
 	{
 		private readonly Dictionary<SectionWidget, List<IWidget>> sectionedWidgets = new Dictionary<SectionWidget, List<IWidget>>();
 		private readonly List<IWidget> uncategorizedWidgets = new List<IWidget>();
+		private readonly Stack<SectionWidget> sectionStack = new Stack<SectionWidget>();
 		private bool isBuilding = false;
 
+		public string? Name { get; set; }
+		public string? Description { get; set; }
+		
 		public bool ShowUncategorizedFirst { get; set; } = true;
 		public bool SkipEmptySections { get; set; } = true;
 		
@@ -44,6 +48,24 @@ namespace AcidicGui.Widgets
 			return this;
 		}
 
+		public WidgetBuilder PushDefaultSection(string sectionTitle, out SectionWidget widget)
+		{
+			AddSection(sectionTitle, out widget);
+			
+			sectionStack.Push(widget);
+			
+			return this;
+		}
+
+		public WidgetBuilder PopDefaultSection()
+		{
+			ThrowIfNotBuilding();
+
+			sectionStack.Pop();
+
+			return this;
+		}
+		
 		public WidgetBuilder AddSection<TSection>(out TSection section)
 			where TSection : SectionWidget, new()
 		{
@@ -68,8 +90,15 @@ namespace AcidicGui.Widgets
 
 			if (section == null)
 			{
-				uncategorizedWidgets.Add(widget);
-				return this;
+				if (sectionStack.Count == 0)
+				{
+					uncategorizedWidgets.Add(widget);
+					return this;
+				}
+				else
+				{
+					section = sectionStack.Peek();
+				}
 			}
 
 			if (!sectionedWidgets.TryGetValue(section, out List<IWidget> widgetList))

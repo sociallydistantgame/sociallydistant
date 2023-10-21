@@ -134,6 +134,11 @@ namespace Core.Config
 			return HasKey(key) && allSettings[key].Type == SettingsType.Int;
 		}
 
+		public void ForceChangeNotify()
+		{
+			changesSubject.OnNext(this);
+		}
+		
 		/// <inheritdoc />
 		public void SetFloat(string key, float value)
 		{

@@ -1,4 +1,5 @@
 ﻿#nullable enable
+using System.IO;
 using System.Threading.Tasks;
 using UI.Themes.ThemeData;
 using UI.Theming;
@@ -20,8 +21,14 @@ namespace Modding
 		}
 
 		/// <inheritdoc />
+		public string Id => $"usertheme:{Path.GetFileName(path)}";
+
+		/// <inheritdoc />
 		public bool CanEdit => true;
 
+		/// <inheritdoc />
+		public string? FilePath => path;
+		
 		/// <inheritdoc />
 		public bool CanCopy => true;
 

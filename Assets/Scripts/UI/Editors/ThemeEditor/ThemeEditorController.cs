@@ -4,26 +4,39 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+using System.Threading.Tasks;
 using AcidicGui.Common;
 using AcidicGui.Widgets;
+using Codice.Client.GameUI.Update;
 using GamePlatform;
 using Modding;
+using PlasticGui.WorkspaceWindow.CodeReview;
 using TMPro;
+using UI.Applications.Chat;
+using UI.Themes.Serialization;
+using UI.Themes.ThemedElements;
 using UI.Theming;
+using UI.UiHelpers;
 using UI.Widgets;
+using UI.Widgets.Settings;
 using UnityEngine;
 using UnityExtensions;
 using UnityEngine.UI;
 
 namespace UI.Editors.ThemeEditor
 {
-	public class ThemeEditorController : MonoBehaviour
+	public class ThemeEditorController : 
+		MonoBehaviour,
+		IThemeEditContext
 	{
 		[Header("Dependencies")]
 		[SerializeField]
 		private GameManagerHolder gameManager = null!;
-		
+
 		[Header("UI")]
+		[SerializeField]
+		private ShellThemePreview themePreview = null!;
+		
 		[SerializeField]
 		private WidgetList categoryWidgetList = null!;
 
@@ -44,6 +57,23 @@ namespace UI.Editors.ThemeEditor
 		
 		[SerializeField]
 		private Button cloneThemeButton = null!;
+
+		[Header("Toolbar")]
+		[SerializeField]
+		private Button newButton = null!;
+
+		[SerializeField]
+		private Button openButton = null!;
+
+		[SerializeField]
+		private Button saveButton = null!;
+
+		[SerializeField]
+		private Button saveAsButton = null!;
+
+		[SerializeField]
+		private Button uploadButton = null!;
+		
 		
 		[Header("Pages")]
 		[SerializeField]
@@ -51,14 +81,37 @@ namespace UI.Editors.ThemeEditor
 
 		[SerializeField]
 		private VisibilityController cloneThemePage = null!;
+
+		[SerializeField]
+		private VisibilityController backdropPage = null!;
 		
+		private readonly List<EditableNamedColor> namedColors = new List<EditableNamedColor>();
+
+		private EditableNamedColor? temporaryColor;
+		private bool saving = false;
+		private bool hasUnsavedChanges = false;
+		private bool useDarkMode = false;
 		private OperatingSystemTheme.ThemeEditor? themeEditor = null;
 		private EditorMode editorMode;
 		private IThemeAsset? themeToClone;
+		private IThemeAsset? themeToOpen;
+		private DialogHelper dialogHlper = null!;
+
+		/// <inheritdoc />
+		public bool UseDarkMode
+		{
+			get => useDarkMode;
+			set
+			{
+				useDarkMode = value;
+				UpdateWidgets();
+			}
+		}
 		
 		private void Awake()
 		{
 			this.AssertAllFieldsAreSerialized(typeof(ThemeEditorController));
+			this.MustGetComponent(out dialogHlper);
 		}
 
 		private void Start()
@@ -66,14 +119,54 @@ namespace UI.Editors.ThemeEditor
 			createEmptyButton.onClick.AddListener(CreateEmptyTheme);
 			cloneThemeButton.onClick.AddListener(CreateEmptyTheme);
 			
+			newButton.onClick.AddListener(OnNewClicked);
+			saveButton.onClick.AddListener(async () =>
+			{
+				await Save();
+			});
+			
+			saveAsButton.onClick.AddListener(async () =>
+			{
+				await SaveAs();
+			});
+			
+			
+			
 			SetEditorMode(EditorMode.NewTheme);
 		}
 
+		private void ResetEditableColors()
+		{
+			namedColors.Clear();
+
+			if (themeEditor == null)
+				return;
+
+			namedColors.AddRange(themeEditor.Colors.Keys.Select(
+				key => new EditableNamedColor
+				{
+					name = key,
+					dark = themeEditor.Colors[key].darkColor,
+					light = themeEditor.Colors[key].lightColor
+				}
+			));
+		}
+		
 		private async void CreateEmptyTheme()
 		{
+			if (themeToOpen != null)
+			{
+				OperatingSystemTheme theme = await themeToOpen.LoadAsync();
+				themeEditor = theme.GetUserEditor();
+				ResetEditableColors();
+				SetEditorMode(EditorMode.ThemeInfo);
+				return;
+			}
+			
 			if (themeToClone == null)
 			{
 				themeEditor = OperatingSystemTheme.CreateEmpty(true, true);
+				hasUnsavedChanges = true;
 			}
 			else
 			{
@@ -95,6 +188,7 @@ namespace UI.Editors.ThemeEditor
 				this.themeEditor = newTheme.GetUserEditor();
 			}
 
+			ResetEditableColors();
 			SetEditorMode(EditorMode.ThemeInfo);
 		}
 		
@@ -109,17 +203,46 @@ namespace UI.Editors.ThemeEditor
 			UpdateCategoryWidgets();
 			UpdateEditorWidgets();
 			RefreshPreview();
+			UpdateToolbar();
+		}
+
+		private void UpdateToolbar()
+		{
+			newButton.enabled = themeEditor != null && !saving;
+			openButton.enabled = newButton.enabled;
+			saveButton.enabled = openButton.enabled && hasUnsavedChanges;
+			saveAsButton.enabled = openButton.enabled;
+			uploadButton.enabled = saveAsButton.enabled;
 		}
 
 		private void UpdateClonePage()
 		{
+			var sb = new StringBuilder();
+			
+			if (themeToOpen != null)
+			{
+				cloneImage.texture = themeToOpen.PreviewImage;
+				cloneTitle.SetText(themeToOpen.Name);
+				
+				sb.Append("<b>Theme author:</b> ");
+				sb.AppendLine(themeToOpen.Author);
+				sb.AppendLine();
+
+				sb.Append(themeToOpen.Description);
+			
+				this.cloneDescription.SetText(sb);
+				
+				this.cloneThemeButton.MustGetComponentInChildren<TextMeshProUGUI>()
+					.SetText("Open theme");
+				
+				return;
+			}
+			
 			if (themeToClone == null)
 				return;
 
 			cloneImage.texture = themeToClone.PreviewImage;
 			cloneTitle.SetText(themeToClone.Name);
-
-			var sb = new StringBuilder();
 
 			sb.Append("<b>Theme author:</b> ");
 			sb.AppendLine(themeToClone.Author);
@@ -128,12 +251,18 @@ namespace UI.Editors.ThemeEditor
 			sb.Append(themeToClone.Description);
 			
 			this.cloneDescription.SetText(sb);
+			
+			this.cloneThemeButton.MustGetComponentInChildren<TextMeshProUGUI>()
+				.SetText("Create new theme");
 		}
 		
 		private void RefreshPreview()
 		{
+			themePreview.SetPreviewTheme(themeEditor?.Theme, this.useDarkMode);
+			
 			newThemePage.Hide();
 			cloneThemePage.Hide();
+			backdropPage.Hide();
 
 			switch (editorMode)
 			{
@@ -144,25 +273,36 @@ namespace UI.Editors.ThemeEditor
 					cloneThemePage.Show();
 					UpdateClonePage();
 					break;
-				case EditorMode.OpenTheme:
+				case EditorMode.OpenTheme when themeToOpen != null:
+					cloneThemePage.Show();
+					UpdateClonePage();
 					break;
 				case EditorMode.ThemeInfo:
 					break;
 				case EditorMode.Backdrop:
+					backdropPage.Show();
 					break;
 				case EditorMode.Shell:
+					backdropPage.Show();
 					break;
 				case EditorMode.Windows:
+					backdropPage.Show();
 					break;
 				case EditorMode.Widgets:
 					break;
 				case EditorMode.Terminal:
 					break;
-				default:
-					throw new ArgumentOutOfRangeException();
+				case EditorMode.Colors:
+					break;
 			}
 		}
 
+		private void MarkDirty()
+		{
+			hasUnsavedChanges = true;
+			UpdateToolbar();
+		}
+		
 		private void UpdateEditorWidgets()
 		{
 			switch (editorMode)
@@ -171,24 +311,214 @@ namespace UI.Editors.ThemeEditor
 					SetupNewThemeWidgets();
 					break;
 				case EditorMode.OpenTheme:
+					SetupOpenThemeWidgets();
 					break;
 				case EditorMode.ThemeInfo:
+					SetupThemeInfo();
 					break;
 				case EditorMode.Backdrop:
+					SetupBackdrop();
 					break;
 				case EditorMode.Shell:
+					SetupShell();
 					break;
 				case EditorMode.Windows:
+					SetupWindows();
 					break;
 				case EditorMode.Widgets:
+					SetupWidgets();
 					break;
 				case EditorMode.Terminal:
+					SetupTerminal();
 					break;
-				default:
-					throw new ArgumentOutOfRangeException();
+				case EditorMode.Colors:
+					SetupColors();
+					break;
 			}
 		}
 
+		private void SetupColors()
+		{
+			var builder = new WidgetBuilder();
+			builder.Begin();
+
+			builder.AddSection("Colors", out SectionWidget section);
+
+			builder.AddLabel("Use this section to add, edit, and delete colors that you can use repeatedly throughout the theme. You can use this to give frequent colors a name, and they will appear inside color pickers.", section);
+
+			var colorCount = 0;
+			foreach (EditableNamedColor color in namedColors)
+			{
+				builder.AddWidget(new NamedColorEntry
+				{
+					ColorName = color.name,
+					DarkColor = color.dark,
+					LightColor = color.light,
+					EditContext = this,
+					IsTemporary = false
+				}, section);
+				
+				colorCount++;
+			}
+
+			if (temporaryColor != null)
+			{
+				builder.AddWidget(new NamedColorEntry
+				{
+					ColorName = temporaryColor.name,
+					DarkColor = temporaryColor.dark,
+					LightColor = temporaryColor.light,
+					EditContext = this,
+					IsTemporary = true
+				}, section);
+			}
+			else
+			{
+				if (colorCount == 0)
+					builder.AddLabel("This theme haws no named colors yet. Click the button below to add a color.", section);
+
+				builder.AddButton("Add color", () =>
+				{
+					temporaryColor = new EditableNamedColor();
+					SetupColors();
+				}, section);
+			}
+
+			editorWidgetList.SetItems(builder.Build());
+		}
+
+		private void SetupTerminal()
+		{
+			var builder = new WidgetBuilder();
+
+			builder.Begin();
+			
+			themeEditor?.TerminalStyle.BuildWidgets(builder, MarkDirty, this);
+			
+			editorWidgetList.SetItems(builder.Build());
+		}
+
+		private void SetupBackdrop()
+		{
+			var builder = new WidgetBuilder();
+
+			builder.Begin();
+			
+			themeEditor?.BackdropStyle.BuildWidgets(builder, MarkDirty, this);
+			
+			editorWidgetList.SetItems(builder.Build());
+		}
+
+		private void SetupShell()
+		{
+			var builder = new WidgetBuilder();
+
+			builder.Begin();
+			
+			themeEditor?.ShellStyle.BuildWidgets(builder, MarkDirty, this);
+			
+			editorWidgetList.SetItems(builder.Build());
+		}
+
+		private void SetupWidgets()
+		{
+			var builder = new WidgetBuilder();
+
+			builder.Begin();
+			
+			themeEditor?.WidgetStyle.BuildWidgets(builder, MarkDirty, this);
+			
+			editorWidgetList.SetItems(builder.Build());
+		}
+
+		private void SetupWindows()
+		{
+			var builder = new WidgetBuilder();
+
+			builder.Begin();
+			
+			themeEditor?.WindowStyle.BuildWidgets(builder, MarkDirty, this);
+			
+			editorWidgetList.SetItems(builder.Build());
+		}
+
+		private void SetupThemeInfo()
+		{
+			if (themeEditor == null)
+				return;
+			
+			var builder = new WidgetBuilder();
+
+			builder.Begin();
+
+			builder.AddSection("Theme Info", out SectionWidget section)
+				.AddWidget(new LabelWidget
+				{
+					Text = "Enter your theme's name and description, and add an optional preview image. This is what will be displayed on Steam Workshop and in the game's Customization Settings. You can change these later after publishing the theme too."
+				}, section);
+
+			builder.AddWidget(new SettingsInputFieldWidget
+			{
+				Title = "Theme name",
+				CurrentValue = themeEditor.Name,
+				Callback = (v) =>
+				{
+					hasUnsavedChanges = true;
+					themeEditor.Name = v;
+					UpdateToolbar();
+				}
+			}, section);
+			
+			
+			
+			editorWidgetList.SetItems(builder.Build());
+		}
+        
+		private void SetupOpenThemeWidgets()
+		{
+			var builder = new WidgetBuilder();
+
+			builder.Begin();
+
+			builder.AddSection("Open Existing Theme", out SectionWidget section);
+
+			var list = new ListWidget
+			{
+				AllowSelectNone = false
+			};
+
+			builder.AddWidget(list, section);
+
+			var themeCount = 0;
+			foreach (IThemeAsset theme in GetThemes().Where(x => x.CanEdit))
+			{
+				builder.AddWidget(new ListItemWidget<IThemeAsset>()
+				{
+					List = list,
+					Title = theme.Name,
+					Selected = themeToOpen == theme,
+					Callback = (t) =>
+					{
+						themeToOpen = t;
+						RefreshPreview();
+					},
+					Data = theme
+				}, section);
+
+				themeCount++;
+			}
+
+			if (themeCount == 0)
+			{
+				builder.AddWidget(new LabelWidget()
+				{
+					Text = "You don't have any themes to open yet."
+				}, section);
+			}
+			
+			editorWidgetList.SetItems(builder.Build());
+		}
+		
 		private void SetupNewThemeWidgets()
 		{
 			var builder = new WidgetBuilder();
@@ -293,6 +623,71 @@ namespace UI.Editors.ThemeEditor
 					List = list
 				}, section);
 			}
+			else
+			{
+				builder.AddWidget(new ListItemWidget<EditorMode>
+				{
+					Callback = SetEditorMode,
+					Data = EditorMode.ThemeInfo,
+					Title = "Theme Info",
+					Selected = this.editorMode == EditorMode.ThemeInfo,
+					List = list
+				}, section);
+				
+				builder.AddWidget(new ListItemWidget<EditorMode>
+				{
+					Callback = SetEditorMode,
+					Data = EditorMode.Colors,
+					Title = "Colors",
+					Selected = this.editorMode == EditorMode.Colors,
+					List = list
+				}, section);
+				
+				builder.AddWidget(new ListItemWidget<EditorMode>
+				{
+					Callback = SetEditorMode,
+					Data = EditorMode.Backdrop,
+					Title = "Backdrops",
+					Selected = this.editorMode == EditorMode.Backdrop,
+					List = list
+				}, section);
+				
+				builder.AddWidget(new ListItemWidget<EditorMode>
+				{
+					Callback = SetEditorMode,
+					Data = EditorMode.Shell,
+					Title = "Desktop/Shell",
+					Selected = this.editorMode == EditorMode.Shell,
+					List = list
+				}, section);
+				
+				builder.AddWidget(new ListItemWidget<EditorMode>
+				{
+					Callback = SetEditorMode,
+					Data = EditorMode.Windows,
+					Title = "Window Decorations",
+					Selected = this.editorMode == EditorMode.Windows,
+					List = list
+				}, section);
+				
+				builder.AddWidget(new ListItemWidget<EditorMode>
+				{
+					Callback = SetEditorMode,
+					Data = EditorMode.Widgets,
+					Title = "Widgets",
+					Selected = this.editorMode == EditorMode.Widgets,
+					List = list
+				}, section);
+				
+				builder.AddWidget(new ListItemWidget<EditorMode>
+				{
+					Callback = SetEditorMode,
+					Data = EditorMode.Terminal,
+					Title = "Terminal Style",
+					Selected = this.editorMode == EditorMode.Terminal,
+					List = list
+				}, section);
+			}
 			
 			categoryWidgetList.SetItems(builder.Build());
 		}
@@ -305,7 +700,126 @@ namespace UI.Editors.ThemeEditor
 			foreach (IThemeAsset theme in gameManager.Value.ContentManager.GetContentOfType<IThemeAsset>())
 				yield return theme;
 		}
+
+		private async Task<string?> SaveAs()
+		{
+			if (themeEditor == null)
+				return null;
+
+			return null;
+		} 
 		
+		private async Task Save()
+		{
+			if (themeEditor == null)
+				return;
+			
+			hasUnsavedChanges = false;
+
+			if (string.IsNullOrWhiteSpace(themeEditor.FilePath))
+			{
+				themeEditor.FilePath = await SaveAs();
+				return;
+			}
+
+			await SaveInternal(themeEditor.FilePath, themeEditor);
+			
+			if (gameManager.Value == null)
+				return;
+
+			await gameManager.Value.ContentManager.RefreshContentDatabaseAsync();
+		}
+
+		private async Task SaveInternal(string path, OperatingSystemTheme.ThemeEditor editor)
+		{
+			saving = true;
+			UpdateToolbar();
+			
+			using var saver = new ThemeSaver(path, editor);
+
+			await saver.SaveAsync();
+
+			saving = false;
+			UpdateToolbar();
+		}
+		
+		private Task<bool?> AskForSave()
+		{
+			var completionSource = new TaskCompletionSource<bool?>();
+
+			this.dialogHlper.AskYesNoCancel(
+				"Save and continue",
+				"Your theme currently has unsaved changes. Would you like to save changes before continuing?",
+				null,
+				completionSource.SetResult
+			);
+			
+			return completionSource.Task;
+		}
+		
+		private async Task<bool> SaveIfNeeded()
+		{
+			if (!hasUnsavedChanges)
+				return true;
+
+			bool? shouldSave = await AskForSave();
+
+			if (shouldSave == null)
+				return false;
+
+
+			if (shouldSave == true)
+				await Save();
+
+			return true;
+		}
+
+		private async void OnNewClicked()
+		{
+			bool shouldContinue = await SaveIfNeeded();
+
+			if (!shouldContinue)
+				return;
+			
+			themeEditor = null;
+			
+			SetEditorMode(EditorMode.NewTheme);
+		}
+
+		private void RebuildThemeColors(bool updateUi = true)
+		{
+			if (themeEditor == null)
+				return;
+
+			themeEditor.Colors.Clear();
+
+			foreach (EditableNamedColor editable in namedColors)
+			{
+				if (string.IsNullOrWhiteSpace(editable.name))
+					continue;
+
+				themeEditor.Colors[editable.name] = new NamedColor
+				{
+					darkColor = editable.dark,
+					lightColor = editable.light
+				};
+			}
+
+
+			MarkDirty();
+
+			RefreshPreview();
+
+			if (this.editorMode == EditorMode.Colors && updateUi)
+				SetupColors();
+		}
+
+		private class EditableNamedColor
+		{
+			public string? name;
+			public Color dark;
+			public Color light;
+		}
 		
 		private enum EditorMode
 		{
@@ -318,6 +832,92 @@ namespace UI.Editors.ThemeEditor
 			Widgets,
 			Terminal,
 			Colors
+		}
+
+		/// <inheritdoc />
+		public bool ColorWithNameExists(string colorName)
+		{
+			return namedColors.Any(x => x.name == colorName);
+		}
+
+		/// <inheritdoc />
+		public void RenameColor(string colorName, string newName)
+		{
+			if (colorName == newName)
+				return;
+			
+			if (string.IsNullOrWhiteSpace(colorName) && temporaryColor == null)
+				throw new InvalidOperationException("RenameColor called with an empty color name, but the temporary color is null.");
+			
+			if (string.IsNullOrWhiteSpace(newName))
+				throw new InvalidOperationException("RenameColor called with a new color name that's blank or whitespace.");
+
+			if (ColorWithNameExists(newName))
+				throw new InvalidOperationException("Attempting to rename a color to another color that already exists.");
+
+			if (temporaryColor != null && string.IsNullOrWhiteSpace(colorName))
+			{
+				temporaryColor.name = newName;
+				namedColors.Add(temporaryColor);
+				temporaryColor = null;
+				RebuildThemeColors();
+				return;
+			}
+
+			EditableNamedColor? existingColor = namedColors.FirstOrDefault(x => x.name == colorName);
+			if (existingColor == null)
+				throw new InvalidOperationException("Color with name " + colorName + " does not exist.");
+
+			existingColor.name = newName;
+			RebuildThemeColors();
+		}
+
+		/// <inheritdoc />
+		public void CancelTemporaryColor()
+		{
+			temporaryColor = null;
+			RebuildThemeColors();
+		}
+
+		/// <inheritdoc />
+		public void UpdateColors(string colorName, Color dark, Color light)
+		{
+			EditableNamedColor? color = namedColors.FirstOrDefault(x => x.name == colorName);
+			if (color == null)
+				throw new InvalidOperationException($"Color {colorName} does not exist.");
+
+			color.dark = dark;
+			color.light = light;
+			
+			RebuildThemeColors(false);
+		}
+
+		/// <inheritdoc />
+		public void DeleteColor(string colorName)
+		{
+			EditableNamedColor? color = namedColors.FirstOrDefault(x => x.name == colorName);
+			if (color == null)
+				return;
+
+			namedColors.Remove(color);
+			RebuildThemeColors();
+		}
+
+		/// <inheritdoc />
+		public Color? GetNamedColor(string colorName, bool useDark)
+		{
+			EditableNamedColor? color = namedColors.FirstOrDefault(x => x.name == colorName);
+			if (color == null)
+				return null;
+
+			return useDark ? color.dark : color.light;
+		}
+
+		/// <inheritdoc />
+		public string[] GetColorNames()
+		{
+			return namedColors.Select(x => x.name)
+				.ToArray()!;
 		}
 	}
 }

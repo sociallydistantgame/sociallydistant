@@ -1,5 +1,6 @@
 ﻿#nullable enable
 using System;
+using AcidicGui.Widgets;
 using UI.Themes.Serialization;
 using UnityEngine;
 
@@ -19,6 +20,18 @@ namespace UI.Themes.ThemeData
 		{
 			serializer.Serialize(dayTimeBackdrop, assets, nameof(dayTimeBackdrop));
 			serializer.Serialize(nightTimeBackdrop, assets, nameof(nightTimeBackdrop));
+		}
+
+		/// <inheritdoc />
+		public void BuildWidgets(WidgetBuilder builder, Action markDirtyAction, IThemeEditContext editContext)
+		{
+			builder.PushDefaultSection("Day-time Backdrop", out _);
+			dayTimeBackdrop.BuildWidgets(builder, markDirtyAction, editContext);
+			builder.PopDefaultSection();
+			
+			builder.PushDefaultSection("Night-time Backdrop", out _);
+			nightTimeBackdrop.BuildWidgets(builder, markDirtyAction, editContext);
+			builder.PopDefaultSection();
 		}
 	}
 }
