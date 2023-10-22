@@ -220,6 +220,8 @@ namespace UI.Windowing
 		{
 			if (!allowClosing)
 				return;
+
+			RefreshCloseBlockers();
 			
 			foreach (IWindowCloseBlocker closeBlocker in closeBlockers)
 				if (!closeBlocker.CheckCanClose())
@@ -275,8 +277,14 @@ namespace UI.Windowing
 			currentClient.SetParent(clientArea);
 
 			currentClient.localScale = Vector3.one;
-			
-			this.closeBlockers.AddRange(this.currentClient.GetComponentsInChildren<IWindowCloseBlocker>(true));
+
+			RefreshCloseBlockers();
+		}
+
+		private void RefreshCloseBlockers()
+		{
+			this.closeBlockers.Clear();
+			this.closeBlockers.AddRange(this.ClientArea.GetComponentsInChildren<IWindowCloseBlocker>(true));
 		}
 
 		private void UpdateWindowState()

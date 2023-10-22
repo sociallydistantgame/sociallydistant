@@ -42,7 +42,11 @@ namespace UI.UiHelpers
 			chooser.Directory = directory;
 			chooser.Filter = extensionFilter;
 
-			return await chooser.GetFilePath();
+			string result = await chooser.GetFilePath();
+
+			win.ForceClose();
+			
+			return result;
 		}
 		
 		public void AskYesNoCancel(string title, string message, IWindow? parentWindow, Action<bool?> callback)
