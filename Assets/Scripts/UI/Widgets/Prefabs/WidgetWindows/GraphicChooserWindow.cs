@@ -156,7 +156,11 @@ namespace UI.Widgets.Prefabs.WidgetWindows
 
 		private async void Import()
 		{
-			string importPath = await dialogHelper.OpenFile("Import texture", Environment.CurrentDirectory, "JPEG Image|*.jpg,.jpeg|PNG image|*.png");
+			string importPath = await dialogHelper.OpenFile(
+				"Import texture",
+				Environment.CurrentDirectory,
+				"Compatible image files|*.jpeg,*.jpg,*.png"
+			);
 			if (string.IsNullOrWhiteSpace(importPath))
 				return;
 

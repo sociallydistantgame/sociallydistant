@@ -311,6 +311,8 @@ namespace UI.Editors.ThemeEditor
 		{
 			hasUnsavedChanges = true;
 			UpdateToolbar();
+
+			RefreshPreview();
 		}
 		
 		private void UpdateEditorWidgets()

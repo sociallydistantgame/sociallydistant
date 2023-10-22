@@ -275,6 +275,8 @@ MonoBehaviour:
   closeButton: {fileID: 6582805563618753958}
   maximizeButton: {fileID: 4232054490535909200}
   minimizeButton: {fileID: 8452404803286673810}
+  allowClosing: 1
+  allowMinimizing: 1
 --- !u!225 &9130555447081153448
 CanvasGroup:
   m_ObjectHideFlags: 0
@@ -955,7 +957,7 @@ MonoBehaviour:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 7246337653540496734}
-  m_Enabled: 1
+  m_Enabled: 0
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: bb734eac4a064b4b8700d4f90a967873, type: 3}
   m_Name: 
@@ -963,7 +965,12 @@ MonoBehaviour:
   icon:
     textIcon: 
     spriteIcon: {fileID: 0}
-    iconColor: {r: 1, g: 1, b: 1, a: 1}
+    iconColor:
+      name: 0
+      r: 1
+      g: 1
+      b: 1
+      a: 1
   textIcon: {fileID: 3791534751248170649}
   spriteIcon: {fileID: 2915268695016327419}
 --- !u!222 &6112351096773730687
