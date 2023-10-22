@@ -2,16 +2,17 @@
 using AcidicGui.Widgets;
 using UI.Themes.Serialization;
 using UI.Widgets.Settings;
+using UnityEngine;
 
 namespace UI.Themes.ThemeData
 {
 	[Serializable]
 	public class ThemeMargins : IThemeData
 	{
-		public float left;
-		public float top;
-		public float right;
-		public float bottom;
+		public int left;
+		public int top;
+		public int right;
+		public int bottom;
 
 
 		/// <inheritdoc />
@@ -32,7 +33,7 @@ namespace UI.Themes.ThemeData
 				CurrentValue = left.ToString(),
 				Callback = (v) =>
 				{
-					if (!float.TryParse(v, out left))
+					if (!int.TryParse(v, out left))
 						left = 0;
 					markDirtyAction();
 				}
@@ -44,7 +45,7 @@ namespace UI.Themes.ThemeData
 				CurrentValue = top.ToString(),
 				Callback = (v) =>
 				{
-					if (!float.TryParse(v, out top))
+					if (!int.TryParse(v, out top))
 						top = 0;
 					markDirtyAction();
 				}
@@ -56,7 +57,7 @@ namespace UI.Themes.ThemeData
 				CurrentValue = right.ToString(),
 				Callback = (v) =>
 				{
-					if (!float.TryParse(v, out right))
+					if (!int.TryParse(v, out right))
 						right = 0;
 					markDirtyAction();
 				}
@@ -68,13 +69,18 @@ namespace UI.Themes.ThemeData
 				CurrentValue = bottom.ToString(),
 				Callback = (v) =>
 				{
-					if (!float.TryParse(v, out bottom))
+					if (!int.TryParse(v, out bottom))
 						bottom = 0;
 					markDirtyAction();
 				}
 			});
 			
 			
+		}
+		
+		public static implicit operator RectOffset(ThemeMargins margins)
+		{
+			return new RectOffset(margins.left, margins.right, margins.top, margins.bottom);
 		}
 	}
 }

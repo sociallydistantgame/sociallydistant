@@ -64,6 +64,7 @@ namespace UI.Theming
 		private readonly OperatingSystemThemeEngine engine = new OperatingSystemThemeEngine();
 
 		public BackdropStyle BackdropStyle => backdropStyle;
+		public WindowStyle WindowDecorations => windowStyle;
 		
 		/// <inheritdoc />
 		public string Id => name;
