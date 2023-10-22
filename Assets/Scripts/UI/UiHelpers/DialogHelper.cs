@@ -3,8 +3,10 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Threading.Tasks;
 using Player;
 using Shell.Windowing;
+using UI.Widgets;
 using UI.Windowing;
 using UnityEngine;
 using UnityExtensions;
@@ -28,6 +30,21 @@ namespace UI.UiHelpers
 			this.AssertAllFieldsAreSerialized(typeof(DialogHelper));
 		}
 
+		public async Task<string> OpenFile(string title, string directory, string extensionFilter)
+		{
+			OverlayWorkspace overlay = this.player.Value.UiManager.WindowManager.CreateSystemOverlay();
+			IWindow win = overlay.CreateWindow(title);
+			if (win is not UguiWindow guiWin)
+				return string.Empty;
+
+			FileChooserWindow chooser = player.Value.UiManager.CreateFileChooser(guiWin);
+			chooser.FileChooserType = FileChooserWindow.ChooserType.Open;
+			chooser.Directory = directory;
+			chooser.Filter = extensionFilter;
+
+			return await chooser.GetFilePath();
+		}
+		
 		public void AskYesNoCancel(string title, string message, IWindow? parentWindow, Action<bool?> callback)
 		{
 			IMessageDialog messageDialog = player.Value.UiManager.WindowManager.CreateMessageDialog(title, parentWindow);

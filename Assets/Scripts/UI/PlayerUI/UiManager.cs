@@ -17,6 +17,7 @@ using UI.Shell;
 using UI.Themes;
 using UI.Themes.ThemedElements;
 using UI.Theming;
+using UI.Widgets;
 using UI.Windowing;
 using UnityEngine;
 using Utility;
@@ -65,6 +66,10 @@ namespace UI.PlayerUI
 		[SerializeField]
 		private GameObject systemSettingsPrefab = null!;
 
+		[Header("Dialogs")]
+		[SerializeField]
+		private FileChooserWindow fileChooser = null!;
+		
 		private string? lastThemeName;
 		private GameObject? themeEditor;
 		private UguiWindow? settingsWindow;
@@ -218,6 +223,11 @@ namespace UI.PlayerUI
 			
 			Destroy(this.themeEditor);
 			themeEditor = null;
+		}
+
+		public FileChooserWindow CreateFileChooser(UguiWindow win)
+		{
+			return Instantiate(this.fileChooser, win.ClientArea);
 		}
 		
 		private void OnGameModeChanged(GameMode newGameMode)

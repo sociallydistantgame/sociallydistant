@@ -103,3 +103,4 @@ MonoBehaviour:
   windowManagerPrefab: {fileID: 3873711479734453863, guid: 180479df6586f3f41aa4d32d884cd9e5, type: 3}
   popoverLayerPrefab: {fileID: 6738298882049385100, guid: 1976ad0fb0713fe438182c366418dcc7, type: 3}
   systemSettingsPrefab: {fileID: 5073933947700500511, guid: 5ed3dab1604879f4db5fbaa04429d19b, type: 3}
+  fileChooser: {fileID: 6864778542556095150, guid: 919778c5b2364c54d830745a68721e0b, type: 3}
