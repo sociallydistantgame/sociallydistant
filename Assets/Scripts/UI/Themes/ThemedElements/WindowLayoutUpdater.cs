@@ -15,7 +15,22 @@ namespace UI.Themes.ThemedElements
 		private LayoutGroup layoutGroup = null!;
 
 		[SerializeField]
+		private RectTransform titleArea = null!;
+		
+		[SerializeField]
 		private RectTransform iconRect = null!;
+
+		[SerializeField]
+		private RectTransform titleText = null;
+
+		[SerializeField]
+		private RectTransform closeButton = null!;
+
+		[SerializeField]
+		private RectTransform minimizeButton = null!;
+
+		[SerializeField]
+		private RectTransform maximizeButton = null!;
 		
 		/// <inheritdoc />
 		protected override void Awake()
@@ -30,8 +45,14 @@ namespace UI.Themes.ThemedElements
 			WindowStyle windowDecorations = theme.WindowDecorations;
 
 			layoutGroup.padding = windowDecorations.WindowBorderSizes;
-
+			titleArea.SetSizeWithCurrentAnchors(RectTransform.Axis.Vertical, windowDecorations.WindowBorderSizes.top);
+			
 			ApplyElementLayout(iconRect, windowDecorations.IconLayout);
+			ApplyElementLayout(titleText, windowDecorations.TitleTextLayout);
+			ApplyElementLayout(closeButton, windowDecorations.CloseButtonLayout);
+			ApplyElementLayout(maximizeButton, windowDecorations.MaximizeButtonLayout);
+			ApplyElementLayout(minimizeButton, windowDecorations.MinimizeButtonLayout);
+			
 		}
 
 		private void ApplyElementLayout(RectTransform element, WindowElementLayout layout)
