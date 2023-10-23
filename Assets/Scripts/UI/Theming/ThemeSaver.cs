@@ -70,9 +70,9 @@ namespace UI.Theming
 				savedNames.Add(save.name);
 
 				if (assets == null)
-					assets = archive.CreateEntry(ThemeFileConstants.AssetsDirectoryName + "/");
+					assets = archive.CreateEntry(ThemeFileConstants.AssetsDirectoryName);
 
-				await using Stream assetStream = OpenEntryForWriting(assets.Name + "/" + save.name);
+				await using Stream assetStream = OpenEntryForWriting(ThemeFileConstants.AssetsDirectoryName + save.name);
 
 				byte[] bytes = save.texture.EncodeToPNG();
 
