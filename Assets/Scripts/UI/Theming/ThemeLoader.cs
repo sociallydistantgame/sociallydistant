@@ -11,6 +11,7 @@ using UI.Themes.Serialization;
 using UI.Themes.ThemeData;
 using UnityEngine;
 using UnityEngine.Networking;
+using UnityEngine.Rendering.VirtualTexturing;
 
 namespace UI.Theming
 {
@@ -379,6 +380,9 @@ namespace UI.Theming
 		
 		private async Task<Texture2D?> ExtractTextureResourceAsync(ZipArchiveEntry entry)
 		{
+			if (entry == null)
+				return null;
+			
 			// Open the image entry
 			await using Stream entryStream = entry.Open();
 			
@@ -409,12 +413,31 @@ namespace UI.Theming
 			if (uwr == null)
 				return null;
 
-			await uwr.SendWebRequest();
+			try
+			{
+				await uwr.SendWebRequest();
+			}
+			catch (Exception ex)
+			{
+				Debug.LogException(ex);
+				if (!string.IsNullOrWhiteSpace(uwr.downloadHandler.error))
+					Debug.LogError(uwr.downloadHandler.error);
+			}
 
 			if (uwr.result != UnityWebRequest.Result.Success)
 				return  null;
 
-			return DownloadHandlerTexture.GetContent(uwr);
+			try
+			{
+				return DownloadHandlerTexture.GetContent(uwr);
+			}
+			catch (Exception ex)
+			{
+				Debug.LogException(ex);
+				if (!string.IsNullOrWhiteSpace(uwr.downloadHandler.error))
+					Debug.LogError(uwr.downloadHandler.error);
+				return null;
+			}
 		}
 
 		private class LoadThemeAssets : ThemeAssets
