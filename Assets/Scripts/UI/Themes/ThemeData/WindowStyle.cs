@@ -84,6 +84,30 @@ namespace UI.Themes.ThemeData
             iconLayout.BuildWidgets(builder, markDirtyAction, editContext);
             
             builder.PopDefaultSection();
+            
+            builder.PushDefaultSection("Title Text", out _);
+            
+            titleTextLayout.BuildWidgets(builder, markDirtyAction, editContext);
+            
+            builder.PopDefaultSection();
+            
+            builder.PushDefaultSection("Close Button", out _);
+            
+            closeButtonLayout.BuildWidgets(builder, markDirtyAction, editContext);
+            
+            builder.PopDefaultSection();
+            
+            builder.PushDefaultSection("Maximize/Restore Button", out _);
+            
+            maximizeButtonLayout.BuildWidgets(builder, markDirtyAction, editContext);
+            
+            builder.PopDefaultSection();
+            
+            builder.PushDefaultSection("Minimize Button", out _);
+            
+            minimizeButtonLayout.BuildWidgets(builder, markDirtyAction, editContext);
+            
+            builder.PopDefaultSection();
 		}
 	}
 }
