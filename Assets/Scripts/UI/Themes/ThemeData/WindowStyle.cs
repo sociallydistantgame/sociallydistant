@@ -37,6 +37,10 @@ namespace UI.Themes.ThemeData
 		public ThemeGraphic InactiveDecorations => inactiveBorderDecoration;
 
 		public WindowElementLayout IconLayout => iconLayout;
+		public WindowElementLayout TitleTextLayout => titleTextLayout;
+		public WindowElementLayout CloseButtonLayout => closeButtonLayout;
+		public WindowElementLayout MaximizeButtonLayout => maximizeButtonLayout;
+		public WindowElementLayout MinimizeButtonLayout => minimizeButtonLayout;
 		
 		/// <inheritdoc />
 		public void Serialize(IElementSerializer serializer, ThemeAssets assets)
