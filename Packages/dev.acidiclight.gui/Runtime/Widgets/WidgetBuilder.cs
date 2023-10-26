@@ -13,6 +13,16 @@ namespace AcidicGui.Widgets
 		private readonly Stack<SectionWidget> sectionStack = new Stack<SectionWidget>();
 		private bool isBuilding = false;
 
+		public string CurrentSectionName
+		{
+			get
+			{
+				if (sectionStack.Count == 0)
+					return string.Empty;
+
+				return sectionStack.Peek().Text;
+			}
+		}
 		public string? Name { get; set; }
 		public string? Description { get; set; }
 		
