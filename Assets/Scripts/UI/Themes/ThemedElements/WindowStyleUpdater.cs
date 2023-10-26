@@ -64,7 +64,7 @@ namespace UI.Themes.ThemedElements
 				this.decorations.sprite = null;
 			}
 
-			//this.decorationMask.sprite = this.decorations.sprite;
+			this.decorationMask.sprite = this.decorations.sprite;
 
 			ThemeColor titleTextColor = useActiveDecorations
 				? windowStyle.ActiveTitleTextColor
