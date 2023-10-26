@@ -405,7 +405,7 @@ MonoBehaviour:
     m_PersistentCalls:
       m_Calls: []
   m_Sprite: {fileID: 21300000, guid: 37ad9f2eb3cdae647995e10df3f2a0e4, type: 3}
-  m_Type: 0
+  m_Type: 1
   m_PreserveAspect: 0
   m_FillCenter: 1
   m_FillMethod: 4
@@ -843,6 +843,7 @@ GameObject:
   - component: {fileID: 4284464133946836174}
   - component: {fileID: 9182591517849853178}
   - component: {fileID: 8409432427726853592}
+  - component: {fileID: 43386755790127125}
   m_Layer: 5
   m_Name: Client Area
   m_TagString: Untagged
@@ -954,6 +955,22 @@ MonoBehaviour:
   m_FlexibleWidth: -1
   m_FlexibleHeight: -1
   m_LayoutPriority: 1
+--- !u!114 &43386755790127125
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 6986506270247224102}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 7b222ca6429fd3146a0f51ad94ee67f9, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  graphicColor: 0
+  useCustomColor: 0
+  customLightColor: {r: 0, g: 0, b: 0, a: 0}
+  customDarkColor: {r: 0, g: 0, b: 0, a: 0}
 --- !u!1 &7246337653540496734
 GameObject:
   m_ObjectHideFlags: 0
