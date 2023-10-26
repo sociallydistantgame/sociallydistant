@@ -13,12 +13,17 @@ namespace UI.Themes.ThemeData
 		[SerializeField]
 		private SystemColorsData systemColors = new SystemColorsData();
 
+		[SerializeField]
+		private InputFieldTheme inputFieldTheme = new InputFieldTheme();
+		
 		public SystemColorsData SystemColors => systemColors;
+		public InputFieldTheme InputFieldTheme => inputFieldTheme;
 		
 		/// <inheritdoc />
 		public void Serialize(IElementSerializer serializer, ThemeAssets assets)
 		{
 			serializer.Serialize(systemColors, assets, nameof(systemColors));
+			serializer.Serialize(inputFieldTheme, assets, nameof(inputFieldTheme));
 		}
 
 		/// <inheritdoc />
@@ -29,6 +34,8 @@ namespace UI.Themes.ThemeData
 			builder.PopDefaultSection();
 			
 			systemColors.BuildWidgets(builder, markDirtyAction, editContext);
+			
+			inputFieldTheme.BuildWidgets(builder, markDirtyAction, editContext);
 		}
 	}
 }

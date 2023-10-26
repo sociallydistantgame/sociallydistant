@@ -65,6 +65,7 @@ namespace UI.Theming
 
 		public BackdropStyle BackdropStyle => backdropStyle;
 		public WindowStyle WindowDecorations => windowStyle;
+		public WidgetStyle WidgetStyles => widgetStyle;
 		
 		/// <inheritdoc />
 		public string Id => name;
