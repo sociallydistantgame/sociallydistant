@@ -31,6 +31,12 @@ namespace UI.Themes.ThemeData
         
 		[SerializeField]
 		private WindowElementLayout maximizeButtonLayout = new WindowElementLayout();
+
+		[SerializeField]
+		private ThemeColor activeTitleTextColor = new ThemeColor();
+		
+		[SerializeField]
+		private ThemeColor inactiveTitleTextColor = new ThemeColor();
 		
 		public ThemeMargins WindowBorderSizes => windowBorderSizes;
 		public ThemeGraphic ActiveDecorations => activeBorderDecoration;
@@ -41,6 +47,8 @@ namespace UI.Themes.ThemeData
 		public WindowElementLayout CloseButtonLayout => closeButtonLayout;
 		public WindowElementLayout MaximizeButtonLayout => maximizeButtonLayout;
 		public WindowElementLayout MinimizeButtonLayout => minimizeButtonLayout;
+		public ThemeColor ActiveTitleTextColor => activeTitleTextColor;
+		public ThemeColor InactiveTitleTextColor => inactiveTitleTextColor;
 		
 		/// <inheritdoc />
 		public void Serialize(IElementSerializer serializer, ThemeAssets assets)
@@ -54,6 +62,9 @@ namespace UI.Themes.ThemeData
 			serializer.Serialize(closeButtonLayout, assets, nameof(closeButtonLayout));
 			serializer.Serialize(maximizeButtonLayout, assets, nameof(maximizeButtonLayout));
 			serializer.Serialize(minimizeButtonLayout, assets, nameof(minimizeButtonLayout));
+			
+			serializer.Serialize(activeTitleTextColor, assets, nameof(activeTitleTextColor));
+			serializer.Serialize(inactiveTitleTextColor, assets, nameof(inactiveTitleTextColor));
 		}
 
 		/// <inheritdoc />
@@ -88,6 +99,8 @@ namespace UI.Themes.ThemeData
             builder.PushDefaultSection("Title Text", out _);
             
             titleTextLayout.BuildWidgets(builder, markDirtyAction, editContext);
+            activeTitleTextColor.BuildWidgets(builder, markDirtyAction, editContext);
+            inactiveTitleTextColor.BuildWidgets(builder, markDirtyAction, editContext);
             
             builder.PopDefaultSection();
             

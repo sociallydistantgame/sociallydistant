@@ -24,6 +24,7 @@ namespace UI.Themes.ThemeData
 
 		public ThemeColor Color => color;
 		public Texture2D? Texture => this.texture;
+		public ThemeMargins SpriteMargins => spriteMargins;
 		
 		/// <inheritdoc />
 		public void Serialize(IElementSerializer serializer, ThemeAssets assets)
