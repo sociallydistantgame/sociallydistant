@@ -82,5 +82,10 @@ namespace UI.Themes.ThemeData
 		{
 			return new RectOffset(margins.left, margins.right, margins.top, margins.bottom);
 		}
+
+		public Vector4 ToVector4()
+		{
+			return new Vector4(left, bottom, right, top);
+		}
 	}
 }
