@@ -92,7 +92,7 @@ namespace UnityExtensions
         public static void MustGetComponentInParent<T>(this MonoBehaviour monoBehaviour, out T component)
             where T : class
         {
-            component = monoBehaviour.transform.parent.gameObject.GetComponentInParent<T>();
+            component = monoBehaviour.transform.GetComponentInParent<T>();
             Assert.IsNotNull(component);
         }
 
