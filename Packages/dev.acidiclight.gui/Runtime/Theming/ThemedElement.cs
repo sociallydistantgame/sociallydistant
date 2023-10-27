@@ -14,7 +14,7 @@ namespace AcidicGui.Theming
 		private IDisposable? themeObserver;
 		private TTHemeProvider themeProvider;
 
-		protected TTHemeProvider Provider => this.themeProvider;
+		public TTHemeProvider Provider => this.themeProvider;
 		
 		/// <inheritdoc />
 		protected override void Awake()

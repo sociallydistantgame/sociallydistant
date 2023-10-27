@@ -15,15 +15,20 @@ namespace UI.Themes.ThemeData
 
 		[SerializeField]
 		private InputFieldTheme inputFieldTheme = new InputFieldTheme();
+
+		[SerializeField]
+		private DropdownTheme dropdownTheme = new DropdownTheme();
 		
 		public SystemColorsData SystemColors => systemColors;
 		public InputFieldTheme InputFieldTheme => inputFieldTheme;
+		public DropdownTheme DropdownTheme => dropdownTheme;
 		
 		/// <inheritdoc />
 		public void Serialize(IElementSerializer serializer, ThemeAssets assets)
 		{
 			serializer.Serialize(systemColors, assets, nameof(systemColors));
 			serializer.Serialize(inputFieldTheme, assets, nameof(inputFieldTheme));
+			serializer.Serialize(dropdownTheme, assets, nameof(dropdownTheme));
 		}
 
 		/// <inheritdoc />
@@ -34,8 +39,8 @@ namespace UI.Themes.ThemeData
 			builder.PopDefaultSection();
 			
 			systemColors.BuildWidgets(builder, markDirtyAction, editContext);
-			
 			inputFieldTheme.BuildWidgets(builder, markDirtyAction, editContext);
+			dropdownTheme.BuildWidgets(builder, markDirtyAction, editContext);
 		}
 	}
 }
