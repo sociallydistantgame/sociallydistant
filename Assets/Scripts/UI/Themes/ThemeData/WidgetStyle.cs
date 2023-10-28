@@ -18,10 +18,18 @@ namespace UI.Themes.ThemeData
 
 		[SerializeField]
 		private DropdownTheme dropdownTheme = new DropdownTheme();
+
+		[SerializeField]
+		private ToggleStyle toggleStyle = new ToggleStyle();
+
+		[SerializeField]
+		private ToggleStyle radioButtonStyle = new ToggleStyle();
 		
 		public SystemColorsData SystemColors => systemColors;
 		public InputFieldTheme InputFieldTheme => inputFieldTheme;
 		public DropdownTheme DropdownTheme => dropdownTheme;
+		public ToggleStyle ToggleStyle => toggleStyle;
+		public ToggleStyle RadioButtonStyle => radioButtonStyle;
 		
 		/// <inheritdoc />
 		public void Serialize(IElementSerializer serializer, ThemeAssets assets)
@@ -29,6 +37,8 @@ namespace UI.Themes.ThemeData
 			serializer.Serialize(systemColors, assets, nameof(systemColors));
 			serializer.Serialize(inputFieldTheme, assets, nameof(inputFieldTheme));
 			serializer.Serialize(dropdownTheme, assets, nameof(dropdownTheme));
+			serializer.Serialize(toggleStyle, assets, nameof(toggleStyle));
+			serializer.Serialize(radioButtonStyle, assets, nameof(radioButtonStyle));
 		}
 
 		/// <inheritdoc />
@@ -41,6 +51,8 @@ namespace UI.Themes.ThemeData
 			systemColors.BuildWidgets(builder, markDirtyAction, editContext);
 			inputFieldTheme.BuildWidgets(builder, markDirtyAction, editContext);
 			dropdownTheme.BuildWidgets(builder, markDirtyAction, editContext);
+			toggleStyle.BuildWidgets(builder, markDirtyAction, editContext);
+			radioButtonStyle.BuildWidgets(builder, markDirtyAction, editContext);
 		}
 	}
 }
