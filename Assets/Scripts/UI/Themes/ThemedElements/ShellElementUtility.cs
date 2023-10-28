@@ -1,6 +1,7 @@
 ﻿#nullable enable
 using UnityEngine.UI;
 using ThisOtherThing.UI.Shapes;
+using ThisOtherThing.UI.ShapeUtils;
 using UI.Themes.ThemeData;
 using UI.Theming;
 using UnityEngine;
@@ -32,6 +33,7 @@ namespace UI.Themes.ThemedElements
 		
 		public static void ApplyRectangleStyle(this Rectangle rectangle, OperatingSystemTheme theme, ThemeRectangleStyle rectStyle, bool useDarkMode)
 		{
+			rectangle.RoundedProperties.Type = rectStyle.Rounding > 0 ? RoundedRects.RoundedProperties.RoundedType.Uniform : RoundedRects.RoundedProperties.RoundedType.None;
 			rectangle.ShapeProperties.FillColor = theme.TranslateColor(rectStyle.MainColor, useDarkMode);
 			rectangle.ShapeProperties.OutlineColor = theme.TranslateColor(rectStyle.BorderColor, useDarkMode);
 			rectangle.ShapeProperties.DrawOutline = rectStyle.BorderThickness > 0;
