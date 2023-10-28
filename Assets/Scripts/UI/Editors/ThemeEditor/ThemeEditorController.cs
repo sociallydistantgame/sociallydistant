@@ -22,6 +22,7 @@ using UI.Widgets.Settings;
 using UnityEngine;
 using UnityExtensions;
 using UnityEngine.UI;
+using ButtonWidget = AcidicGui.Widgets.ButtonWidget;
 
 namespace UI.Editors.ThemeEditor
 {
@@ -29,6 +30,8 @@ namespace UI.Editors.ThemeEditor
 		MonoBehaviour,
 		IThemeEditContext
 	{
+		private static readonly string useDarkModeKey = "themeEditor.useDarkModeForPreview";
+		
 		[Header("Dependencies")]
 		[SerializeField]
 		private GameManagerHolder gameManager = null!;
@@ -58,6 +61,9 @@ namespace UI.Editors.ThemeEditor
 		[SerializeField]
 		private Button cloneThemeButton = null!;
 
+		[SerializeField]
+		private WidgetList previewWidgetList = null!;
+		
 		[Header("Toolbar")]
 		[SerializeField]
 		private Button newButton = null!;
@@ -90,7 +96,14 @@ namespace UI.Editors.ThemeEditor
 
 		[SerializeField]
 		private VisibilityController windowPreview = null!;
-		
+
+		[SerializeField]
+		private VisibilityController widgetPreviewPage = null!;
+
+		[Header("Settings")]
+		[SerializeField]
+		private Toggle darkModeToggle = null!;
+        
 		private readonly List<EditableNamedColor> namedColors = new List<EditableNamedColor>();
 
 		private EditableNamedColor? temporaryColor;
@@ -122,6 +135,11 @@ namespace UI.Editors.ThemeEditor
 
 		private void Start()
 		{
+			if (gameManager.Value != null)
+				useDarkMode = gameManager.Value.SettingsManager.GetBool(useDarkModeKey, false);
+			
+			darkModeToggle.SetIsOnWithoutNotify(useDarkMode);
+			darkModeToggle.onValueChanged.AddListener(ToggleDarkPreview);
 			createEmptyButton.onClick.AddListener(CreateEmptyTheme);
 			cloneThemeButton.onClick.AddListener(CreateEmptyTheme);
 			
@@ -139,8 +157,22 @@ namespace UI.Editors.ThemeEditor
 			
 			
 			SetEditorMode(EditorMode.NewTheme);
+			BuildPreviewWidgets();
 		}
 
+		private void ToggleDarkPreview(bool dark)
+		{
+			this.UseDarkMode = dark;
+			UpdateWidgets();
+			RefreshPreview();
+
+			if (gameManager.Value != null)
+			{
+				gameManager.Value.SettingsManager.SetBool(useDarkModeKey, useDarkMode);
+				gameManager.Value.SettingsManager.Save();
+			}
+		}
+		
 		private void ResetEditableColors()
 		{
 			namedColors.Clear();
@@ -271,6 +303,7 @@ namespace UI.Editors.ThemeEditor
 			backdropPage.Hide();
 			desktopPreview.Hide();
 			windowPreview.Hide();
+			widgetPreviewPage.Hide();
 
 			switch (editorMode)
 			{
@@ -299,10 +332,12 @@ namespace UI.Editors.ThemeEditor
 					windowPreview.Show();
 					break;
 				case EditorMode.Widgets:
+					widgetPreviewPage.Show();
 					break;
 				case EditorMode.Terminal:
 					break;
 				case EditorMode.Colors:
+					widgetPreviewPage.Show();
 					break;
 			}
 		}
@@ -831,6 +866,66 @@ namespace UI.Editors.ThemeEditor
 			public string? name;
 			public Color dark;
 			public Color light;
+		}
+
+		private void BuildPreviewWidgets()
+		{
+			var builder = new WidgetBuilder();
+
+			builder.Begin();
+
+			builder.AddSection("User information", out SectionWidget section);
+			builder.AddLabel("Please log into Online Baking", section);
+			builder.AddWidget(new SettingsInputFieldWidget
+			{
+				Title = "Username",
+				CurrentValue = "admin",
+			}, section);
+			
+			builder.AddWidget(new SettingsInputFieldWidget
+			{
+				Title = "Password",
+				Description = "If you've forgotten your password, contact the office IT department for assistance.",
+				CurrentValue = "password123",
+			}, section);
+			
+			builder.AddWidget(new SettingsToggleWidget()
+			{
+				Title = "Remember me",
+				CurrentValue = true
+			}, section);
+			
+			builder.AddWidget(new SettingsToggleWidget()
+			{
+				Title = "I am human",
+				CurrentValue = false
+			}, section);
+
+			builder.AddWidget(new ButtonWidget
+			{
+				Text = "Log in"
+			}, section);
+			
+			builder.AddSection("Advanced login settings", out section);
+
+			builder.AddWidget(new SettingsDropdownWidget
+			{
+				Title = "Cookie policy",
+				Description = "Determine how we should manage cookies during this session.",
+				CurrentIndex = 0,
+				Choices = new string[]
+				{
+					"Allow tracking cookies",
+					"Necessary cookies only"
+				}
+			}, section);
+
+			
+			
+			
+			
+			
+			previewWidgetList.SetItems(builder.Build());
 		}
 		
 		private enum EditorMode
