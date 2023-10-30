@@ -11,6 +11,9 @@ namespace UI.Themes.ThemeData
 	public class WidgetStyle : IThemeData
 	{
 		[SerializeField]
+		private ThemeTypography typography = new ThemeTypography();
+		
+		[SerializeField]
 		private SystemColorsData systemColors = new SystemColorsData();
 
 		[SerializeField]
@@ -30,10 +33,12 @@ namespace UI.Themes.ThemeData
 		public DropdownTheme DropdownTheme => dropdownTheme;
 		public ToggleStyle ToggleStyle => toggleStyle;
 		public ToggleStyle RadioButtonStyle => radioButtonStyle;
+		public ThemeTypography Typography => typography;
 		
 		/// <inheritdoc />
 		public void Serialize(IElementSerializer serializer, ThemeAssets assets)
 		{
+			serializer.Serialize(typography, assets, nameof(typography));
 			serializer.Serialize(systemColors, assets, nameof(systemColors));
 			serializer.Serialize(inputFieldTheme, assets, nameof(inputFieldTheme));
 			serializer.Serialize(dropdownTheme, assets, nameof(dropdownTheme));

@@ -263,6 +263,7 @@ GameObject:
   - component: {fileID: 5979394132509968318}
   - component: {fileID: 3306179198015020248}
   - component: {fileID: 4581208023335696919}
+  - component: {fileID: 3971595508595869774}
   m_Layer: 0
   m_Name: Name Error
   m_TagString: Untagged
@@ -387,6 +388,20 @@ MonoBehaviour:
   m_hasFontAssetChanged: 0
   m_baseMaterial: {fileID: 0}
   m_maskOffset: {x: 0, y: 0, z: 0, w: 0}
+--- !u!114 &3971595508595869774
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2675161767340306674}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 749e108ff5691294cb7c1d87f562057b, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  ignoreColor: 0
+  textStyle: 0
 --- !u!1 &3656254944231085104
 GameObject:
   m_ObjectHideFlags: 0
@@ -455,6 +470,7 @@ GameObject:
   - component: {fileID: 8741339455714974308}
   - component: {fileID: 1175467508381031881}
   - component: {fileID: 1158038911769541213}
+  - component: {fileID: 8195132439022851842}
   m_Layer: 0
   m_Name: Description
   m_TagString: Untagged
@@ -579,6 +595,20 @@ MonoBehaviour:
   m_hasFontAssetChanged: 0
   m_baseMaterial: {fileID: 0}
   m_maskOffset: {x: 0, y: 0, z: 0, w: 0}
+--- !u!114 &8195132439022851842
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 4120487971980164351}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 749e108ff5691294cb7c1d87f562057b, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  ignoreColor: 0
+  textStyle: 1
 --- !u!1 &4261427285417117134
 GameObject:
   m_ObjectHideFlags: 0
@@ -590,6 +620,7 @@ GameObject:
   - component: {fileID: 2746150566786908799}
   - component: {fileID: 3394453241704311461}
   - component: {fileID: 6550018804753954815}
+  - component: {fileID: 2770090859482968724}
   m_Layer: 0
   m_Name: Description
   m_TagString: Untagged
@@ -714,6 +745,20 @@ MonoBehaviour:
   m_hasFontAssetChanged: 0
   m_baseMaterial: {fileID: 0}
   m_maskOffset: {x: 0, y: 0, z: 0, w: 0}
+--- !u!114 &2770090859482968724
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 4261427285417117134}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 749e108ff5691294cb7c1d87f562057b, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  ignoreColor: 0
+  textStyle: 1
 --- !u!1 &5447476687412742125
 GameObject:
   m_ObjectHideFlags: 0
@@ -828,6 +873,7 @@ GameObject:
   - component: {fileID: 3944805078281119732}
   - component: {fileID: 7321892877644973224}
   - component: {fileID: 7631590479485897367}
+  - component: {fileID: 9074272481963715355}
   m_Layer: 0
   m_Name: Name Label
   m_TagString: Untagged
@@ -952,6 +998,20 @@ MonoBehaviour:
   m_hasFontAssetChanged: 0
   m_baseMaterial: {fileID: 0}
   m_maskOffset: {x: 0, y: 0, z: 0, w: 0}
+--- !u!114 &9074272481963715355
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 5643947943016440244}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 749e108ff5691294cb7c1d87f562057b, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  ignoreColor: 0
+  textStyle: 1
 --- !u!1 &6024051145923437147
 GameObject:
   m_ObjectHideFlags: 0
@@ -1042,10 +1102,10 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   m_IgnoreLayout: 0
-  m_MinWidth: 48
-  m_MinHeight: 32
-  m_PreferredWidth: 48
-  m_PreferredHeight: 32
+  m_MinWidth: 16
+  m_MinHeight: 16
+  m_PreferredWidth: 16
+  m_PreferredHeight: 16
   m_FlexibleWidth: -1
   m_FlexibleHeight: -1
   m_LayoutPriority: 1
@@ -1242,10 +1302,10 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   m_IgnoreLayout: 0
-  m_MinWidth: 48
-  m_MinHeight: 32
-  m_PreferredWidth: 48
-  m_PreferredHeight: 32
+  m_MinWidth: 16
+  m_MinHeight: 16
+  m_PreferredWidth: 16
+  m_PreferredHeight: 16
   m_FlexibleWidth: -1
   m_FlexibleHeight: -1
   m_LayoutPriority: 1
@@ -1664,7 +1724,7 @@ MonoBehaviour:
     m_Top: 0
     m_Bottom: 0
   m_ChildAlignment: 3
-  m_Spacing: 0
+  m_Spacing: 3
   m_ChildForceExpandWidth: 0
   m_ChildForceExpandHeight: 0
   m_ChildControlWidth: 1
@@ -1731,7 +1791,7 @@ MonoBehaviour:
     m_Top: 0
     m_Bottom: 0
   m_ChildAlignment: 3
-  m_Spacing: 0
+  m_Spacing: 3
   m_ChildForceExpandWidth: 0
   m_ChildForceExpandHeight: 0
   m_ChildControlWidth: 1

@@ -1,6 +1,7 @@
 ﻿#nullable enable
 using System.Collections.Generic;
 using System;
+using UnityEditor;
 using UnityEngine;
 
 namespace AcidicGui.Widgets
@@ -40,7 +41,13 @@ namespace AcidicGui.Widgets
 		public void Recycle(WidgetController widget)
 		{
 			widget.OnRecycle();
-			
+
+			if (recycleBinRoot == null)
+			{
+				UnityEngine.Object.Destroy(widget.gameObject);
+				return;
+			}
+
 			widget.gameObject.SetActive(false);
 
 			Type type = widget.GetType();

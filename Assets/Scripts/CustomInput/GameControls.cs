@@ -538,6 +538,34 @@ public partial class @GameControls: IInputActionCollection2, IDisposable
                     ""isPartOfComposite"": false
                 }
             ]
+        },
+        {
+            ""name"": ""Shell"",
+            ""id"": ""2e3223bc-eb8f-49c5-b972-f3ca8e18d5a1"",
+            ""actions"": [
+                {
+                    ""name"": ""TakeScreenshot"",
+                    ""type"": ""Button"",
+                    ""id"": ""b9d9a683-2f71-45dc-aca1-572fed21dc04"",
+                    ""expectedControlType"": ""Button"",
+                    ""processors"": """",
+                    ""interactions"": """",
+                    ""initialStateCheck"": false
+                }
+            ],
+            ""bindings"": [
+                {
+                    ""name"": """",
+                    ""id"": ""4f04768f-7b45-4545-b2a4-c84cc7f81254"",
+                    ""path"": ""<Keyboard>/f2"",
+                    ""interactions"": """",
+                    ""processors"": """",
+                    ""groups"": """",
+                    ""action"": ""TakeScreenshot"",
+                    ""isComposite"": false,
+                    ""isPartOfComposite"": false
+                }
+            ]
         }
     ],
     ""controlSchemes"": []
@@ -554,6 +582,9 @@ public partial class @GameControls: IInputActionCollection2, IDisposable
         m_UI_RightClick = m_UI.FindAction("RightClick", throwIfNotFound: true);
         m_UI_TrackedDevicePosition = m_UI.FindAction("TrackedDevicePosition", throwIfNotFound: true);
         m_UI_TrackedDeviceOrientation = m_UI.FindAction("TrackedDeviceOrientation", throwIfNotFound: true);
+        // Shell
+        m_Shell = asset.FindActionMap("Shell", throwIfNotFound: true);
+        m_Shell_TakeScreenshot = m_Shell.FindAction("TakeScreenshot", throwIfNotFound: true);
     }
 
     public void Dispose()
@@ -729,6 +760,52 @@ public partial class @GameControls: IInputActionCollection2, IDisposable
         }
     }
     public UIActions @UI => new UIActions(this);
+
+    // Shell
+    private readonly InputActionMap m_Shell;
+    private List<IShellActions> m_ShellActionsCallbackInterfaces = new List<IShellActions>();
+    private readonly InputAction m_Shell_TakeScreenshot;
+    public struct ShellActions
+    {
+        private @GameControls m_Wrapper;
+        public ShellActions(@GameControls wrapper) { m_Wrapper = wrapper; }
+        public InputAction @TakeScreenshot => m_Wrapper.m_Shell_TakeScreenshot;
+        public InputActionMap Get() { return m_Wrapper.m_Shell; }
+        public void Enable() { Get().Enable(); }
+        public void Disable() { Get().Disable(); }
+        public bool enabled => Get().enabled;
+        public static implicit operator InputActionMap(ShellActions set) { return set.Get(); }
+        public void AddCallbacks(IShellActions instance)
+        {
+            if (instance == null || m_Wrapper.m_ShellActionsCallbackInterfaces.Contains(instance)) return;
+            m_Wrapper.m_ShellActionsCallbackInterfaces.Add(instance);
+            @TakeScreenshot.started += instance.OnTakeScreenshot;
+            @TakeScreenshot.performed += instance.OnTakeScreenshot;
+            @TakeScreenshot.canceled += instance.OnTakeScreenshot;
+        }
+
+        private void UnregisterCallbacks(IShellActions instance)
+        {
+            @TakeScreenshot.started -= instance.OnTakeScreenshot;
+            @TakeScreenshot.performed -= instance.OnTakeScreenshot;
+            @TakeScreenshot.canceled -= instance.OnTakeScreenshot;
+        }
+
+        public void RemoveCallbacks(IShellActions instance)
+        {
+            if (m_Wrapper.m_ShellActionsCallbackInterfaces.Remove(instance))
+                UnregisterCallbacks(instance);
+        }
+
+        public void SetCallbacks(IShellActions instance)
+        {
+            foreach (var item in m_Wrapper.m_ShellActionsCallbackInterfaces)
+                UnregisterCallbacks(item);
+            m_Wrapper.m_ShellActionsCallbackInterfaces.Clear();
+            AddCallbacks(instance);
+        }
+    }
+    public ShellActions @Shell => new ShellActions(this);
     public interface IUIActions
     {
         void OnNavigate(InputAction.CallbackContext context);
@@ -741,5 +818,9 @@ public partial class @GameControls: IInputActionCollection2, IDisposable
         void OnRightClick(InputAction.CallbackContext context);
         void OnTrackedDevicePosition(InputAction.CallbackContext context);
         void OnTrackedDeviceOrientation(InputAction.CallbackContext context);
+    }
+    public interface IShellActions
+    {
+        void OnTakeScreenshot(InputAction.CallbackContext context);
     }
 }

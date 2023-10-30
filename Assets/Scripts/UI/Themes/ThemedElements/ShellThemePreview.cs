@@ -1,6 +1,11 @@
 ﻿#nullable enable
+using System;
+using TMPro;
+using UI.PlayerUI;
+using UI.Themes.ThemeData;
 using UI.Theming;
 using UnityEngine;
+using UnityExtensions;
 
 namespace UI.Themes.ThemedElements
 {
@@ -9,8 +14,14 @@ namespace UI.Themes.ThemedElements
 		[SerializeField]
 		private bool useDarkMode;
 
+		private UiManager uiManager = null!;
 		private OperatingSystemTheme? myTheme;
-		
+
+		private void Awake()
+		{
+			this.MustGetComponentInParent(out uiManager);
+		}
+
 		/// <inheritdoc />
 		protected override OperatingSystemTheme? GetMyTheme()
 		{
@@ -26,6 +37,12 @@ namespace UI.Themes.ThemedElements
 
 		/// <inheritdoc />
 		public override bool UseDarkMode => useDarkMode;
+
+		/// <inheritdoc />
+		public override TMP_FontAsset GetFont(ThemeFont font)
+		{
+			return uiManager.GetFont(font);
+		}
 
 		public void SetPreviewTheme(OperatingSystemTheme theme, bool darkMode)
 		{

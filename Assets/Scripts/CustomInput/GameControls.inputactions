@@ -516,6 +516,34 @@
                     "isPartOfComposite": false
                 }
             ]
+        },
+        {
+            "name": "Shell",
+            "id": "2e3223bc-eb8f-49c5-b972-f3ca8e18d5a1",
+            "actions": [
+                {
+                    "name": "TakeScreenshot",
+                    "type": "Button",
+                    "id": "b9d9a683-2f71-45dc-aca1-572fed21dc04",
+                    "expectedControlType": "Button",
+                    "processors": "",
+                    "interactions": "",
+                    "initialStateCheck": false
+                }
+            ],
+            "bindings": [
+                {
+                    "name": "",
+                    "id": "4f04768f-7b45-4545-b2a4-c84cc7f81254",
+                    "path": "<Keyboard>/f2",
+                    "interactions": "",
+                    "processors": "",
+                    "groups": "",
+                    "action": "TakeScreenshot",
+                    "isComposite": false,
+                    "isPartOfComposite": false
+                }
+            ]
         }
     ],
     "controlSchemes": []

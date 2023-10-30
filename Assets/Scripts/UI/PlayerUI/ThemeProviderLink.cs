@@ -1,4 +1,6 @@
 ﻿#nullable enable
+using TMPro;
+using UI.Themes.ThemeData;
 using UI.Themes.ThemedElements;
 using UI.Theming;
 using UnityEngine;
@@ -30,5 +32,11 @@ namespace UI.PlayerUI
 
 		/// <inheritdoc />
 		public override bool UseDarkMode => linkedElement.Provider.UseDarkMode;
+
+		/// <inheritdoc />
+		public override TMP_FontAsset GetFont(ThemeFont font)
+		{
+			return linkedElement.Provider.GetFont(font);
+		}
 	}
 }

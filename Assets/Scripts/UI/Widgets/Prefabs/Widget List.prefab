@@ -447,7 +447,7 @@ MonoBehaviour:
       m_Top: 0
       m_Bottom: 0
     _Gravity: 1
-    _ContentSpacing: 0
+    _ContentSpacing: 3
     _DefaultItemSize: 60
     _ForwardDragToParents: 0
     _ForwardDragSameDirectionAtBoundary: 0

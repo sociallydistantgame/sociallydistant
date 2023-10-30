@@ -9,12 +9,14 @@ using Core.Config.SystemConfigCategories;
 using GamePlatform;
 using Shell;
 using Shell.Windowing;
+using TMPro;
 using UI.Backdrop;
 using UI.CharacterCreator;
 using UI.Login;
 using UI.Popovers;
 using UI.Shell;
 using UI.Themes;
+using UI.Themes.ThemeData;
 using UI.Themes.ThemedElements;
 using UI.Theming;
 using UI.Widgets;
@@ -69,7 +71,18 @@ namespace UI.PlayerUI
 		[Header("Dialogs")]
 		[SerializeField]
 		private FileChooserWindow fileChooser = null!;
-		
+
+		[Header("Fonts")]
+		[SerializeField]
+		private TMP_FontAsset sansSerifFont = null!;
+
+		[SerializeField]
+		private TMP_FontAsset serifFont = null!;
+
+		[SerializeField]
+		private TMP_FontAsset monospaceFont = null!;
+
+		private Camera mainCamera = null!;
 		private string? lastThemeName;
 		private GameObject? themeEditor;
 		private UguiWindow? settingsWindow;
@@ -82,6 +95,19 @@ namespace UI.PlayerUI
 		private IDisposable? settingsObserver;
 
 		public override bool UseDarkMode => this.themeService.DarkMode;
+
+		/// <inheritdoc />
+		public override TMP_FontAsset GetFont(ThemeFont font)
+		{
+			return font switch
+			{
+				ThemeFont.SansSerif => sansSerifFont,
+				ThemeFont.Serif => serifFont,
+				ThemeFont.Monospace => monospaceFont,
+				_ => sansSerifFont
+			};
+		}
+
 		public IThemeService ThemeService => themeService;
 		public BackdropController Backdrop => backdrop;
 		public PopoverLayer PopoverLayer => popoverLayer;
@@ -96,6 +122,8 @@ namespace UI.PlayerUI
 		{
 			this.AssertAllFieldsAreSerialized(typeof(UiManager));
 
+			this.mainCamera = Camera.main;
+			
 			Instantiate(backdropPrefab, this.transform).MustGetComponent(out backdrop);
 			Instantiate(this.popoverLayerPrefab, this.transform).MustGetComponent(out popoverLayer);
 			Instantiate(windowManagerPrefab, this.transform).MustGetComponent(out windowManager);
@@ -272,8 +300,27 @@ namespace UI.PlayerUI
 	                HideDesktop();
 	                break;
 			}
+
+			FixCanvasCameras();
 		}
 
+		private void FixCanvasCameras()
+		{
+			Canvas[]? canvases = this.GetComponentsInChildren<Canvas>();
+
+			if (canvases == null)
+				return;
+
+			foreach (Canvas canvas in canvases)
+			{
+				if (canvas.transform.parent != this.transform)
+					continue;
+
+				canvas.worldCamera = mainCamera;
+				canvas.renderMode = RenderMode.ScreenSpaceCamera;
+			}
+		}
+		
 		/// <inheritdoc />
 		protected override OperatingSystemTheme? GetMyTheme()
 		{
