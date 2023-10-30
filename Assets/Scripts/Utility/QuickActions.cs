@@ -3,6 +3,7 @@
 using Core.Config;
 using GamePlatform;
 using UnityEditor;
+using UnityEngine.Device;
 
 namespace Utility
 {
@@ -10,6 +11,12 @@ namespace Utility
 	{
 		private const string MenuName = "Quick Actions";
 
+		[MenuItem(itemName: MenuName + "/Open Game Data")]
+		private static void OpenGameData()
+		{
+			System.Diagnostics.Process.Start(Application.persistentDataPath);
+		}
+		
 		[MenuItem(itemName: MenuName + "/Initialization Flow/Debug World")]
 		public static void InitFlow_DebugWorld()
 		{

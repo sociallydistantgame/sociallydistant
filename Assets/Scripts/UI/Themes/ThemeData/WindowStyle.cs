@@ -37,7 +37,11 @@ namespace UI.Themes.ThemeData
 		
 		[SerializeField]
 		private ThemeColor inactiveTitleTextColor = new ThemeColor();
-		
+
+		[SerializeField]
+		private ThemeTypographyStyle windowTitleFont = new ThemeTypographyStyle();
+
+		public ThemeTypographyStyle TitleTextFontStyle => this.windowTitleFont;
 		public ThemeMargins WindowBorderSizes => windowBorderSizes;
 		public ThemeGraphic ActiveDecorations => activeBorderDecoration;
 		public ThemeGraphic InactiveDecorations => inactiveBorderDecoration;
@@ -65,6 +69,7 @@ namespace UI.Themes.ThemeData
 			
 			serializer.Serialize(activeTitleTextColor, assets, nameof(activeTitleTextColor));
 			serializer.Serialize(inactiveTitleTextColor, assets, nameof(inactiveTitleTextColor));
+			serializer.Serialize(windowTitleFont, assets, nameof(windowTitleFont));
 		}
 
 		/// <inheritdoc />
@@ -99,6 +104,7 @@ namespace UI.Themes.ThemeData
             builder.PushDefaultSection("Title Text", out _);
             
             titleTextLayout.BuildWidgets(builder, markDirtyAction, editContext);
+            windowTitleFont.BuildWidgets(builder, markDirtyAction, editContext, false);
             activeTitleTextColor.BuildWidgets(builder, markDirtyAction, editContext);
             inactiveTitleTextColor.BuildWidgets(builder, markDirtyAction, editContext);
             

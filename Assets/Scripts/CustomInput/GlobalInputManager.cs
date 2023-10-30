@@ -35,6 +35,7 @@ namespace CustomInput
 		private void Start()
 		{
 			inputManagers.Insert(0, new WindowInputManager(windowFocusService));
+			inputManagers.Insert(1, new ShellInputManager());
 		}
 
 		private void OnEnable()

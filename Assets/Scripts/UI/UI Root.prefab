@@ -104,3 +104,6 @@ MonoBehaviour:
   popoverLayerPrefab: {fileID: 6738298882049385100, guid: 1976ad0fb0713fe438182c366418dcc7, type: 3}
   systemSettingsPrefab: {fileID: 5073933947700500511, guid: 5ed3dab1604879f4db5fbaa04429d19b, type: 3}
   fileChooser: {fileID: 6864778542556095150, guid: 919778c5b2364c54d830745a68721e0b, type: 3}
+  sansSerifFont: {fileID: 11400000, guid: f509d26bf7ce06243bf3324babe5918e, type: 2}
+  serifFont: {fileID: 11400000, guid: f509d26bf7ce06243bf3324babe5918e, type: 2}
+  monospaceFont: {fileID: 11400000, guid: 87de73e7c24d6134d8dd62f6b304d98d, type: 2}

@@ -13,6 +13,7 @@ using Modding;
 using PlasticGui.WorkspaceWindow.CodeReview;
 using TMPro;
 using UI.Applications.Chat;
+using UI.PlayerUI;
 using UI.Themes.Serialization;
 using UI.Themes.ThemedElements;
 using UI.Theming;
@@ -106,6 +107,7 @@ namespace UI.Editors.ThemeEditor
         
 		private readonly List<EditableNamedColor> namedColors = new List<EditableNamedColor>();
 
+		private UiManager uiManager = null!;
 		private EditableNamedColor? temporaryColor;
 		private bool saving = false;
 		private bool hasUnsavedChanges = false;
@@ -131,6 +133,7 @@ namespace UI.Editors.ThemeEditor
 		{
 			this.AssertAllFieldsAreSerialized(typeof(ThemeEditorController));
 			this.MustGetComponent(out dialogHlper);
+			this.MustGetComponentInParent(out uiManager);
 		}
 
 		private void Start()
@@ -158,6 +161,7 @@ namespace UI.Editors.ThemeEditor
 			
 			SetEditorMode(EditorMode.NewTheme);
 			BuildPreviewWidgets();
+			RefreshPreview();
 		}
 
 		private void ToggleDarkPreview(bool dark)
@@ -296,7 +300,10 @@ namespace UI.Editors.ThemeEditor
 		
 		private void RefreshPreview()
 		{
-			themePreview.SetPreviewTheme(themeEditor?.Theme, this.useDarkMode);
+			if (themeEditor != null)
+				themePreview.SetPreviewTheme(themeEditor.Theme, this.useDarkMode);
+			else
+				themePreview.SetPreviewTheme(uiManager.CurrentTheme, uiManager.UseDarkMode);
 			
 			newThemePage.Hide();
 			cloneThemePage.Hide();
@@ -331,6 +338,7 @@ namespace UI.Editors.ThemeEditor
 					backdropPage.Show();
 					windowPreview.Show();
 					break;
+				case EditorMode.Typography:
 				case EditorMode.Widgets:
 					widgetPreviewPage.Show();
 					break;
@@ -362,6 +370,9 @@ namespace UI.Editors.ThemeEditor
 					break;
 				case EditorMode.ThemeInfo:
 					SetupThemeInfo();
+					break;
+				case EditorMode.Typography:
+					SetupTypography();
 					break;
 				case EditorMode.Backdrop:
 					SetupBackdrop();
@@ -445,6 +456,17 @@ namespace UI.Editors.ThemeEditor
 			editorWidgetList.SetItems(builder.Build());
 		}
 
+		private void SetupTypography()
+		{
+			var builder = new WidgetBuilder();
+
+			builder.Begin();
+			
+			themeEditor?.WidgetStyle.Typography.BuildWidgets(builder, MarkDirty, this);
+			
+			editorWidgetList.SetItems(builder.Build());
+		}
+		
 		private void SetupBackdrop()
 		{
 			var builder = new WidgetBuilder();
@@ -693,6 +715,15 @@ namespace UI.Editors.ThemeEditor
 				builder.AddWidget(new ListItemWidget<EditorMode>
 				{
 					Callback = SetEditorMode,
+					Data = EditorMode.Typography,
+					Title = "Typography",
+					Selected = this.editorMode == EditorMode.Typography,
+					List = list
+				}, section);
+				
+				builder.AddWidget(new ListItemWidget<EditorMode>
+				{
+					Callback = SetEditorMode,
 					Data = EditorMode.Backdrop,
 					Title = "Backdrops",
 					Selected = this.editorMode == EditorMode.Backdrop,
@@ -933,6 +964,7 @@ namespace UI.Editors.ThemeEditor
 			NewTheme,
 			OpenTheme,
 			ThemeInfo,
+			Typography,
 			Backdrop,
 			Shell,
 			Windows,
