@@ -21,9 +21,13 @@ namespace UI.Windowing
 		[SerializeField]
 		private UguiWindow window = null!;
 
+		private Canvas rootCanvas;
+		
 		private void Awake()
 		{
 			this.AssertAllFieldsAreSerialized(typeof(WindowDragSurface));
+			this.MustGetComponentInParent(out Canvas windowCanvas);
+			rootCanvas = windowCanvas.rootCanvas;
 		}
 
 		/// <inheritdoc />
@@ -31,7 +35,7 @@ namespace UI.Windowing
 		{
 			if (isDragging)
 			{
-				this.window.Position += eventData.delta / this.window.RectTransform.lossyScale;
+                this.window.Position += eventData.delta  / this.window.RectTransform.lossyScale;
 			}
 		}
 
