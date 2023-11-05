@@ -12,17 +12,32 @@ namespace AcidicGui.Widgets
 
 		[SerializeField]
 		private TextMeshProUGUI label = null!;
+
+		[SerializeField]
+		private TextMeshProUGUI description = null!;
+
+		private bool ignoreCallback;
 		
 		public bool Selected { get; set; }
 		public ListWidget List { get; set; }
 		public Action? Callback { get; set; }
 		public string? Title { get; set; }
+		public string? Description { get; set; }
 		
 		/// <inheritdoc />
 		public override void UpdateUI()
 		{
-			label.SetText(Title);
-            
+			if (string.IsNullOrWhiteSpace(Description))
+			{
+				label.SetText(string.Empty);
+				description.SetText(Title);
+			}
+			else
+			{
+				label.SetText(Title);
+				description.SetText(Description);
+			}
+
 			toggle.group = List?.ToggleGroup;
 			toggle.SetIsOnWithoutNotify(Selected);
 			toggle.onValueChanged.AddListener(OnValueChanged);
@@ -51,11 +66,19 @@ namespace AcidicGui.Widgets
 		/// <inheritdoc />
 		public override void OnRecycle()
 		{
-			toggle.onValueChanged.RemoveAllListeners();
+			if (ignoreCallback)
+				return;
 			
+			ignoreCallback = true;
+			
+			toggle.onValueChanged.RemoveAllListeners();
+
+			toggle.group = null;
 			toggle.group = null;
 			Callback = null;
 			this.List = null;
+			
+			ignoreCallback = false;
 		}
 	}
 }
