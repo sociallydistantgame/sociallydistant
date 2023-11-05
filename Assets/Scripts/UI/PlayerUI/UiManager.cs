@@ -316,8 +316,8 @@ namespace UI.PlayerUI
 				if (canvas.transform.parent != this.transform)
 					continue;
 
-				canvas.worldCamera = mainCamera;
-				canvas.renderMode = RenderMode.ScreenSpaceCamera;
+				canvas.worldCamera = null;
+				canvas.renderMode = RenderMode.ScreenSpaceOverlay;
 			}
 		}
 		

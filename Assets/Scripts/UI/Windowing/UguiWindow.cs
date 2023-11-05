@@ -282,7 +282,8 @@ namespace UI.Windowing
 
 			currentClient = newClient;
 			currentClient.SetParent(clientArea);
-
+			currentClient.localPosition = Vector3.zero;
+			
 			currentClient.localScale = Vector3.one;
 
 			RefreshCloseBlockers();
