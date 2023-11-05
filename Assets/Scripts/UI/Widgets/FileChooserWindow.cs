@@ -68,6 +68,11 @@ namespace UI.Widgets
 			selectButton.onClick.AddListener(Select);
 			cancelButton.onClick.AddListener(Cancel);
 
+			toolbar.backPressed.AddListener(GoBack);
+			toolbar.forwardPressed.AddListener(GoForward);
+			toolbar.upPressed.AddListener(GoUp);
+			toolbar.createDirectoryPressed.AddListener(CreateDirectory);
+			
 			BuildFilterList();
 			RefreshLists();
 		}
@@ -164,6 +169,8 @@ namespace UI.Widgets
 		private void RefreshFiles()
 		{
 			toolbar.UpdateCurrentPath(Directory);
+			toolbar.CanGoBack = history.Count > 0;
+			toolbar.CanGoForward = future.Count > 0;
 			
 			nameInput.SetTextWithoutNotify(Path.GetFileName(chosenPath));
 			
@@ -261,13 +268,7 @@ namespace UI.Widgets
 				}, places);
 			}
 
-			var deviceList = new ListWidget
-			{
-				AllowSelectNone = true
-			};
-			
-			builder.AddSection("Devices", out SectionWidget devices)
-				.AddWidget(deviceList, devices);
+			builder.AddSection("Devices", out SectionWidget devices);
 
 			foreach (SystemVolume drive in SociallyDistantUtility.GetSystemDiskDrives())
 			{
@@ -276,7 +277,7 @@ namespace UI.Widgets
 					Title = drive.VolumeLabel,
 					Description = $"{SociallyDistantUtility.GetFriendlyFileSize(drive.FreeSpace)} / {SociallyDistantUtility.GetFriendlyFileSize(drive.TotalSpace)}",
 					Callback = Navigate,
-					List = deviceList,
+					List = list,
 					Data = drive.Path,
 					Selected = Directory == drive.Path
 				}, devices);
@@ -288,12 +289,23 @@ namespace UI.Widgets
 
 		private void Navigate(string path)
 		{
+			Navigate(path, true);
+		}
+		
+		private void Navigate(string path, bool addToHistory)
+		{
 			chosenPath = path;
 			
 			if (System.IO.Directory.Exists(path))
 			{
+				if (addToHistory)
+				{
+					future.Clear();
+					history.Push(Directory);
+				}
+
 				this.Directory = path;
-				RefreshLists();
+				RefreshFiles();
 			}
 		}
 		
@@ -411,7 +423,46 @@ namespace UI.Widgets
 		{
 			Select();
 		}
-        
+
+		private void GoBack()
+		{
+			if (history.Count == 0)
+				return;
+
+			string path = history.Pop();
+			
+			future.Push(Directory);
+			Navigate(path, false);
+		}
+
+		private void GoForward()
+		{
+			if (future.Count == 0)
+				return;
+
+			string path = future.Pop();
+			
+			history.Push(Directory);
+			Navigate(path, false);
+		}
+
+		private void GoUp()
+		{
+			string? parent = Path.GetDirectoryName(Directory);
+			if (string.IsNullOrWhiteSpace(parent))
+				return;
+
+			if (!System.IO.Directory.Exists(parent))
+				return;
+			
+			Navigate(parent);
+		}
+
+		private async void CreateDirectory()
+		{
+			
+		}
+		
 		public enum ChooserType
 		{
 			Open,
