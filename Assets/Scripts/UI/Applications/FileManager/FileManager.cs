@@ -4,12 +4,17 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using Architecture;
+using Com.TheFallenGames.OSA.Core;
+using Com.TheFallenGames.OSA.Core.SubComponents;
 using Core;
 using OS.Devices;
 using UI.Windowing;
 using OS.FileSystems;
+using Shell;
+using Shell.Common;
 using Shell.Windowing;
 using TMPro;
+using UI.Shell.Common;
 using UnityEngine;
 using UnityEngine.UI;
 using UnityExtensions;
@@ -22,7 +27,13 @@ namespace UI.Applications.FileManager
 		IProgramOpenHandler
 
 	{
-		private readonly List<FileIconWidget> fileIcons = new List<FileIconWidget>();
+		[Header("UI")]
+		[SerializeField]
+		private FileManagerToolbar toolbar = null!;
+        
+		[SerializeField]
+		private FileGridAdapter filesGrid = null!;
+        
 		private ISystemProcess process = null!;
 		private IWindow window = null!;
 		private IVirtualFileSystem vfs = null!;
@@ -34,37 +45,18 @@ namespace UI.Applications.FileManager
 		public bool CanGoUp => currentDirectory != "/";
 		public bool CanGoBack => history.Any();
 		public bool CanGoForward => future.Any();
-
-		[Header("UI")]
-		[SerializeField]
-		private TextMeshProUGUI currentDirectoryText = null!;
-
-		[SerializeField]
-		private Button backButton = null!;
-		
-		[SerializeField]
-		private Button forwardButton = null!;
-		
-		[SerializeField]
-		private Button upButton = null!;
-
-		[SerializeField]
-		private RectTransform filesGrid = null!;
-
-		[SerializeField]
-		private FileIconWidget fileIconWidgetTemplate = null!;
 		
 		private void Awake()
 		{
 			this.AssertAllFieldsAreSerialized(typeof(FileManager));
-			this.fileIconWidgetTemplate.gameObject.SetActive(false);
 		}
 
 		private void Start()
 		{
-			this.backButton.onClick.AddListener(this.GoBack);
-			this.forwardButton.onClick.AddListener(this.GoForward);
-			this.upButton.onClick.AddListener(GoUp);
+			this.toolbar.backPressed.AddListener(this.GoBack);
+			this.toolbar.forwardPressed.AddListener(this.GoForward);
+			this.toolbar.upPressed.AddListener(GoUp);
+			this.filesGrid.onFileDoubleClicked.AddListener(this.OnFileClicked);
 			
 			this.UpdateUI();
 		}
@@ -81,44 +73,44 @@ namespace UI.Applications.FileManager
 
 		private void UpdateUI()
 		{
-			this.currentDirectoryText.SetText(this.currentDirectory);
+			this.toolbar.UpdateCurrentPath(this.currentDirectory);
 			this.process.WorkingDirectory = currentDirectory;
 
-			this.backButton.enabled = CanGoBack;
-			this.forwardButton.enabled = CanGoForward;
-			this.upButton.enabled = CanGoUp;
+			this.toolbar.CanGoBack = CanGoBack;
+			this.toolbar.CanGoForward = CanGoForward;
+			this.toolbar.CanGoUp = CanGoUp;
 			
 			// Get all directories AND files in the current one
-			var allEntries = new List<string>();
-			allEntries.AddRange(this.vfs.GetDirectories(this.currentDirectory));
-			allEntries.AddRange(vfs.GetFiles(this.currentDirectory));
-			
-			// Delete any icons we don't need.
-			for (var i = fileIcons.Count - 1; i >= allEntries.Count; i--)
+			var allEntries = new List<ShellFileModel>();
+			foreach (string path in this.vfs.GetDirectories(this.currentDirectory))
 			{
-				FileIconWidget widget = fileIcons[i];
-				fileIcons.RemoveAt(i);
-				widget.OnFileClicked -= OnFileClicked;
+				allEntries.Add(new ShellFileModel
+				{
+					Path = path,
+					Name = PathUtility.GetFileName(path),
+					Icon = new CompositeIcon
+					{
+						iconColor = Color.white.ToShellColor(),
+						textIcon = MaterialIcons.Folder,
+					}
+				});
+			}
 
-				Destroy(widget.gameObject);
-			}
-			
-			// Create any new ones we DO need.
-			for (var i = fileIcons.Count; i < allEntries.Count; i++)
+			foreach (string path in vfs.GetFiles(this.currentDirectory))
 			{
-				FileIconWidget widget = Instantiate(this.fileIconWidgetTemplate, this.filesGrid);
-				
-				widget.OnFileClicked += OnFileClicked;
-				widget.gameObject.SetActive(true);
+				allEntries.Add(new ShellFileModel
+				{
+					Path = path,
+					Name = PathUtility.GetFileName(path),
+					Icon = new CompositeIcon
+					{
+						iconColor = Color.white.ToShellColor(),
+						textIcon = MaterialIcons.Description,
+					}
+				});
+			}
 
-				fileIcons.Add(widget);
-			}
-			
-			// Set file paths for all entries.
-			for (var i = 0; i < allEntries.Count; i++)
-			{
-				fileIcons[i].SetFilePath(vfs, allEntries[i]);
-			}
+			this.filesGrid.SetFiles(allEntries);
 		}
 
 		private void OnFileClicked(string path)

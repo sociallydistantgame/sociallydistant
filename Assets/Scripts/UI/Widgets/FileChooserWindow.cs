@@ -9,9 +9,12 @@ using System.Threading.Tasks;
 using System.Xml.Schema;
 using AcidicGui.Widgets;
 using Core;
+using Shell;
+using Shell.Common;
 using Shell.Windowing;
 using TMPro;
 using UI.Applications.FileManager;
+using UI.Shell.Common;
 using UI.Windowing;
 using Unity.Profiling.Editor;
 using UnityEngine;
@@ -43,7 +46,7 @@ namespace UI.Widgets
 		private WidgetList placesList = null!;
 
 		[SerializeField]
-		private WidgetList fileList = null!;
+		private FileGridAdapter fileList = null!;
 		
 		public string Filter { get; set; } = string.Empty;
 		public string Directory { get; set; } = Environment.CurrentDirectory;
@@ -72,6 +75,7 @@ namespace UI.Widgets
 			toolbar.forwardPressed.AddListener(GoForward);
 			toolbar.upPressed.AddListener(GoUp);
 			toolbar.createDirectoryPressed.AddListener(CreateDirectory);
+			fileList.onFileDoubleClicked.AddListener(OnFileDoubleClicked);
 			
 			BuildFilterList();
 			RefreshLists();
@@ -87,6 +91,23 @@ namespace UI.Widgets
 			this.filters.AddRange(parsedFilters);
 
 			this.filterIndex = 0;
+		}
+
+		private void OnFileDoubleClicked(string path)
+		{
+			if (System.IO.Directory.Exists(path))
+			{
+				Navigate(path);
+				return;
+			}
+
+			if (!File.Exists(path))
+				return;
+
+			if (!this.ApplyFilter(Path.GetFileName(path)))
+				return;
+			
+			callback?.Invoke(path);
 		}
 
 		private IList<ExtensionFilterData> ParseFilterList(string filter)
@@ -173,33 +194,24 @@ namespace UI.Widgets
 			toolbar.CanGoForward = future.Count > 0;
 			
 			nameInput.SetTextWithoutNotify(Path.GetFileName(chosenPath));
-			
-			var builder = new WidgetBuilder();
-			builder.Begin();
-
-			var list = new ListWidget
-			{
-				AllowSelectNone = true
-			};
-
-			builder.AddWidget(list);
-
+            
 			string[] directories = System.IO.Directory.GetDirectories(Directory);
 			string[] files = System.IO.Directory.GetFiles(Directory);
 
-			var entryCount = 0;
+			var fileModels = new List<ShellFileModel>();
+			
 			foreach (string dir in directories)
 			{
-				builder.AddWidget(new ListItemWidget<string>
+				fileModels.Add(new ShellFileModel
 				{
-					List = list,
-					Data = dir,
-					Title = Path.GetFileName(dir),
-					Selected = dir == chosenPath,
-					Callback = Navigate
+					Path = dir,
+					Name = Path.GetFileName(dir),
+					Icon = new CompositeIcon
+					{
+						textIcon = MaterialIcons.Folder,
+						iconColor = Color.white.ToShellColor()
+					}
 				});
-				
-				entryCount ++;
 			}
 			
 			foreach (string dir in files)
@@ -207,26 +219,19 @@ namespace UI.Widgets
 				if (!ApplyFilter(Path.GetFileName(dir)))
 					continue;
 				
-				builder.AddWidget(new ListItemWidget<string>
+				fileModels.Add(new ShellFileModel
 				{
-					List = list,
-					Data = dir,
-					Title = Path.GetFileName(dir),
-					Selected = dir == chosenPath,
-					Callback = (p) =>
+					Path = dir,
+					Name = Path.GetFileName(dir),
+					Icon = new CompositeIcon
 					{
-						chosenPath = p;
-						nameInput.SetTextWithoutNotify(Path.GetFileName(chosenPath));
+						textIcon = MaterialIcons.Description,
+						iconColor = Color.white.ToShellColor()
 					}
 				});
-				
-				entryCount ++;
 			}
 			
-			if (entryCount == 0)
-				builder.AddLabel("Directory is empty");
-			
-			fileList.SetItems(builder.Build());
+			fileList.SetFiles(fileModels);
 		}
 
 		private bool ApplyFilter(string filename)

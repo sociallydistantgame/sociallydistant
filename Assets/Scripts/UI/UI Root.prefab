@@ -92,7 +92,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   acidicGuiSettings: {fileID: 11400000, guid: 736af5b49d1afe548b65ab894401a75f, type: 2}
-  defaultTheme: {fileID: 11400000, guid: 95354615bfedb1040a08e68f1d5693bb, type: 2}
+  defaultTheme: {fileID: -4257553632059914568, guid: c6a6aa124c467bd41b83937fe3f2941a, type: 3}
   gameManager: {fileID: 11400000, guid: 872374c25807361459f4e174bb460b2c, type: 2}
   themeService: {fileID: 11400000, guid: 0261859824a581e40a24f72973b52394, type: 2}
   themeEditorPrefab: {fileID: 4585425317818486975, guid: 6b1e7230dd426c1408692df1e41264f8, type: 3}
