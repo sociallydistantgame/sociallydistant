@@ -4,8 +4,6 @@ using System.IO;
 using System.Threading.Tasks;
 using Player;
 using UnityEngine;
-using UnityEngine.Experimental.Rendering;
-using Object = UnityEngine.Object;
 
 namespace CustomInput.InputManagers
 {
