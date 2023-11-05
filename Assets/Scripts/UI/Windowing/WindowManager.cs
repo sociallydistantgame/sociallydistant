@@ -58,7 +58,8 @@ namespace UI.Windowing
 			var rt = go.AddComponent<RectTransform>();
 
 			rt.SetParent(this.transform);
-			
+
+			rt.localPosition = Vector3.zero;
 			rt.anchorMin = new Vector2(0, 0);
 			rt.anchorMax = new Vector2(1, 1);
 			rt.pivot = Vector2.zero;
@@ -73,7 +74,7 @@ namespace UI.Windowing
 			image.color = new Color(0, 0, 0, 0.75f);
 
 			UguiWorkspaceDefinition workspace = DefineWorkspace(rt);
-
+			
 			return new OverlayWorkspace(go, workspace);
 		}
 		

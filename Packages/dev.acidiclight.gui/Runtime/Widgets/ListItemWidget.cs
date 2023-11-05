@@ -7,6 +7,7 @@ namespace AcidicGui.Widgets
 	{
 		public ListWidget List { get; set; }
 		public string? Title { get; set; }
+		public string? Description { get; set; }
 		public TData Data { get; set; }
 		public Action<TData>? Callback { get; set; }
 		public bool Selected { get; set; }
@@ -20,6 +21,7 @@ namespace AcidicGui.Widgets
 			ListItemWidgetController controller = assembler.GetListItem(destination);
 
 			controller.Title = this.Title;
+			controller.Description = Description;
 			controller.List = this.List;
 			controller.Callback = OnSelect;
 			controller.Selected = Selected;

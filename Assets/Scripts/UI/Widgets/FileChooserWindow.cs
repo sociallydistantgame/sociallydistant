@@ -8,8 +8,10 @@ using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 using System.Xml.Schema;
 using AcidicGui.Widgets;
+using Core;
 using Shell.Windowing;
 using TMPro;
+using UI.Applications.FileManager;
 using UI.Windowing;
 using Unity.Profiling.Editor;
 using UnityEngine;
@@ -22,6 +24,9 @@ namespace UI.Widgets
 		MonoBehaviour,
 		IWindowCloseBlocker
 	{
+		[SerializeField]
+		private FileManagerToolbar toolbar = null!;
+		
 		[SerializeField]
 		private Button selectButton = null!;
 
@@ -158,6 +163,8 @@ namespace UI.Widgets
 		
 		private void RefreshFiles()
 		{
+			toolbar.UpdateCurrentPath(Directory);
+			
 			nameInput.SetTextWithoutNotify(Path.GetFileName(chosenPath));
 			
 			var builder = new WidgetBuilder();
@@ -253,6 +260,28 @@ namespace UI.Widgets
 					Selected = Directory == place
 				}, places);
 			}
+
+			var deviceList = new ListWidget
+			{
+				AllowSelectNone = true
+			};
+			
+			builder.AddSection("Devices", out SectionWidget devices)
+				.AddWidget(deviceList, devices);
+
+			foreach (SystemVolume drive in SociallyDistantUtility.GetSystemDiskDrives())
+			{
+				builder.AddWidget(new ListItemWidget<string>()
+				{
+					Title = drive.VolumeLabel,
+					Description = $"{SociallyDistantUtility.GetFriendlyFileSize(drive.FreeSpace)} / {SociallyDistantUtility.GetFriendlyFileSize(drive.TotalSpace)}",
+					Callback = Navigate,
+					List = deviceList,
+					Data = drive.Path,
+					Selected = Directory == drive.Path
+				}, devices);
+			}
+			
 			
 			placesList.SetItems(builder.Build());
 		}
