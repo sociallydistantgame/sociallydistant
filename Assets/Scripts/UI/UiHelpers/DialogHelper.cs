@@ -25,6 +25,8 @@ namespace UI.UiHelpers
 
 		public bool AreAnyDialogsOpen => openDialogs.Any();
 		
+		public IFileChooserDriver? FileChooserDriver { get; set; }
+		
 		private void Awake()
 		{
 			this.AssertAllFieldsAreSerialized(typeof(DialogHelper));
@@ -42,7 +44,7 @@ namespace UI.UiHelpers
 			chooser.Directory = directory;
 			chooser.Filter = extensionFilter;
 
-			string result = await chooser.GetFilePath();
+			string result = await chooser.GetFilePath(FileChooserDriver);
 
 			win.ForceClose();
 			

@@ -15,7 +15,7 @@ namespace Architecture
 		private bool killedFirst;
 
 		/// <inheritdoc />
-		public void OnProgramOpen(ISystemProcess process, IWindow window, ITextConsole console)
+		public void OnProgramOpen(ISystemProcess process, IWindow window, ITextConsole console, string[] args)
 		{
 			this.process = process;
 			this.window = window;
