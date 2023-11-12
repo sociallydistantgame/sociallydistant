@@ -15,6 +15,7 @@ using Shell.Common;
 using Shell.Windowing;
 using TMPro;
 using UI.Shell.Common;
+using UI.UiHelpers;
 using UnityEngine;
 using UnityEngine.UI;
 using UnityExtensions;
@@ -33,7 +34,10 @@ namespace UI.Applications.FileManager
         
 		[SerializeField]
 		private FileGridAdapter filesGrid = null!;
-        
+
+		[SerializeField]
+		private FileAssociationMap fileAssociations = null!;
+		
 		private ISystemProcess process = null!;
 		private IWindow window = null!;
 		private IVirtualFileSystem vfs = null!;
@@ -41,6 +45,8 @@ namespace UI.Applications.FileManager
 		private Stack<string> history = new Stack<string>();
 		private Stack<string> future = new Stack<string>();
 		private ITextConsole console = null!;
+		private DialogHelper dialogHelper = null!;
+		
 
 		public bool CanGoUp => currentDirectory != "/";
 		public bool CanGoBack => history.Any();
@@ -49,6 +55,7 @@ namespace UI.Applications.FileManager
 		private void Awake()
 		{
 			this.AssertAllFieldsAreSerialized(typeof(FileManager));
+			this.MustGetComponent(out dialogHelper);
 		}
 
 		private void Start()
@@ -62,7 +69,7 @@ namespace UI.Applications.FileManager
 		}
 
 		/// <inheritdoc />
-		public void OnProgramOpen(ISystemProcess process, IWindow window, ITextConsole console)
+		public void OnProgramOpen(ISystemProcess process, IWindow window, ITextConsole console, string[] args)
 		{
 			this.process = process;
 			this.window = window;
@@ -120,6 +127,19 @@ namespace UI.Applications.FileManager
 			else if (vfs.IsExecutable(path))
 			{
 				process.User.Computer.ExecuteProgram(process, console, path, Array.Empty<string>());
+			}
+			else if (vfs.FileExists(path))
+			{
+				ISystemProcess? fileProcess = fileAssociations.OpenFile(this.process, path);
+				if (fileProcess != null)
+					return;
+
+				dialogHelper.ShowMessage(
+					"Cannot open file",
+					$"Cannot open the file '{path}' because you do not have any programs installed that can open it.",
+					this.window,
+					null
+				);
 			}
 		}
 

@@ -52,6 +52,7 @@ namespace UI.Widgets
 		public string Directory { get; set; } = Environment.CurrentDirectory;
 		public ChooserType FileChooserType { get; set; }
 
+		private IFileChooserDriver? driver;
 		private readonly Stack<string> history = new Stack<string>();
 		private readonly Stack<string> future = new Stack<string>();
 		private readonly List<ExtensionFilterData> filters = new List<ExtensionFilterData>();
@@ -95,13 +96,13 @@ namespace UI.Widgets
 
 		private void OnFileDoubleClicked(string path)
 		{
-			if (System.IO.Directory.Exists(path))
+			if (driver?.DirectoryExists(path) == true)
 			{
 				Navigate(path);
 				return;
 			}
 
-			if (!File.Exists(path))
+			if (driver?.FileExists(path) != true)
 				return;
 
 			if (!this.ApplyFilter(Path.GetFileName(path)))
@@ -160,16 +161,7 @@ namespace UI.Widgets
 
 		private IEnumerable<string> GetPlaces()
 		{
-			if (Application.isEditor)
-				yield return Application.dataPath.Replace('/', Path.DirectorySeparatorChar);;
-			
-			yield return Environment.GetFolderPath(Environment.SpecialFolder.UserProfile);
-			yield return Environment.GetFolderPath(Environment.SpecialFolder.Desktop);
-			yield return Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments);
-			yield return Environment.GetFolderPath(Environment.SpecialFolder.MyMusic);
-			yield return Environment.GetFolderPath(Environment.SpecialFolder.MyPictures);
-			yield return Environment.GetFolderPath(Environment.SpecialFolder.MyVideos);
-			yield return Application.persistentDataPath.Replace('/', Path.DirectorySeparatorChar);
+			return driver?.GetCommonPlacePaths() ?? Enumerable.Empty<string>();
 		}
 		
 		private void RefreshLists()
@@ -194,9 +186,9 @@ namespace UI.Widgets
 			toolbar.CanGoForward = future.Count > 0;
 			
 			nameInput.SetTextWithoutNotify(Path.GetFileName(chosenPath));
-            
-			string[] directories = System.IO.Directory.GetDirectories(Directory);
-			string[] files = System.IO.Directory.GetFiles(Directory);
+
+			IEnumerable<string> directories = driver?.GetSubDirectories(Directory) ?? Enumerable.Empty<string>();
+			IEnumerable<string> files = driver?.GetFiles(Directory) ?? Enumerable.Empty<string>();
 
 			var fileModels = new List<ShellFileModel>();
 			
@@ -247,7 +239,7 @@ namespace UI.Widgets
 			return data.Extensions
 				.Any(x => Regex.IsMatch(filename, x));
 		}
-		
+
 		private void RefreshPlaces()
 		{
 			var builder = new WidgetBuilder();
@@ -273,10 +265,16 @@ namespace UI.Widgets
 				}, places);
 			}
 
-			builder.AddSection("Devices", out SectionWidget devices);
+			IEnumerable<SystemVolume> drives = driver?.GetSystemVolumes()
+			                                   ?? Enumerable.Empty<SystemVolume>();
 
-			foreach (SystemVolume drive in SociallyDistantUtility.GetSystemDiskDrives())
+			SectionWidget? devices = null;
+
+			foreach (SystemVolume drive in drives)
 			{
+				if (devices == null)
+					builder.AddSection("Devices", out devices);
+
 				builder.AddWidget(new ListItemWidget<string>()
 				{
 					Title = drive.VolumeLabel,
@@ -287,8 +285,7 @@ namespace UI.Widgets
 					Selected = Directory == drive.Path
 				}, devices);
 			}
-			
-			
+
 			placesList.SetItems(builder.Build());
 		}
 
@@ -301,7 +298,7 @@ namespace UI.Widgets
 		{
 			chosenPath = path;
 			
-			if (System.IO.Directory.Exists(path))
+			if (driver?.DirectoryExists(path) == true)
 			{
 				if (addToHistory)
 				{
@@ -314,8 +311,10 @@ namespace UI.Widgets
 			}
 		}
 		
-		public Task<string> GetFilePath()
+		public Task<string> GetFilePath(IFileChooserDriver? driver = null)
 		{
+			this.driver = driver ?? new HostFileChooserDriver();
+			
 			var completionSource = new TaskCompletionSource<string>();
 
 			callback = completionSource.SetResult;
