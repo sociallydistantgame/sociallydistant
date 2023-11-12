@@ -51,6 +51,25 @@ namespace UI.UiHelpers
 			return result;
 		}
 		
+		public async Task<string> SaveFile(string title, string directory, string extensionFilter)
+		{
+			OverlayWorkspace overlay = this.player.Value.UiManager.WindowManager.CreateSystemOverlay();
+			IWindow win = overlay.CreateWindow(title);
+			if (win is not UguiWindow guiWin)
+				return string.Empty;
+
+			FileChooserWindow chooser = player.Value.UiManager.CreateFileChooser(guiWin);
+			chooser.FileChooserType = FileChooserWindow.ChooserType.Save;
+			chooser.Directory = directory;
+			chooser.Filter = extensionFilter;
+
+			string result = await chooser.GetFilePath(FileChooserDriver);
+
+			win.ForceClose();
+			
+			return result;
+		}
+		
 		public void AskYesNoCancel(string title, string message, IWindow? parentWindow, Action<bool?> callback)
 		{
 			IMessageDialog messageDialog = player.Value.UiManager.WindowManager.CreateMessageDialog(title, parentWindow);
