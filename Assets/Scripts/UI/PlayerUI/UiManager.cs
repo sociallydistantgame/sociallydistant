@@ -24,6 +24,7 @@ using UI.Windowing;
 using UnityEngine;
 using Utility;
 using UniRx;
+using UnityEngine.UI;
 using UnityExtensions;
 
 namespace UI.PlayerUI
@@ -304,6 +305,14 @@ namespace UI.PlayerUI
 			FixCanvasCameras();
 		}
 
+		private void FixCanvasScaler(CanvasScaler scaler)
+		{
+			scaler.uiScaleMode = CanvasScaler.ScaleMode.ScaleWithScreenSize;
+
+			scaler.referenceResolution = new Vector2(1920, 1080);
+			scaler.matchWidthOrHeight = 1;
+		}
+		
 		private void FixCanvasCameras()
 		{
 			Canvas[]? canvases = this.GetComponentsInChildren<Canvas>();
@@ -316,6 +325,11 @@ namespace UI.PlayerUI
 				if (canvas.transform.parent != this.transform)
 					continue;
 
+				if (!canvas.TryGetComponent(out CanvasScaler scaler))
+					scaler = canvas.gameObject.AddComponent<CanvasScaler>();
+
+				FixCanvasScaler(scaler);
+				
 				canvas.worldCamera = null;
 				canvas.renderMode = RenderMode.ScreenSpaceOverlay;
 			}
