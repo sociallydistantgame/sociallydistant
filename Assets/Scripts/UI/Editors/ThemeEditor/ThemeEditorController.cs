@@ -14,6 +14,7 @@ using PlasticGui.WorkspaceWindow.CodeReview;
 using TMPro;
 using UI.Applications.Chat;
 using UI.PlayerUI;
+using UI.Themes.Importers;
 using UI.Themes.Serialization;
 using UI.Themes.ThemedElements;
 using UI.Theming;
@@ -395,6 +396,28 @@ namespace UI.Editors.ThemeEditor
 			}
 		}
 
+		private async void OpenShiftOSSkin()
+		{
+			string skinPath = await this.dialogHlper.OpenFile("Open ShiftOS Skin", Environment.CurrentDirectory, "ShiftOS skin file|*.skn");
+
+			if (string.IsNullOrWhiteSpace(skinPath))
+				return;
+
+			try
+			{
+				OperatingSystemTheme theme = await ShiftOSSkinFactory.ImportTheme(skinPath);
+				themeEditor = theme.GetUserEditor();
+				ResetEditableColors();
+				SetEditorMode(EditorMode.ThemeInfo);
+			}
+			catch (Exception ex)
+			{
+				this.dialogHlper.ShowMessage("Skin import error", $"An error has occurred while importing the selected ShiftOS skin. {ex.Message} - more information in the game's log.", null, null);
+				
+				Debug.LogException(ex);
+			}
+		}
+		
 		private void SetupColors()
 		{
 			var builder = new WidgetBuilder();
@@ -584,6 +607,19 @@ namespace UI.Editors.ThemeEditor
 					Text = "You don't have any themes to open yet."
 				}, section);
 			}
+
+			builder.AddSection("Import from ShiftOS Skin", out SectionWidget shiftosSection);
+
+			builder.AddLabel(
+				"You can import shiftOS skins from ShiftOS 0.0.7, 0.0.8, and 1.0. They will be converted to Socially Distant themes, where you can further edit them. To begin, just click the Open ShiftOS Skin button below.",
+				shiftosSection
+			);
+
+			builder.AddWidget(new ButtonWidget
+			{
+				Text = "Open ShiftOS Skin",
+				ClickAction = OpenShiftOSSkin
+			}, shiftosSection);
 			
 			editorWidgetList.SetItems(builder.Build());
 		}
