@@ -194,6 +194,7 @@ namespace UI.Theming
 			{
 				theme.assets.TryGetValue(graphicName, out Texture2D? result);
 				return result;
+				
 			}
 
 			/// <inheritdoc />
