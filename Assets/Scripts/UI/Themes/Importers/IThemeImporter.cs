@@ -6,8 +6,14 @@ using System.Threading.Tasks;
 using Newtonsoft.Json;
 using System.Drawing;
 using System.Linq;
+using System.Resources;
+using Nothke.Utils;
 using UI.Themes.ThemeData;
 using UI.Theming;
+using Unity.Collections;
+using UnityEngine;
+using UnityEngine.Experimental.Rendering;
+using Color = System.Drawing.Color;
 
 namespace UI.Themes.Importers
 {
@@ -54,8 +60,202 @@ namespace UI.Themes.Importers
 			themeEditor.WindowStyle.WindowBorderSizes.bottom = skinData.BottomBorderWidth;
 			themeEditor.WindowStyle.WindowBorderSizes.right = skinData.RightBorderWidth;
 			themeEditor.WindowStyle.WindowBorderSizes.top = skinData.TitlebarHeight;
+
+			Texture2D windowBorderTexture = CreateWindowTextureFromShiftOS(skinData);
+			
+			// Apply the window background texture to both inactive and active decorations.
+			// Note that ShiftOS never had inactive windows.
+			// This involves adding the texture to the theme data and then applying it to the decoration.
+			string winTextureName = nameof(windowBorderTexture);
+			
+			themeEditor.SetGraphic(winTextureName, windowBorderTexture);
+			themeEditor.WindowStyle.ActiveDecorations.UseGraphicName(winTextureName, themeEditor);
+			themeEditor.WindowStyle.InactiveDecorations.UseGraphicName(winTextureName, themeEditor);
+			themeEditor.WindowStyle.ActiveDecorations.SetMargins(themeEditor.WindowStyle.WindowBorderSizes);
+			themeEditor.WindowStyle.InactiveDecorations.SetMargins(themeEditor.WindowStyle.WindowBorderSizes);
+			
+			// Backdrops - ShiftOS only has one
+			Texture2D backdropTexture = GetTextureFromBitstream(skinData.DesktopBackgroundImage, skinData.DesktopColor.ToUnityColor(), skinData.SystemKey.ToUnityColor());
+
+			string backdropName = nameof(backdropTexture);
+			themeEditor.SetGraphic(backdropName, backdropTexture);
+			
+			themeEditor.BackdropStyle.DayTime.UseGraphicName(backdropName, themeEditor);
+			themeEditor.BackdropStyle.NightTime.UseGraphicName(backdropName, themeEditor);
 		}
 
+		private Texture2D CreateWindowTextureFromShiftOS(SkinData skinData)
+		{
+			var resultTexture = new Texture2D(1024, 1024, TextureFormat.RGBA32, false);
+
+			// Step 1: Load/generate border textures
+			Texture2D leftBorderTexture = GetTextureFromBitstream(skinData.LeftBorderBG, skinData.BorderLeftBackground.ToUnityColor(), skinData.SystemKey.ToUnityColor());
+			Texture2D topBorderTexture = GetTextureFromBitstream(skinData.TitleBarBackground, skinData.TitleBackgroundColor.ToUnityColor(), skinData.SystemKey.ToUnityColor());
+			Texture2D bottomBorderTexture = GetTextureFromBitstream(skinData.BottomBorderBG, skinData.BorderBottomBackground.ToUnityColor(), skinData.SystemKey.ToUnityColor());
+			Texture2D rightBorderTexture = GetTextureFromBitstream(skinData.RightBorderBG, skinData.BorderRightBackground.ToUnityColor(), skinData.SystemKey.ToUnityColor());
+			Texture2D topLeftCornerTexture = GetTextureFromBitstream(skinData.TitleLeftBG, skinData.TitleLeftCornerBackground.ToUnityColor(), skinData.SystemKey.ToUnityColor());
+			Texture2D topRightCornerTexture = GetTextureFromBitstream(skinData.TitleRightBG, skinData.TitleRightCornerBackground.ToUnityColor(), skinData.SystemKey.ToUnityColor());
+			Texture2D bottomLeftCornerTexture = GetTextureFromBitstream(skinData.BottomLBorderBG, skinData.BorderBottomLeftBackground.ToUnityColor(), skinData.SystemKey.ToUnityColor());
+			Texture2D bottomRightCornerTexture = GetTextureFromBitstream(skinData.BottomRBorderBG, skinData.BorderBottomRightBackground.ToUnityColor(), skinData.SystemKey.ToUnityColor());
+			Texture2D clientAreaTexture = GetTextureFromBitstream(null, skinData.ControlColor.ToUnityColor(), skinData.SystemKey.ToUnityColor());
+			
+			// Step 2: Blit them
+			RenderTexture? rt = RenderTexture.GetTemporary(1024, 1024);
+			rt.BeginPixelRendering();
+
+			GL.Clear(true, true, default);
+
+			var renderTitleCorners = true;
+            
+			int titleLeftInner = skinData.TitleLeftCornerWidth;
+			int titleRightInner = rt.width - skinData.TitleRightCornerWidth;
+
+			if (!skinData.ShowTitleCorners)
+			{
+				renderTitleCorners = false;
+				titleLeftInner = 0;
+				titleRightInner = rt.width;
+			}
+			
+			int titleWidth = titleRightInner - titleLeftInner;
+			
+			int leftInner = skinData.LeftBorderWidth;
+			int topInner = skinData.TitlebarHeight;
+			int rightInner = rt.width - skinData.RightBorderWidth;
+			int bottomInner = rt.height - skinData.BottomBorderWidth;
+
+			int clientWidth = rightInner - leftInner;
+			int clientHeight = bottomInner - topInner;
+			int clientWithBottomHeight = clientHeight + skinData.BottomBorderWidth;
+			int clientWithBorderWidth = rt.width;
+
+			rt.DrawSprite(
+				topBorderTexture,
+				new Rect(
+					titleLeftInner,
+					rt.height - skinData.TitlebarHeight,
+					titleWidth,
+					skinData.TitlebarHeight
+				)
+			);
+
+			if (renderTitleCorners)
+			{
+				rt.DrawSprite(
+					topLeftCornerTexture,
+					new Rect(
+						0,
+						rt.height - skinData.TitlebarHeight,
+						titleLeftInner,
+						skinData.TitlebarHeight
+					)
+				);
+
+				rt.DrawSprite(
+					topRightCornerTexture,
+					new Rect(
+						titleRightInner,
+						rt.height - skinData.TitlebarHeight,
+						skinData.TitleRightCornerWidth,
+						skinData.TitlebarHeight
+					)
+				);
+			}
+
+			rt.DrawSprite(
+				leftBorderTexture,
+				new Rect(
+					0,
+					skinData.BottomBorderWidth,
+					leftInner,
+					clientHeight
+				)
+			);
+			
+			rt.DrawSprite(
+				rightBorderTexture,
+				new Rect(
+					rightInner,
+					skinData.BottomBorderWidth,
+					skinData.RightBorderWidth,
+					clientHeight
+				)
+			);
+
+			rt.DrawSprite(
+				bottomBorderTexture,
+				new Rect(
+					leftInner,
+					0,
+					clientWidth,
+					skinData.BottomBorderWidth
+				)
+			);
+
+			rt.DrawSprite(
+				bottomLeftCornerTexture,
+				new Rect(
+					0,
+					0,
+					leftInner,
+					skinData.BottomBorderWidth
+				)
+			);
+
+			rt.DrawSprite(
+				bottomRightCornerTexture,
+				new Rect(
+					rightInner,
+					0,
+					skinData.LeftBorderWidth,
+					skinData.BottomBorderWidth
+				)
+			);
+
+			rt.DrawSprite(
+				clientAreaTexture,
+				new Rect(
+					leftInner,
+					skinData.BottomBorderWidth,
+					clientWidth,
+					clientHeight
+				)
+			);
+			
+			rt.EndRendering();
+			
+			Graphics.CopyTexture(rt, resultTexture);
+			
+			RenderTexture.ReleaseTemporary(rt);
+			
+			return resultTexture;
+		}
+		
+		private Texture2D GetTextureFromBitstream(byte[]? bitstream, UnityEngine.Color backgroundColorForInvalid, UnityEngine.Color key)
+		{
+			if (bitstream == null || bitstream.Length == 0)
+			{
+				var solidTexture = new Texture2D(1, 1, TextureFormat.RGBA32, false);
+				solidTexture.SetPixels(new[] { backgroundColorForInvalid });
+				return solidTexture;
+			}
+
+			var imageTexture = new Texture2D(1, 1);
+			imageTexture.LoadImage(bitstream);
+
+			UnityEngine.Color[] colorData = imageTexture.GetPixels();
+			
+			for (var i = 0; i < colorData.Length; i++)
+			{
+				if (colorData[i] == key)
+					colorData[i] = default;
+			}
+            
+			imageTexture.SetPixelData(colorData, 0);
+            
+			return imageTexture;
+		}
+		
 		private class SkinData
 		{
 			public string TitleFont = "Microsoft Sans Serif, 8pt, style=Bold";
@@ -188,6 +388,19 @@ namespace UI.Themes.Importers
 
 			return readCount == magicNumber.Length && magicNumber.SequenceEqual(zipMagic);
 
+		}
+	}
+
+	public static class PhilipAdamsReallyFuckingAnnoysMeBecauseIHaveToWriteTheseExtensions
+	{
+		public static UnityEngine.Color ToUnityColor(this System.Drawing.Color gdiColor)
+		{
+			return new UnityEngine.Color(
+				gdiColor.R / 255f,
+				gdiColor.G / 255f,
+				gdiColor.B / 255f,
+				gdiColor.A / 255f
+			);
 		}
 	}
 }

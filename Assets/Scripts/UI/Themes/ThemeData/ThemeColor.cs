@@ -43,5 +43,15 @@ namespace UI.Themes.ThemeData
 				}
 			});
 		}
+		
+		public static implicit operator ThemeColor(UnityEngine.Color color)
+		{
+			var themeColor = new ThemeColor();
+
+			themeColor.isCustom = true;
+			themeColor.value = ColorUtility.ToHtmlStringRGBA(color);
+			
+			return themeColor;
+		}
 	}
 }

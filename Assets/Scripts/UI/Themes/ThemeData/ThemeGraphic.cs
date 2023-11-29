@@ -25,6 +25,19 @@ namespace UI.Themes.ThemeData
 		public ThemeColor Color => color;
 		public Texture2D? Texture => this.texture;
 		public ThemeMargins SpriteMargins => spriteMargins;
+
+		public void UseGraphicName(string graphicName, IGraphicPickerSource graphicSource)
+		{
+			this.color = UnityEngine.Color.white;
+			this.graphicName = graphicName;
+
+			this.texture = graphicSource.GetGraphic(this.graphicName);
+		}
+
+		public void SetMargins(ThemeMargins themeMargins)
+		{
+			this.spriteMargins = themeMargins;
+		}
 		
 		/// <inheritdoc />
 		public void Serialize(IElementSerializer serializer, ThemeAssets assets)
