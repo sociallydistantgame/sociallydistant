@@ -2,6 +2,7 @@
 
 using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -407,6 +408,7 @@ namespace UI.Editors.ThemeEditor
 			{
 				OperatingSystemTheme theme = await ShiftOSSkinFactory.ImportTheme(skinPath);
 				themeEditor = theme.GetUserEditor();
+				hasUnsavedChanges = true;
 				ResetEditableColors();
 				SetEditorMode(EditorMode.ThemeInfo);
 			}
@@ -819,8 +821,40 @@ namespace UI.Editors.ThemeEditor
 		{
 			if (themeEditor == null)
 				return null;
+			
+			if (string.IsNullOrWhiteSpace(themeEditor.Name))
+			{
+				// We need to get a name for the theme!
+				// Set it as an unnamed theme because I'm too lazy to implement text entry dialogs.
+				themeEditor.Name = "Unnamed theme";
+			}
 
-			return null;
+			string userThemesPath = Path.Combine(Application.persistentDataPath, "themes");
+
+			string filename = string.Empty;
+			string fullPath = string.Empty;
+			var index = 0;
+
+			do
+			{
+				if (index == 0)
+				{
+					filename = $"{themeEditor.Name}.sdtheme";
+				}
+				else
+				{
+					filename = $"{themeEditor.Name} ({index}).sdtheme";
+				}
+
+				fullPath = Path.Combine(userThemesPath, filename);
+				
+				index++;
+			} while (File.Exists(fullPath));
+
+
+			await SaveInternal(fullPath, themeEditor);
+			
+			return fullPath;
 		} 
 		
 		private async Task Save()
