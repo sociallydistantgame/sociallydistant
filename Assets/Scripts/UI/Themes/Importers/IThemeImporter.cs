@@ -225,8 +225,39 @@ namespace UI.Themes.Importers
 			rt.EndRendering();
 			
 			Graphics.CopyTexture(rt, resultTexture);
-			
+			resultTexture.Apply();
+            
 			RenderTexture.ReleaseTemporary(rt);
+
+			// This shit prevents my computer from crashing when I try to screenshare to my partner on discord
+			// And yknow
+			// You can't spell crash without ash!
+			// And it's important we don't crash when we're with ash!
+			// so DO NOT fuck this up!
+			if (Application.isEditor && !Application.isPlaying)
+			{
+				UnityEngine.Object.DestroyImmediate(leftBorderTexture);
+				UnityEngine.Object.DestroyImmediate(topBorderTexture);
+				UnityEngine.Object.DestroyImmediate(bottomBorderTexture);
+				UnityEngine.Object.DestroyImmediate(rightBorderTexture);
+				UnityEngine.Object.DestroyImmediate(topLeftCornerTexture);
+				UnityEngine.Object.DestroyImmediate(topRightCornerTexture);
+				UnityEngine.Object.DestroyImmediate(bottomLeftCornerTexture);
+				UnityEngine.Object.DestroyImmediate(bottomRightCornerTexture);
+				UnityEngine.Object.DestroyImmediate(clientAreaTexture);
+			}
+			else
+			{
+				UnityEngine.Object.Destroy(leftBorderTexture);
+				UnityEngine.Object.Destroy(topBorderTexture);
+				UnityEngine.Object.Destroy(bottomBorderTexture);
+				UnityEngine.Object.Destroy(rightBorderTexture);
+				UnityEngine.Object.Destroy(topLeftCornerTexture);
+				UnityEngine.Object.Destroy(topRightCornerTexture);
+				UnityEngine.Object.Destroy(bottomLeftCornerTexture);
+				UnityEngine.Object.Destroy(bottomRightCornerTexture);
+				UnityEngine.Object.Destroy(clientAreaTexture);
+			}
 			
 			return resultTexture;
 		}
