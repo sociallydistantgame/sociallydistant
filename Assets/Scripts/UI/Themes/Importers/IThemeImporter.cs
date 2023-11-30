@@ -237,12 +237,14 @@ namespace UI.Themes.Importers
 			{
 				var solidTexture = new Texture2D(1, 1, TextureFormat.RGBA32, false);
 				solidTexture.SetPixels(new[] { backgroundColorForInvalid });
+				solidTexture.Apply();
 				return solidTexture;
 			}
 
 			var imageTexture = new Texture2D(1, 1);
 			imageTexture.LoadImage(bitstream);
-
+			imageTexture.Apply();
+			
 			UnityEngine.Color[] colorData = imageTexture.GetPixels();
 			
 			for (var i = 0; i < colorData.Length; i++)
@@ -251,8 +253,9 @@ namespace UI.Themes.Importers
 					colorData[i] = default;
 			}
             
-			imageTexture.SetPixelData(colorData, 0);
-            
+			imageTexture.SetPixels(colorData);
+			imageTexture.Apply();
+			
 			return imageTexture;
 		}
 		

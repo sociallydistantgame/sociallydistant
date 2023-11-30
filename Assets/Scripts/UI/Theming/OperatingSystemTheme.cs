@@ -200,6 +200,9 @@ namespace UI.Theming
 			/// <inheritdoc />
 			public void SetGraphic(string name, Texture2D? texture)
 			{
+				if (texture != null && string.IsNullOrWhiteSpace(texture.name))
+					texture.name = name;
+				
 				if (texture == null && theme.assets.ContainsKey(name))
 					theme.assets.Remove(name);
 				else if (texture != null)
