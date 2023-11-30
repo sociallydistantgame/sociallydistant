@@ -348,12 +348,15 @@ namespace UI.Themes.Importers
 			if (!File.Exists(path))
 				throw new FileNotFoundException(path);
 
+			string themeName = Path.GetFileNameWithoutExtension(path);
+			
 			bool isZippedFolder = await IdentifyZippedFolder(path);
 			bool isJsonObject = await IdentifyJson(path);
 
 			if (isJsonObject)
 			{
 				OperatingSystemTheme.ThemeEditor theme = OperatingSystemTheme.CreateEmpty(true, true);
+				theme.Name = themeName;
 
 				var twentySeventeenImporter = new ShiftOS2017Importer(path);
 
