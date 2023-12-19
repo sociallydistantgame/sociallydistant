@@ -223,10 +223,14 @@ namespace UI.Themes.Importers
 			);
 			
 			rt.EndRendering();
+
+			var activeOld = RenderTexture.active;
+			RenderTexture.active = rt;
 			
-			Graphics.CopyTexture(rt, resultTexture);
+			resultTexture.ReadPixels(new Rect(0, 0, rt.width, rt.height), 0, 0);
 			resultTexture.Apply();
-            
+			RenderTexture.active = activeOld;
+			
 			RenderTexture.ReleaseTemporary(rt);
 
 			// This shit prevents my computer from crashing when I try to screenshare to my partner on discord
