@@ -1,7 +1,7 @@
 ﻿#nullable enable
 
-using System;
 using System.Collections.Generic;
+using System.IO;
 using Architecture;
 using Core;
 using GamePlatform;
@@ -12,6 +12,7 @@ using UnityEngine.InputSystem;
 using UnityExtensions;
 using Utility;
 using DevTools.Social;
+using UI.Theming;
 
 namespace DevTools
 {
@@ -57,6 +58,8 @@ namespace DevTools
 			menus.Insert(2, new GodModeMenu(deviceCoordinator, playerInstance));
 			menus.Insert(3, new HackablesMenu(world));
 			menus.Insert(4, new SocialDebug(world));
+			menus.Insert(5, new GuiToolsMenu(playerInstance));
+			
 
 			overlay = new Texture2D(1, 1);
 			overlay.SetPixel(0, 0, Color.black);
@@ -139,6 +142,28 @@ namespace DevTools
 				currentMenu = menuStack.Pop();
 			else
 				currentMenu = null;
+		}
+	}
+
+	public class DebugHelpers
+	{
+		public static void SaveAndOpenTexture(Texture2D texture)
+		{
+			string folder = Path.Combine(Application.persistentDataPath, "temp");
+			if (!Directory.Exists(folder))
+				Directory.CreateDirectory(folder);
+
+			string filepath = Path.Combine(folder, Path.GetTempFileName() + ".png");
+
+			byte[] data = texture.EncodeToPNG();
+
+			using (FileStream stream = File.Open(filepath, FileMode.OpenOrCreate))
+			{
+				stream.SetLength(data.Length);
+				stream.Write(data, 0, data.Length);
+			}
+
+			System.Diagnostics.Process.Start(filepath);
 		}
 	}
 }
