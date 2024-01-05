@@ -11,41 +11,49 @@ using UniRx;
 
 namespace UI.Backdrop
 {
-	public class BackdropUpdater : ShellElement
+	public class BackdropUpdater : MonoBehaviour
 	{
+		[Header("UI")]
 		[SerializeField]
 		private GameManagerHolder gameManager = null!;
 		
 		[SerializeField]
 		private WorldManagerHolder worldManager = null!;
 
+		[Header("Backdrops")]
+		[SerializeField]
+		private Texture2D dayTime = null!;
+		
+		[SerializeField]
+		private Texture2D nightTime = null!;
+		
+		[SerializeField]
+		private Texture2D dayTimePanic = null!;
+		
+		[SerializeField]
+		private Texture2D nightTimePanic = null!;
+		
 		private GameMode gameMode;
+		private bool isPanicking = false;
 		private bool isNightTime = false;
 		private BackdropController backdrop = null!;
 		private IDisposable? gameModeObserver;
-
-		/// <inheritdoc />
-		protected override void Awake()
+		
+		private void Awake()
 		{
-			base.Awake();
 			this.MustGetComponent(out backdrop);
 		}
-
-		/// <inheritdoc />
-		protected override void Start()
+		
+		private void Start()
 		{
-			base.Start();
-
 			if (gameManager.Value == null)
 				return;
 
 			gameModeObserver = gameManager.Value.GameModeObservable.Subscribe(OnGameModeChanged);
 		}
-
-		/// <inheritdoc />
-		protected override void OnDestroy()
+		
+		private void OnDestroy()
 		{
-			base.OnDestroy();
 			gameModeObserver?.Dispose();
 		}
 
@@ -54,11 +62,12 @@ namespace UI.Backdrop
 			if (worldManager.Value == null ||
 			    (gameMode != GameMode.OnDesktop && gameMode != GameMode.InMission))
 			{
-				if (!isNightTime)
+				if (isNightTime && !isPanicking)
 					return;
 
-				isNightTime = false;
-				NotifyThemePropertyChanged();
+				isNightTime = true;
+				isPanicking = false;
+				UpdateBackdrop();
 				return;
 			}
 
@@ -71,24 +80,26 @@ namespace UI.Backdrop
 				return;
 
 			isNightTime = night;
-			NotifyThemePropertyChanged();
+			UpdateBackdrop();
 		}
-
-		/// <inheritdoc />
-		protected override void OnUpdateTheme(OperatingSystemTheme theme)
+		
+		private void UpdateBackdrop()
 		{
-			BackdropStyle backdropStyle = theme.BackdropStyle;
-
-			bool dark = Provider.UseDarkMode;
 			bool night = isNightTime;
+			bool panic = isPanicking;
 
-			ThemeGraphic graphic = night
-				? backdropStyle.NightTime
-				: backdropStyle.DayTime;
+			Texture2D? texture = null;
 
-			Color tint = theme.TranslateColor(graphic.Color, dark);
-			
-			this.backdrop.SetBackdrop(new BackdropSettings(tint, graphic.Texture));
+			if (panic)
+			{
+				texture = night ? nightTimePanic : dayTimePanic;
+			}
+			else
+			{
+				texture = night ? nightTime : dayTime;
+			}
+
+			this.backdrop.SetBackdrop(new BackdropSettings(Color.white, texture));
 		}
 
 		private void OnGameModeChanged(GameMode newGameMode)

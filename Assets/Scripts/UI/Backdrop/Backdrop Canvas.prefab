@@ -85,7 +85,7 @@ MonoBehaviour:
   m_FallbackScreenDPI: 96
   m_DefaultSpriteDPI: 96
   m_DynamicPixelsPerUnit: 1
-  m_PresetInfoIsWorld: 1
+  m_PresetInfoIsWorld: 0
 --- !u!114 &6535055903319226498
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -114,6 +114,10 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   gameManager: {fileID: 11400000, guid: 872374c25807361459f4e174bb460b2c, type: 2}
   worldManager: {fileID: 11400000, guid: 6ddfb5183f8225440a5d156e7fb16747, type: 2}
+  dayTime: {fileID: 2800000, guid: 8b36c560769a3ea41b5a7a629d97eaec, type: 3}
+  nightTime: {fileID: 2800000, guid: 5c897359a9ff5a948be54f9aec1c1e7d, type: 3}
+  dayTimePanic: {fileID: 2800000, guid: 7a25451e1865c334f89caeaa682b092d, type: 3}
+  nightTimePanic: {fileID: 2800000, guid: e034165fa0137494eb9a1dd4435b640f, type: 3}
 --- !u!1 &1950767313297915128
 GameObject:
   m_ObjectHideFlags: 0
