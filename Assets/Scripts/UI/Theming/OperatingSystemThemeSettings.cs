@@ -1,4 +1,5 @@
 ﻿using AcidicGui.Theming;
+using TMPro;
 using UnityEngine;
 
 namespace UI.Theming
@@ -8,7 +9,10 @@ namespace UI.Theming
 	{
 		[SerializeField]
 		private OperatingSystemTheme defaultShellTheme = null!;
-        
+
+		[SerializeField]
+		private TMP_FontAsset normalFont = null!;
+		
 		/// <inheritdoc />
 		protected override OperatingSystemTheme GetPreviewTheme()
 		{

@@ -13,4 +13,5 @@ MonoBehaviour:
   m_Name: OSThemeSettings
   m_EditorClassIdentifier: 
   fallbackAccentColor: {r: 0.105882354, g: 0.6666667, b: 0.96862745, a: 1}
-  defaultShellTheme: {fileID: 11400000, guid: 95354615bfedb1040a08e68f1d5693bb, type: 2}
+  defaultShellTheme: {fileID: -4257553632059914568, guid: c6a6aa124c467bd41b83937fe3f2941a, type: 3}
+  normalFont: {fileID: 11400000, guid: a9524fa8b1ab53749899ad15333c8c9d, type: 2}

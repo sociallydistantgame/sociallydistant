@@ -6,6 +6,7 @@ using OS.Devices;
 using Player;
 using Shell.Windowing;
 using TMPro;
+using UI.Controllers;
 using UI.PlayerUI;
 using UI.Windowing;
 using UnityEngine;
@@ -26,13 +27,10 @@ namespace UI.Shell
 
 		[Header("UI")]
 		[SerializeField]
-		private Button systemSettingsButton = null!;
-		
-		[SerializeField]
 		private RectTransform workspaceArea = null!;
 
 		[SerializeField]
-		private TextMeshProUGUI shellUserDisplayTText = null!;
+		private StatusBarController statusBarController = null!;
 		
 		private IWorkspaceDefinition currentWorkspace = null!;
 		private ISystemProcess loginProcess = null!;
@@ -52,7 +50,6 @@ namespace UI.Shell
 			this.loginUser = this.playerHolder.Value.Computer.PlayerUser;
 			this.loginProcess = this.playerHolder.Value.OsInitProcess.CreateLoginProcess(this.loginUser);
 			this.currentWorkspace = playerHolder.Value.UiManager.WindowManager.DefineWorkspace(this.workspaceArea);
-			this.systemSettingsButton.onClick.AddListener(uiManager.OpenSettings);
 
 			this.UpdateUserDisplay();
 		}
@@ -78,7 +75,7 @@ namespace UI.Shell
 			string username = this.loginUser.UserName;
 			string hostname = this.loginUser.Computer.Name;
 			
-			this.shellUserDisplayTText.SetText($"{username}@{hostname}");
+			statusBarController.UserInfo = $"{username}@{hostname}";
 		}
 	}
 }

@@ -54,7 +54,6 @@ namespace UI.Windowing
 		[SerializeField]
 		private bool allowMinimizing = true;
 
-		private WindowStyleUpdater styleUpdater = null!;
 		private static UguiWindow? firstWindow = null!;
 		private bool isFirstWindow = false;
 		private GameObject? eventSystemFocusedGameObject;
@@ -158,7 +157,6 @@ namespace UI.Windowing
 		{
 			this.AssertAllFieldsAreSerialized(typeof(UguiWindow));
 			
-			this.MustGetComponent(out styleUpdater);
 			this.MustGetComponent(out rectTransform);
 			this.MustGetComponent(out contentSizeFitter);
 			this.clientArea.MustGetComponent(out layoutElement);
@@ -204,9 +202,6 @@ namespace UI.Windowing
 		{
 			if (eventSystemFocusedGameObject == null)
 			{
-				if (focusService.FocusedWindow is UguiWindow w)
-					w.styleUpdater.UseActiveDecorations = false;
-				
 				focusService.SetWindow(null);
 				return;
 			}
@@ -217,8 +212,7 @@ namespace UI.Windowing
 				focusService.SetWindow(null);
 				return;
 			}
-
-			newWindow.styleUpdater.UseActiveDecorations = true;
+			
 			newWindow.transform.SetAsLastSibling();
 			focusService.SetWindow(newWindow);
 		}
