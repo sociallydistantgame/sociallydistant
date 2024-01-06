@@ -56,8 +56,11 @@ namespace GamePlatform
 		private ContentManager contentManager = new ContentManager();
 		private IGameData? currentGameData;
 		private PlayerInfo loadedPlayerInfo;
+		private Subject<bool> panicSubject = new Subject<bool>();
+		private bool panicking;
 
 		public IObservable<GameMode> GameModeObservable { get; private set; }
+		public IObservable<bool> PanicObservable { get; private set; }
 
 		public bool IsGameActive => false;
 		public IContentManager ContentManager => this.contentManager;
@@ -90,6 +93,12 @@ namespace GamePlatform
 				return gameMode.Subscribe(observer);
 			});
 			
+			PanicObservable = Observable.Create<bool>(observer =>
+			{
+				observer.OnNext(panicking);
+				return panicSubject.Subscribe(observer);
+			});
+            
 			// Default to loading
 			SetGameMode(GameMode.Loading);
 			

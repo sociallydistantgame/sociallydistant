@@ -227,9 +227,7 @@ GameObject:
   - component: {fileID: 6008542917495658622}
   - component: {fileID: 9058584308950514725}
   - component: {fileID: 469427984001414979}
-  - component: {fileID: 8412459462015091344}
   - component: {fileID: 1446264150837137296}
-  - component: {fileID: 7808017304146492252}
   m_Layer: 5
   m_Name: Window
   m_TagString: Untagged
@@ -414,25 +412,6 @@ MonoBehaviour:
   m_FillOrigin: 0
   m_UseSpriteMesh: 0
   m_PixelsPerUnitMultiplier: 1
---- !u!114 &8412459462015091344
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 3878192602872851283}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 010c020867d99d440a35f54adc6518ca, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  layoutGroup: {fileID: 7296615716005008966}
-  titleArea: {fileID: 5906961771620591546}
-  iconRect: {fileID: 5399498365733833035}
-  titleText: {fileID: 1672184123482259225}
-  closeButton: {fileID: 1566284972542201551}
-  minimizeButton: {fileID: 2704949830426625776}
-  maximizeButton: {fileID: 5487177491724789063}
 --- !u!114 &1446264150837137296
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -446,21 +425,6 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   m_ShowMaskGraphic: 0
---- !u!114 &7808017304146492252
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 3878192602872851283}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 1cb93e33c3581504583da0b1bb86ce77, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  decorations: {fileID: 4003680900986688154}
-  decorationMask: {fileID: 469427984001414979}
-  titleText: {fileID: 4196968042359634026}
 --- !u!1 &3929386586842696849
 GameObject:
   m_ObjectHideFlags: 0
@@ -855,10 +819,7 @@ GameObject:
   m_Component:
   - component: {fileID: 8931764993326978078}
   - component: {fileID: 1443621449798703412}
-  - component: {fileID: 4284464133946836174}
-  - component: {fileID: 9182591517849853178}
   - component: {fileID: 8409432427726853592}
-  - component: {fileID: 43386755790127125}
   m_Layer: 5
   m_Name: Client Area
   m_TagString: Untagged
@@ -912,44 +873,6 @@ MonoBehaviour:
   m_ChildScaleWidth: 1
   m_ChildScaleHeight: 1
   m_ReverseArrangement: 0
---- !u!222 &4284464133946836174
-CanvasRenderer:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 6986506270247224102}
-  m_CullTransparentMesh: 1
---- !u!114 &9182591517849853178
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 6986506270247224102}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: fe87c0e1cc204ed48ad3b37840f39efc, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  m_Material: {fileID: 0}
-  m_Color: {r: 0.06666667, g: 0.07450981, b: 0.08235294, a: 1}
-  m_RaycastTarget: 1
-  m_RaycastPadding: {x: 0, y: 0, z: 0, w: 0}
-  m_Maskable: 1
-  m_OnCullStateChanged:
-    m_PersistentCalls:
-      m_Calls: []
-  m_Sprite: {fileID: 0}
-  m_Type: 0
-  m_PreserveAspect: 0
-  m_FillCenter: 1
-  m_FillMethod: 4
-  m_FillAmount: 1
-  m_FillClockwise: 1
-  m_FillOrigin: 0
-  m_UseSpriteMesh: 0
-  m_PixelsPerUnitMultiplier: 1
 --- !u!114 &8409432427726853592
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -970,22 +893,6 @@ MonoBehaviour:
   m_FlexibleWidth: -1
   m_FlexibleHeight: -1
   m_LayoutPriority: 1
---- !u!114 &43386755790127125
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 6986506270247224102}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 7b222ca6429fd3146a0f51ad94ee67f9, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  graphicColor: 0
-  useCustomColor: 0
-  customLightColor: {r: 0, g: 0, b: 0, a: 0}
-  customDarkColor: {r: 0, g: 0, b: 0, a: 0}
 --- !u!1 &7246337653540496734
 GameObject:
   m_ObjectHideFlags: 0
