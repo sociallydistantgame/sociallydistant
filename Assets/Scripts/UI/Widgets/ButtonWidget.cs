@@ -11,18 +11,18 @@ namespace UI.Widgets
 {
 	public class ButtonWidget : MonoBehaviour
 	{
-		private Button button = null!;
-
 		[SerializeField]
 		private TextMeshProUGUI label = null!;
 
+		private Button button = null!;
+		
 		public string Text
 		{
 			get => label.text;
-			set => label.text = value;
+			set => label.SetText(value);
 		}
 
-		public event Action<ButtonWidget>? Clicked; 
+		public Action<ButtonWidget>? Clicked { get; set; }
 
 		private void Awake()
 		{

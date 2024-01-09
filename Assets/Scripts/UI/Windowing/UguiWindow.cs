@@ -21,7 +21,7 @@ namespace UI.Windowing
 		ISelectHandler,
 		IDeselectHandler,
 		IPointerDownHandler,
-		IWindowWithClient<RectTransform>
+		IFloatingGuiWithClient<RectTransform>
 	{
 		[FormerlySerializedAs("dragService")]
 		[Header("Dependencies")]
@@ -79,10 +79,10 @@ namespace UI.Windowing
 			get => iconWidget.Icon;
 			set => iconWidget.Icon = value;
 		}
-		
+
 		/// <inheritdoc />
-		public IWorkspaceDefinition Workspace { get; private set; } = null!;
-		
+		public IWorkspaceDefinition? Workspace { get; set; }
+
 		/// <inheritdoc />
 		public string Title
 		{

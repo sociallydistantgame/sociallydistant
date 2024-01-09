@@ -75,32 +75,29 @@ namespace UI.UiHelpers
 			IMessageDialog messageDialog = player.Value.UiManager.WindowManager.CreateMessageDialog(title, parentWindow);
 			messageDialog.Title = title;
 			messageDialog.Message = message;
-			messageDialog.Icon = MessageDialogIcon.Question;
 
 			messageDialog.Buttons.Add("Yes");
 			messageDialog.Buttons.Add("No");
 			messageDialog.Buttons.Add("Cancel");
 
 
-			messageDialog.ButtonPressed += FireCallback;
+			messageDialog.DismissCallback = FireCallback;
 			
 			openDialogs.Add(messageDialog);
 			return;
 
-			void FireCallback(int buttonId)
+			void FireCallback(MessageDialogResult buttonId)
 			{
-				messageDialog.ButtonPressed -= FireCallback;
+				messageDialog.DismissCallback = null;
 
 				switch (buttonId)
 				{
-					case 0:
+					case MessageDialogResult.Yes:
 						callback?.Invoke(true);
 						break;
-					case 1:
-						callback?.Invoke(false);
-						return;
 					default:
-						callback?.Invoke(null);
+					case MessageDialogResult.No:
+						callback?.Invoke(false);
 						return;
 				}
 			}
@@ -111,18 +108,17 @@ namespace UI.UiHelpers
 			IMessageDialog messageDialog = player.Value.UiManager.WindowManager.CreateMessageDialog(title, parentWindow);
 			messageDialog.Title = title;
 			messageDialog.Message = message;
-			messageDialog.Icon = MessageDialogIcon.Question;
 
 			messageDialog.Buttons.Add("Yes");
 			messageDialog.Buttons.Add("No");
 
-			void fireCallback(int buttonId)
+			void fireCallback(MessageDialogResult result)
 			{
-				messageDialog.ButtonPressed -= fireCallback;
-				callback?.Invoke(buttonId==0);
+				messageDialog.DismissCallback = null;
+				callback?.Invoke(result == MessageDialogResult.Yes);
 			}
 
-			messageDialog.ButtonPressed += fireCallback;
+			messageDialog.DismissCallback = fireCallback;
 			
 			openDialogs.Add(messageDialog);
 		}
@@ -132,11 +128,10 @@ namespace UI.UiHelpers
 			IMessageDialog messageDialog = player.Value.UiManager.WindowManager.CreateMessageDialog(title, parentWindow);
 			messageDialog.Title = title;
 			messageDialog.Message = message;
-			messageDialog.Icon = MessageDialogIcon.Information;
 
 			messageDialog.Buttons.Add("OK");
             
-			messageDialog.ButtonPressed += _ =>
+			messageDialog.DismissCallback += _ =>
 			{
 				callback?.Invoke();
 			};
