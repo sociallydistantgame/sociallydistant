@@ -5,16 +5,15 @@ using System.Collections.Generic;
 
 namespace Shell.Windowing
 {
-	public interface IMessageDialog : ICloseable
+	public interface IMessageDialog : IWindow
 	{
-		string Title { get; set; }
 		string Message { get; set; }
-		MessageDialogIcon Icon { get; set; }
+		CommonColor Color { get; set; }
 
 		IList<MessageBoxButtonData> Buttons { get; }
 
-		event Action<int>? ButtonPressed; 
-
+		Action<MessageDialogResult>? DismissCallback { get; set; }
+		
 		void Setup(IWindow window);
 	}
 }

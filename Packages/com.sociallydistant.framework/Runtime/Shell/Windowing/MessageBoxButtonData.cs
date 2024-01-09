@@ -4,13 +4,13 @@ namespace Shell.Windowing
 	public struct MessageBoxButtonData
 	{
 		public string Text;
-		public string Icon;
+		public MessageDialogResult Result;
 		
 		public static implicit operator MessageBoxButtonData(string text)
 		{
 			return new MessageBoxButtonData
 			{
-				Icon = string.Empty,
+				Result = MessageDialogResult.Ok,
 				Text = text
 			};
 		}
