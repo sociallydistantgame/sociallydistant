@@ -197,7 +197,6 @@ GameObject:
   - component: {fileID: 8741339455714974308}
   - component: {fileID: 1175467508381031881}
   - component: {fileID: 1158038911769541213}
-  - component: {fileID: 8655351095208235577}
   m_Layer: 0
   m_Name: Description
   m_TagString: Untagged
@@ -255,8 +254,8 @@ MonoBehaviour:
       m_Calls: []
   m_text: Title text
   m_isRightToLeft: 0
-  m_fontAsset: {fileID: 11400000, guid: f509d26bf7ce06243bf3324babe5918e, type: 2}
-  m_sharedMaterial: {fileID: -6538113406969041546, guid: f509d26bf7ce06243bf3324babe5918e, type: 2}
+  m_fontAsset: {fileID: 11400000, guid: a9524fa8b1ab53749899ad15333c8c9d, type: 2}
+  m_sharedMaterial: {fileID: 7501800038310029699, guid: a9524fa8b1ab53749899ad15333c8c9d, type: 2}
   m_fontSharedMaterials: []
   m_fontMaterial: {fileID: 0}
   m_fontMaterials: []
@@ -322,19 +321,6 @@ MonoBehaviour:
   m_hasFontAssetChanged: 0
   m_baseMaterial: {fileID: 0}
   m_maskOffset: {x: 0, y: 0, z: 0, w: 0}
---- !u!114 &8655351095208235577
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 4120487971980164351}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 749e108ff5691294cb7c1d87f562057b, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  textStyle: 0
 --- !u!1 &5643947943016440244
 GameObject:
   m_ObjectHideFlags: 0
@@ -346,7 +332,6 @@ GameObject:
   - component: {fileID: 3944805078281119732}
   - component: {fileID: 7321892877644973224}
   - component: {fileID: 7631590479485897367}
-  - component: {fileID: 1257413140080365839}
   m_Layer: 0
   m_Name: Title
   m_TagString: Untagged
@@ -404,8 +389,8 @@ MonoBehaviour:
       m_Calls: []
   m_text: Title text
   m_isRightToLeft: 0
-  m_fontAsset: {fileID: 11400000, guid: f509d26bf7ce06243bf3324babe5918e, type: 2}
-  m_sharedMaterial: {fileID: -6538113406969041546, guid: f509d26bf7ce06243bf3324babe5918e, type: 2}
+  m_fontAsset: {fileID: 11400000, guid: 77d5145bcbd1efc4d9e32ba6b95d6a41, type: 2}
+  m_sharedMaterial: {fileID: -5371027837993382120, guid: 77d5145bcbd1efc4d9e32ba6b95d6a41, type: 2}
   m_fontSharedMaterials: []
   m_fontMaterial: {fileID: 0}
   m_fontMaterials: []
@@ -429,13 +414,13 @@ MonoBehaviour:
   m_faceColor:
     serializedVersion: 2
     rgba: 4294967295
-  m_fontSize: 14
-  m_fontSizeBase: 14
+  m_fontSize: 12
+  m_fontSizeBase: 12
   m_fontWeight: 400
   m_enableAutoSizing: 0
   m_fontSizeMin: 18
   m_fontSizeMax: 72
-  m_fontStyle: 1
+  m_fontStyle: 0
   m_HorizontalAlignment: 1
   m_VerticalAlignment: 256
   m_textAlignment: 65535
@@ -471,19 +456,6 @@ MonoBehaviour:
   m_hasFontAssetChanged: 0
   m_baseMaterial: {fileID: 0}
   m_maskOffset: {x: 0, y: 0, z: 0, w: 0}
---- !u!114 &1257413140080365839
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 5643947943016440244}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 749e108ff5691294cb7c1d87f562057b, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  textStyle: 1
 --- !u!1001 &968138224114780450
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -519,6 +491,10 @@ PrefabInstance:
       propertyPath: m_AnchoredPosition.y
       value: 0
       objectReference: {fileID: 0}
+    - target: {fileID: 3053151556953451310, guid: b1849565e3aef9d4e8171f7779013f3b, type: 3}
+      propertyPath: acidicGuiSettings
+      value: 
+      objectReference: {fileID: 11400000, guid: 736af5b49d1afe548b65ab894401a75f, type: 2}
     - target: {fileID: 3568599825351550219, guid: b1849565e3aef9d4e8171f7779013f3b, type: 3}
       propertyPath: m_AnchorMax.y
       value: 0
@@ -647,6 +623,10 @@ PrefabInstance:
       propertyPath: m_LocalEulerAnglesHint.z
       value: 0
       objectReference: {fileID: 0}
+    - target: {fileID: 8708105275506561194, guid: b1849565e3aef9d4e8171f7779013f3b, type: 3}
+      propertyPath: acidicGuiSettings
+      value: 
+      objectReference: {fileID: 11400000, guid: 736af5b49d1afe548b65ab894401a75f, type: 2}
     m_RemovedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: b1849565e3aef9d4e8171f7779013f3b, type: 3}
 --- !u!114 &956066077015956439 stripped
