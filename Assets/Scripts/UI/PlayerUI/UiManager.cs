@@ -211,7 +211,11 @@ namespace UI.PlayerUI
 
 			settingsWindow.WindowClosed += SettingsClosed;
 
-			//Instantiate(systemSettingsPrefab, settingsWindow.ClientArea);
+			// Create a RectTransformContent to host settings inside
+			var content = new RectTransformContent();
+			Instantiate(systemSettingsPrefab, content.RectTransform);
+
+			settingsWindow.ActiveContent.Content = content;
 		}
 
 		private void SettingsClosed(IWindow win)
