@@ -2,6 +2,7 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using Architecture;
 using GamePlatform;
 using OS.Devices;
 using Shell;
@@ -21,6 +22,9 @@ namespace UI.Windowing
 		[SerializeField]
 		private DockGroup iconGroup = null!;
 
+		[SerializeField]
+		private MainToolGroup terminal = null!;
+		
 		private Desktop shell;
 		private readonly List<TabbedTool> tools = new List<TabbedTool>();
 		private TabbedTool? currentTool;
@@ -45,7 +49,11 @@ namespace UI.Windowing
 			if (gameManager.Value == null)
 				return;
 			
-			this.tools.AddRange(this.gameManager.Value.AvailableTools.Select(x=>new TabbedTool(x, shell.LoginProcess)));
+			// Really cursed bullshit linq code that I'd never get CAUGHT DEAD writing for trixel...
+			// that makes the terminal always show up first no matter what.
+			this.tools.AddRange(this.gameManager.Value.AvailableTools
+				.OrderByDescending(x=>x.Equals(terminal))
+				.Select(x=>new TabbedTool(x, shell.LoginProcess)));
 
 			this.BuildDock();
 
