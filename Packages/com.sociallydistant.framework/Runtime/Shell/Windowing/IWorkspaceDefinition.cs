@@ -4,10 +4,9 @@ namespace Shell.Windowing
 {
 	public interface IWorkspaceDefinition
 	{
-		string Name { get; set; }
-		
-		IReadOnlyList<IWindow> WindowList { get; }
+		IReadOnlyList < IWindow > WindowList { get; }
 
-		IWindow CreateWindow(string title);
+		IFloatingGui CreateFloatingGui(string title);
+		IMessageDialog CreateMessageDialog(string title);
 	}
 }

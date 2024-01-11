@@ -1,10 +1,11 @@
 ﻿#nullable enable
 using OS.Devices;
+using Shell;
 
 namespace UI.Shell
 {
-	public interface IProgramOpener<TProgramUserInterface>
+	public interface IProgramOpener
 	{
-		ISystemProcess OpenProgram(IProgram<TProgramUserInterface> program, string[] arguments, ISystemProcess? parentProcess, ITextConsole? console);
+		ISystemProcess OpenProgram(IProgram program, string[] arguments, ISystemProcess? parentProcess, ITextConsole? console);
 	}
 }

@@ -127,7 +127,7 @@ namespace UI.Widgets
 
 			OverlayWorkspace overlay = playerInstanceHolder.Value.UiManager.WindowManager.CreateSystemOverlay();
 
-			IWindow win = overlay.CreateWindow("Graphic Picker - Choose Graphic");
+			IWindow win = overlay.CreateFloatingGui("Graphic Picker - Choose Graphic");
 
 			if (win is not UguiWindow guiWin || GraphicSource == null)
 			{

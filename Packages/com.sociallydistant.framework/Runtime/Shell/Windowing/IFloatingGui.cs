@@ -3,7 +3,7 @@ using UnityEngine;
 
 namespace Shell.Windowing
 {
-	public interface IFloatingGui : IWindow
+	public interface IFloatingGui : IWindow, IContentHolder
 	{
 		Vector2 MinimumSize { get; set; }
 		Vector2 Position { get; set; }

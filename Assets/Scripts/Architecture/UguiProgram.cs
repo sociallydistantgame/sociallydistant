@@ -1,18 +1,21 @@
 ﻿#nullable enable
+using System.ComponentModel;
 using Core;
 using OS.Devices;
+using Shell;
 using Shell.Common;
 using Shell.Windowing;
 using UI.Shell;
 using UI.Windowing;
 using UnityEngine;
+using UnityEngine.Serialization;
 
 namespace Architecture
 {
 	[CreateAssetMenu(menuName = "ScriptableObject/Assets/Program")]
 	public class UguiProgram :
 		ScriptableObject,
-		IProgram<RectTransform>,
+		IProgram,
 		INamedAsset
 	{
 		[SerializeField]
@@ -23,7 +26,7 @@ namespace Architecture
 
 		[SerializeField]
 		private RectTransform programGuiPrefab = null!;
-
+		
 		[SerializeField]
 		private CompositeIcon programIcon;
 		
@@ -39,13 +42,13 @@ namespace Architecture
 		public CompositeIcon Icon => this.programIcon;
 		
 		/// <inheritdoc />
-		public void InstantiateIntoWindow(ISystemProcess process, IWindowWithClient<RectTransform> window, ITextConsole console, string[] args)
+		public void InstantiateIntoWindow(ISystemProcess process, IContentPanel window, ITextConsole console, string[] args)
 		{
-			// Delay execution of Awake until we're ready.
-			programGuiPrefab.gameObject.SetActive(false);
-			RectTransform programRect = Instantiate(this.programGuiPrefab);
-			programGuiPrefab.gameObject.SetActive(true);
-
+			// Create a RectTransformContent to instantiate the program into.
+			var windowContent = new RectTransformContent();
+			
+			RectTransform programRect = Instantiate(this.programGuiPrefab, windowContent.RectTransform);
+			
 			// Set the name of the process
 			process.Name = binaryName;
 			
@@ -60,7 +63,7 @@ namespace Architecture
 				killHandler = programRect.gameObject.AddComponent<ProcessKillHandler>();
 			
 			// Associate the program with its window
-			window.SetClient(programRect);
+			window.Content = windowContent;
 			
 			// Find all components implementing IProgramOpenHandler and fire off the event.
 			IProgramOpenHandler[] openHandlers = programRect.gameObject.GetComponentsInChildren<IProgramOpenHandler>(true);

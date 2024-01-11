@@ -3,6 +3,7 @@ using System;
 using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
+using Architecture;
 using Core.Config;
 using Core.Config.SystemConfigCategories;
 using GamePlatform.ContentManagement;
@@ -53,6 +54,11 @@ namespace Modding
 
 			// Find Restitched save data. If we do, the player gets a little gift from the lead programmer of the game - who.......created this game as well? <3
 			// FindRestitchedDataAndRegisterRestitchedContent();
+			
+			// Load tabbed tools from resources
+			MainToolGroup[]? tabbedTools = Resources.LoadAll<MainToolGroup>("TabbedTools");
+			foreach (MainToolGroup tool in tabbedTools)
+				this.Context.AvailableTools.Add(tool);
 		}
 
 		/// <inheritdoc />

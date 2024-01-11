@@ -22,9 +22,12 @@ namespace UI.Windowing
 		[SerializeField]
 		private InfoBoxController infoBoxController = null!;
 		
-		private IWindow? parentWindow;
+		private IFloatingGui parentWindow;
 		private ObservableList<MessageBoxButtonData> buttonsList = new ObservableList<MessageBoxButtonData>();
-		
+
+		/// <inheritdoc />
+		public bool CanClose => true;
+
 		/// <inheritdoc />
 		public void Close()
 		{
@@ -79,7 +82,13 @@ namespace UI.Windowing
 		
 		/// <inheritdoc />
 		public bool IsActive => parentWindow?.IsActive == true;
-		
+
+		/// <inheritdoc />
+		public IWorkspaceDefinition CreateWindowOverlay()
+		{
+			return this.parentWindow!.CreateWindowOverlay();
+		}
+
 		/// <inheritdoc />
 		public void ForceClose()
 		{
@@ -109,9 +118,16 @@ namespace UI.Windowing
 		private void Awake()
 		{
 			this.AssertAllFieldsAreSerialized(typeof(UguiMessageDialog));
+			this.MustGetComponentInParent(out this.parentWindow);
 			
 			this.buttonsList.ItemAdded += HandleItemAdded;
 			this.buttonsList.ItemRemoved += HandleItemRemoved;
+			
+			parentWindow.EnableMaximizeButton = false;
+			parentWindow.EnableMinimizeButton = false;
+			parentWindow.EnableCloseButton = false;
+			
+			parentWindow.MinimumSize = Vector2.zero;
 		}
 
 		private void HandleItemRemoved(MessageBoxButtonData obj)
@@ -150,24 +166,6 @@ namespace UI.Windowing
 		{
 			DismissCallback?.Invoke(result);
 			Close();
-		}
-		
-		/// <inheritdoc />
-		public void Setup(IWindow window)
-		{
-			if (window is not IFloatingGuiWithClient<RectTransform> rectWindow)
-				throw new InvalidOperationException("fuck");
-			
-			this.parentWindow = window;
-			
-			rectWindow.EnableMaximizeButton = false;
-			rectWindow.EnableMinimizeButton = false;
-			rectWindow.EnableCloseButton = false;
-			
-			rectWindow.MinimumSize = Vector2.zero;
-			
-			this.MustGetComponent(out RectTransform rect);
-			rectWindow.SetClient(rect);
 		}
 	}
 }

@@ -96,7 +96,8 @@ namespace UI.Controllers
 		private void UpdateColors()
 		{
 			Color color = this.Color.GetColor();
-			Color translucentColor = color * 0.25f;
+			
+			var translucentColor = new Color(color.r, color.g, color.b, 0.25f);
 
 			this.titleComponent.color = color;
 			this.indicator.ShapeProperties.OutlineColor = color;

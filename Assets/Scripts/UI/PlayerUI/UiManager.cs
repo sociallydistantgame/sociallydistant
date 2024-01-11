@@ -86,7 +86,7 @@ namespace UI.PlayerUI
 		private Camera mainCamera = null!;
 		private string? lastThemeName;
 		private GameObject? themeEditor;
-		private UguiWindow? settingsWindow;
+		private IFloatingGui? settingsWindow;
 		private OverlayWorkspace? overlayWorkspace;
 		private WindowManager windowManager = null!;
 		private PopoverLayer popoverLayer = null!;
@@ -204,14 +204,14 @@ namespace UI.PlayerUI
 				return;
 
 			OpenOverlay();
-			settingsWindow = this.overlayWorkspace?.CreateWindow("System Settings", null);
+			settingsWindow = this.overlayWorkspace?.CreateFloatingGui("System Settings");
 
 			if (settingsWindow == null)
 				return;
 
 			settingsWindow.WindowClosed += SettingsClosed;
 
-			Instantiate(systemSettingsPrefab, settingsWindow.ClientArea);
+			//Instantiate(systemSettingsPrefab, settingsWindow.ClientArea);
 		}
 
 		private void SettingsClosed(IWindow win)

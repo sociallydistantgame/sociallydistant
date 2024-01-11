@@ -14,6 +14,8 @@ namespace Modules
 	/// </summary>
 	public interface IGameContext
 	{
+		TabbedToolCollection AvailableTools { get; }
+		
 		GameMode CurrentGameMode { get; }
 		
 		ISocialService SocialService { get; }
