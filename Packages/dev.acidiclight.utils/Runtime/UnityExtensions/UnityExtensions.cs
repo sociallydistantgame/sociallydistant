@@ -100,8 +100,7 @@ namespace UnityExtensions
         {
             MustGetComponent(inComponent.gameObject, out component);
         }
-
-        [NotNull]
+        
         public static T MustGetComponent<T>([NotNull] this GameObject gameObject)
         {
             gameObject.MustGetComponent(out T component);

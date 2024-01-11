@@ -35,7 +35,7 @@ namespace UI.UiHelpers
 		public async Task<string> OpenFile(string title, string directory, string extensionFilter)
 		{
 			OverlayWorkspace overlay = this.player.Value.UiManager.WindowManager.CreateSystemOverlay();
-			IWindow win = overlay.CreateWindow(title);
+			IWindow win = overlay.CreateFloatingGui(title);
 			if (win is not UguiWindow guiWin)
 				return string.Empty;
 
@@ -54,7 +54,7 @@ namespace UI.UiHelpers
 		public async Task<string> SaveFile(string title, string directory, string extensionFilter)
 		{
 			OverlayWorkspace overlay = this.player.Value.UiManager.WindowManager.CreateSystemOverlay();
-			IWindow win = overlay.CreateWindow(title);
+			IWindow win = overlay.CreateFloatingGui(title);
 			if (win is not UguiWindow guiWin)
 				return string.Empty;
 

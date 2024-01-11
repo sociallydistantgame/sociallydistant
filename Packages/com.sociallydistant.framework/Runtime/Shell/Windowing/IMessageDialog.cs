@@ -5,7 +5,7 @@ using System.Collections.Generic;
 
 namespace Shell.Windowing
 {
-	public interface IMessageDialog : IWindow
+	public interface IMessageDialog : ISystemWindow
 	{
 		string Message { get; set; }
 		CommonColor Color { get; set; }
@@ -13,7 +13,5 @@ namespace Shell.Windowing
 		IList<MessageBoxButtonData> Buttons { get; }
 
 		Action<MessageDialogResult>? DismissCallback { get; set; }
-		
-		void Setup(IWindow window);
 	}
 }

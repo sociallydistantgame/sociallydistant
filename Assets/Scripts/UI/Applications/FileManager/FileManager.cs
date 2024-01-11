@@ -39,7 +39,7 @@ namespace UI.Applications.FileManager
 		private FileAssociationMap fileAssociations = null!;
 		
 		private ISystemProcess process = null!;
-		private IWindow window = null!;
+		private IContentPanel window = null!;
 		private IVirtualFileSystem vfs = null!;
 		private string currentDirectory = "/";
 		private Stack<string> history = new Stack<string>();
@@ -69,7 +69,7 @@ namespace UI.Applications.FileManager
 		}
 
 		/// <inheritdoc />
-		public void OnProgramOpen(ISystemProcess process, IWindow window, ITextConsole console, string[] args)
+		public void OnProgramOpen(ISystemProcess process, IContentPanel window, ITextConsole console, string[] args)
 		{
 			this.process = process;
 			this.window = window;
@@ -137,7 +137,7 @@ namespace UI.Applications.FileManager
 				dialogHelper.ShowMessage(
 					"Cannot open file",
 					$"Cannot open the file '{path}' because you do not have any programs installed that can open it.",
-					this.window,
+					this.window.Window,
 					null
 				);
 			}

@@ -81,16 +81,21 @@ namespace UI.Windowing
 		/// <inheritdoc />
 		public IMessageDialog CreateMessageDialog(string title, IWindow? parent = null)
 		{
-			IWorkspaceDefinition targetWorkspace = parent?.Workspace ?? fallbackWorkspace;
-			IWindow dialogWindow = targetWorkspace.CreateWindow(title);
+			IWorkspaceDefinition targetWorkspace = parent?.CreateWindowOverlay() ?? CreateSystemOverlay();
+			IFloatingGui messageWindow = targetWorkspace.CreateFloatingGui(title);
+			
+			// Create a RectTransformContent object to hold the dialog's UI inside.
+			// The reason this is confusing and complicated is because much of the windowing API is in the modding SDK,
+			// and has no awareness of the fact we're using Unity GUI. Therefore rect transforms are completely opaque to it.
+			var rectHolder = new RectTransformContent();
+			
+			// Assign it to the window.
+			messageWindow.ActiveContent.Content = rectHolder;
 			
 			// instantiate the dialog prefab as disabled
 			messageDialogPrefab.gameObject.SetActive(false);
-			UguiMessageDialog dialogInstance = Instantiate(messageDialogPrefab);
+			UguiMessageDialog dialogInstance = Instantiate(messageDialogPrefab, rectHolder.RectTransform);
 			messageDialogPrefab.gameObject.SetActive(true);
-			
-			// Link it to the parent window.
-			dialogInstance.Setup(dialogWindow);
 			
 			// wake it up
 			dialogInstance.gameObject.SetActive(true);

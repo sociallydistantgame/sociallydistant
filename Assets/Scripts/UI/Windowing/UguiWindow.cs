@@ -21,7 +21,7 @@ namespace UI.Windowing
 		ISelectHandler,
 		IDeselectHandler,
 		IPointerDownHandler,
-		IFloatingGuiWithClient<RectTransform>
+		IFloatingGui
 	{
 		[FormerlySerializedAs("dragService")]
 		[Header("Dependencies")]
@@ -36,9 +36,6 @@ namespace UI.Windowing
 		private RectTransform clientArea = null!;
 
 		[SerializeField]
-		private TextMeshProUGUI titleText = null!;
-
-		[SerializeField]
 		private Button closeButton = null!;
 
 		[SerializeField]
@@ -47,6 +44,9 @@ namespace UI.Windowing
 		[SerializeField]
 		private Button minimizeButton = null!;
 
+		[SerializeField]
+		private WindowTabManager tabManager = null!;
+		
 		[Header("Settings")]
 		[SerializeField]
 		private bool allowClosing = true;
@@ -74,6 +74,9 @@ namespace UI.Windowing
 		public event Action<IWindow>? WindowClosed;
 
 		/// <inheritdoc />
+		public IContentPanel ActiveContent => tabManager.ActiveContent;
+		
+		/// <inheritdoc />
 		public CompositeIcon Icon
 		{
 			get => iconWidget.Icon;
@@ -82,13 +85,6 @@ namespace UI.Windowing
 
 		/// <inheritdoc />
 		public IWorkspaceDefinition? Workspace { get; set; }
-
-		/// <inheritdoc />
-		public string Title
-		{
-			get => titleText.text;
-			set => titleText.SetText(value);
-		}
 
 		/// <inheritdoc />
 		public WindowState WindowState
@@ -129,6 +125,12 @@ namespace UI.Windowing
 		public bool IsActive
 			=> gameObject.activeSelf && transform.IsLastSibling();
 
+		/// <inheritdoc />
+		public IWorkspaceDefinition CreateWindowOverlay()
+		{
+			throw new NotImplementedException();
+		}
+
 		public Vector2 Position
 		{
 			get => rectTransform.anchoredPosition;
@@ -145,10 +147,7 @@ namespace UI.Windowing
 				layoutElement.minHeight = (int) value.y;
 			}
 		}
-
-		/// <inheritdoc />
-		public RectTransform Client => currentClient;
-
+		
 		public RectTransform RectTransform => rectTransform;
 
 		public RectTransform ClientArea => this.clientArea;
@@ -217,6 +216,9 @@ namespace UI.Windowing
 			focusService.SetWindow(newWindow);
 		}
 
+		/// <inheritdoc />
+		public bool CanClose { get; }
+
 		public void Close()
 		{
 			if (!allowClosing)
@@ -263,26 +265,6 @@ namespace UI.Windowing
 				this.WindowState = WindowState.Maximized;
 		}
 		
-		/// <inheritdoc />
-		public void SetClient(RectTransform newClient)
-		{
-			if (currentClient == newClient)
-				return;
-
-			this.closeBlockers.Clear();
-			
-			if (currentClient != null)
-				Destroy(currentClient.gameObject);
-
-			currentClient = newClient;
-			currentClient.SetParent(clientArea);
-			currentClient.localPosition = Vector3.zero;
-			
-			currentClient.localScale = Vector3.one;
-
-			RefreshCloseBlockers();
-		}
-
 		private void RefreshCloseBlockers()
 		{
 			this.closeBlockers.Clear();
@@ -364,5 +346,6 @@ namespace UI.Windowing
 		{
 			this.transform.SetAsLastSibling();
 		}
+
 	}
 }

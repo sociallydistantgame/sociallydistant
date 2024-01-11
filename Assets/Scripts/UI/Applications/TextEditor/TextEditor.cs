@@ -44,7 +44,7 @@ namespace UI.Applications.TextEditor
 		private DialogHelper dialogHelper = null!;
 		private string? fileBeingEdited;
 		private ISystemProcess process;
-		private IWindow win;
+		private IContentPanel win;
 		private ITextConsole console;
 		private bool hasUnsavedChanges = false;
 
@@ -67,7 +67,7 @@ namespace UI.Applications.TextEditor
 		}
 
 		/// <inheritdoc />
-		public void OnProgramOpen(ISystemProcess process, IWindow window, ITextConsole console, string[] args)
+		public void OnProgramOpen(ISystemProcess process, IContentPanel window, ITextConsole console, string[] args)
 		{
 			this.process = process;
 			this.win = window;
@@ -190,7 +190,7 @@ namespace UI.Applications.TextEditor
 			dialogHelper.AskYesNoCancel(
 				"Unsaved changes",
 				"The current document has unsaved changes. Would you like to save before continuing?",
-				this.win,
+				this.win.Window,
 				source.SetResult
 			);
 			

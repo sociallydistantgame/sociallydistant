@@ -6,7 +6,7 @@ using System;
 
 namespace UI.Windowing
 {
-	public class OverlayWorkspace : IClientWorkspaceDefinition<UguiWindow, RectTransform>
+	public class OverlayWorkspace : IWorkspaceDefinition
 	{
 		private readonly GameObject go;
 		private readonly UguiWorkspaceDefinition workspace;
@@ -29,29 +29,22 @@ namespace UI.Windowing
 		}
 		
 		/// <inheritdoc />
-		public UguiWindow CreateWindow(string title, RectTransform? client = default)
+		public IFloatingGui CreateFloatingGui(string title)
 		{
-			UguiWindow? win = workspace.CreateWindow(title, client);
+			IFloatingGui? win = workspace.CreateFloatingGui(title);
 
 			win.WindowClosed += this.WindowClosed;
 			
 			return win;
 		}
-
-		/// <inheritdoc />
-		public string Name
-		{
-			get => go.name;
-			set => go.name = value;
-		}
-
+		
 		/// <inheritdoc />
 		public IReadOnlyList<IWindow> WindowList => workspace.WindowList;
 
 		/// <inheritdoc />
-		public IWindow CreateWindow(string title)
+		public IMessageDialog CreateMessageDialog(string title)
 		{
-			return CreateWindow(title, null);
+			return null;
 		}
 
 		private void WindowClosed(IWindow win)

@@ -1,0 +1,16 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: aa0b1a30db2747559073d4622a98a9fb, type: 3}
+  m_Name: Terminal
+  m_EditorClassIdentifier: 
+  program: {fileID: 11400000, guid: dc7e52a226c87f34991a0fb15aa6276e, type: 2}
+  allowUserTabs: 1

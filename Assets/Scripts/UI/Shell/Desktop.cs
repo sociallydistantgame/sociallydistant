@@ -4,6 +4,7 @@ using System;
 using Architecture;
 using OS.Devices;
 using Player;
+using Shell;
 using Shell.Windowing;
 using TMPro;
 using UI.Controllers;
@@ -18,7 +19,7 @@ namespace UI.Shell
 {
 	public class Desktop :
 		MonoBehaviour,
-		IProgramOpener<RectTransform>,
+		IProgramOpener,
 		IDesktop
 	{
 		[Header("Dependencies")]
@@ -37,6 +38,8 @@ namespace UI.Shell
 		private IUser loginUser = null!;
 		private UiManager uiManager = null!;
 
+		internal ISystemProcess LoginProcess => loginProcess;
+		
 		public IWorkspaceDefinition CurrentWorkspace => currentWorkspace;
 		
 		private void Awake()
@@ -55,18 +58,18 @@ namespace UI.Shell
 		}
 
 		/// <inheritdoc />
-		public ISystemProcess OpenProgram(IProgram<RectTransform> program, string[] arguments, ISystemProcess? parentProcess, ITextConsole? console)
+		public ISystemProcess OpenProgram(IProgram program, string[] arguments, ISystemProcess? parentProcess, ITextConsole? console)
 		{
 			// Create a process for the window, if we weren't supplied with one.
 			ISystemProcess windowProcess = parentProcess ?? this.loginProcess.Fork();
 			
 			// Create a new window for the program, on the current workspace.
-			IWindowWithClient<RectTransform>? win = CurrentWorkspace.CreateWindow("Window") as IWindowWithClient<RectTransform>;
+			IFloatingGui? win = CurrentWorkspace.CreateFloatingGui("Window");
 			if (win == null)
 				throw new InvalidOperationException("Cannot launch a program window because the workspace didn't create a valid window.");
-
+			
 			// Spawn the program
-			program.InstantiateIntoWindow(windowProcess, win, console, arguments);
+			program.InstantiateIntoWindow(windowProcess, win.ActiveContent, console, arguments);
 			return windowProcess;
 		}
 

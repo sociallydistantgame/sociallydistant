@@ -21,7 +21,7 @@ namespace UI.Applications.Terminal
 		IWindowCloseBlocker
 	{
 		private ISystemProcess process = null!;
-		private IWindow window = null!;
+		private IContentPanel window = null!;
 		private ISystemProcess? shellProcess;
 		private SimpleTerminalRenderer st = null!;
 		private ITextConsole? textConsole;
@@ -72,7 +72,7 @@ namespace UI.Applications.Terminal
 		}
 
 		/// <inheritdoc />
-		public void OnProgramOpen(ISystemProcess process, IWindow window, ITextConsole console, string[] args)
+		public void OnProgramOpen(ISystemProcess process, IContentPanel window, ITextConsole console, string[] args)
 		{
 			this.process = process;
 			this.window = window;
@@ -91,7 +91,7 @@ namespace UI.Applications.Terminal
 					dialogHelper.AskQuestion(
 						"Force-quit running tasks?",
 						"There are tasks currently running inside this Terminal. Are you sure you want to quit the Terminal and force-quit all currently-running tasks? Any unsaved data will be lost.",
-						this.window,
+						this.window.Window,
 						result =>
 						{
 							if (result)

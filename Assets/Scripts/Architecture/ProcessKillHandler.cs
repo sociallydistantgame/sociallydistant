@@ -10,17 +10,16 @@ namespace Architecture
 		MonoBehaviour,
 		IProgramOpenHandler
 	{
-		private IWindow window = null!;
+		private IContentPanel window = null!;
 		private ISystemProcess process = null!;
 		private bool killedFirst;
 
 		/// <inheritdoc />
-		public void OnProgramOpen(ISystemProcess process, IWindow window, ITextConsole console, string[] args)
+		public void OnProgramOpen(ISystemProcess process, IContentPanel window, ITextConsole console, string[] args)
 		{
 			this.process = process;
 			this.window = window;
 			
-			this.window.WindowClosed += HandleWindowClosed;
 			this.process.Killed += HandleProcessKilled;
 		}
 
@@ -43,7 +42,7 @@ namespace Architecture
 				process.Kill();
 			}
 
-			window.WindowClosed -= HandleWindowClosed;
+			window.Window.WindowClosed -= HandleWindowClosed;
 		}
 	}
 }

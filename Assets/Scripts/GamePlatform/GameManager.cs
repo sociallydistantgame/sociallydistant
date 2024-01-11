@@ -49,6 +49,7 @@ namespace GamePlatform
 		[SerializeField]
 		private SocialServiceHolder socialHolder = null!;
 
+		private TabbedToolCollection availableTools;
 		private GameMode currentGameMode;
 		private SettingsManager settingsManager;
 		private ModuleManager moduleManager;
@@ -67,6 +68,9 @@ namespace GamePlatform
 
 		public IInfoPanelService InfoPanelService => this.infoPanelService;
 
+		/// <inheritdoc />
+		public TabbedToolCollection AvailableTools => availableTools;
+        
 		/// <inheritdoc />
 		public ISocialService SocialService => socialHolder.Value!;
 
@@ -87,6 +91,8 @@ namespace GamePlatform
 		
 		private void Awake()
 		{
+			availableTools = new TabbedToolCollection(this);
+			
 			GameModeObservable = Observable.Create<GameMode>(observer =>
 			{
 				observer.OnNext(currentGameMode);
