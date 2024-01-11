@@ -4,6 +4,7 @@ using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
+using System.Text;
 using GamePlatform;
 using Player;
 using TMPro;
@@ -21,6 +22,9 @@ namespace UI.Login
 		private GameManagerHolder gameManager = null!;
 
 		[Header("UI")]
+		[SerializeField]
+		private TextMeshProUGUI gameVersion = null!;
+		
 		[SerializeField]
 		private UserListController userListController = null!;
 		
@@ -52,6 +56,8 @@ namespace UI.Login
 		{
 			this.AssertAllFieldsAreSerialized(typeof(LoginManager));
 			this.startGameButton.MustGetComponentInChildren(out buttonText);
+
+			SetupVersion();
 		}
 
 		private IEnumerator Start()
@@ -68,6 +74,19 @@ namespace UI.Login
 			RefreshMainArea();
 		}
 
+		private void SetupVersion()
+		{
+			var sb = new StringBuilder();
+
+			sb.Append("version <b>");
+			sb.Append(Application.version);
+			sb.Append("</b> (unity ");
+			sb.Append(Application.unityVersion);
+			sb.Append(")");
+			
+			gameVersion.SetText(sb);
+		}
+		
 		private void RefreshUserList()
 		{
 			var models = new List<UserListItemModel>();
