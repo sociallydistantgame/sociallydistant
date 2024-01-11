@@ -22,6 +22,7 @@ namespace UI.Windowing
 		private IWorkspaceDefinition workspace;
 		private IFloatingGui window;
 		private WindowTabManager tabManager;
+		private CanvasGroup canvasGroup = null!;
 
 		/// <inheritdoc />
 		public bool CanClose => window.CanClose;
@@ -126,7 +127,7 @@ namespace UI.Windowing
 			base.Awake();
 			
 			this.AssertAllFieldsAreSerialized(typeof(Tile));
-
+			this.MustGetComponent(out canvasGroup);
 			this.MustGetComponent(out rectTRansform);
 			
 			// Creates the underlying tile window
@@ -144,6 +145,22 @@ namespace UI.Windowing
 			// Cursed shit to get the tab manager for the underlying window.
 			// You shouldn't do this unless your name is Ritchie and you're the lead programmer of the game.
 			tabManager = (window as MonoBehaviour)!.MustGetComponent<WindowTabManager>();
+		}
+
+		/// <inheritdoc />
+		public void Hide()
+		{
+			canvasGroup.interactable = false;
+			canvasGroup.blocksRaycasts = false;
+			canvasGroup.alpha = 0;
+		}
+
+		/// <inheritdoc />
+		public void Show()
+		{
+			canvasGroup.interactable = true;
+			canvasGroup.blocksRaycasts = true;
+			canvasGroup.alpha = 1;
 		}
 	}
 }

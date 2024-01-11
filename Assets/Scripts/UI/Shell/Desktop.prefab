@@ -771,6 +771,7 @@ GameObject:
   - component: {fileID: 5603949211056546753}
   - component: {fileID: 6081449114487649310}
   - component: {fileID: 8089699474828081371}
+  - component: {fileID: 3948985727256814824}
   m_Layer: 5
   m_Name: Secondary Tile
   m_TagString: Untagged
@@ -831,6 +832,18 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   playerHolder: {fileID: 11400000, guid: b143bb84d08c6044bb9b1a69e33c8460, type: 2}
+--- !u!225 &3948985727256814824
+CanvasGroup:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 7335306972066584669}
+  m_Enabled: 1
+  m_Alpha: 1
+  m_Interactable: 1
+  m_BlocksRaycasts: 1
+  m_IgnoreParentGroups: 0
 --- !u!1 &7511392613807805256
 GameObject:
   m_ObjectHideFlags: 0
@@ -843,6 +856,7 @@ GameObject:
   - component: {fileID: 1772033141657457915}
   - component: {fileID: 5588379476355655725}
   - component: {fileID: 4075500287936291628}
+  - component: {fileID: 6870565930098975977}
   m_Layer: 5
   m_Name: Main Tile
   m_TagString: Untagged
@@ -917,6 +931,18 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   gameManager: {fileID: 11400000, guid: 872374c25807361459f4e174bb460b2c, type: 2}
   iconGroup: {fileID: 8035880706312508592}
+--- !u!225 &6870565930098975977
+CanvasGroup:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 7511392613807805256}
+  m_Enabled: 1
+  m_Alpha: 1
+  m_Interactable: 1
+  m_BlocksRaycasts: 1
+  m_IgnoreParentGroups: 0
 --- !u!1 &7597357237064200184
 GameObject:
   m_ObjectHideFlags: 0

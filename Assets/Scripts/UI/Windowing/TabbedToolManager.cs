@@ -117,6 +117,7 @@ namespace UI.Windowing
 			if (this.currentTool == null)
 				return;
 
+			tile.Show();
 			this.currentTool.RestoreState(this.tile);
 			this.UpdateDockActiveStates();
 		}
@@ -126,6 +127,9 @@ namespace UI.Windowing
 			if (tool == this.currentTool)
 			{
 				DeactivateCurrentTool();
+
+				tile.Hide();
+				
 				return;
 			}
 

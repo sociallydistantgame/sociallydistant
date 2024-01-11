@@ -6,6 +6,7 @@ namespace Shell.Windowing
 		ITabbedContent, 
 		IWorkspaceDefinition
 	{
-		
+		void Hide();
+		void Show();
 	}
 }
