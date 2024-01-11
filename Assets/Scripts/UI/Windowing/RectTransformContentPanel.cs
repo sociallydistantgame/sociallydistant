@@ -26,13 +26,20 @@ namespace UI.Windowing
 		/// <inheritdoc />
 		public void Close()
 		{
-			throw new System.NotImplementedException();
+			if (!CanClose)
+				return;
+
+			ForceClose();
 		}
 
 		/// <inheritdoc />
 		public void ForceClose()
 		{
-			throw new System.NotImplementedException();
+			ITabbedContent? tabbedContent = GetComponentInParent<ITabbedContent>();
+			if (tabbedContent == null)
+				return;
+
+			tabbedContent.RemoveTab(this);
 		}
 
 		/// <inheritdoc />
