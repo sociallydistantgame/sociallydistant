@@ -53,6 +53,7 @@ namespace UI.Windowing
 			// that makes the terminal always show up first no matter what.
 			this.tools.AddRange(this.gameManager.Value.AvailableTools
 				.OrderByDescending(x=>x.Equals(terminal))
+				.ThenBy(x=>x.Program.WindowTitle)
 				.Select(x=>new TabbedTool(x, shell.LoginProcess)));
 
 			this.BuildDock();
