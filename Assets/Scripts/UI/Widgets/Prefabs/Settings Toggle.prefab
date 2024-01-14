@@ -61,7 +61,7 @@ MonoBehaviour:
     m_Top: 6
     m_Bottom: 6
   m_ChildAlignment: 3
-  m_Spacing: 0
+  m_Spacing: 3
   m_ChildForceExpandWidth: 0
   m_ChildForceExpandHeight: 0
   m_ChildControlWidth: 1
@@ -468,7 +468,6 @@ GameObject:
   - component: {fileID: 1922124479025074406}
   - component: {fileID: 2499490245027086706}
   - component: {fileID: 6425829235911570180}
-  - component: {fileID: 4030843178044687831}
   m_Layer: 0
   m_Name: Label
   m_TagString: Untagged
@@ -526,8 +525,8 @@ MonoBehaviour:
       m_Calls: []
   m_text: Enabled
   m_isRightToLeft: 0
-  m_fontAsset: {fileID: 11400000, guid: 8f586378b4e144a9851e7b34d9b748ee, type: 2}
-  m_sharedMaterial: {fileID: 2180264, guid: 8f586378b4e144a9851e7b34d9b748ee, type: 2}
+  m_fontAsset: {fileID: 11400000, guid: a9524fa8b1ab53749899ad15333c8c9d, type: 2}
+  m_sharedMaterial: {fileID: 7501800038310029699, guid: a9524fa8b1ab53749899ad15333c8c9d, type: 2}
   m_fontSharedMaterials: []
   m_fontMaterial: {fileID: 0}
   m_fontMaterials: []
@@ -551,8 +550,8 @@ MonoBehaviour:
   m_faceColor:
     serializedVersion: 2
     rgba: 4294967295
-  m_fontSize: 36
-  m_fontSizeBase: 36
+  m_fontSize: 12
+  m_fontSizeBase: 12
   m_fontWeight: 400
   m_enableAutoSizing: 0
   m_fontSizeMin: 18
@@ -593,20 +592,6 @@ MonoBehaviour:
   m_hasFontAssetChanged: 0
   m_baseMaterial: {fileID: 0}
   m_maskOffset: {x: 0, y: 0, z: 0, w: 0}
---- !u!114 &4030843178044687831
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 8223113061208800206}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 749e108ff5691294cb7c1d87f562057b, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  ignoreColor: 0
-  textStyle: 0
 --- !u!1001 &2464430085496101221
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -713,7 +698,7 @@ PrefabInstance:
     - target: {fileID: 7111726950150069549, guid: 065800940920d9a42a59f9760c134625, type: 3}
       propertyPath: m_TargetGraphic
       value: 
-      objectReference: {fileID: 1399809581078391667}
+      objectReference: {fileID: 1994981773457845235}
     m_RemovedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: 065800940920d9a42a59f9760c134625, type: 3}
 --- !u!224 &1099645603480451972 stripped
@@ -721,15 +706,15 @@ RectTransform:
   m_CorrespondingSourceObject: {fileID: 3274631237163180769, guid: 065800940920d9a42a59f9760c134625, type: 3}
   m_PrefabInstance: {fileID: 2464430085496101221}
   m_PrefabAsset: {fileID: 0}
---- !u!114 &1399809581078391667 stripped
+--- !u!114 &1994981773457845235 stripped
 MonoBehaviour:
-  m_CorrespondingSourceObject: {fileID: 3557409943094718998, guid: 065800940920d9a42a59f9760c134625, type: 3}
+  m_CorrespondingSourceObject: {fileID: 4151460418899063446, guid: 065800940920d9a42a59f9760c134625, type: 3}
   m_PrefabInstance: {fileID: 2464430085496101221}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 0}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 9a832df0d7bb845ec878cc0adac39c0f, type: 3}
+  m_Script: {fileID: 11500000, guid: fe87c0e1cc204ed48ad3b37840f39efc, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
 --- !u!114 &4648427162624558152 stripped
