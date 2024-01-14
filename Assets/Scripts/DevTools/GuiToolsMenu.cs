@@ -26,8 +26,6 @@ namespace DevTools
 				GUILayout.Label("Sorry, UiManager isn't available!");
 				return;
 			}
-
-			GuiTool("Set Gui Skin", devMenu, SetGuiSkin);
 		}
 
 		private void GuiTool(string name, DeveloperMenu devMenu, Action<DeveloperMenu, UiManager> action)
@@ -36,11 +34,6 @@ namespace DevTools
 				return;
 			
 			action?.Invoke(devMenu, playerInstance.Value.UiManager);
-		}
-
-		private void SetGuiSkin(DeveloperMenu devMenu, UiManager uiManager)
-		{
-			devMenu.PushMenu(new DevSkinLoader(uiManager));
 		}
 	}
 }

@@ -27,7 +27,6 @@ namespace Modding
 		private AccessibilitySettings? a11ySettings;
 		private UiSettings uiSettings;
 		private IDisposable? settingsObservable;
-		private UserThemeSource userThemeSource = new UserThemeSource();
 		
 		/// <inheritdoc />
 		public override bool IsCoreModule => true;
@@ -45,9 +44,6 @@ namespace Modding
 			
 			// Watch system settings
 			settingsObservable = Context.SettingsManager.ObserveChanges(OnSettingsUpdated);
-		
-			// User-created themes
-			Context.ContentManager.AddContentSource(userThemeSource);
 			
 			// Websites
 			Context.ContentManager.AddContentSource(websites);
@@ -66,16 +62,12 @@ namespace Modding
 		{
 			Context.ContentManager.RemoveContentSource(websites);
 			
-			if (userThemeSource != null)
-				Context.ContentManager.RemoveContentSource(userThemeSource);
-			
 			if (graphicsSettings != null)
 				Context.SettingsManager.UnregisterSettingsCategory(graphicsSettings);
 
 			if (a11ySettings != null)
 				Context.SettingsManager.UnregisterSettingsCategory(a11ySettings);
 
-			userThemeSource = null;
 			settingsObservable?.Dispose();
 			settingsObservable = null;
 		}

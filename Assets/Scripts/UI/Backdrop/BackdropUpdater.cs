@@ -2,9 +2,6 @@
 using System;
 using Core;
 using GamePlatform;
-using UI.Themes.ThemeData;
-using UI.Themes.ThemedElements;
-using UI.Theming;
 using UnityEngine;
 using UnityExtensions;
 using UniRx;

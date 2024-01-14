@@ -1,6 +1,7 @@
 ﻿#nullable enable
 using System;
 using Shell;
+using Shell.Common;
 using UnityEngine;
 
 namespace UI
@@ -13,7 +14,15 @@ namespace UI
 		private static readonly Color cyan = GetPackedColor(0x34B1FDff);
 		private static readonly Color yellow = GetPackedColor(0xCE7B15ff);
 		private static readonly Color purple = GetPackedColor(0x9340FFff);
-		
+
+		public static Color AsUnityColor(this ShellColor shellColor)
+		{
+			if (shellColor.name == ShellColorName.Custom)
+				return new Color(shellColor.r, shellColor.g, shellColor.b, shellColor.a);
+
+			// TODO: Named shell colors
+			return default;
+		}
 
 		public static Color GetPackedColor(uint packedColor)
 		{
