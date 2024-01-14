@@ -1042,8 +1042,7 @@ GameObject:
   - component: {fileID: 2756510905530764679}
   - component: {fileID: 4362876061954745466}
   - component: {fileID: 4039676345795430686}
-  - component: {fileID: 5126846110467644232}
-  - component: {fileID: 7508961094598466173}
+  - component: {fileID: 2653971823527391008}
   m_Layer: 0
   m_Name: Toolbar
   m_TagString: Untagged
@@ -1089,12 +1088,12 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   m_Padding:
-    m_Left: 0
-    m_Right: 0
-    m_Top: 0
-    m_Bottom: 0
+    m_Left: 3
+    m_Right: 3
+    m_Top: 3
+    m_Bottom: 3
   m_ChildAlignment: 3
-  m_Spacing: 0
+  m_Spacing: 3
   m_ChildForceExpandWidth: 0
   m_ChildForceExpandHeight: 0
   m_ChildControlWidth: 1
@@ -1110,7 +1109,7 @@ CanvasRenderer:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 8284510268882241899}
   m_CullTransparentMesh: 1
---- !u!114 &5126846110467644232
+--- !u!114 &2653971823527391008
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -1119,7 +1118,7 @@ MonoBehaviour:
   m_GameObject: {fileID: 8284510268882241899}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: fe87c0e1cc204ed48ad3b37840f39efc, type: 3}
+  m_Script: {fileID: 11500000, guid: 9a832df0d7bb845ec878cc0adac39c0f, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
   m_Material: {fileID: 0}
@@ -1130,32 +1129,59 @@ MonoBehaviour:
   m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []
-  m_Sprite: {fileID: 0}
-  m_Type: 0
-  m_PreserveAspect: 0
-  m_FillCenter: 1
-  m_FillMethod: 4
-  m_FillAmount: 1
-  m_FillClockwise: 1
-  m_FillOrigin: 0
-  m_UseSpriteMesh: 0
-  m_PixelsPerUnitMultiplier: 1
---- !u!114 &7508961094598466173
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 8284510268882241899}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 7b222ca6429fd3146a0f51ad94ee67f9, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  graphicColor: 5
-  useCustomColor: 0
-  customLightColor: {r: 0, g: 0, b: 0, a: 0}
-  customDarkColor: {r: 0, g: 0, b: 0, a: 0}
+  ShapeProperties:
+    FillColor:
+      serializedVersion: 2
+      rgba: 1086555411
+    DrawFill: 1
+    DrawFillShadow: 0
+    DrawOutline: 1
+    OutlineColor:
+      serializedVersion: 2
+      rgba: 4291003667
+    DrawOutlineShadow: 0
+  RoundedProperties:
+    Type: 0
+    ResolutionMode: 0
+    UniformRadius: 15
+    UseMaxRadius: 0
+    TLRadius: 15
+    TLResolution:
+      Resolution: 0
+      FixedResolution: 10
+      ResolutionMaxDistance: 4
+    TRRadius: 15
+    TRResolution:
+      Resolution: 0
+      FixedResolution: 10
+      ResolutionMaxDistance: 4
+    BRRadius: 15
+    BRResolution:
+      Resolution: 0
+      FixedResolution: 10
+      ResolutionMaxDistance: 4
+    BLRadius: 15
+    BLResolution:
+      Resolution: 0
+      FixedResolution: 10
+      ResolutionMaxDistance: 4
+    UniformResolution:
+      Resolution: 0
+      FixedResolution: 10
+      ResolutionMaxDistance: 4
+  OutlineProperties:
+    Type: 2
+    LineWeight: 1
+  ShadowProperties:
+    ShowShape: 1
+    ShowShadows: 1
+    Angle: 0
+    Distance: 0
+    Shadows: []
+    Offset: {x: 0, y: -0}
+  AntiAliasingProperties:
+    AntiAliasing: 1.25
+  Sprite: {fileID: 0}
 --- !u!1 &8660422040912709106
 GameObject:
   m_ObjectHideFlags: 0
@@ -1368,7 +1394,10 @@ PrefabInstance:
       propertyPath: m_TargetGraphic
       value: 
       objectReference: {fileID: 8743011986837492973}
-    m_RemovedComponents: []
+    m_RemovedComponents:
+    - {fileID: 1467466720879965032, guid: dad29b29e48600943bdbb679a578447e, type: 3}
+    - {fileID: 3737334637458402034, guid: dad29b29e48600943bdbb679a578447e, type: 3}
+    - {fileID: 1042049775933889821, guid: dad29b29e48600943bdbb679a578447e, type: 3}
   m_SourcePrefab: {fileID: 100100000, guid: dad29b29e48600943bdbb679a578447e, type: 3}
 --- !u!224 &55663137939024404 stripped
 RectTransform:
