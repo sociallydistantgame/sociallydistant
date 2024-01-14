@@ -11,7 +11,6 @@ GameObject:
   - component: {fileID: 6488754036996992522}
   - component: {fileID: 1048677011354214597}
   - component: {fileID: 8292572827677215402}
-  - component: {fileID: 5515690588004509628}
   - component: {fileID: 4163100945662758011}
   m_Layer: 5
   m_Name: Current Path
@@ -70,8 +69,8 @@ MonoBehaviour:
       m_Calls: []
   m_text: 
   m_isRightToLeft: 0
-  m_fontAsset: {fileID: 11400000, guid: 8f586378b4e144a9851e7b34d9b748ee, type: 2}
-  m_sharedMaterial: {fileID: 2180264, guid: 8f586378b4e144a9851e7b34d9b748ee, type: 2}
+  m_fontAsset: {fileID: 11400000, guid: a97c620d43f1a2940985c9505c0b2192, type: 2}
+  m_sharedMaterial: {fileID: -7565511834693117629, guid: a97c620d43f1a2940985c9505c0b2192, type: 2}
   m_fontSharedMaterials: []
   m_fontMaterial: {fileID: 0}
   m_fontMaterials: []
@@ -95,8 +94,8 @@ MonoBehaviour:
   m_faceColor:
     serializedVersion: 2
     rgba: 4294967295
-  m_fontSize: 36
-  m_fontSizeBase: 36
+  m_fontSize: 12
+  m_fontSizeBase: 12
   m_fontWeight: 400
   m_enableAutoSizing: 0
   m_fontSizeMin: 18
@@ -137,20 +136,6 @@ MonoBehaviour:
   m_hasFontAssetChanged: 0
   m_baseMaterial: {fileID: 0}
   m_maskOffset: {x: 0, y: 0, z: 0, w: 0}
---- !u!114 &5515690588004509628
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1807506933176608543}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 749e108ff5691294cb7c1d87f562057b, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  ignoreColor: 0
-  textStyle: 0
 --- !u!114 &4163100945662758011
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -181,8 +166,6 @@ GameObject:
   m_Component:
   - component: {fileID: 8363377026978806708}
   - component: {fileID: 8488143605581691632}
-  - component: {fileID: 5367424198227540331}
-  - component: {fileID: 553420784926475580}
   - component: {fileID: 4014690765900815135}
   - component: {fileID: 2844059176275255702}
   m_Layer: 5
@@ -225,52 +208,6 @@ CanvasRenderer:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 5620390317867692173}
   m_CullTransparentMesh: 1
---- !u!114 &5367424198227540331
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 5620390317867692173}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: fe87c0e1cc204ed48ad3b37840f39efc, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  m_Material: {fileID: 0}
-  m_Color: {r: 1, g: 1, b: 1, a: 1}
-  m_RaycastTarget: 1
-  m_RaycastPadding: {x: 0, y: 0, z: 0, w: 0}
-  m_Maskable: 1
-  m_OnCullStateChanged:
-    m_PersistentCalls:
-      m_Calls: []
-  m_Sprite: {fileID: 0}
-  m_Type: 0
-  m_PreserveAspect: 0
-  m_FillCenter: 1
-  m_FillMethod: 4
-  m_FillAmount: 1
-  m_FillClockwise: 1
-  m_FillOrigin: 0
-  m_UseSpriteMesh: 0
-  m_PixelsPerUnitMultiplier: 1
---- !u!114 &553420784926475580
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 5620390317867692173}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 7b222ca6429fd3146a0f51ad94ee67f9, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  graphicColor: 5
-  useCustomColor: 0
-  customLightColor: {r: 0, g: 0, b: 0, a: 0}
-  customDarkColor: {r: 0, g: 0, b: 0, a: 0}
 --- !u!114 &4014690765900815135
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -284,12 +221,12 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   m_Padding:
-    m_Left: 12
-    m_Right: 12
-    m_Top: 12
-    m_Bottom: 12
+    m_Left: 0
+    m_Right: 0
+    m_Top: 0
+    m_Bottom: 0
   m_ChildAlignment: 3
-  m_Spacing: 6
+  m_Spacing: 3
   m_ChildForceExpandWidth: 0
   m_ChildForceExpandHeight: 0
   m_ChildControlWidth: 1
@@ -314,6 +251,18 @@ MonoBehaviour:
   forwardButton: {fileID: 6547559073472691119}
   upButton: {fileID: 5243323185362836895}
   createDirectoryButton: {fileID: 1654592697293349499}
+  backPressed:
+    m_PersistentCalls:
+      m_Calls: []
+  forwardPressed:
+    m_PersistentCalls:
+      m_Calls: []
+  upPressed:
+    m_PersistentCalls:
+      m_Calls: []
+  createDirectoryPressed:
+    m_PersistentCalls:
+      m_Calls: []
 --- !u!1001 &937700532138563937
 PrefabInstance:
   m_ObjectHideFlags: 0

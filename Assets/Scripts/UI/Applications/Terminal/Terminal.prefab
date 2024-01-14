@@ -33,8 +33,8 @@ RectTransform:
   m_Father: {fileID: 767516243218133721}
   m_RootOrder: 1
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
-  m_AnchorMin: {x: 0, y: 1}
-  m_AnchorMax: {x: 0, y: 1}
+  m_AnchorMin: {x: 0, y: 0}
+  m_AnchorMax: {x: 0, y: 0}
   m_AnchoredPosition: {x: 0, y: 0}
   m_SizeDelta: {x: 0, y: 0}
   m_Pivot: {x: 0, y: 1}
@@ -93,8 +93,8 @@ MonoBehaviour:
   m_faceColor:
     serializedVersion: 2
     rgba: 4294967295
-  m_fontSize: 36
-  m_fontSizeBase: 36
+  m_fontSize: 12
+  m_fontSizeBase: 12
   m_fontWeight: 400
   m_enableAutoSizing: 0
   m_fontSizeMin: 18
@@ -345,7 +345,7 @@ MonoBehaviour:
   fgColor: {r: 0, g: 0, b: 0, a: 0}
   backgroundColorPlotter: {fileID: 3120867517983499152}
   font: {fileID: 11400000, guid: 01f7b1a20704caa4ea69a70de99e7999, type: 2}
-  fontSize: 14
+  fontSize: 12
   textMeshPro: {fileID: 7313729233040099238}
   asciiBeep: {fileID: 0}
   showBackgroundColor: 0
@@ -544,7 +544,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   font: {fileID: 11400000, guid: 01f7b1a20704caa4ea69a70de99e7999, type: 2}
-  fontSize: 14
+  fontSize: 12
   allowAltScreen: 1
   vtiden: sterm
   tabSpaces: 8
