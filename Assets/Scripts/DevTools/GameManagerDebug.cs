@@ -24,18 +24,6 @@ namespace DevTools
 				GUILayout.Label("Sorry, GameManager isn't available!");
 				return;
 			}
-
-			if (gameManager.Value.CurrentGameMode == GameMode.ThemeCreator)
-			{
-				if (GUILayout.Button("Exit Theme Editor"))
-					gameManager.Value.GoToLoginScreen();
-			}
-
-			if (gameManager.Value.CurrentGameMode != GameMode.ThemeCreator)
-			{
-				if (GUILayout.Button("Enter Theme Editor"))
-					gameManager.Value.EnterThemeEditor();
-			}
 			
 			if (gameManager.Value.IsGameActive)
 			{
