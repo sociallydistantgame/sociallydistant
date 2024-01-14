@@ -143,11 +143,6 @@ namespace GamePlatform
 
 			switch (flow)
 			{
-				case InitializationFlow.ThemeEditor:
-				{
-					await EnterThemeEditor();
-					break;
-				}
 				case InitializationFlow.MostRecentSave:
 				{
 					// Find the most recent save file, if any.
@@ -178,16 +173,6 @@ namespace GamePlatform
 					break;
 				}
 			}
-		}
-
-		public async Task EnterThemeEditor()
-		{
-			if (this.currentGameMode == GameMode.ThemeCreator)
-				return;
-			
-			await EndCurrentGame();
-			
-			SetGameMode(GameMode.ThemeCreator);
 		}
 		
 		public async Task GoToLoginScreen()
@@ -318,8 +303,7 @@ namespace GamePlatform
 		{
 			LoginScreen,
 			MostRecentSave,
-			DebugWorld,
-			ThemeEditor
+			DebugWorld
 		}
 	}
 }
