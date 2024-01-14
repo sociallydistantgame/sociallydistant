@@ -1,12 +1,9 @@
 ﻿#nullable enable
 
-using System;
 using System.Text.RegularExpressions;
-using Architecture;
 using Shell.Common;
 using TMPro;
 using UI.PlayerUI;
-using UI.Themes;
 using UnityEngine;
 using UnityEngine.UI;
 using UnityExtensions;
@@ -69,7 +66,7 @@ namespace UI.Widgets
 
 				if (spriteIcon != null)
 				{
-					spriteIcon.color = uiManager.ThemeService.GetColor(icon.iconColor).AsUnityColor();
+					spriteIcon.color = icon.iconColor.AsUnityColor();
 					spriteIcon.sprite = icon.spriteIcon;
 				}
 			}
@@ -77,7 +74,7 @@ namespace UI.Widgets
 			{
 				if (textIcon != null)
 				{
-					textIcon.color = uiManager.ThemeService.GetColor(icon.iconColor).AsUnityColor();
+					textIcon.color = icon.iconColor.AsUnityColor();
 					textIcon.SetText(Regex.Unescape(icon.textIcon));
 				}
 

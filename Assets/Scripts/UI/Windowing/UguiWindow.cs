@@ -1,18 +1,14 @@
 ﻿#nullable enable
 using System;
 using System.Collections.Generic;
-using Architecture;
 using Shell.Common;
 using Shell.Windowing;
-using TMPro;
-using UI.Themes.ThemedElements;
 using UI.Widgets;
 using UnityEngine;
 using UnityEngine.EventSystems;
 using UnityEngine.Serialization;
 using UnityEngine.UI;
 using UnityExtensions;
-using Utility;
 
 namespace UI.Windowing
 {

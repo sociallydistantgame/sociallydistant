@@ -2,7 +2,6 @@
 
 using System;
 using System.Linq;
-using AcidicGui.Theming;
 using Core;
 using Core.Config;
 using Core.Config.SystemConfigCategories;
@@ -15,35 +14,24 @@ using UI.CharacterCreator;
 using UI.Login;
 using UI.Popovers;
 using UI.Shell;
-using UI.Themes;
-using UI.Themes.ThemeData;
-using UI.Themes.ThemedElements;
-using UI.Theming;
 using UI.Widgets;
 using UI.Windowing;
 using UnityEngine;
-using Utility;
 using UniRx;
+using UnityEngine.EventSystems;
 using UnityEngine.UI;
 using UnityExtensions;
 
 namespace UI.PlayerUI
 {
 	public class UiManager : 
-		OperatingSystemThemeProvider,
+		MonoBehaviour,
 		IShellContext
 	{
-		[Header("Theme")]
-		[SerializeField]
-		private OperatingSystemTheme? defaultTheme = null!;
-		
 		[Header("Dependencies")]
 		[SerializeField]
 		private GameManagerHolder gameManager = null!;
-
-		[SerializeField]
-		private ThemeService themeService = null!;
-
+		
 		[Header("Prefabs")]
 		[SerializeField]
 		private GameObject characterCreatorPrefab = null!;
@@ -91,21 +79,6 @@ namespace UI.PlayerUI
 		private IDisposable? gameModeObserver;
 		private IDisposable? settingsObserver;
 
-		public override bool UseDarkMode => this.themeService.DarkMode;
-
-		/// <inheritdoc />
-		public override TMP_FontAsset GetFont(ThemeFont font)
-		{
-			return font switch
-			{
-				ThemeFont.SansSerif => sansSerifFont,
-				ThemeFont.Serif => serifFont,
-				ThemeFont.Monospace => monospaceFont,
-				_ => sansSerifFont
-			};
-		}
-
-		public IThemeService ThemeService => themeService;
 		public BackdropController Backdrop => backdrop;
 		public PopoverLayer PopoverLayer => popoverLayer;
 		public WindowManager WindowManager => windowManager;
@@ -309,63 +282,9 @@ namespace UI.PlayerUI
 			}
 		}
 		
-		/// <inheritdoc />
-		protected override OperatingSystemTheme? GetMyTheme()
-		{
-			if (themeService != null && themeService.UserTheme != null)
-				return themeService.UserTheme;
-
-			return defaultTheme;
-		}
-
-		/// <inheritdoc />
-		protected override bool OnChangeTheme(OperatingSystemTheme newTheme)
-		{
-			if (themeService == null)
-				return false;
-
-			themeService.UserTheme = newTheme;
-			return true;
-		}
-
-		private async void LoadTheme(string newThemeName)
-		{
-			if (newThemeName == lastThemeName)
-				return;
-
-			if (string.IsNullOrWhiteSpace(newThemeName))
-				newThemeName = "default";
-
-			IThemeAsset? theme = null;
-
-			if (gameManager.Value != null)
-			{
-				theme = gameManager.Value.ContentManager.GetContentOfType<IThemeAsset>()
-					.FirstOrDefault(x => x.Id == newThemeName);
-			}
-
-			if (theme == null)
-			{
-                newThemeName = "default";
-				theme = defaultTheme!;
-			}
-
-			OperatingSystemTheme actualTheme = await theme.LoadAsync();
-            
-			ChangeTheme(actualTheme);
-
-			lastThemeName = newThemeName;
-		}
-		
 		private void OnSettingsUpdated(ISettingsManager settingsManager)
 		{
-			AccessibilitySettings accessibility = settingsManager.FindSettings<AccessibilitySettings>() ?? new AccessibilitySettings(settingsManager);
-			UiSettings? gui = settingsManager.FindSettings<UiSettings>() ?? new UiSettings(settingsManager);
-            
-			this.themeService.DarkMode = gui?.DarkMode == true;
-
-			string themeName = gui?.ThemeName ?? "default";
-			LoadTheme(themeName);
+			// TODO: User interface settings
 		}
 	}
 }

@@ -59,12 +59,6 @@ namespace UI.Widgets
 		[SerializeField]
 		private GraphicPickerWidgetController graphicPickerPrefab = null!;
 		
-		[SerializeField]
-		private NamedColorEntryController namedColorEntryPrefab = null!;
-
-		[SerializeField]
-		private ThemeColorSelectWidgetController themeColorSelectPrefab = null!;
-		
 		/// <inheritdoc />
 		public WidgetRecycleBin RecycleBin
 		{
@@ -148,17 +142,7 @@ namespace UI.Widgets
 		{
 			return RecycleOrInstantiate(this.guildHeaderPrefab, destination);
 		}
-
-		public NamedColorEntryController GetNamedColorEntry(RectTransform destination)
-		{
-			return RecycleOrInstantiate(this.namedColorEntryPrefab, destination);
-		}
-
-		public ThemeColorSelectWidgetController GetThemeColorSelect(RectTransform destination)
-		{
-			return RecycleOrInstantiate(this.themeColorSelectPrefab, destination);
-		}
-
+		
 		public GraphicPickerWidgetController GetGraphicPicker(RectTransform destination)
 		{
 			return RecycleOrInstantiate(this.graphicPickerPrefab, destination);
