@@ -34,12 +34,6 @@ namespace Utility
 		{
 			EditorPrefs.SetInt(GameManager.InitializationFlowEditorPreference, (int) GameManager.InitializationFlow.LoginScreen);
 		}
-
-		[MenuItem(itemName: MenuName + "/Initialization Flow/Theme Editor")]
-		public static void InitFlow_ThemeEditor()
-		{
-			EditorPrefs.SetInt(GameManager.InitializationFlowEditorPreference, (int) GameManager.InitializationFlow.ThemeEditor);
-		}
 		
 		[MenuItem(MenuName + "/Accept legal agreement for script mods")]
 		public static void AcceptScriptModLegalAgreement()
