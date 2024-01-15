@@ -478,8 +478,6 @@ namespace UI.Terminal.SimpleTerminal
 			// Compute scale of the target point size relative to the sampling point size of the font asset.
 			float pointSizeScale = fs / (font.faceInfo.pointSize * font.faceInfo.scale);
 			float emScale = fs * 0.01f;
-
-			float height = ((font.faceInfo.lineHeight - font.faceInfo.underlineOffset) * emScale);
             
             
 
@@ -495,7 +493,9 @@ namespace UI.Terminal.SimpleTerminal
 			
 			Vector3 scale = transform.lossyScale;
 
-			height = fs + font.faceInfo.underlineThickness;
+			float height = font.faceInfo.lineHeight
+			         / font.faceInfo.pointSize
+			         * fs;
 			
 			this.characterWidth = width / scale.x;
 			this.lineHeight = height / scale.y;
