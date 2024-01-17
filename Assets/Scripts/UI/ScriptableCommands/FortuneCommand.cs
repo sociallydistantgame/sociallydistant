@@ -2,6 +2,7 @@
 using Architecture;
 using Misc.Fortune;
 using UnityEngine;
+using System.Threading.Tasks;
 
 namespace UI.ScriptableCommands
 {
@@ -12,9 +13,10 @@ namespace UI.ScriptableCommands
 		private FortunesTable fortunesTable = null!;
 		
 		/// <inheritdoc />
-		protected override void OnExecute()
+		protected override Task OnExecute()
 		{
 			Console.WriteLine(fortunesTable.GetRandomFortune().TrimEnd());
+			return Task.CompletedTask;
 		}
 	}
 }

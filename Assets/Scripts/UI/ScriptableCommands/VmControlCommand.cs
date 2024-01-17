@@ -3,6 +3,7 @@ using System;
 using Architecture;
 using UnityEngine;
 using Utility;
+using System.Threading.Tasks;
 
 namespace UI.ScriptableCommands
 {
@@ -10,12 +11,12 @@ namespace UI.ScriptableCommands
 	public class VmControlCommand : ScriptableCommand
 	{
 		/// <inheritdoc />
-		protected override void OnExecute()
+		protected override Task OnExecute()
 		{
 			if (this.Arguments.Length < 1)
 			{
 				PrintUsage();
-				return;
+				return Task.CompletedTask;
 			}
 
 			string command = Arguments[0];
@@ -29,6 +30,8 @@ namespace UI.ScriptableCommands
 					PrintUsage();
 					break;
 			}
+			
+			return Task.CompletedTask;
 		}
 
 		private void PrintUsage()

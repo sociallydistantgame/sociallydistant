@@ -2,6 +2,7 @@
 using Architecture;
 using OS.Network;
 using UnityEngine;
+using System.Threading.Tasks;
 
 namespace UI.ScriptableCommands
 {
@@ -9,7 +10,7 @@ namespace UI.ScriptableCommands
 	public class NetworkInfoCommand : ScriptableCommand
 	{
 		/// <inheritdoc />
-		protected override void OnExecute()
+		protected override Task OnExecute()
 		{
 			Console.WriteLine();
 			Console.WriteLine("Network Configuration");
@@ -19,7 +20,7 @@ namespace UI.ScriptableCommands
 			{
 				Console.WriteLine("  No network interfaces found.");
 				Console.WriteLine();
-				return;
+				return Task.CompletedTask;
 			}
 			
 			foreach (NetworkInterfaceInformation iface in this.Network.GetInterfaceInformation())
@@ -31,6 +32,8 @@ namespace UI.ScriptableCommands
     Subnet mask:          {iface.SubnetMask}
     Default gateway:      {iface.DefaultGateway}");
 			}
+			
+			return Task.CompletedTask;
 		}
 	}
 }

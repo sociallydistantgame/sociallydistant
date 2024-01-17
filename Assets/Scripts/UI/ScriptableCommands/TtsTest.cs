@@ -3,6 +3,7 @@ using System.Text;
 using Accessibility;
 using Architecture;
 using UnityEngine;
+using System.Threading.Tasks;
 
 namespace UI.ScriptableCommands
 {
@@ -13,13 +14,12 @@ namespace UI.ScriptableCommands
 		private ScreenReaderHolder screenReader = null!;
 		
 		/// <inheritdoc />
-		protected override async void OnExecute()
+		protected override async Task OnExecute()
 		{
 			if (screenReader == null || screenReader.Value == null)
 			{
 				Console.WriteLine("Speech service not active.");
 				this.EndProcess();
-				return;
 			}
 
 			var textBuilder = new StringBuilder();

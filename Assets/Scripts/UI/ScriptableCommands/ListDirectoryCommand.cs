@@ -4,6 +4,7 @@ using Architecture;
 using Core;
 using UnityEngine;
 using Utility;
+using System.Threading.Tasks;
 
 namespace UI.ScriptableCommands
 {
@@ -11,7 +12,7 @@ namespace UI.ScriptableCommands
 	public class ListDirectoryCommand : ScriptableCommand
 	{
 		/// <inheritdoc />
-		protected override void OnExecute()
+		protected override Task OnExecute()
 		{
 			// TODO: Listing directories specified in arguments
 			// TODO: Colorful output
@@ -20,7 +21,7 @@ namespace UI.ScriptableCommands
 			if (!FileSystem.DirectoryExists(CurrentWorkingDirectory))
 			{
 				Console.WriteLine($"ls: {CurrentWorkingDirectory}: Directory not found.");
-				return;
+				return Task.CompletedTask;
 			}
 
 			foreach (string directory in FileSystem.GetDirectories(CurrentWorkingDirectory))
@@ -33,7 +34,9 @@ namespace UI.ScriptableCommands
 			{
 				string filename = PathUtility.GetFileName(directory);
 				Console.WriteLine(filename);
-			} 
+			}
+			
+			return Task.CompletedTask;
 		}
 		
 	}
