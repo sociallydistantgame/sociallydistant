@@ -9,6 +9,8 @@ namespace OS.Devices
 		public readonly char Character;
 		public readonly KeyModifiers Modifiers;
 
+		public bool HasModifiers => this.Modifiers != KeyModifiers.None;
+		
 		public ConsoleInputData(KeyCode keyCode, KeyModifiers modifiers)
 		{
 			this.KeyCode = keyCode;

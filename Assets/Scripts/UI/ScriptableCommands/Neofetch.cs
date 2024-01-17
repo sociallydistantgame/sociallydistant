@@ -6,6 +6,7 @@ using System.Linq;
 using System.Text;
 using Architecture;
 using UnityEngine;
+using System.Threading.Tasks;
 
 namespace UI.ScriptableCommands
 {
@@ -50,7 +51,7 @@ namespace UI.ScriptableCommands
 		private readonly string colors = "\x1b[41m   \x1b[42m   \x1b[43m   \x1b[44m   \x1b[45m   \x1b[46m   \x1b[47m   \x1b[40m   \r\n\x1b[101m   \x1b[102m   \x1b[103m   \x1b[104m   \x1b[105m   \x1b[106m   \x1b[107m   \x1b[100m   \x1b[0m";
 		
 		/// <inheritdoc />
-		protected override void OnExecute()
+		protected override Task OnExecute()
 		{
 			var systemInformation = new Dictionary<string, string>();
 			
@@ -67,6 +68,7 @@ namespace UI.ScriptableCommands
 			string text = BuildText(UserName, HostName, systemInformation);
 			
 			Console.WriteLine(text);
+			return Task.CompletedTask;
 		}
 
 		private string BuildText(string username, string hostname, Dictionary<string, string> systemInformation)

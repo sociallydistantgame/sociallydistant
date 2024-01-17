@@ -4,6 +4,7 @@ using System.Linq;
 using System.Text;
 using Architecture;
 using UnityEngine;
+using System.Threading.Tasks;
 
 namespace UI.ScriptableCommands
 {
@@ -17,7 +18,7 @@ namespace UI.ScriptableCommands
                 ||     ||
 ";
 		/// <inheritdoc />
-		protected override void OnExecute()
+		protected override Task OnExecute()
 		{
 			string text = string.Empty;
 			if (Arguments.Length > 0)
@@ -36,6 +37,7 @@ namespace UI.ScriptableCommands
 			
 			Console.WriteLine(speechBubble.Trim());
 			Console.WriteLine(cow);
+			return Task.CompletedTask;
 		}
 
 

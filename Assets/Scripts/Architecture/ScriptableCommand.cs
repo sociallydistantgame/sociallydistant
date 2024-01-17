@@ -34,13 +34,13 @@ namespace Architecture
 			Arguments = arguments;
 			FileSystem = process.User.Computer.GetFileSystem(process.User);
 			
-			OnExecute();
+			await OnExecute();
 
 			if (autoKillOnComplete)
 				process.Kill();
 		}
 
-		protected abstract void OnExecute();
+		protected abstract Task OnExecute();
 
 		protected void EndProcess()
 		{

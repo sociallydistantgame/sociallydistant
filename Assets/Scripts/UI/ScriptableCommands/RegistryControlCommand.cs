@@ -6,6 +6,7 @@ using Architecture;
 using Core.Config;
 using GamePlatform;
 using UnityEngine;
+using System.Threading.Tasks;
 
 namespace UI.ScriptableCommands
 {
@@ -16,19 +17,19 @@ namespace UI.ScriptableCommands
 		private GameManagerHolder gameManagerHolder = null!;
 		
 		/// <inheritdoc />
-		protected override void OnExecute()
+		protected override Task OnExecute()
 		{
 			if (gameManagerHolder.Value == null)
 			{
 				Console.WriteLine("Could not connect to the System Settings service.");
 				EndProcess();
-				return;
+				return Task.CompletedTask;
 			}
 			
 			if (Arguments.Length == 0)
 			{
 				PrintUsage();
-				return;
+				return Task.CompletedTask;
 			}
 
 			ISettingsManager settings = gameManagerHolder.Value.SettingsManager;
@@ -80,6 +81,8 @@ namespace UI.ScriptableCommands
 					PrintUsage();
 					break;
 			}
+			
+			return Task.CompletedTask;
 		}
 
 		private void ListKeys(ISettingsManager settings)

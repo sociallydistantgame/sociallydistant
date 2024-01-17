@@ -1,6 +1,7 @@
 ﻿#nullable enable
 using System;
 using UnityEngine;
+using System.Threading.Tasks;
 
 namespace Architecture
 {
@@ -11,9 +12,10 @@ namespace Architecture
 		private string manualUrl = "https://man.sociallydistantgame.com/";
 		
 		/// <inheritdoc />
-		protected override void OnExecute()
+		protected override Task OnExecute()
 		{
 			System.Diagnostics.Process.Start(manualUrl);
+			return Task.CompletedTask;
 		}
 	}
 }
