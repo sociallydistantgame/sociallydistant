@@ -1,4 +1,5 @@
 ﻿using System;
+using UnityEngine;
 
 namespace UI.Terminal.SimpleTerminal
 {
@@ -93,6 +94,66 @@ namespace UI.Terminal.SimpleTerminal
 				return;
 
 			this.Write(ch.ToString());
+		}
+
+		public void Raw(KeyCode keyCode, bool modifierControl, bool modifierAlt, bool modifierShift)
+		{
+			var modifierMask = 0;
+
+			if (modifierControl)
+				modifierMask += 1;
+
+			if (modifierAlt)
+				modifierMask += 2;
+
+			if (modifierShift)
+				modifierMask += 4;
+
+			if (modifierMask == 0)
+			{
+				switch (keyCode)
+				{
+					case KeyCode.LeftArrow:
+						this.LeftArrow();
+						return;
+					case KeyCode.RightArrow:
+						this.RightArrow();
+						return;
+					case KeyCode.UpArrow:
+						this.UpArrow();
+						return;
+					case KeyCode.DownArrow:
+						this.DownArrow();
+						return;
+					case KeyCode.Backspace:
+						this.Backspace();
+						return;
+					case KeyCode.KeypadEnter:
+					case KeyCode.Return:
+						this.Enter();
+						return;
+					case KeyCode.Delete:
+						this.Delete();
+						return;
+					case KeyCode.Home:
+						this.Home();
+						return;
+					case KeyCode.End:
+						this.End();
+						return;
+				}
+			}
+			
+			// Anything else is written as an escape sequence with a tilde terminator.
+			this.Char('\x1b');
+			this.Char('[');
+
+			var rawKeyCode = (int) keyCode;
+			this.Write(rawKeyCode.ToString());
+			this.Char(';');
+			this.Write(modifierMask.ToString());
+			
+			this.Char('~');
 		}
 	}
 

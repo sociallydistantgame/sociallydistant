@@ -12,13 +12,13 @@ namespace UI.Shell
 		private readonly ITextConsole input;
 		private readonly Stream fileStream;
 		private readonly StreamWriter fileWriter;
-
-		public bool SuppressInput
-		{
-			get => input.SuppressInput;
-			set => input.SuppressInput = value;
-		}
 		
+		/// <inheritdoc />
+		public ConsoleInputData? ReadInput()
+		{
+			return input.ReadInput();
+		}
+
 		public FileOutputConsole(ITextConsole input, Stream output)
 		{
 			this.input = input;
@@ -34,6 +34,9 @@ namespace UI.Shell
 		}
 
 		/// <inheritdoc />
+		public bool IsInteractive => input.IsInteractive;
+
+		/// <inheritdoc />
 		public void ClearScreen()
 		{
 			fileWriter.Flush();
@@ -45,12 +48,6 @@ namespace UI.Shell
 		public void WriteText(string text)
 		{
 			fileWriter.Write(text);
-		}
-
-		/// <inheritdoc />
-		public bool TryDequeueSubmittedInput(out string input)
-		{
-			return this.input.TryDequeueSubmittedInput(out input);
 		}
 	}
 }

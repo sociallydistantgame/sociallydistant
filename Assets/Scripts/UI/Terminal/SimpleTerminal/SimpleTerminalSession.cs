@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Runtime.InteropServices;
 using System.Text;
@@ -11,7 +12,7 @@ using static UI.Terminal.SimpleTerminal.Data.EmulatorConstants;
 
 namespace UI.Terminal.SimpleTerminal
 {
-    public class SimpleTerminalSession : IAutoCompletedConsole
+    public class SimpleTerminalSession : ITextConsoleWithPhysicalDisplay
     {
         private LineEditorState lineEditorState;
         private readonly SimpleTerminal term;
@@ -23,6 +24,7 @@ namespace UI.Terminal.SimpleTerminal
         private STREscape strescseq = new STREscape();
         private CSIEscape csiescseq = new CSIEscape();
         private readonly List<string> completions = new List<string>();
+        private readonly ConcurrentQueue<ConsoleInputData> pendingKeys = new ConcurrentQueue<ConsoleInputData>();
 
         private int prevLineCount;
         private StringBuilder line = new StringBuilder();
@@ -48,17 +50,21 @@ namespace UI.Terminal.SimpleTerminal
             set => term.SuppressInput = value;
         }
 
+        /// <inheritdoc />
+        public ConsoleInputData? ReadInput()
+        {
+            this.PtyRead();
+
+            if (!pendingKeys.TryDequeue(out ConsoleInputData data))
+                return null;
+                
+            return data;
+        }
+
         public SimpleTerminalSession(SimpleTerminal term, PseudoTerminal pty)
         {
             this.term = term;
             this.pty = pty;
-        }
-
-        public void ResetInputStartPosition()
-        {
-            this.lineEditorState.wasPositionReset = this.lineEditorState.isEditing;
-            this.lineEditorState.isEditing = false;
-            
         }
 
         private void InsertAutoComplete()
@@ -77,82 +83,34 @@ namespace UI.Terminal.SimpleTerminal
             cursor = line.Length;
         }
 
-        private void HandleCompletionsUp()
-        {
-            if (selectedCompletion > 0)
-                selectedCompletion--;
-            else
-                this.WriteText("\a");
-        }
-
-        private void HandleCompletionsDown()
-        {
-            if (completions != null && selectedCompletion < completions.Count - 1)
-                selectedCompletion++;
-            else
-                this.WriteText("\a");
-        }
-
         private void HandleLeftArrow()
         {
-            if (this.cursor > 0)
-                this.cursor--;
-            else
-                this.WriteText("\a");
+            this.pendingKeys.Enqueue(new ConsoleInputData(KeyCode.LeftArrow));
         }
 
         private void HandleUpArrow()
         {
-            if (completions.Count > 0)
-            {
-                HandleCompletionsUp();
-                return;
-            }
-
-            if (this.cursor > 0)
-                this.cursor = 0;
-            else
-                // TODO: Insert next item in history
-                this.WriteText("\a");
+            this.pendingKeys.Enqueue(new ConsoleInputData(KeyCode.UpArrow));
         }
 
         private void HandleDownArrow()
         {
-            if (completions.Count > 0)
-            {
-                HandleCompletionsDown();
-                return;
-            }
-            
-            if (this.cursor < this.line.Length)
-                this.cursor = this.line.Length;
-            else
-                // TODO: Insert next item in future
-                this.WriteText("\a");
+            this.pendingKeys.Enqueue(new ConsoleInputData(KeyCode.DownArrow));
         }
 
         private void HandleRightArrow()
         {
-            if (this.cursor < this.line.Length)
-                this.cursor++;
-            else
-                this.WriteText("\a");
+            this.pendingKeys.Enqueue(new ConsoleInputData(KeyCode.RightArrow));
         }
 
         private void HandleHome()
         {
-            if (this.cursor > 0)
-                this.cursor = 0;
-            else
-                this.WriteText("\a");
+            this.pendingKeys.Enqueue(new ConsoleInputData(KeyCode.Home));
         }
 
         private void HandleEnd()
         {
-            if (this.cursor < this.line.Length)
-                this.cursor = this.line.Length;
-            else
-                this.WriteText("\a");
+            this.pendingKeys.Enqueue(new ConsoleInputData(KeyCode.End));
         }
 
         public void WriteText(string text)
@@ -170,6 +128,9 @@ namespace UI.Terminal.SimpleTerminal
             byte[] bytes = Encoding.UTF8.GetBytes(text);
             this.pty.Write(bytes, 0, bytes.Length);
         }
+
+        /// <inheritdoc />
+        public bool IsInteractive => true;
 
         public void ClearScreen()
         {
@@ -340,9 +301,7 @@ namespace UI.Terminal.SimpleTerminal
                     return;
                 }
 
-                this.line.Insert(this.cursor, (char)u);
-                this.cursor++;
-                this.completionsAreDirty = true;
+                this.pendingKeys.Enqueue(new ConsoleInputData((char) u));
             }
         }
 
@@ -351,87 +310,25 @@ namespace UI.Terminal.SimpleTerminal
             switch (ascii)
             {
                 case '\t': /* HT */
-                    this.InsertAutoComplete();
+                    this.pendingKeys.Enqueue(new ConsoleInputData(KeyCode.Tab));
                     return;
                 case '\b': /* BS */
-                    if (this.cursor > 0)
-                    {
-                        this.completionsAreDirty = true;
-                        this.cursor--;
-                        this.line.Remove(this.cursor, 1);
-                    }
-                    else
-                    {
-                        this.WriteText("\a");
-                    }
-
+                    this.pendingKeys.Enqueue(new ConsoleInputData(KeyCode.Backspace));
                     return;
                 case '\r': /* CR */
-                    this.lineQueue.Enqueue(this.line.ToString());
-                    this.line.Length = 0;
-                    this.cursor = 0;
-                    this.completionsAreDirty = true;
+                    this.pendingKeys.Enqueue(new ConsoleInputData(KeyCode.Return));
                     return;
-                case '\f': /* LF [IGNORED] */
-                case '\v': /* VT [IGNORED] */
-                case '\n': /* LF [IGNORED] */
-                case '\a': /* BEL [IGNORED] */
-                    break;
                 case 0x1b: /* ESC */
                     this.CsiReset();
                     this.lineEditorState.esc &=
                         ~(EscapeState.ESC_CSI | EscapeState.ESC_ALTCHARSET | EscapeState.ESC_TEST);
                     this.lineEditorState.esc |= EscapeState.ESC_START;
                     return;
-                case 0x0e: /* SO (LS1 -- Locking shift 1) [IGNORED] */
-                case 0x0f: /* SI (LS0 -- Locking shift 0) [IGNORED] */
-                case 0x1a: /* SUB [IGNORED] */
-                    break;
                 case 0x18: /* CAN */
                     this.CsiReset();
                     break;
-                case 0x05: /* ENQ (IGNORED) */
-                case 0x00: /* NUL (IGNORED) */
-                case 0x11: /* XON (IGNORED) */
-                case 0x13: /* XOFF (IGNORED) */
-                    break;
                 case 0x7f: /* DEL */
-                    if (this.cursor < this.line.Length)
-                    {
-                        completionsAreDirty = true;
-                        this.line.Remove(this.cursor, 1);
-                    }
-                    else
-                        this.WriteText("\a");
-                    break;
-                case 0x80: /* PAD [IGNORED] */
-                case 0x81: /* HOP [IGNORED] */
-                case 0x82: /* BPH [IGNORED] */
-                case 0x83: /* NBH [IGNORED] */
-                case 0x84: /* IND [IGNORED] */
-                case 0x85: /* NEL -- Next line [IGNORED] */
-                case 0x86: /* SSA [IGNORED] */
-                case 0x87: /* ESA [IGNORED] */
-                case 0x88: /* HTS -- Horizontal tab stop [IGNORED] */
-                case 0x89: /* HTJ [IGNORED] */
-                case 0x8a: /* VTS [IGNORED] */
-                case 0x8b: /* PLD [IGNORED] */
-                case 0x8c: /* PLU [IGNORED] */
-                case 0x8d: /* RI [IGNORED] */
-                case 0x8e: /* SS2 [IGNORED] */
-                case 0x8f: /* SS3 [IGNORED] */
-                case 0x91: /* PU1 [IGNORED] */
-                case 0x92: /* PU2 [IGNORED] */
-                case 0x93: /* STS [IGNORED] */
-                case 0x94: /* CCH [IGNORED] */
-                case 0x95: /* MW [IGNORED] */
-                case 0x96: /* SPA [IGNORED] */
-                case 0x97: /* EPA [IGNORED] */
-                case 0x98: /* SOS [IGNORED] */
-                case 0x99: /* SGCI [IGNORED] */
-                case 0x9a: /* DECID -- Identify Terminal [IGNORED] */
-                case 0x9b: /* CSI [IGNORED] */
-                case 0x9c: /* ST [IGNORED] */
+                    this.pendingKeys.Enqueue(new ConsoleInputData(KeyCode.Delete));
                     break;
                 case 0x90: /* DCS -- Device Control String */
                 case 0x9d: /* OSC -- Operating System Command */
@@ -544,10 +441,8 @@ namespace UI.Terminal.SimpleTerminal
                     case 'K': /* EL -- Clear line */
                         goto unknown;
                     case 'S': /* SU -- Scroll <n> line up */
-                        this.HandleCompletionsUp();
                         break;
                     case 'T': /* SD -- Scroll <n> line down */
-                        this.HandleCompletionsDown();
                         break;
                     case 'L': /* IL -- Insert <n> blank lines */
                     case 'l': /* RM -- Reset Mode */
@@ -733,5 +628,17 @@ namespace UI.Terminal.SimpleTerminal
             public EscapeState esc;
             public bool wasPositionReset;
         }
+
+        /// <inheritdoc />
+        public int CursorLeft => term.CursorLeft;
+
+        /// <inheritdoc />
+        public int CursorTop => term.CursorTop;
+
+        /// <inheritdoc />
+        public int Width => term.Columns;
+
+        /// <inheritdoc />
+        public int Height => term.Rows;
     }
 }

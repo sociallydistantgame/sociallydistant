@@ -237,49 +237,23 @@ namespace UI.Terminal.SimpleTerminal
                                      || alt
                                      || shift;
 
-                    switch (ev.keyCode)
+
+
+                    // KeyCode.None means we're getting text, send a character instead.
+                    if (ev.keyCode == KeyCode.None)
                     {
-                        case KeyCode.PageUp when !modifiers:
-                            simpleTerminal.RegionScrollUp(-1);
-                            break;
-                        case KeyCode.PageDown when !modifiers:
-                            simpleTerminal.RegionScrollDown(-1);
-                            break;
-
-                        case KeyCode.Delete when !modifiers:
-                            simpleTerminal.Input.Delete();
-                            break;
-                        case KeyCode.UpArrow when !modifiers:
-                            simpleTerminal.Input.UpArrow();
-                            break;
-                        case KeyCode.DownArrow when !modifiers:
-                            simpleTerminal.Input.DownArrow();
-                            break;
-                        case KeyCode.RightArrow when !modifiers:
-                            simpleTerminal.Input.RightArrow();
-                            break;
-                        case KeyCode.LeftArrow when !modifiers:
-                            simpleTerminal.Input.LeftArrow();
-                            break;
-                        case KeyCode.End when !modifiers:
-                            simpleTerminal.Input.End();
-                            break;
-                        case KeyCode.Home when !modifiers:
-                            simpleTerminal.Input.Home();
-                            break;
-                        case KeyCode.Backspace when !modifiers:
-                            simpleTerminal.Input.Backspace();
-                            break;
-                        case KeyCode.Return when !modifiers :
-                        case KeyCode.KeypadEnter when !modifiers:
-                            simpleTerminal.Input.Enter();
-                            break;
-                        case { } when ev.character != '\0':
-                            char ch = ev.character;
-                            simpleTerminal.Input.Char(ch);
-
-                            break;
+                        simpleTerminal.Input.Char(ev.character);
+                        continue;
                     }
+
+                    bool isFunctionKey = ev.functionKey;
+                    bool isSpecial = control || alt;
+                    bool isPrintable = !char.IsControl((char) ev.keyCode);
+
+                    if (isPrintable && !isFunctionKey && !isSpecial)
+                        continue;
+                    
+                    simpleTerminal.Input.Raw(ev.keyCode, control, alt, shift);
                 }
 
             eventData.Use();

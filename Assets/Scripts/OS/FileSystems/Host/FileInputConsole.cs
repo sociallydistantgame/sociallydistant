@@ -13,13 +13,20 @@ namespace OS.FileSystems.Host
 		private readonly ITextConsole output;
 		private readonly Stream fileStream;
 		private readonly StreamReader fileReader;
-
-		public bool SuppressInput
-		{
-			get => output.SuppressInput;
-			set => output.SuppressInput = value;
-		}
 		
+		/// <inheritdoc />
+		public ConsoleInputData? ReadInput()
+		{
+			if (fileReader.EndOfStream)
+				return null;
+
+			int nextChar = fileReader.Read();
+			if (nextChar <= 0)
+				return null;
+
+			return new ConsoleInputData((char) nextChar);
+		}
+
 		public FileInputConsole(ITextConsole output, Stream fileStream)
 		{
 			this.output = output;
@@ -36,6 +43,9 @@ namespace OS.FileSystems.Host
 			if (output is IDisposable disposable)
 				disposable.Dispose();
 		}
+
+		/// <inheritdoc />
+		public bool IsInteractive => false;
 
 		/// <inheritdoc />
 		public void ClearScreen()
