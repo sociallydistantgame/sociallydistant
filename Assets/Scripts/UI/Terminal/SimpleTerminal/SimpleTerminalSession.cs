@@ -459,22 +459,38 @@ namespace UI.Terminal.SimpleTerminal
                     case 'u': /* DECRC -- Restore cursor position (ANSI.SYS) */
                     case ' ':
                         goto unknown;
-                    case '~':
-                        switch (this.csiescseq.arg[0])
-                        {
-                            case 1:
-                                this.HandleHome();
-                                break;
-                            case 4:
-                                this.HandleEnd();
-                                break;
-                        }
-
+                    case '~': // Socially Distant keystroke events. See https://man.sociallydistantgame.com/index.php/Terminal_Escape_Sequences#Keystroke_events
+                        if (csiescseq.narg < 2)
+                            return;
+                        
+                        DecodeAndSendKeystroke(csiescseq.arg[0], csiescseq.arg[1]);
                         break;
                 }
             }
         }
 
+        private void DecodeAndSendKeystroke(int keyCode, int modifiersMask)
+        {
+            bool control = (modifiersMask & 1) != 0;
+            bool alt = (modifiersMask & 2) != 0;
+            bool shift = (modifiersMask & 4) != 0;
+
+            var unityKeyCode = (KeyCode) keyCode;
+
+            KeyModifiers modifiers = default;
+
+            if (control)
+                modifiers |= KeyModifiers.Control;
+
+            if (alt)
+                modifiers |= KeyModifiers.Alt;
+
+            if (shift)
+                modifiers |= KeyModifiers.Shift;
+            
+            pendingKeys.Enqueue(new ConsoleInputData(unityKeyCode, modifiers));
+        }
+        
         private bool EscHandle(uint ascii)
         {
             switch (ascii)

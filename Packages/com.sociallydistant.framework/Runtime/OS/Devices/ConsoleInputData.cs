@@ -9,6 +9,13 @@ namespace OS.Devices
 		public readonly char Character;
 		public readonly KeyModifiers Modifiers;
 
+		public ConsoleInputData(KeyCode keyCode, KeyModifiers modifiers)
+		{
+			this.KeyCode = keyCode;
+			this.Modifiers = modifiers;
+			this.Character = '\0';
+		}
+		
 		public ConsoleInputData(char character)
 		{
 			this.Character = character;
