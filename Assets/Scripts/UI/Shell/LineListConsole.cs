@@ -9,7 +9,16 @@ namespace UI.Shell
 		private int readPosition = 0;
 		
 		public bool SuppressInput { get; set; }
-		
+
+		/// <inheritdoc />
+		public ConsoleInputData? ReadInput()
+		{
+			return null;
+		}
+
+		/// <inheritdoc />
+		public bool IsInteractive => false;
+
 		/// <inheritdoc />
 		public void ClearScreen()
 		{

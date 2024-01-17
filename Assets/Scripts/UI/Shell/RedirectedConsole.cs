@@ -6,22 +6,21 @@ namespace UI.Shell
 	{
 		private readonly ITextConsole input;
 		private readonly ITextConsole output;
-
-		public bool SuppressInput
-		{
-			get => input.SuppressInput && output.SuppressInput;
-			set
-			{
-				this.input.SuppressInput = value;
-				this.output.SuppressInput = value;
-			}
-		}
 		
+		/// <inheritdoc />
+		public ConsoleInputData? ReadInput()
+		{
+			return input.ReadInput();
+		}
+
 		public RedirectedConsole(ITextConsole input, ITextConsole output)
 		{
 			this.input = input;
 			this.output = output;
 		}
+
+		/// <inheritdoc />
+		public bool IsInteractive => input.IsInteractive;
 
 		/// <inheritdoc />
 		public void ClearScreen()
@@ -33,12 +32,6 @@ namespace UI.Shell
 		public void WriteText(string text)
 		{
 			output.WriteText(text);
-		}
-
-		/// <inheritdoc />
-		public bool TryDequeueSubmittedInput(out string input)
-		{
-			return this.input.TryDequeueSubmittedInput(out input);
 		}
 	}
 }

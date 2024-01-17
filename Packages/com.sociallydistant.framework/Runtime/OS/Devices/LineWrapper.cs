@@ -1,7 +1,8 @@
-﻿using System.Collections.Generic;
+﻿#nullable enable
 using System.Text;
+using System.Collections.Generic;
 
-namespace UI.Terminal.SimpleTerminal
+namespace OS.Devices
 {
 	public class LineWrapper
 	{

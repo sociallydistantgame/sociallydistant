@@ -332,14 +332,14 @@ namespace UI.Terminal.SimpleTerminal
 			var underline = false;
 			var strikethrough = false;
 
-			int currentRow = 0;
-			int collectedWhitespace = 0;
+			var currentRow = 0;
+			var collectedWhitespace = 0;
 
 			this.stringBuilder.Length = 0;
 
 			Color color = fgColor;
 			
-			for (int i = 0; i < colorCells.Length; i++)
+			for (var i = 0; i < colorCells.Length; i++)
 			{
 				ref ColorCell cell = ref colorCells[i];
 

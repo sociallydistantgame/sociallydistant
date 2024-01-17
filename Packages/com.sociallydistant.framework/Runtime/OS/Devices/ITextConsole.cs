@@ -4,9 +4,10 @@ namespace OS.Devices
 {
 	public interface ITextConsole
 	{
+		bool IsInteractive { get; }
+		
 		void ClearScreen();
 		void WriteText(string text);
-		bool TryDequeueSubmittedInput(out string input);
-		bool SuppressInput { get; set; }
+		ConsoleInputData? ReadInput();
 	}
 }

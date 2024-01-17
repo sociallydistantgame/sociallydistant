@@ -1,9 +1,7 @@
 ﻿#nullable enable
 
 using System;
-using System.Collections;
 using System.Collections.Generic;
-using System.IO;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -114,12 +112,8 @@ namespace UI.Shell
 			if (consoleDevice == null)
 				return string.Empty;
 
-			string text;
-			
-			while (!consoleDevice.TryDequeueSubmittedInput(out text))
-				await Task.Yield();
-
-			return text;
+			var lineEditor = new OS.Devices.LineEditor(consoleDevice);
+			return await lineEditor.ReadLineAsync();
 		}
 		
 		private async Task<string> ReadLine()

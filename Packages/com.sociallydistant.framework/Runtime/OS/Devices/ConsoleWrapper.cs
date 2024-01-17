@@ -1,22 +1,21 @@
 ﻿#nullable enable
 
 using System;
+using System.Threading.Tasks;
 
 namespace OS.Devices
 {
 	public class ConsoleWrapper
 	{
 		private readonly ITextConsole textConsole;
+		private readonly LineEditor lineEditor;
 
-		public bool SuppressInput
-		{
-			get => textConsole.SuppressInput;
-			set => textConsole.SuppressInput = value;
-		}
+		public bool IsInteractive => textConsole.IsInteractive;
 		
 		public ConsoleWrapper(ITextConsole textConsole)
 		{
 			this.textConsole = textConsole;
+			this.lineEditor =  new LineEditor(textConsole);
 		}
 
 		public void Clear()
@@ -50,7 +49,30 @@ namespace OS.Devices
 
 		public bool ReadLine(out string text)
 		{
-			return textConsole.TryDequeueSubmittedInput(out text);
+			return lineEditor.Update(out text);
+		}
+
+		public async Task<string> ReadLineAsync()
+		{
+			return await lineEditor.ReadLineAsync();
+		}
+		
+		public ConsoleInputData? ReadKey()
+		{
+			return textConsole.ReadInput();
+		}
+
+		public async Task<ConsoleInputData> ReadKeyAsync()
+		{
+			ConsoleInputData? data = ReadKey();
+
+			while (!data.HasValue)
+			{
+				await Task.Yield();
+				data = ReadKey();
+			}
+
+			return data.Value;
 		}
 	}
 }
