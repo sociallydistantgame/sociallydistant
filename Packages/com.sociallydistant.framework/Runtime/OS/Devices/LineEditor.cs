@@ -25,7 +25,17 @@ namespace OS.Devices
 		private int selectedCompletion;
 		private int lastCursorX;
 		private int lastCursorY;
+		private IAutoCompleteSource? autoCompleteSource;
+		private bool completionsAreDirty = false;
 
+		public IAutoCompleteSource? AutoCompleteSource
+		{
+			get => autoCompleteSource;
+			set => autoCompleteSource = value;
+		}
+		
+		public bool UsePasswordChars { get; set; }
+		
 		public LineEditor(ITextConsole console)
 		{
 			this.console = console;
@@ -159,7 +169,8 @@ namespace OS.Devices
 
 			if (!needsRender)
 				return;
-			
+
+			this.UpdateCompletions();
 			this.RenderLineEditor();
 		}
 
@@ -168,7 +179,7 @@ namespace OS.Devices
 			ConsoleInputData? readData = console.ReadInput();
 			if (!readData.HasValue)
 				return false;
-
+			
 			HandleInput(readData.Value);
 			return true;
 		}
@@ -179,9 +190,30 @@ namespace OS.Devices
 			{
 				this.lineBuilder.Insert(caretIndex, input.Character);
 				caretIndex++;
+				completionsAreDirty = true;
 				return;
 			}
 
+			// Interactive mode keystrokes
+			if (console.IsInteractive)
+			{
+				switch (input.KeyCode)
+				{
+					// Insert selected completion
+					case KeyCode.Tab when !input.HasModifiers && !UsePasswordChars:
+						this.InsertAutoComplete();
+						break;
+					
+					case KeyCode.UpArrow when !input.HasModifiers && !UsePasswordChars:
+						SelectPreviousCompletion();
+						break;
+					case KeyCode.DownArrow when !input.HasModifiers && !UsePasswordChars:
+						SelectNextCompletion();
+						break;
+					
+				}
+			}
+			
 			switch (input.KeyCode)
 			{
 				case KeyCode.LeftArrow:
@@ -206,12 +238,14 @@ namespace OS.Devices
 
 					caretIndex--;
 					lineBuilder.Remove(caretIndex, 1);
+					completionsAreDirty = true;
 					break;
 				case KeyCode.Delete:
 					if (caretIndex == lineBuilder.Length)
 						break;
 
 					lineBuilder.Remove(caretIndex, 1);
+					completionsAreDirty = true;
 					break;
 			}
 		}
@@ -223,7 +257,7 @@ namespace OS.Devices
 		
 		private void RenderLineEditor()
         {
-            string wordWrapped = lineWrapper.Wrap(this.lineBuilder, firstColumn, firstRow, width, this.caretIndex, out int cx, out int cy, out int lineCount, out int lastLineWidth);
+	        string wordWrapped = lineWrapper.Wrap(this.lineBuilder, firstColumn, firstRow, width, this.caretIndex, out int cx, out int cy, out int lineCount, out int lastLineWidth);
             var completionIndicator = string.Empty;
             var completionsOnNewLine = false;
 
@@ -288,6 +322,78 @@ namespace OS.Devices
             lastCursorY = cy;
 
             this.previousLineCount = lineCount;
+        }
+		
+		private void UpdateCompletions()
+		{
+			if (!completionsAreDirty)
+				return;
+            
+			this.completions.Clear();
+			if (this.autoCompleteSource == null)
+				return;
+            
+			// ignore completions when entering a password.
+			if (UsePasswordChars)
+				return;
+			
+			this.completions.AddRange(this.autoCompleteSource.GetCompletions(this.lineBuilder, out completionInsertionPoint));
+			this.selectedCompletion = 0;
+			this.completionsAreDirty = false;
+		}
+		
+		private void InsertAutoComplete()
+		{
+			if (UsePasswordChars)
+				return;
+			
+			if (completions.Count == 0)
+			{
+				this.WriteText("\a");
+				return;
+			}
+
+			completionsAreDirty = true;
+
+			string completion = completions[selectedCompletion];
+			lineBuilder.Length = completionInsertionPoint;
+			lineBuilder.Append(completion);
+			caretIndex = lineBuilder.Length;
+			completionsAreDirty = true;
+		}
+		
+        private void SelectPreviousCompletion()
+        {
+        	if (UsePasswordChars)
+            	return;
+            
+            if (completions.Count == 0)
+            	return;
+            
+            if (selectedCompletion > 0)
+            {
+                this.WriteText("\a");
+                return;
+            }
+            
+            this.selectedCompletion--;
+        }
+		
+        private void SelectNextCompletion()
+        {
+        	if (UsePasswordChars)
+            	return;
+            
+            if (completions.Count == 0)
+            	return;
+
+            if (selectedCompletion >= completions.Count - 1)
+            {
+	            this.WriteText("\a");
+	            return;
+            }
+
+            this.selectedCompletion++;
         }
 		
 		private enum State

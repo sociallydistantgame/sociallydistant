@@ -67,22 +67,6 @@ namespace UI.Terminal.SimpleTerminal
             this.pty = pty;
         }
 
-        private void InsertAutoComplete()
-        {
-            if (completions.Count == 0)
-            {
-                this.WriteText("\a");
-                return;
-            }
-
-            completionsAreDirty = true;
-
-            string completion = completions[selectedCompletion];
-            line.Length = completionInsertionPoint;
-            line.Append(completion);
-            cursor = line.Length;
-        }
-
         private void HandleLeftArrow()
         {
             this.pendingKeys.Enqueue(new ConsoleInputData(KeyCode.LeftArrow));
@@ -172,7 +156,6 @@ namespace UI.Terminal.SimpleTerminal
             {
                 this.lineEditorState.wasPositionReset = false;
                 this.SetupLineEditor();
-                this.RenderLineEditor();
             }
 
             // This will dequeue any submitted lines.
@@ -538,93 +521,7 @@ namespace UI.Terminal.SimpleTerminal
 
             return true;
         }
-
-        private void UpdateCompletions()
-        {
-            if (!completionsAreDirty)
-                return;
-            
-            this.completions.Clear();
-            if (this.autoCompleteSource == null)
-                return;
-            
-            this.completions.AddRange(this.autoCompleteSource.GetCompletions(this.line, out completionInsertionPoint));
-            this.selectedCompletion = 0;
-            this.completionsAreDirty = false;
-        }
         
-        private void RenderLineEditor()
-        {
-            if (!this.lineEditorState.isEditing)
-                return;
-
-            UpdateCompletions();
-            
-            string wordWrapped = lineWrapper.Wrap(this.line, lineEditorState.firstLineColumn, lineEditorState.firstLineRow, term.Columns, this.cursor, out int cx, out int cy, out int lineCount, out int lastLineWidth);
-            string completionIndicator = string.Empty;
-            var completionsOnNewLine = false;
-
-            if (cursor >= completionInsertionPoint && completions.Count > 0)
-            {
-                if (completions.Count > 1)
-                    completionIndicator = $"{completions[selectedCompletion].Substring(line.Length - completionInsertionPoint)} ({selectedCompletion + 1}/{completions.Count})";
-                else
-                    completionIndicator = completions[0].Substring(line.Length - completionInsertionPoint);
-
-                if (lastLineWidth + completionIndicator.Length >= term.Columns)
-                {
-                    lineCount++;
-                    completionsOnNewLine = true;
-                }
-            }
-
-            // Determine if we need to scroll.
-            int bottom = this.lineEditorState.firstLineRow + lineCount;
-            int previousBottom = this.lineEditorState.firstLineRow + prevLineCount; 
-            if (bottom > this.term.Rows)
-            {
-                int scroll = bottom - this.term.Rows;
-                this.lineEditorState.firstLineRow -= scroll; // Adjust first row to compensate
-
-                // Scroll up
-                this.WriteText($"\x1b[{scroll}S");
-            }
-            
-            // Handle scrolling back down when we no longer occupy the last line.
-            if (previousBottom > bottom && previousBottom==this.term.Rows)
-            {
-                int scroll = previousBottom - bottom;
-                this.lineEditorState.firstLineRow += scroll; // Adjust first row to compensate
-
-                this.WriteText($"\x1b[{scroll}T");
-            }
-
-            // Move the cursor back to the start of the line, visually
-            this.WriteText($"\x1b[{this.lineEditorState.firstLineRow + 1};{this.lineEditorState.firstLineColumn + 1}H");
-
-            // If we have previous text, then we need to delete it
-            int linesToDelete = Math.Max(this.prevLineCount, lineCount);
-            if (linesToDelete > 0) this.WriteText("\x1b[0J");
-
-            // Write each line
-            this.WriteText(wordWrapped);
-
-            // Write the completions indicator
-            if (completionIndicator.Length > 0)
-            {
-                if (completionsOnNewLine)
-                    WriteText(Environment.NewLine);
-                WriteText("\x1b[2;3;90m");
-                WriteText(completionIndicator);
-                WriteText("\x1b[22;23;39m");
-            }
-            
-            // Move cursor to where it should be in the line editor
-            this.WriteText($"\x1b[{cy + 1};{cx + 1}H");
-
-            this.prevLineCount = lineCount;
-        }
-
         private void SetupLineEditor()
         {
             if (!this.lineEditorState.isEditing)
