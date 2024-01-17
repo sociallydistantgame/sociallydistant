@@ -58,6 +58,17 @@ namespace UI.Terminal.SimpleTerminal
 
 		public void Raw(KeyCode keyCode, bool modifierControl, bool modifierAlt, bool modifierShift)
 		{
+			// Fix modifiers for keystrokes where the main key is the same as the modifier
+			if (keyCode == KeyCode.LeftControl || keyCode == KeyCode.RightControl)
+				modifierControl = false;
+
+			if (keyCode == KeyCode.LeftShift || keyCode == KeyCode.RightShift)
+				modifierShift = false;
+
+			if (keyCode == KeyCode.LeftAlt || keyCode == KeyCode.RightAlt)
+				modifierAlt = false;
+			
+			
 			var modifierMask = 0;
 
 			if (modifierControl)

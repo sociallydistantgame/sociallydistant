@@ -113,6 +113,7 @@ namespace UI.Shell
 				return string.Empty;
 
 			var lineEditor = new OS.Devices.LineEditor(consoleDevice);
+			lineEditor.AutoCompleteSource = this;
 			return await lineEditor.ReadLineAsync();
 		}
 		
