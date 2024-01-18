@@ -18,6 +18,13 @@ namespace OS.Devices
 		/// <inheritdoc />
 		public IComputer Computer { get; private set; }
 
+		/// <inheritdoc />
+		public bool CheckPassword(string password)
+		{
+			// Players don't have passwords.
+			return false;
+		}
+
 		public PlayerUser(PlayerComputer computer, string username)
 		{
 			Computer = computer;

@@ -22,7 +22,8 @@ namespace Architecture
 		protected INetworkConnection? Network => this.process.User.Computer.Network;
 		protected string UserName => process.User.UserName;
 		protected string HostName => process.User.Computer.Name;
-
+		protected ISystemProcess Process => process;
+		
 		protected string CurrentWorkingDirectory => process.WorkingDirectory;
 		
 		/// <inheritdoc />

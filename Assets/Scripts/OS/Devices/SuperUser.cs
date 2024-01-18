@@ -18,6 +18,13 @@ namespace OS.Devices
 		/// <inheritdoc />
 		public IComputer Computer { get; private set; }
 
+		/// <inheritdoc />
+		public bool CheckPassword(string password)
+		{
+			// root doesn't have a password.
+			return false;
+		}
+
 		public SuperUser(IComputer computer)
 		{
 			this.Computer = computer;

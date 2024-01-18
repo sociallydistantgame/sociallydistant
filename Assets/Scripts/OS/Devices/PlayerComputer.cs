@@ -87,6 +87,9 @@ namespace OS.Devices
 		}
 
 		/// <inheritdoc />
+		public IUser SuperUser => su;
+
+		/// <inheritdoc />
 		public ISystemProcess? ExecuteProgram(ISystemProcess parentProcess, ITextConsole console, string programName, string[] arguments)
 		{
 			// Perhaps we should remove this in favour of calling the VFS method directly?
