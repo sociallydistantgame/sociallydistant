@@ -169,7 +169,7 @@ namespace OS.Devices
 
 			if (!needsRender)
 				return;
-
+			
 			this.UpdateCompletions();
 			this.RenderLineEditor();
 		}
@@ -231,6 +231,7 @@ namespace OS.Devices
 				case KeyCode.KeypadEnter:
 				case KeyCode.Return:
 					state = State.Done;
+					this.completionsAreDirty = true;
 					break;
 				case KeyCode.Backspace:
 					if (caretIndex <= 0)
@@ -330,6 +331,10 @@ namespace OS.Devices
 				return;
             
 			this.completions.Clear();
+
+			if (this.state == State.Done)
+				return;
+			
 			if (this.autoCompleteSource == null)
 				return;
             
