@@ -511,56 +511,23 @@ namespace OS.Devices
         {
 	        if (direction == 0)
 		        return;
-	        
-	        if (HasSelection)
+
+	        int start = selectionStart;
+	        int end = selectionEnd;
+
+	        if (start == end)
 	        {
-		        var swapped = false;
-
-		        int start = selectionStart;
-		        int end = selectionEnd;
-
-		        if (end < start)
+		        if (start == -1)
 		        {
-			        (end, start) = (start, end);
-			        swapped = true;
+			        start = caretIndex;
+			        end = start;
 		        }
-
-		        int newEnd = end + direction;
-
-		        if (newEnd < 0 || newEnd > lineBuilder.Length)
-		        {
-			        WriteText("\a");
-			        return;
-		        }
-
-		        end = newEnd;
-		        
-		        if (swapped)
-		        {
-			        (end, start) = (start, end);
-		        }
-
-		        selectionStart = start;
-		        selectionEnd = end;
 	        }
-	        else
-	        {
-		        int start = caretIndex;
-		        int end = start + direction;
 
-		        if (end < start)
-			        (start, end) = (end, start);
+	        end += direction;
 
-		        if (start < 0 || end > lineBuilder.Length)
-		        {
-			        WriteText("\a");
-			        return;
-		        }
-
-		        selectionStart = start;
-		        selectionEnd = end;
-		        completionsAreDirty = true;
-	        }
+	        selectionStart = Math.Clamp(start, 0, lineBuilder.Length);
+	        selectionEnd = Math.Clamp(end, 0, lineBuilder.Length);
         }
         
 		private enum State
