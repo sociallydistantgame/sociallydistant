@@ -140,7 +140,39 @@ namespace UI.Shell
 			}
 
 			return lineBuilder.ToString();
-		} 
+		}
+
+		public async Task RunScript(string scriptText)
+		{
+			if (process == null)
+				return;
+			
+			if (consoleDevice == null)
+				return;
+			
+			if (!initialized)
+				return;
+
+			ProcessTokens(scriptText);
+
+			while (pendingInstructions.Count > 0)
+			{
+				ShellInstruction? nextInstruction = pendingInstructions.Dequeue();
+
+				try
+				{
+					await nextInstruction.RunAsync(this.process, this.consoleDevice);
+				}
+				catch (Exception ex)
+				{
+					// log the full error to Unity
+					Debug.LogException(ex);
+						
+					// Log a partial error to the console
+					this.consoleDevice.WriteText(ex.Message + Environment.NewLine);
+				}
+			}
+		}
 		
 		/// <inheritdoc />
 		public async Task Run()

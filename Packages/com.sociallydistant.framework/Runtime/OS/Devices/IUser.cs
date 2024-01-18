@@ -7,5 +7,7 @@
 		string Home { get; }
 		PrivilegeLevel PrivilegeLevel { get; }
 		IComputer Computer { get; }
+
+		bool CheckPassword(string password);
 	}
 }

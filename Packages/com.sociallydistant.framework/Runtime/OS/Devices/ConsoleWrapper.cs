@@ -10,6 +10,7 @@ namespace OS.Devices
 		private readonly ITextConsole textConsole;
 		private readonly LineEditor lineEditor;
 
+		public ITextConsole Device => textConsole;
 		public bool IsInteractive => textConsole.IsInteractive;
 		
 		public ConsoleWrapper(ITextConsole textConsole)
@@ -52,8 +53,16 @@ namespace OS.Devices
 			return lineEditor.Update(out text);
 		}
 
-		public async Task<string> ReadLineAsync()
+		public async Task<string> ReadLineAsync(IAutoCompleteSource? autoCompleteSource = null)
 		{
+			lineEditor.UsePasswordChars = false;
+			lineEditor.AutoCompleteSource = autoCompleteSource;
+			return await lineEditor.ReadLineAsync();
+		}
+		
+		public async Task<string> ReadPasswordAsync()
+		{
+			lineEditor.UsePasswordChars = true;
 			return await lineEditor.ReadLineAsync();
 		}
 		
