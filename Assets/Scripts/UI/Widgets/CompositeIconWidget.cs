@@ -1,5 +1,6 @@
 ﻿#nullable enable
 
+using System;
 using System.Text.RegularExpressions;
 using Shell.Common;
 using TMPro;
@@ -36,6 +37,11 @@ namespace UI.Widgets
 			this.MustGetComponentInParent(out uiManager);
 		}
 
+		private void Start()
+		{
+			UpdateIcon();
+		}
+
 		public CompositeIcon Icon
 		{
 			get => icon;
@@ -56,6 +62,11 @@ namespace UI.Widgets
 
 		private void UpdateIcon()
 		{
+			bool shouldBeActive = this.icon.spriteIcon != null || !string.IsNullOrWhiteSpace(this.icon.textIcon);
+			
+			if (this.gameObject.activeSelf != shouldBeActive)
+				this.gameObject.SetActive(shouldBeActive);
+			
 			if (uiManager == null)
 				return;
 			
