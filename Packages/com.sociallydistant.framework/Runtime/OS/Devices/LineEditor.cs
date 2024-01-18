@@ -5,6 +5,7 @@ using System.Text;
 using System.Threading.Tasks;
 using UnityEngine;
 using UnityEngine.Networking;
+using UnityEngine.XR;
 
 namespace OS.Devices
 {
@@ -27,7 +28,14 @@ namespace OS.Devices
 		private int lastCursorY;
 		private IAutoCompleteSource? autoCompleteSource;
 		private bool completionsAreDirty = false;
+		private int selectionStart = -1;
+		private int selectionEnd = -1;
 
+		public bool HasSelection
+		{
+			get => selectionStart != -1;
+		}
+		
 		public IAutoCompleteSource? AutoCompleteSource
 		{
 			get => autoCompleteSource;
@@ -188,6 +196,7 @@ namespace OS.Devices
 		{
 			if (!char.IsControl(input.Character))
 			{
+				DeleteSelection();
 				this.lineBuilder.Insert(caretIndex, input.Character);
 				caretIndex++;
 				completionsAreDirty = true;
@@ -211,21 +220,48 @@ namespace OS.Devices
 						SelectNextCompletion();
 						break;
 					
+					case KeyCode.LeftArrow when input.Modifiers.HasFlag(KeyModifiers.Shift):
+						ExpandSelection(-1);
+						break;
+					case KeyCode.RightArrow when input.Modifiers.HasFlag(KeyModifiers.Shift):
+						ExpandSelection(1);
+						break;
 				}
 			}
+
+			if (input.HasModifiers)
+				return;
 			
 			switch (input.KeyCode)
 			{
 				case KeyCode.LeftArrow:
+					if (HasSelection)
+					{
+						caretIndex = Math.Min(selectionStart, selectionEnd);
+						CancelSelection();
+						break;
+					}
+					
 					caretIndex = Math.Max(caretIndex - 1, 0);
 					break;
 				case KeyCode.RightArrow:
+					if (HasSelection)
+					{
+						caretIndex = Math.Max(selectionStart, selectionEnd);
+						CancelSelection();
+						break;
+					}
+					
 					caretIndex = Math.Min(caretIndex + 1, lineBuilder.Length);
 					break;
 				case KeyCode.Home:
+					CancelSelection();
+					
 					caretIndex = 0;
 					break;
 				case KeyCode.End:
+					CancelSelection();
+					
 					caretIndex = lineBuilder.Length;
 					break;
 				case KeyCode.KeypadEnter:
@@ -234,6 +270,12 @@ namespace OS.Devices
 					this.completionsAreDirty = true;
 					break;
 				case KeyCode.Backspace:
+					if (HasSelection)
+					{
+						DeleteSelection();
+						break;
+					}
+					
 					if (caretIndex <= 0)
 						break;
 
@@ -242,7 +284,13 @@ namespace OS.Devices
 					completionsAreDirty = true;
 					break;
 				case KeyCode.Delete:
-					if (caretIndex == lineBuilder.Length)
+					if (HasSelection)
+					{
+						DeleteSelection();
+						break;
+					}
+					
+                    if (caretIndex == lineBuilder.Length)
 						break;
 
 					lineBuilder.Remove(caretIndex, 1);
@@ -258,7 +306,7 @@ namespace OS.Devices
 		
 		private void RenderLineEditor()
         {
-	        string wordWrapped = lineWrapper.Wrap(this.lineBuilder, firstColumn, firstRow, width, this.caretIndex, out int cx, out int cy, out int lineCount, out int lastLineWidth);
+	        string wordWrapped = lineWrapper.Wrap(this.lineBuilder, firstColumn, firstRow, width, this.caretIndex, selectionStart, selectionEnd, out int cx, out int cy, out int lineCount, out int lastLineWidth, out int selStart, out int selEnd);
             var completionIndicator = string.Empty;
             var completionsOnNewLine = false;
 
@@ -304,6 +352,14 @@ namespace OS.Devices
             int linesToDelete = Math.Max(this.previousLineCount, lineCount);
             if (linesToDelete > 0) this.WriteText("\x1b[0J");
 
+            // Insert selection background
+            if (selEnd > -1)
+				wordWrapped = wordWrapped.Insert(selEnd, "\x1b[0m");
+            
+            if (selStart > -1)
+				wordWrapped = wordWrapped.Insert(selStart, "\x1b[44m");
+            
+            
             // Write each line
             this.WriteText(wordWrapped);
 
@@ -332,6 +388,9 @@ namespace OS.Devices
             
 			this.completions.Clear();
 
+			if (HasSelection)
+				return;
+			
 			if (this.state == State.Done)
 				return;
 			
@@ -400,7 +459,86 @@ namespace OS.Devices
 
             this.selectedCompletion++;
         }
-		
+
+        private void CancelSelection()
+        {
+	        this.selectionStart = -1;
+	        this.selectionEnd = -1;
+        }
+        
+        private void DeleteSelection()
+        {
+	        if (!HasSelection)
+		        return;
+
+	        int start = Math.Min(selectionStart, selectionEnd);
+	        int length = Math.Max(selectionStart, selectionEnd) - start;
+
+	        CancelSelection();
+
+	        if (length == 0)
+		        return;
+
+	        lineBuilder.Remove(start, length);
+	        completionsAreDirty = true;
+        }
+        
+        private void ExpandSelection(int direction)
+        {
+	        if (direction == 0)
+		        return;
+	        
+	        if (HasSelection)
+	        {
+		        var swapped = false;
+
+		        int start = selectionStart;
+		        int end = selectionEnd;
+
+		        if (end < start)
+		        {
+			        (end, start) = (start, end);
+			        swapped = true;
+		        }
+
+		        int newEnd = end + direction;
+
+		        if (newEnd < 0 || newEnd > lineBuilder.Length)
+		        {
+			        WriteText("\a");
+			        return;
+		        }
+
+		        end = newEnd;
+		        
+		        if (swapped)
+		        {
+			        (end, start) = (start, end);
+		        }
+
+		        selectionStart = start;
+		        selectionEnd = end;
+	        }
+	        else
+	        {
+		        int start = caretIndex;
+		        int end = start + direction;
+
+		        if (end < start)
+			        (start, end) = (end, start);
+
+		        if (start < 0 || end > lineBuilder.Length)
+		        {
+			        WriteText("\a");
+			        return;
+		        }
+
+		        selectionStart = start;
+		        selectionEnd = end;
+		        completionsAreDirty = true;
+	        }
+        }
+        
 		private enum State
 		{
 			None,
