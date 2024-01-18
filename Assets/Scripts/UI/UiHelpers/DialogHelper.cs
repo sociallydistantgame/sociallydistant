@@ -109,8 +109,16 @@ namespace UI.UiHelpers
 			messageDialog.Title = title;
 			messageDialog.Message = message;
 
-			messageDialog.Buttons.Add("Yes");
-			messageDialog.Buttons.Add("No");
+			messageDialog.Buttons.Add(new MessageBoxButtonData
+			{
+				Text = "Yes",
+				Result = MessageDialogResult.Yes
+			});
+			messageDialog.Buttons.Add(new MessageBoxButtonData
+			{
+				Text = "No",
+				Result = MessageDialogResult.No
+			});
 
 			void fireCallback(MessageDialogResult result)
 			{
