@@ -30,6 +30,9 @@ namespace OS.Devices
 		private bool completionsAreDirty = false;
 		private int selectionStart = -1;
 		private int selectionEnd = -1;
+		
+		// TODO: Allow this to be set in the player state. This is static in the mean time to allow the mode to persist across all LineEditor instances.
+		private static bool overtypeMode = false;
 
 		public bool HasSelection
 		{
@@ -197,7 +200,15 @@ namespace OS.Devices
 			if (!char.IsControl(input.Character))
 			{
 				DeleteSelection();
-				this.lineBuilder.Insert(caretIndex, input.Character);
+				if (overtypeMode && caretIndex < lineBuilder.Length)
+				{
+					this.lineBuilder[caretIndex] = input.Character;
+				}
+				else
+				{
+					this.lineBuilder.Insert(caretIndex, input.Character);
+				}
+
 				caretIndex++;
 				completionsAreDirty = true;
 				return;
@@ -240,6 +251,9 @@ namespace OS.Devices
 			
 			switch (input.KeyCode)
 			{
+				case KeyCode.Insert:
+					overtypeMode = !overtypeMode;
+					break;
 				case KeyCode.LeftArrow:
 					if (HasSelection)
 					{
