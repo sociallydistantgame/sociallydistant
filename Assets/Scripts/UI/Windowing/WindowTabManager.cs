@@ -116,6 +116,7 @@ namespace UI.Windowing
 			rt.localScale = Vector3.one;
 
 			var panel = go.AddComponent<RectTransformContentPanel>();
+			panel.Title = "Tab";
 			
 			this.panels.Insert(index, panel);
 
