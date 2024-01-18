@@ -303,6 +303,23 @@ namespace OS.Devices
 		{
 			this.console.WriteText(text);
 		}
+
+		private string MaskPassword(string originalText)
+		{
+			var builder = new StringBuilder(originalText);
+
+			for (var i = 0; i < builder.Length; i++)
+			{
+				char character = builder[i];
+				
+				if (character == '\r' || character == '\n')
+					continue;
+
+				builder[i] = '*';
+			}
+
+			return builder.ToString();
+		}
 		
 		private void RenderLineEditor()
         {
@@ -324,6 +341,10 @@ namespace OS.Devices
                 }
             }
 
+            // Password masking
+            if (UsePasswordChars)
+	            wordWrapped = MaskPassword(wordWrapped);
+            
             // Determine if we need to scroll.
             int bottom = this.firstRow + lineCount;
             int previousBottom = this.firstRow + previousLineCount; 
