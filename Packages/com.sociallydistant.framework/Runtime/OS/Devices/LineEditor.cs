@@ -226,6 +226,12 @@ namespace OS.Devices
 					case KeyCode.RightArrow when input.Modifiers.HasFlag(KeyModifiers.Shift):
 						ExpandSelection(1);
 						break;
+					case KeyCode.Home when input.Modifiers.HasFlag(KeyModifiers.Shift):
+						ExpandSelection(-lineBuilder.Length);
+						break;
+					case KeyCode.End when input.Modifiers.HasFlag(KeyModifiers.Shift):
+						ExpandSelection(lineBuilder.Length);
+						break;
 				}
 			}
 
