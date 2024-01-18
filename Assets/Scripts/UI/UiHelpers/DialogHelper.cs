@@ -122,6 +122,8 @@ namespace UI.UiHelpers
 
 			void fireCallback(MessageDialogResult result)
 			{
+				this.openDialogs.Remove(messageDialog);
+				
 				messageDialog.DismissCallback = null;
 				callback?.Invoke(result == MessageDialogResult.Yes);
 			}
