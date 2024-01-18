@@ -373,6 +373,9 @@ namespace OS.Devices
             int linesToDelete = Math.Max(this.previousLineCount, lineCount);
             if (linesToDelete > 0) this.WriteText("\x1b[0J");
 
+            if (selEnd < selStart)
+	            (selStart, selEnd) = (selEnd, selStart);
+            
             // Insert selection background
             if (selEnd > -1)
 				wordWrapped = wordWrapped.Insert(selEnd, "\x1b[0m");
