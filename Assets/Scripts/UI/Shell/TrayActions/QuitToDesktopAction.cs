@@ -40,7 +40,7 @@ namespace UI.Shell.TrayActions
 				return;
 
 			dialogHelper.AskQuestion(
-				"Quit Sociallu Distant?",
+				"Quit Socially Distant?",
 				"Do you want to quit Socially Distant and return to your host desktop? Your progress will be saved, but any unsaved changes to files will be lost.",
 				null,
 				OnDialogDismissed
