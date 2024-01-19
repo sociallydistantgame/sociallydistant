@@ -15,8 +15,6 @@ using Shell.Windowing;
 using TMPro;
 using UI.Applications.FileManager;
 using UI.Shell.Common;
-using UI.Windowing;
-using Unity.Profiling.Editor;
 using UnityEngine;
 using UnityExtensions;
 using UnityEngine.UI;

@@ -70,12 +70,14 @@ namespace UI.Widgets
 			button.spriteState = textureSet.spriteState;
 		}
 
+		#if UNITY_EDITOR
 		/// <inheritdoc />
 		protected override void OnValidate()
 		{
 			UpdateBackground();
 			base.OnValidate();
 		}
+		#endif
 
 		public enum ButtonColor
 		{

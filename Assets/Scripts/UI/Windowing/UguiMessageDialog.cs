@@ -5,15 +5,11 @@ using Architecture;
 using Shell;
 using Shell.Common;
 using Shell.Windowing;
-using TMPro;
 using TrixelCreative.TrixelAudio;
 using TrixelCreative.TrixelAudio.Data;
 using UI.Controllers;
-using UI.Widgets;
-using UnityEditor.PackageManager.UI;
 using UnityEngine;
 using UnityExtensions;
-using Utility;
 
 namespace UI.Windowing
 {

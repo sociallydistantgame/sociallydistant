@@ -11,7 +11,6 @@ using Shell.Windowing;
 using TMPro;
 using UI.UiHelpers;
 using UI.Widgets;
-using UnityEditor.PackageManager.UI;
 using UnityEngine;
 using UnityExtensions;
 using UnityEngine.UI;
