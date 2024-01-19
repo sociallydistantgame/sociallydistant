@@ -33,8 +33,8 @@ RectTransform:
   m_Father: {fileID: 767516243218133721}
   m_RootOrder: 1
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
-  m_AnchorMin: {x: 0, y: 1}
-  m_AnchorMax: {x: 0, y: 1}
+  m_AnchorMin: {x: 0, y: 0}
+  m_AnchorMax: {x: 0, y: 0}
   m_AnchoredPosition: {x: 0, y: 0}
   m_SizeDelta: {x: 0, y: 0}
   m_Pivot: {x: 0, y: 1}
@@ -347,7 +347,7 @@ MonoBehaviour:
   font: {fileID: 11400000, guid: 01f7b1a20704caa4ea69a70de99e7999, type: 2}
   fontSize: 12
   textMeshPro: {fileID: 7313729233040099238}
-  asciiBeep: {fileID: 0}
+  asciiBeep: {fileID: 11400000, guid: c67bb88e188d15b42bf98ee0175f7609, type: 2}
   showBackgroundColor: 0
   backgroundGraphic: {fileID: 8831732625854447881}
 --- !u!114 &8872636909277723952

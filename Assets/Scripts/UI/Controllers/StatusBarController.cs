@@ -1,12 +1,16 @@
 ﻿#nullable enable
 
+using System;
+using Core;
 using GamePlatform;
 using Player;
 using TMPro;
+using UI.UiHelpers;
 using UnityEngine;
 using UnityEngine.EventSystems;
 using UnityExtensions;
 using UnityEngine.UI;
+using UniRx;
 
 namespace UI.Controllers
 {
@@ -29,6 +33,13 @@ namespace UI.Controllers
 		[SerializeField]
 		private Button systemSettingsButton = null!;
 
+		[SerializeField]
+		private Button logoutButton = null!;
+
+		private GameMode gameMode;
+		private IDisposable? gameModeObserver;
+		private DialogHelper dialogHelper = null!;
+		
 		public string UserInfo
 		{
 			get => userText.text;
@@ -40,6 +51,8 @@ namespace UI.Controllers
 		{
 			this.AssertAllFieldsAreSerialized(typeof(StatusBarController));
 			base.Awake();
+
+			this.MustGetComponent(out dialogHelper);
 		}
 
 		/// <inheritdoc />
@@ -48,6 +61,19 @@ namespace UI.Controllers
 			base.Start();
 			
 			this.systemSettingsButton.onClick.AddListener(OpenSettings);
+			this.logoutButton.onClick.AddListener(OnLogoutClicked);
+
+			if (this.gameManagerHolder.Value == null)
+				return;
+
+			gameModeObserver = gameManagerHolder.Value.GameModeObservable.Subscribe(OnGameModeChanged);
+		}
+
+		/// <inheritdoc />
+		protected override void OnDestroy()
+		{
+			gameModeObserver?.Dispose();
+			base.OnDestroy();
 		}
 
 		private void OpenSettings()
@@ -56,6 +82,34 @@ namespace UI.Controllers
 				return;
 
 			player.Value.UiManager.OpenSettings();
+		}
+
+		private async void OnLogoutClicked()
+		{
+			bool shouldLogout = await dialogHelper.AskQuestionAsync(
+				"End session",
+				"Are you sure you want to log out and end the current session? All open programs will be closed and any unsaved progress will be lost."
+			);
+
+			if (!shouldLogout)
+				return;
+
+			if (gameManagerHolder.Value == null)
+				return;
+
+			await gameManagerHolder.Value.EndCurrentGame();
+			await gameManagerHolder.Value.GoToLoginScreen();
+		}
+
+		private void UpdateUI()
+		{
+			this.logoutButton.gameObject.SetActive(gameMode == GameMode.OnDesktop);
+		}
+		
+		private void OnGameModeChanged(GameMode newGameMode)
+		{
+			this.gameMode = newGameMode;
+			UpdateUI();
 		}
 	}
 }

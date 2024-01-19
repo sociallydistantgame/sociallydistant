@@ -249,7 +249,7 @@ namespace GamePlatform
 			
 			
 			
-			SetGameMode(GameMode.LockScreen);
+			SetGameMode(GameMode.OnDesktop);
 		}
 
 		public async Task QuitVM()

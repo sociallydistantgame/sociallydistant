@@ -6,6 +6,8 @@ using Shell;
 using Shell.Common;
 using Shell.Windowing;
 using TMPro;
+using TrixelCreative.TrixelAudio;
+using TrixelCreative.TrixelAudio.Data;
 using UI.Controllers;
 using UI.Widgets;
 using UnityEditor.PackageManager.UI;
@@ -21,9 +23,13 @@ namespace UI.Windowing
 	{
 		[SerializeField]
 		private InfoBoxController infoBoxController = null!;
+
+		[SerializeField]
+		private SoundEffectAsset popupSound = null!;
 		
 		private IFloatingGui parentWindow;
 		private ObservableList<MessageBoxButtonData> buttonsList = new ObservableList<MessageBoxButtonData>();
+		private TrixelAudioSource trixelAudio = null!;
 
 		/// <inheritdoc />
 		public bool CanClose => true;
@@ -119,6 +125,7 @@ namespace UI.Windowing
 		{
 			this.AssertAllFieldsAreSerialized(typeof(UguiMessageDialog));
 			this.MustGetComponentInParent(out this.parentWindow);
+			this.MustGetComponent(out trixelAudio);
 			
 			this.buttonsList.ItemAdded += HandleItemAdded;
 			this.buttonsList.ItemRemoved += HandleItemRemoved;
@@ -128,6 +135,11 @@ namespace UI.Windowing
 			parentWindow.EnableCloseButton = false;
 			
 			parentWindow.MinimumSize = Vector2.zero;
+		}
+
+		private void Start()
+		{
+			trixelAudio.Play(this.popupSound);
 		}
 
 		private void HandleItemRemoved(MessageBoxButtonData obj)

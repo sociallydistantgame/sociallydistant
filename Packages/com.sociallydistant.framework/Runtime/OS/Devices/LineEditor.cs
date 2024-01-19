@@ -261,6 +261,9 @@ namespace OS.Devices
 						CancelSelection();
 						break;
 					}
+
+					if (caretIndex == 0)
+						Bell();
 					
 					caretIndex = Math.Max(caretIndex - 1, 0);
 					break;
@@ -271,6 +274,9 @@ namespace OS.Devices
 						CancelSelection();
 						break;
 					}
+
+					if (caretIndex == lineBuilder.Length)
+						Bell();
 					
 					caretIndex = Math.Min(caretIndex + 1, lineBuilder.Length);
 					break;
@@ -295,9 +301,12 @@ namespace OS.Devices
 						DeleteSelection();
 						break;
 					}
-					
+
 					if (caretIndex <= 0)
+					{
+						Bell();
 						break;
+					}
 
 					caretIndex--;
 					lineBuilder.Remove(caretIndex, 1);
@@ -309,9 +318,12 @@ namespace OS.Devices
 						DeleteSelection();
 						break;
 					}
-					
-                    if (caretIndex == lineBuilder.Length)
+
+					if (caretIndex == lineBuilder.Length)
+					{
+						Bell();
 						break;
+					}
 
 					lineBuilder.Remove(caretIndex, 1);
 					completionsAreDirty = true;
@@ -472,15 +484,18 @@ namespace OS.Devices
 		
         private void SelectPreviousCompletion()
         {
-        	if (UsePasswordChars)
-            	return;
-            
-            if (completions.Count == 0)
-            	return;
-            
-            if (selectedCompletion > 0)
-            {
-                this.WriteText("\a");
+	        if (UsePasswordChars)
+	            return;
+
+	        if (completions.Count == 0)
+	        {
+		        Bell();
+		        return;
+	        }
+
+	        if (selectedCompletion > 0)
+	        {
+		        Bell();
                 return;
             }
             
@@ -491,13 +506,16 @@ namespace OS.Devices
         {
         	if (UsePasswordChars)
             	return;
-            
-            if (completions.Count == 0)
-            	return;
 
-            if (selectedCompletion >= completions.Count - 1)
+	        if (completions.Count == 0)
+	        {
+		        Bell();
+		        return;
+	        }
+
+	        if (selectedCompletion >= completions.Count - 1)
             {
-	            this.WriteText("\a");
+	            Bell();
 	            return;
             }
 
@@ -544,10 +562,21 @@ namespace OS.Devices
 		        }
 	        }
 
+	        if (end == 0 && direction < 0)
+		        Bell();
+
+	        if (end == lineBuilder.Length && direction > 0)
+		        Bell();
+	        
 	        end += direction;
 
 	        selectionStart = Math.Clamp(start, 0, lineBuilder.Length);
 	        selectionEnd = Math.Clamp(end, 0, lineBuilder.Length);
+        }
+
+        private void Bell()
+        {
+	        WriteText("\a");
         }
         
 		private enum State
