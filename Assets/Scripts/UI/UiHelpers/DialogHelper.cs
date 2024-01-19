@@ -102,6 +102,13 @@ namespace UI.UiHelpers
 				}
 			}
 		}
+
+		public Task<bool> AskQuestionAsync(string title, string message, IWindow? parentWindow = null)
+		{
+			var completionSource = new TaskCompletionSource<bool>();
+			AskQuestion(title, message, parentWindow, completionSource.SetResult);
+			return completionSource.Task;
+		}
 		
 		public void AskQuestion(string title, string message, IWindow? parentWindow, Action<bool>? callback)
 		{

@@ -75,6 +75,7 @@ Canvas:
   m_OverrideSorting: 0
   m_OverridePixelPerfect: 0
   m_SortingBucketNormalizedSize: 0
+  m_VertexColorAlwaysGammaSpace: 0
   m_AdditionalShaderChannelsFlag: 25
   m_SortingLayerID: 0
   m_SortingOrder: 0
@@ -428,10 +429,10 @@ RectTransform:
   m_Father: {fileID: 5720685047907028765}
   m_RootOrder: 1
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
-  m_AnchorMin: {x: 0, y: 0}
-  m_AnchorMax: {x: 0, y: 0}
-  m_AnchoredPosition: {x: 0, y: 0}
-  m_SizeDelta: {x: 0, y: 0}
+  m_AnchorMin: {x: 0, y: 1}
+  m_AnchorMax: {x: 0, y: 1}
+  m_AnchoredPosition: {x: 100, y: -360.57}
+  m_SizeDelta: {x: 200, y: 600}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &2905743426540212722
 MonoBehaviour:
@@ -665,10 +666,10 @@ RectTransform:
   m_Father: {fileID: 61250970002275436}
   m_RootOrder: 1
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
-  m_AnchorMin: {x: 0, y: 0}
-  m_AnchorMax: {x: 0, y: 0}
-  m_AnchoredPosition: {x: 0, y: 0}
-  m_SizeDelta: {x: 0, y: 0}
+  m_AnchorMin: {x: 0, y: 1}
+  m_AnchorMax: {x: 0, y: 1}
+  m_AnchoredPosition: {x: 100, y: -52.91}
+  m_SizeDelta: {x: 56.23, y: 15.32}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!222 &4283839064565251189
 CanvasRenderer:
@@ -1072,10 +1073,10 @@ RectTransform:
   m_Father: {fileID: 61250970002275436}
   m_RootOrder: 0
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
-  m_AnchorMin: {x: 0, y: 0}
-  m_AnchorMax: {x: 0, y: 0}
-  m_AnchoredPosition: {x: 0, y: 0}
-  m_SizeDelta: {x: 0, y: 0}
+  m_AnchorMin: {x: 0, y: 1}
+  m_AnchorMax: {x: 0, y: 1}
+  m_AnchoredPosition: {x: 100, y: -30.625}
+  m_SizeDelta: {x: 143.34, y: 61.25}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!222 &5722226630932928347
 CanvasRenderer:
@@ -1290,10 +1291,10 @@ RectTransform:
   m_Father: {fileID: 5720685047907028765}
   m_RootOrder: 0
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
-  m_AnchorMin: {x: 0, y: 0}
-  m_AnchorMax: {x: 0, y: 0}
-  m_AnchoredPosition: {x: 0, y: 0}
-  m_SizeDelta: {x: 0, y: 0}
+  m_AnchorMin: {x: 0, y: 1}
+  m_AnchorMax: {x: 0, y: 1}
+  m_AnchoredPosition: {x: 100, y: -30.285}
+  m_SizeDelta: {x: 200, y: 60.57}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &6970343648979782792
 MonoBehaviour:
@@ -1811,15 +1812,15 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 2242858788664724577, guid: f73ba1ff1b09d8143a32ed57081c1c13, type: 3}
       propertyPath: m_LocalRotation.x
-      value: 0
+      value: -0
       objectReference: {fileID: 0}
     - target: {fileID: 2242858788664724577, guid: f73ba1ff1b09d8143a32ed57081c1c13, type: 3}
       propertyPath: m_LocalRotation.y
-      value: 0
+      value: -0
       objectReference: {fileID: 0}
     - target: {fileID: 2242858788664724577, guid: f73ba1ff1b09d8143a32ed57081c1c13, type: 3}
       propertyPath: m_LocalRotation.z
-      value: 0
+      value: -0
       objectReference: {fileID: 0}
     - target: {fileID: 2242858788664724577, guid: f73ba1ff1b09d8143a32ed57081c1c13, type: 3}
       propertyPath: m_AnchoredPosition.x
