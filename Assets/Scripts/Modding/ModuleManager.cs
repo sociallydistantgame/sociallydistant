@@ -11,7 +11,6 @@ using Core;
 using Core.Config;
 using GamePlatform;
 using Modules;
-using PlasticGui;
 using UnityEngine;
 using UniRx;
 

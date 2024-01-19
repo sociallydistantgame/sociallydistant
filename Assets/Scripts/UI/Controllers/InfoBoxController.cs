@@ -137,6 +137,7 @@ namespace UI.Controllers
 			}
 		}
 		
+		#if UNITY_EDITOR
 		/// <inheritdoc />
 		protected override void OnValidate()
 		{
@@ -150,6 +151,7 @@ namespace UI.Controllers
 
 			UpdateColors();
 		}
+		#endif
 
 		/// <inheritdoc />
 		public IEnumerator<ButtonDefinition> GetEnumerator()

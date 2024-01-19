@@ -1,9 +1,12 @@
 {
     "name": "ThisOtherThing.UIShapesKit.Editor",
+    "rootNamespace": "",
     "references": [
         "GUID:0b74d47bdee30c04aa2184f2c3e27973"
     ],
-    "includePlatforms": [],
+    "includePlatforms": [
+        "Editor"
+    ],
     "excludePlatforms": [],
     "allowUnsafeCode": false,
     "overrideReferences": false,

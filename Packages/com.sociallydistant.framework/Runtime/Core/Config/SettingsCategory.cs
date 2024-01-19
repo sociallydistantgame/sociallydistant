@@ -1,8 +1,5 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Linq;
-using System.Reflection;
-using PlasticGui.WorkspaceWindow.Diff;
 
 namespace Core.Config
 {

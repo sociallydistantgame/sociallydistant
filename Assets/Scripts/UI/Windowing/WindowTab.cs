@@ -1,6 +1,5 @@
 ﻿#nullable enable
 using System;
-using Codice.Client.GameUI.Update;
 using ThisOtherThing.UI.Shapes;
 using TMPro;
 using UnityEngine;
