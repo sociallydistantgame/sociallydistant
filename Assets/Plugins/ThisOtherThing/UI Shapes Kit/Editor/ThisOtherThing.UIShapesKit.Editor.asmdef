@@ -1,7 +1,5 @@
 {
-    "name": "ThisOtherThing.UIShapesKit.Edito,
-  "references":[ "GUID:0b74d47bdee30c04aa2184f2c3e27973" ]r",
-    "rootNamespace": "",
+    "name": "ThisOtherThing.UIShapesKit.Editor",
     "references": [
         "GUID:0b74d47bdee30c04aa2184f2c3e27973"
     ],
