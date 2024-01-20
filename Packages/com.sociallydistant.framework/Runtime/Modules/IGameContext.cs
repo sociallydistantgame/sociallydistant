@@ -2,6 +2,7 @@
 using ContentManagement;
 using Core;
 using Core.Config;
+using Core.Scripting;
 using OS;
 using Shell;
 using Shell.InfoPanel;
@@ -49,5 +50,10 @@ namespace Modules
 		///		Gets a reference to the game's settings manager.
 		/// </summary>
 		ISettingsManager SettingsManager { get; }
+		
+		/// <summary>
+		///		Gets a reference to the script system.
+		/// </summary>
+		IScriptSystem ScriptSystem { get; }
 	}
 }

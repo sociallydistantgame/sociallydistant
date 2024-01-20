@@ -3,6 +3,7 @@
 using System;
 using System.Threading.Tasks;
 using Architecture;
+using Core.Scripting;
 using OS.Devices;
 using Shell.Windowing;
 using UI.Shell;
@@ -20,6 +21,7 @@ namespace UI.Applications.Terminal
 		IProgramOpenHandler,
 		IWindowCloseBlocker
 	{
+		private OperatingSystemExecutionContext context = null!;
 		private ISystemProcess process = null!;
 		private IContentPanel window = null!;
 		private ISystemProcess? shellProcess;
@@ -51,9 +53,12 @@ namespace UI.Applications.Terminal
 			// application to use.
 			this.shellProcess = this.process.Fork();
 			
+			// Create a shell execution context for the in-game OS.
+			this.context = new OperatingSystemExecutionContext(shellProcess);
+			
 			// TODO: Command-line arguments to specify the shell
 			// Create a shell.
-			this.shell = new InteractiveShell(this);
+			this.shell = new InteractiveShell(context);
 			shell.Setup(shellProcess, textConsole);
 
 			await shell.Run();

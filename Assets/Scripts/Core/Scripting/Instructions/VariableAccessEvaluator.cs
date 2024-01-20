@@ -1,12 +1,6 @@
 ﻿#nullable enable
-
-namespace UI.Shell
+namespace Core.Scripting.Instructions
 {
-	public interface IArgumentEvaluator
-	{
-		string GetArgumentText(ICommandShell shell);
-	}
-
 	public class VariableAccessEvaluator : IArgumentEvaluator
 	{
 		private readonly string variableName;
@@ -17,9 +11,9 @@ namespace UI.Shell
 		}
 		
 		/// <inheritdoc />
-		public string GetArgumentText(ICommandShell shell)
+		public string GetArgumentText(IScriptExecutionContext context)
 		{
-			return shell.GetVariableValue(variableName);
+			return context.GetVariableValue(variableName);
 		}
 	}
 }

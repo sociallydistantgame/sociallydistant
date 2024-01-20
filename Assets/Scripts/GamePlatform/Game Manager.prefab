@@ -44,6 +44,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: dc94989c30eaf0c459d5bf7611e1bf68, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  gameInitializationScript: {fileID: 4239777983668273547, guid: a71e0f944385470a83bb0d99faa95bd8, type: 3}
   playerInstance: {fileID: 11400000, guid: b143bb84d08c6044bb9b1a69e33c8460, type: 2}
   worldManager: {fileID: 11400000, guid: 6ddfb5183f8225440a5d156e7fb16747, type: 2}
   infoPanelService: {fileID: 11400000, guid: e04c289c2acd7e44fbdc339b481d4594, type: 2}

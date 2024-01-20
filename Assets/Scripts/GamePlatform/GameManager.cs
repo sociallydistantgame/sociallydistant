@@ -8,6 +8,7 @@ using System.Threading.Tasks;
 using ContentManagement;
 using Core;
 using Core.Config;
+using Core.Scripting;
 using Core.Serialization.Binary;
 using Core.WorldData.Data;
 using Cysharp.Threading.Tasks;
@@ -37,6 +38,9 @@ namespace GamePlatform
 		IGameContext
 	{
 		[SerializeField]
+		private ShellScriptAsset gameInitializationScript = null!;
+		
+		[SerializeField]
 		private PlayerInstanceHolder playerInstance = null!;
 		
 		[SerializeField]
@@ -48,6 +52,8 @@ namespace GamePlatform
 		[SerializeField]
 		private SocialServiceHolder socialHolder = null!;
 
+		private readonly UnityTextConsole unityConsole = new UnityTextConsole();
+		private IScriptSystem scriptSystem;
 		private TabbedToolCollection availableTools;
 		private GameMode currentGameMode;
 		private SettingsManager settingsManager;
@@ -87,9 +93,13 @@ namespace GamePlatform
 
 		/// <inheritdoc />
 		public ISettingsManager SettingsManager => settingsManager;
-		
+
+		/// <inheritdoc />
+		public IScriptSystem ScriptSystem => scriptSystem;
+
 		private void Awake()
 		{
+			scriptSystem = new ScriptSystem(this);
 			availableTools = new TabbedToolCollection(this);
 			
 			GameModeObservable = Observable.Create<GameMode>(observer =>
@@ -245,9 +255,19 @@ namespace GamePlatform
 			}
 
 			this.currentGameData = gameToLoad;
-			
-			
-			
+
+			try
+			{
+				await gameInitializationScript.ExecuteAsync(unityConsole);
+			}
+			catch (Exception ex)
+			{
+				this.playerInstance.Value.UiManager.ShowGameLoadError(ex);
+
+				await EndCurrentGame();
+				await GoToLoginScreen();
+			}
+
 			SetGameMode(GameMode.OnDesktop);
 		}
 

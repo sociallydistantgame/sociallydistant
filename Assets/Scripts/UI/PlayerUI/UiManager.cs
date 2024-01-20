@@ -2,6 +2,7 @@
 
 using System;
 using System.Linq;
+using System.Text;
 using Core;
 using Core.Config;
 using Core.Config.SystemConfigCategories;
@@ -21,6 +22,7 @@ using UniRx;
 using UnityEngine.EventSystems;
 using UnityEngine.UI;
 using UnityExtensions;
+using Utility;
 
 namespace UI.PlayerUI
 {
@@ -285,6 +287,24 @@ namespace UI.PlayerUI
 		private void OnSettingsUpdated(ISettingsManager settingsManager)
 		{
 			// TODO: User interface settings
+		}
+
+		public void ShowGameLoadError(Exception ex)
+		{
+			Debug.LogException(ex);
+			
+			var sb = new StringBuilder();
+
+			sb.AppendLine("Socially Distant could not load your save file. You have been logged out.");
+			sb.AppendLine();
+			sb.AppendException(ex);
+			
+			IMessageDialog dialog = windowManager.CreateMessageDialog("Failed to load game");
+
+			dialog.Title = "System error";
+			dialog.Message = sb.ToString();
+			
+			dialog.Buttons.Add("OK");
 		}
 	}
 }

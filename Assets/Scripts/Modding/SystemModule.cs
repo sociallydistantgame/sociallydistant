@@ -6,6 +6,7 @@ using System.Threading.Tasks;
 using Architecture;
 using Core.Config;
 using Core.Config.SystemConfigCategories;
+using Core.Scripting.GlobalCommands;
 using GamePlatform.ContentManagement;
 using GameplaySystems.WebPages;
 using Modules;
@@ -22,6 +23,8 @@ namespace Modding
 	[IgnoreModdingLegalWaiver]
 	public class SystemModule : GameModule
 	{
+		private static SystemModule? currentSystemModule;
+		
 		private readonly WebSiteContentManager websites = new();
 		private GraphicsSettings? graphicsSettings;
 		private AccessibilitySettings? a11ySettings;
@@ -33,10 +36,17 @@ namespace Modding
 
 		/// <inheritdoc />
 		public override string ModuleId => "com.sociallydistant.system";
-
+		
 		/// <inheritdoc />
 		protected override async Task OnInitialize()
 		{
+			if (currentSystemModule != null)
+				throw new InvalidOperationException("Multiple instances of the Socially Distant system module were loaded. This is a bug.");
+
+			RegisterGlobalCommands();
+			
+			currentSystemModule = this;
+			
 			// System settings modules
 			graphicsSettings = Context.SettingsManager.RegisterSettingsCategory<GraphicsSettings>();
 			a11ySettings = Context.SettingsManager.RegisterSettingsCategory<AccessibilitySettings>();
@@ -60,6 +70,8 @@ namespace Modding
 		/// <inheritdoc />
 		protected override async Task OnShutdown()
 		{
+			UnregisterGlobalCommands();
+			
 			Context.ContentManager.RemoveContentSource(websites);
 			
 			if (graphicsSettings != null)
@@ -70,11 +82,23 @@ namespace Modding
 
 			settingsObservable?.Dispose();
 			settingsObservable = null;
+
+			currentSystemModule = null;
 		}
 
 		private void OnSettingsUpdated(ISettingsManager settings)
 		{
 			
+		}
+
+		private void RegisterGlobalCommands()
+		{
+			Context.ScriptSystem.RegisterGlobalCommand("hookexec", new ExecuteHookCommand());
+		}
+
+		private void UnregisterGlobalCommands()
+		{
+			Context.ScriptSystem.UnregisterGlobalCommand("hookexec");
 		}
 		
 		private void FindRestitchedDataAndRegisterRestitchedContent()
@@ -151,6 +175,14 @@ namespace Modding
 
             // Register Restitched content with ContentManager.
             Context.ContentManager.AddContentSource<RestitchedContentSource>();
+		}
+
+		public static SystemModule GetSystemModule()
+		{
+			if (currentSystemModule == null)
+				throw new InvalidOperationException("Socially Distant is not running.");
+
+			return currentSystemModule;
 		}
 	}
 }
