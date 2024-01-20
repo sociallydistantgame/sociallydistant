@@ -1,6 +1,6 @@
 ﻿using OS.Devices;
 
-namespace UI.Shell
+namespace Core.Scripting.Consoles
 {
 	public class RedirectedConsole : ITextConsole
 	{

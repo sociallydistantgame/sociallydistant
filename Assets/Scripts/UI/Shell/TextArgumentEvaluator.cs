@@ -1,4 +1,7 @@
 ﻿#nullable enable
+using Core.Scripting;
+using Core.Scripting.Instructions;
+
 namespace UI.Shell
 {
 	public class TextArgumentEvaluator : IArgumentEvaluator
@@ -11,7 +14,7 @@ namespace UI.Shell
 		}
 		
 		/// <inheritdoc />
-		public string GetArgumentText(ICommandShell shell)
+		public string GetArgumentText(IScriptExecutionContext context)
 		{
 			// We add a trailing space for shell builtins to use, but the shell will automatically trim this.
 			return text + " ";

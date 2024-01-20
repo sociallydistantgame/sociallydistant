@@ -37,7 +37,7 @@ namespace Modules
 		protected abstract Task OnInitialize();
 		protected abstract Task OnShutdown();
 
-		protected IGameContext Context { get; private set; } = null!;
+		public IGameContext Context { get; private set; } = null!;
 		
 		/// <summary>
 		///		Initializes the module if it is not already initialized.

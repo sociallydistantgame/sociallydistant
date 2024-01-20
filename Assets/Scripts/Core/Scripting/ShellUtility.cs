@@ -3,10 +3,8 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using Architecture;
-using Core;
-using TMPro;
 
-namespace Utility
+namespace Core.Scripting
 {
 	public static class ShellUtility
 	{
@@ -174,7 +172,7 @@ namespace Utility
 			       || char.IsLetterOrDigit(character);
 		}
 		
-		public static IEnumerable<ShellToken> IdentifyTokens(StringBuilder rawInput)
+		public static IEnumerable<ShellToken> IdentifyTokens(string rawInput)
 		{
 			int lastTokenStart = 0;
 			
@@ -256,7 +254,7 @@ namespace Utility
 					}
 					
 					// White-space when not in a quote
-					case { } when char.IsWhiteSpace(charView.Current) && !inQuote:
+					case { } when charView.Current != '\n' && char.IsWhiteSpace(charView.Current) && !inQuote:
 					{
 						if (tokenBuilder.Length > 0)
 							yield return EndTextToken();
@@ -288,6 +286,7 @@ namespace Utility
 					}
 					
 					// Sequential operator
+					case '\n':
 					case ';':
 					{
 						if (tokenBuilder.Length > 0)

@@ -3,7 +3,7 @@ using System;
 using System.IO;
 using OS.Devices;
 
-namespace UI.Shell
+namespace Core.Scripting.Consoles
 {
 	public class FileOutputConsole : 
 		ITextConsole,

@@ -1,7 +1,7 @@
 ﻿using System.Text;
 using OS.Devices;
 
-namespace UI.Shell
+namespace Core.Scripting.Consoles
 {
 	public class LineListConsole : ITextConsole
 	{
