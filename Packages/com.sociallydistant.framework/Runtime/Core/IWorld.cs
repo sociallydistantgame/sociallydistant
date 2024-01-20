@@ -26,5 +26,7 @@ namespace Core
 		IWorldTable<WorldGuildData> Guilds { get; }
 		IWorldTable<WorldMemberData> Members { get; }
 		IWorldTable<WorldRelationshipData> Relationships { get; }
+		
+		IWorldFlagCollection WorldFlags { get; }
 	}
 }

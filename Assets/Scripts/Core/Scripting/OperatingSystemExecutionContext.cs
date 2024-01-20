@@ -30,7 +30,7 @@ namespace Core.Scripting
 		}
 
 		/// <inheritdoc />
-		public Task<bool> TryExecuteCommandAsync(string name, string[] args, ITextConsole console)
+		public Task<bool> TryExecuteCommandAsync(string name, string[] args, ITextConsole console, IScriptExecutionContext? callSite = null)
 		{
 			ISystemProcess? commandProcess = FindProgram(this.process, console, name, args);
 			if (commandProcess == null)

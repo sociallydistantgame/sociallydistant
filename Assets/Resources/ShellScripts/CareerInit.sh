@@ -16,8 +16,8 @@ hookexec BeforeWorldStateUpdate
 #
 # World flags won't be set automatically when the command finishes. This allows you to also update
 # the save file based on quest completion states, by setting a world flag on completion of a quest. 
-worldflag check CREATED_CITY_ISPS /ShellScripts/Career/CreateISPs
-worldflag check LIFEPATH_QUEST_COMPLETED /ShellScripts/Career/SetupLifepathQuest
+worldflag run-if-unset CREATED_CITY_ISPS ShellScripts/Career/CreateISPs
+worldflag run-if-unset LIFEPATH_QUEST_COMPLETED ShellScripts/Career/SetupLifepathQuest
 
 # We're done. Let mods run code after we've updated the core world state.
 hookexec AfterWorldStateUpdate

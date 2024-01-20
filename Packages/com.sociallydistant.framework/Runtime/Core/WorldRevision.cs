@@ -12,6 +12,7 @@
 		AddedHackables = 7,
 		Lifepaths = 8,
 		ChatAndSocialMedia = 9,
+		AddedWorldFlags = 10,
 
 		Latest
 	}

@@ -7,6 +7,7 @@ using OS;
 using Shell;
 using Shell.InfoPanel;
 using Social;
+using System.Threading.Tasks;
 
 namespace Modules
 {
@@ -55,5 +56,10 @@ namespace Modules
 		///		Gets a reference to the script system.
 		/// </summary>
 		IScriptSystem ScriptSystem { get; }
+
+		Task SaveCurrentGame(bool silent);
+		Task EndCurrentGame(bool save);
+		
+		bool IsDebugWorld { get; }
 	}
 }

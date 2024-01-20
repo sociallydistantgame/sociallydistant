@@ -186,21 +186,21 @@ namespace GamePlatform
 		
 		public async Task GoToLoginScreen()
 		{
-			await EndCurrentGame();
+			await EndCurrentGame(true);
 
 			SetGameMode(GameMode.AtLoginScreen);
 		}
 
 		public async Task StartCharacterCreator()
 		{
-			await EndCurrentGame();
+			await EndCurrentGame(true);
 			
 			SetGameMode(GameMode.CharacterCreator);
 		}
 		
 		public async Task StartGame(IGameData gameToLoad)
 		{
-			await EndCurrentGame();
+			await EndCurrentGame(true);
 			
 			SetGameMode(GameMode.Loading);
 
@@ -264,7 +264,7 @@ namespace GamePlatform
 			{
 				this.playerInstance.Value.UiManager.ShowGameLoadError(ex);
 
-				await EndCurrentGame();
+				await EndCurrentGame(false);
 				await GoToLoginScreen();
 			}
 
@@ -277,26 +277,40 @@ namespace GamePlatform
 			SetGameMode(GameMode.Loading);
 			
 			// Save and end the current game
-			await EndCurrentGame();
+			await EndCurrentGame(true);
 
 			PlatformHelper.QuitToDesktop();
 		}
 		
-		public async Task SaveCurrentGame()
+		/// <inheritdoc />
+		public async Task SaveCurrentGame(bool silent)
 		{
 			if (currentGameData == null)
 				return;
 
+			if (worldManager.Value == null)
+				return;
+			
 			await currentGameData.UpdatePlayerInfo(loadedPlayerInfo);
 			await currentGameData.SaveWorld(worldManager.Value);
+
+			if (silent)
+				return;
+
+			await gameInitializationScript.ExecuteAsync(unityConsole);
 		}
 
-		public async Task EndCurrentGame()
+		/// <inheritdoc />
+		public async Task EndCurrentGame(bool save)
 		{
-			await SaveCurrentGame();
+			if (save)
+				await SaveCurrentGame(true);
 
 			this.currentGameData = null;
 		}
+
+		/// <inheritdoc />
+		public bool IsDebugWorld => currentGameData is DebugGameData;
 
 		private void SetGameMode(GameMode newGameMode)
 		{
