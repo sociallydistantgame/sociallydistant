@@ -11,6 +11,7 @@ namespace Core.WorldData
 {
 	public class World : IWorld
 	{
+		private readonly WorldFlagCollection worldFlags = new WorldFlagCollection();
 		private readonly WorldDataObject<ProtectedWorldState> protectedWorldState;
 		private readonly WorldDataObject<GlobalWorldData> globalWorldState;
 		private readonly WorldDataObject<WorldPlayerData> playerData;
@@ -31,7 +32,10 @@ namespace Core.WorldData
 		
         /// <inheritdoc />
         public IWorldDataObject<GlobalWorldData> GlobalWorldState => globalWorldState;
-		
+
+        /// <inheritdoc />
+        public IWorldFlagCollection WorldFlags => worldFlags;
+        
         /// <inheritdoc />
         public IWorldDataObject<WorldPlayerData> PlayerData => playerData;
 		
@@ -100,6 +104,7 @@ namespace Core.WorldData
 
 		public void Serialize(IWorldSerializer serializer)
 		{
+			worldFlags.Serialize(serializer);
 			protectedWorldState.Serialize(serializer);
 			globalWorldState.Serialize(serializer);
 			computers.Serialize(serializer, WorldRevision.AddedComputers);
@@ -145,6 +150,7 @@ namespace Core.WorldData
 			this.computers.Clear();
 			this.globalWorldState.Value = default;
 			this.protectedWorldState.Value = default;
+			this.worldFlags.Clear();
 		}
 
 		public void ChangePlayerLifepath(LifepathAsset asset)

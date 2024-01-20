@@ -9,7 +9,6 @@ MonoBehaviour:
   m_GameObject: {fileID: 0}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 66e7501609f7485a9a73cd0287ada16c, type: 3}
-  m_Name: WorldScript
+  m_Script: {fileID: 11500000, guid: 215fb9b0a0094df48fe654a5bc4bbc52, type: 3}
+  m_Name: WorldCommands
   m_EditorClassIdentifier: 
-  contextCommandProvider: {fileID: 11400000, guid: b3602ed58a90a584ebc44dbba87ffd10, type: 2}

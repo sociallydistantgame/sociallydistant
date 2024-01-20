@@ -6,6 +6,7 @@ using System.Threading.Tasks;
 using Architecture;
 using Core.Config;
 using Core.Config.SystemConfigCategories;
+using Core.Scripting;
 using Core.Scripting.GlobalCommands;
 using GamePlatform.ContentManagement;
 using GameplaySystems.WebPages;
@@ -26,6 +27,7 @@ namespace Modding
 		private static SystemModule? currentSystemModule;
 		
 		private readonly WebSiteContentManager websites = new();
+		private readonly IHookListener debugWorldHook = new DebugWorldHook();
 		private GraphicsSettings? graphicsSettings;
 		private AccessibilitySettings? a11ySettings;
 		private UiSettings uiSettings;
@@ -40,6 +42,8 @@ namespace Modding
 		/// <inheritdoc />
 		protected override async Task OnInitialize()
 		{
+			RegisterHooks();
+			
 			if (currentSystemModule != null)
 				throw new InvalidOperationException("Multiple instances of the Socially Distant system module were loaded. This is a bug.");
 
@@ -70,6 +74,7 @@ namespace Modding
 		/// <inheritdoc />
 		protected override async Task OnShutdown()
 		{
+			UnregisterHooks();
 			UnregisterGlobalCommands();
 			
 			Context.ContentManager.RemoveContentSource(websites);
@@ -94,11 +99,27 @@ namespace Modding
 		private void RegisterGlobalCommands()
 		{
 			Context.ScriptSystem.RegisterGlobalCommand("hookexec", new ExecuteHookCommand());
+			Context.ScriptSystem.RegisterGlobalCommand("worldflag", new WorldFlagCommand(Context.WorldManager));
+			Context.ScriptSystem.RegisterGlobalCommand("savegame", new SaveGameCommand(Context));
+			
 		}
 
 		private void UnregisterGlobalCommands()
 		{
 			Context.ScriptSystem.UnregisterGlobalCommand("hookexec");
+			Context.ScriptSystem.UnregisterGlobalCommand("worldflag");
+			Context.ScriptSystem.UnregisterGlobalCommand("savegame");
+			
+		}
+
+		private void RegisterHooks()
+		{
+			Context.ScriptSystem.RegisterHookListener(CommonScriptHooks.BeforeWorldStateUpdate, debugWorldHook);
+		}
+
+		private void UnregisterHooks()
+		{
+			Context.ScriptSystem.UnregisterHookListener(CommonScriptHooks.BeforeWorldStateUpdate, debugWorldHook);
 		}
 		
 		private void FindRestitchedDataAndRegisterRestitchedContent()

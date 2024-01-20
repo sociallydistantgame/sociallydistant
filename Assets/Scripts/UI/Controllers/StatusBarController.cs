@@ -97,7 +97,7 @@ namespace UI.Controllers
 			if (gameManagerHolder.Value == null)
 				return;
 
-			await gameManagerHolder.Value.EndCurrentGame();
+			await gameManagerHolder.Value.EndCurrentGame(true);
 			await gameManagerHolder.Value.GoToLoginScreen();
 		}
 

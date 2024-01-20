@@ -28,10 +28,10 @@ namespace DevTools
 			if (gameManager.Value.IsGameActive)
 			{
 				if (GUILayout.Button("Save Current Game"))
-					gameManager.Value.SaveCurrentGame();
+					gameManager.Value.SaveCurrentGame(false);
 
 				if (GUILayout.Button("End Current Game"))
-					gameManager.Value.EndCurrentGame();
+					gameManager.Value.EndCurrentGame(true);
 			}
 			else
 			{

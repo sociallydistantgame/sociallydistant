@@ -38,6 +38,17 @@ namespace Core.Scripting.Parsing
 			PopScope();
 		}
 
+		private void Require(ArrayView<ShellToken> tokenView, ShellTokenType requiredType, string error)
+		{
+			if (tokenView.EndOfArray)
+				throw new InvalidOperationException(error);
+
+			if (tokenView.Current.TokenType != requiredType)
+				throw new InvalidOperationException(error);
+
+			tokenView.Advance();
+		}
+		
 		private void PushScope()
 		{
 			if (scopeStack.Count == 0)
@@ -61,10 +72,80 @@ namespace Core.Scripting.Parsing
 			
 			if (tokenView.Current.TokenType != ShellTokenType.Text)
 				throw new InvalidOperationException("Instructions must start with text.");
-
+			
 			return await ParseParallelInstruction(tokenView);
 		}
 
+		private async Task ParseFunctions(ArrayView<ShellToken> tokenView)
+		{
+			while (!tokenView.EndOfArray && tokenView.Current.TokenType == ShellTokenType.Text && tokenView.Current.Text == "function")
+				await ParseFunction(tokenView);
+		}
+		
+		private async Task ParseFunction(ArrayView<ShellToken> tokenView)
+		{
+			if (tokenView.Current.TokenType != ShellTokenType.Text)
+				return;
+
+			if (tokenView.Current.Text != "function")
+				return;
+
+			tokenView.Advance();
+
+			if (tokenView.EndOfArray || tokenView.Current.TokenType != ShellTokenType.Text)
+				throw new InvalidOperationException("Expected name of function");
+
+			string functionName = tokenView.Current.Text;
+
+			tokenView.Advance();
+
+			Require(tokenView, ShellTokenType.OpenParen, "'(' expected");
+			Require(tokenView, ShellTokenType.CloseParen, "')' expected");
+
+			ShellInstruction block = await ParseBlock(tokenView);
+
+			CurrentScope.DeclareFunction(functionName, block);
+		}
+		
+		private async Task<ShellInstruction> ParseBlock(ArrayView<ShellToken> tokenView)
+		{
+			Require(tokenView, ShellTokenType.OpenCurly, "'{' expected");
+
+			PushScope();
+
+			var instructionList = new List<ShellInstruction>();
+
+			while (!tokenView.EndOfArray)
+			{
+				if (tokenView.Current.TokenType == ShellTokenType.CloseCurly)
+					break;
+
+				if (tokenView.Current.TokenType == ShellTokenType.SequentialExecute)
+				{
+					tokenView.Advance();
+					continue;
+				}
+
+				ShellInstruction instruction = await ParseInstruction(tokenView);
+				
+				instructionList.Add(instruction);
+			}
+			
+			Require(tokenView, ShellTokenType.CloseCurly, "'}' expected");
+			PopScope();
+
+			// Skip any newlines after the block
+			while (!tokenView.EndOfArray)
+			{
+				if (tokenView.Current.TokenType != ShellTokenType.SequentialExecute)
+					break;
+					
+				tokenView.Advance();
+			}
+			
+			return new SequentialInstruction(instructionList);
+		}
+		
 		private async Task<ShellInstruction> ParseParallelInstruction(ArrayView<ShellToken> tokenView)
 		{
 			// Parse sequential command list
@@ -103,6 +184,10 @@ namespace Core.Scripting.Parsing
 				while (!tokenView.EndOfArray && tokenView.Current.TokenType == ShellTokenType.SequentialExecute)
 					tokenView.Advance();
 
+				// Special case when parsing blocks.
+				if (!tokenView.EndOfArray && tokenView.Current.TokenType == ShellTokenType.CloseCurly)
+					break;
+				
 				if (!tokenView.EndOfArray)
 					instructionList.Add(await ParsePipeSequence(tokenView));
 			}
@@ -129,6 +214,8 @@ namespace Core.Scripting.Parsing
 		
 		private async Task<ShellInstruction> ParseSingleInstruction(ArrayView<ShellToken> tokenView)
 		{
+			await ParseFunctions(tokenView);
+			
 			// We first try to parse a variable assignment instruction. If that fails, fall back to parsing a command.
 			ShellInstruction? assignment = await ParseVariableAssignment(tokenView);
 			if (assignment != null)

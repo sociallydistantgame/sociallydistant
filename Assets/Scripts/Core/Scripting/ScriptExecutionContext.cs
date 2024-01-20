@@ -1,5 +1,6 @@
 ﻿#nullable enable
 using System;
+using System.Collections.Generic;
 using System.Threading.Tasks;
 using Core.Scripting.Parsing;
 using Modding;
@@ -14,6 +15,12 @@ namespace Core.Scripting
 		ScriptableObject,
 		IScriptExecutionContext
 	{
+		[SerializeField]
+		private ScriptCommandProvider contextCommandProvider = null!;
+
+		private readonly Dictionary<string, IScriptCommand> contextCommandCache = new Dictionary<string, IScriptCommand>();
+		private bool isCacheReady;
+		
 		/// <inheritdoc />
 		public string GetVariableValue(string variableName)
 		{
@@ -26,8 +33,10 @@ namespace Core.Scripting
 		}
 
 		/// <inheritdoc />
-		public async Task<bool> TryExecuteCommandAsync(string name, string[] args, ITextConsole console)
+		public async Task<bool> TryExecuteCommandAsync(string name, string[] args, ITextConsole console, IScriptExecutionContext? callSite = null)
 		{
+			callSite ??= this;
+			
 			var system = SystemModule.GetSystemModule();
 			IGameContext gameContext = system.Context;
 			
@@ -37,7 +46,7 @@ namespace Core.Scripting
 			{
 				// Create a local context so we're not passing this ScriptableObject around directly,
 				// and execute the command in it.
-				var localContext = new LocalScriptExecutionContext(this);
+				var localContext = new LocalScriptExecutionContext(callSite);
 				await globalCommand.ExecuteAsync(localContext, console, name, args);
 				return true;
 			}
@@ -50,8 +59,32 @@ namespace Core.Scripting
 				await scriptAsset.ExecuteAsync(console);
 				return true;
 			}
+
+			// If we're in Unity Editor, we do not cache script commands. Because if we do,
+			// then the cache will persist across multiple Play Mode sessions and we don't want that.
+			#if UNITY_EDITOR
+			isCacheReady = false;
+			#endif
 			
-			// TODO: Context-local commands.
+			if (!isCacheReady)
+			{
+				this.contextCommandCache.Clear();
+				if (this.contextCommandProvider != null)
+				{
+					foreach (ScriptContextCommand? command in contextCommandProvider.ContextCommands)
+						contextCommandCache[command.Name] = command.ScriptCommand;
+				}
+
+				this.isCacheReady = true;
+			}
+
+			if (this.contextCommandCache.TryGetValue(name, out IScriptCommand scriptCommand))
+			{
+				var localContext = new LocalScriptExecutionContext(callSite);
+				await scriptCommand.ExecuteAsync(localContext, console, name, args);
+				return true;
+			}
+			
 			return false;
 		}
 

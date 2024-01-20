@@ -306,6 +306,46 @@ namespace Core.Scripting
 						break;
 					}
 					
+					// Open paren
+					case '(':
+					{
+						if (tokenBuilder.Length > 0)
+							yield return EndTextToken();
+
+						yield return new ShellToken(ShellTokenType.OpenParen, charView.Current.ToString(), charView.CurrentIndex, 1);
+						break;
+					}
+					
+					// Close paren
+					case ')':
+					{
+						if (tokenBuilder.Length > 0)
+							yield return EndTextToken();
+
+						yield return new ShellToken(ShellTokenType.CloseParen, charView.Current.ToString(), charView.CurrentIndex, 1);
+						break;
+					}
+					
+					// Open curly
+					case '{':
+					{
+						if (tokenBuilder.Length > 0)
+							yield return EndTextToken();
+
+						yield return new ShellToken(ShellTokenType.OpenCurly, charView.Current.ToString(), charView.CurrentIndex, 1);
+						break;
+					}
+					
+					// Close curly
+					case '}':
+					{
+						if (tokenBuilder.Length > 0)
+							yield return EndTextToken();
+
+						yield return new ShellToken(ShellTokenType.CloseCurly, charView.Current.ToString(), charView.CurrentIndex, 1);
+						break;
+					}
+					
 					// Assignment
 					case '=':
 					{
@@ -438,6 +478,10 @@ namespace Core.Scripting
 		ParallelExecute,
 		SequentialExecute,
 		VariableAccess,
-		AssignmentOperator
+		AssignmentOperator,
+		OpenParen,
+		CloseParen,
+		OpenCurly,
+		CloseCurly,
 	}
 }
