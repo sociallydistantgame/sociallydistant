@@ -5,12 +5,12 @@ using OS.Devices;
 
 namespace Core.Scripting.Instructions
 {
-	public sealed class BranchInstruction : ShellInstruction
+	public sealed class WhileLoop : ShellInstruction
 	{
 		private readonly ShellInstruction condition;
 		private readonly IReadOnlyCollection<ShellInstruction> body;
-		
-		public BranchInstruction(ShellInstruction condition, IReadOnlyCollection<ShellInstruction> body)
+
+		public WhileLoop(ShellInstruction condition, IReadOnlyCollection<ShellInstruction> body)
 		{
 			this.condition = condition;
 			this.body = body;
@@ -19,15 +19,14 @@ namespace Core.Scripting.Instructions
 		/// <inheritdoc />
 		public override async Task<int> RunAsync(ITextConsole console)
 		{
-			int conditionResult = await condition.RunAsync(console);
-
-			if (conditionResult != 0)
+			var exitCode = 0;
+			while (await condition.RunAsync(console) != 0)
 			{
 				foreach (ShellInstruction instruction in body)
-					await instruction.RunAsync(console);
+					exitCode = await instruction.RunAsync(console);
 			}
-			
-			return conditionResult;
+
+			return exitCode;
 		}
 	}
 }
