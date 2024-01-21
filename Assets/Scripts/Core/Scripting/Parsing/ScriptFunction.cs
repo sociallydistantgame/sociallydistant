@@ -16,7 +16,18 @@ namespace Core.Scripting.Parsing
 		
 		public async Task<bool> ExecuteAsync(string name, string[] args, ITextConsole console)
 		{
-			await body.RunAsync(console);
+			try
+			{
+				await body.RunAsync(console);
+			}
+			catch (ScriptEndException exit)
+			{
+				if (exit.LocalScope)
+					return true;
+
+				throw;
+			}
+
 			return true;
 		}
 	}

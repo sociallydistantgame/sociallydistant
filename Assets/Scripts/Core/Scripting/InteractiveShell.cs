@@ -21,7 +21,8 @@ namespace Core.Scripting
 	public class InteractiveShell :
 		ITerminalProcessController,
 		ICommandShell,
-		IAutoCompleteSource
+		IAutoCompleteSource,
+		IScriptExecutionContext
 	{
 		private readonly IScriptExecutionContext scriptContext;
 		private ISystemProcess? process;
@@ -82,8 +83,51 @@ namespace Core.Scripting
 
 		public void SetVariableValue(string name, string newValue)
 		{
-			if (this.process != null)
-				this.process.Environment[name] = newValue;
+			scriptContext.SetVariableValue(name, newValue);
+		}
+
+		/// <inheritdoc />
+		public async Task<bool> TryExecuteCommandAsync(string name, string[] args, ITextConsole console, IScriptExecutionContext? callSite = null)
+		{
+			switch (name)
+			{
+				case "exit":
+				case "return":
+				{
+					int exitCode = 0;
+
+					if (args.Length > 0)
+					{
+						if (int.TryParse(args[0], out int parsedExitCode))
+							exitCode = parsedExitCode;
+					}
+
+					throw new ScriptEndException(exitCode, name == "return");
+				}
+				case "clear":
+					console.ClearScreen();
+					return true;
+				case "echo":
+				{
+					string text = string.Join(string.Empty, args);
+					console.WriteText(text + Environment.NewLine);
+					return true;
+				}
+			}
+			
+			return await this.scriptContext.TryExecuteCommandAsync(name, args, console, callSite);
+		}
+
+		/// <inheritdoc />
+		public ITextConsole OpenFileConsole(ITextConsole realConsole, string filePath, FileRedirectionType mode)
+		{
+			return this.scriptContext.OpenFileConsole(realConsole, filePath, mode);
+		}
+
+		/// <inheritdoc />
+		public void HandleCommandNotFound(string name, ITextConsole console)
+		{
+			scriptContext.HandleCommandNotFound(name, console);
 		}
 
 		private void UpdateCommandCompletions()
@@ -167,6 +211,11 @@ namespace Core.Scripting
 				{
 					await nextInstruction.RunAsync(this.consoleDevice);
 				}
+				catch (ScriptEndException)
+				{
+					pendingInstructions.Clear();
+					return;
+				}
 				catch (Exception ex)
 				{
 					if (!HandleExceptionsGracefully)
@@ -215,6 +264,11 @@ namespace Core.Scripting
 					{
 						await nextInstruction.RunAsync(this.consoleDevice);
 					}
+					catch (ScriptEndException)
+					{
+						pendingInstructions.Clear();
+						return;
+					}
 					catch (Exception ex)
 					{
 						// log the full error to Unity
@@ -229,7 +283,7 @@ namespace Core.Scripting
 
 		public string GetVariableValue(string name)
 		{
-			return this.process?.Environment[name] ?? name;
+			return scriptContext.GetVariableValue(name);
 		}
 
 		private async Task ProcessTokens(string nextLineToExecute)
@@ -246,7 +300,7 @@ namespace Core.Scripting
 			// Create a view over this array that we can advance during parsing
 			var view = new ArrayView<ShellToken>(typedTokens.ToArray());
 
-			var parser = new ScriptParser(this.scriptContext);
+			var parser = new ScriptParser(this);
 			
 			pendingInstructions.Enqueue(await parser.ParseScript(view));
 		}
