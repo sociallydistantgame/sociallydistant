@@ -23,4 +23,11 @@ worldflag run-if-unset LIFEPATH_QUEST_COMPLETED ShellScripts/Career/SetupLifepat
 hookexec AfterWorldStateUpdate
 
 # Save changes to the world without triggering the script again.
-savegame -s
+if [ worldflag get DEBUG ]
+then
+  echo "Debug save. World will not be saved."
+else
+  savegame -s
+fi
+
+echo End of world update script

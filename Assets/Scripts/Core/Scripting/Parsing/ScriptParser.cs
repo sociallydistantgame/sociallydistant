@@ -30,7 +30,11 @@ namespace Core.Scripting.Parsing
 			
 			while (!script.EndOfArray)
 			{
-				instructions.Add(await ParseInstruction(script));
+				ShellInstruction? next = await ParseInstruction(script);
+				if (next == null)
+					break;
+				
+				instructions.Add(next);
 			}
 
 			return new SequentialInstruction(instructions);
@@ -40,11 +44,28 @@ namespace Core.Scripting.Parsing
 
 		private void Require(ArrayView<ShellToken> tokenView, ShellTokenType requiredType, string error)
 		{
+			while (!tokenView.EndOfArray && tokenView.Current.TokenType == ShellTokenType.Newline)
+				tokenView.Advance();
+			
 			if (tokenView.EndOfArray)
 				throw new InvalidOperationException(error);
 
 			if (tokenView.Current.TokenType != requiredType)
 				throw new InvalidOperationException(error);
+
+			tokenView.Advance();
+		}
+
+		private void RequireKeyword(ArrayView<ShellToken> tokenView, string expected)
+		{
+			while (!tokenView.EndOfArray && tokenView.Current.TokenType == ShellTokenType.Newline)
+				tokenView.Advance();
+			
+			if (tokenView.EndOfArray)
+				throw new InvalidOperationException($"Expected {expected} but instead reached end of file");
+
+			if (tokenView.Current.TokenType != ShellTokenType.Text || tokenView.Current.Text != expected)
+				throw new InvalidOperationException($"Expected {expected} but instead got {tokenView.Current.Text}");
 
 			tokenView.Advance();
 		}
@@ -65,21 +86,158 @@ namespace Core.Scripting.Parsing
 			scopeStack.Pop();
 		}
 		
-		private async Task<ShellInstruction> ParseInstruction(ArrayView<ShellToken> tokenView)
+		private async Task<ShellInstruction?> ParseInstruction(ArrayView<ShellToken> tokenView)
 		{
-			while (tokenView.Current.TokenType == ShellTokenType.SequentialExecute)
+			while (!tokenView.EndOfArray && tokenView.Current.TokenType == ShellTokenType.Newline)
 				tokenView.Advance();
 			
-			if (tokenView.Current.TokenType != ShellTokenType.Text)
-				throw new InvalidOperationException("Instructions must start with text.");
+			if (tokenView.EndOfArray)
+				return null;
+
+			if (tokenView.Current.TokenType == ShellTokenType.CloseCurly)
+				return null;
+			
+			if (tokenView.Current.TokenType == ShellTokenType.Text)
+			{
+				switch (tokenView.Current.Text)
+				{
+					case "function":
+						await ParseFunction(tokenView);
+						return await ParseInstruction(tokenView);
+					case "if":
+						return await ParseIfStatement(tokenView);
+					case "elif":
+					case "else":
+					case "fi":
+						return null;
+				}
+			}
 			
 			return await ParseParallelInstruction(tokenView);
 		}
 
-		private async Task ParseFunctions(ArrayView<ShellToken> tokenView)
+		private async Task<ShellInstruction> ParseIfStatement(ArrayView<ShellToken> tokenView)
 		{
-			while (!tokenView.EndOfArray && tokenView.Current.TokenType == ShellTokenType.Text && tokenView.Current.Text == "function")
-				await ParseFunction(tokenView);
+			RequireKeyword(tokenView, "if");
+
+			// TODO: Add support for && and || operators.
+			ShellInstruction condition = await ParseTest(tokenView);
+			
+			RequireKeyword(tokenView, "then");
+			
+			var mainBody = new List<ShellInstruction>();
+
+			PushScope();
+			while (!tokenView.EndOfArray)
+			{
+				if (tokenView.Current.TokenType == ShellTokenType.Text)
+				{
+					// Make sure we don't parse the else, elif, or fi keywords as commands.
+					if (tokenView.Current.Text == "elif" || tokenView.Current.Text == "else" || tokenView.Current.Text == "fi")
+						break;
+				}
+
+				ShellInstruction? instruction = await ParseInstruction(tokenView);
+				if (instruction == null)
+					break;
+				
+				mainBody.Add(instruction);
+			}
+
+			PopScope();
+
+			var branches = new List<ShellInstruction>();
+			branches.Add(new BranchInstruction(condition, mainBody));
+			while (!tokenView.EndOfArray)
+			{
+				if (tokenView.Current.TokenType != ShellTokenType.Text)
+					break;
+
+				if (tokenView.Current.Text != "elif")
+					break;
+				
+				RequireKeyword(tokenView, "elif");
+
+				ShellInstruction elifCondition = await ParseTest(tokenView);
+				var elifBody = new List<ShellInstruction>();
+				
+				PushScope();
+				while (!tokenView.EndOfArray)
+				{
+					if (tokenView.Current.TokenType == ShellTokenType.Text)
+					{
+						// Make sure we don't parse the else, elif, or fi keywords as commands.
+						if (tokenView.Current.Text == "elif" || tokenView.Current.Text == "else" || tokenView.Current.Text=="fi")
+							break;
+					}
+					
+					ShellInstruction instruction = await ParseInstruction(tokenView);
+					if (instruction == null)
+						break;
+					
+					elifBody.Add(instruction);
+				}
+
+				PopScope();
+				
+				branches.Add(new BranchInstruction(elifCondition, elifBody));
+			}
+
+			var defaultBody = new List<ShellInstruction>();
+			
+			while (!tokenView.EndOfArray)
+			{
+				if (tokenView.Current.TokenType != ShellTokenType.Text)
+					break;
+
+				if (tokenView.Current.TokenType == ShellTokenType.Text && tokenView.Current.Text == "fi")
+					break;
+				
+				if (tokenView.Current.Text != "else")
+					break;
+				
+				RequireKeyword(tokenView, "else");
+
+				while (!tokenView.EndOfArray)
+				{
+					if (tokenView.Current.TokenType == ShellTokenType.Text && tokenView.Current.Text == "fi")
+						break;
+
+					ShellInstruction instruction = await ParseInstruction(tokenView);
+					if (instruction == null)
+						break;
+					
+					defaultBody.Add(instruction);
+				}
+			}
+			
+			RequireKeyword(tokenView, "fi");
+
+			return new BranchEvaluator(branches, defaultBody);
+		}
+
+		private async Task<ShellInstruction> ParseTest(ArrayView<ShellToken> tokenView)
+		{
+			Require(tokenView, ShellTokenType.OpenSquare, $"Expected '['");
+
+			// Test expressions are just syntactic sugar for running the 'test' built-in command. 
+			var commandName = "test";
+
+			var argumentList = new List<IArgumentEvaluator>();
+			while (!tokenView.EndOfArray)
+			{
+				IArgumentEvaluator? argumentEvaluator = await ParseArgument(tokenView);
+				if (argumentEvaluator == null)
+					break;
+				
+				argumentList.Add(argumentEvaluator);
+			}
+			
+			Require(tokenView, ShellTokenType.ClosedSquare, $"Expected '['");
+
+			var commandData = new CommandData(CurrentScope, commandName, argumentList, FileRedirectionType.None, string.Empty);
+
+			return new SingleInstruction(commandData);
 		}
 		
 		private async Task ParseFunction(ArrayView<ShellToken> tokenView)
@@ -180,9 +338,12 @@ namespace Core.Scripting.Parsing
 			instructionList.Add(pipeSequence);
 			while (!tokenView.EndOfArray && tokenView.Current.TokenType == ShellTokenType.SequentialExecute)
 			{
-				// This cursed-ass nested while loop is because of newlines.
-				while (!tokenView.EndOfArray && tokenView.Current.TokenType == ShellTokenType.SequentialExecute)
+				// If we reach a newline, stop.
+				if (tokenView.Current.TokenType == ShellTokenType.Newline)
+				{
 					tokenView.Advance();
+					break;
+				}
 
 				// Special case when parsing blocks.
 				if (!tokenView.EndOfArray && tokenView.Current.TokenType == ShellTokenType.CloseCurly)
@@ -214,8 +375,6 @@ namespace Core.Scripting.Parsing
 		
 		private async Task<ShellInstruction> ParseSingleInstruction(ArrayView<ShellToken> tokenView)
 		{
-			await ParseFunctions(tokenView);
-			
 			// We first try to parse a variable assignment instruction. If that fails, fall back to parsing a command.
 			ShellInstruction? assignment = await ParseVariableAssignment(tokenView);
 			if (assignment != null)

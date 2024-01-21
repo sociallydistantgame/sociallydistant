@@ -91,6 +91,12 @@ namespace Core.Scripting
 		{
 			switch (name)
 			{
+				case "test":
+				{
+					var shellTest = new ShellTester(args);
+					shellTest.Test();
+					return true;
+				}
 				case "exit":
 				case "return":
 				{

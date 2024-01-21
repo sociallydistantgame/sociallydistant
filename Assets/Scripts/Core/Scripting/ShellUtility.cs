@@ -223,9 +223,11 @@ namespace Core.Scripting
 						{
 							switch (charView.Current)
 							{
+								case '\r':
 								case 'r':
 									tokenBuilder.Append('\r');
 									break;
+								case '\n':
 								case 'n':
 									tokenBuilder.Append('\n');
 									break;
@@ -250,6 +252,15 @@ namespace Core.Scripting
 							}
 						}
 
+						break;
+					}
+
+					case '\n' when !inQuote:
+					{
+						if (tokenBuilder.Length > 0)
+							yield return EndTextToken();
+
+						yield return new ShellToken(ShellTokenType.Newline, charView.Current.ToString(), charView.CurrentIndex, 1);
 						break;
 					}
 					
@@ -286,7 +297,6 @@ namespace Core.Scripting
 					}
 					
 					// Sequential operator
-					case '\n':
 					case ';':
 					{
 						if (tokenBuilder.Length > 0)
@@ -323,6 +333,26 @@ namespace Core.Scripting
 							yield return EndTextToken();
 
 						yield return new ShellToken(ShellTokenType.CloseParen, charView.Current.ToString(), charView.CurrentIndex, 1);
+						break;
+					}
+					
+					// Open square
+					case '[':
+					{
+						if (tokenBuilder.Length > 0)
+							yield return EndTextToken();
+
+						yield return new ShellToken(ShellTokenType.OpenSquare, charView.Current.ToString(), charView.CurrentIndex, 1);
+						break;
+					}
+					
+					// Close square
+					case ']':
+					{
+						if (tokenBuilder.Length > 0)
+							yield return EndTextToken();
+
+						yield return new ShellToken(ShellTokenType.ClosedSquare, charView.Current.ToString(), charView.CurrentIndex, 1);
 						break;
 					}
 					
@@ -483,5 +513,8 @@ namespace Core.Scripting
 		CloseParen,
 		OpenCurly,
 		CloseCurly,
+		OpenSquare,
+		ClosedSquare,
+		Newline
 	}
 }
