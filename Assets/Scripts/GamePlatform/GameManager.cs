@@ -266,6 +266,7 @@ namespace GamePlatform
 
 				await EndCurrentGame(false);
 				await GoToLoginScreen();
+				return;
 			}
 
 			SetGameMode(GameMode.OnDesktop);
