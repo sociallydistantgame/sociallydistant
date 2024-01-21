@@ -106,14 +106,44 @@ namespace Core.Scripting.Parsing
 						return await ParseInstruction(tokenView);
 					case "if":
 						return await ParseIfStatement(tokenView);
+					case "while":
+						return await ParseWhileLoop(tokenView);
 					case "elif":
 					case "else":
 					case "fi":
+					case "done":
 						return null;
 				}
 			}
 			
 			return await ParseParallelInstruction(tokenView);
+		}
+
+		private async Task<ShellInstruction> ParseWhileLoop(ArrayView<ShellToken> tokenView)
+		{
+			RequireKeyword(tokenView, "while");
+
+			ShellInstruction condition = await ParseTest(tokenView);
+			
+			RequireKeyword(tokenView, "do");
+			
+			PushScope();
+
+			var body = new List<ShellInstruction>();
+			while (!tokenView.EndOfArray)
+			{
+				ShellInstruction? instruction = await ParseInstruction(tokenView);
+				if (instruction == null)
+					break;
+				
+				body.Add(instruction);
+			}
+            
+			PopScope();
+			
+			RequireKeyword(tokenView, "done");
+
+			return new WhileLoop(condition, body);
 		}
 
 		private async Task<ShellInstruction> ParseIfStatement(ArrayView<ShellToken> tokenView)
