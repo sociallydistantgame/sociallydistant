@@ -7,6 +7,7 @@ namespace OS.Devices
 	public interface ISystemProcess
 	{
 		int Id { get; }
+		int ExitCode { get; }
 		string Name { get; set; }
 		IUser User { get; }
 		ISystemProcess? Parent { get;}
@@ -21,6 +22,6 @@ namespace OS.Devices
 		ISystemProcess ForkAsUser(IUser user);
 
 		
-		void Kill();
+		void Kill(int exitCode = 0);
 	}
 }

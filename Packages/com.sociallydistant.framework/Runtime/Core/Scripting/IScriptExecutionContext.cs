@@ -9,7 +9,7 @@ namespace Core.Scripting
 		string GetVariableValue(string variableName);
 		void SetVariableValue(string variableName, string value);
 
-		Task<bool> TryExecuteCommandAsync(string name, string[] args, ITextConsole console, IScriptExecutionContext? callSite = null);
+		Task<int?> TryExecuteCommandAsync(string name, string[] args, ITextConsole console, IScriptExecutionContext? callSite = null);
 
 		ITextConsole OpenFileConsole(ITextConsole realConsole, string filePath, FileRedirectionType mode);
 

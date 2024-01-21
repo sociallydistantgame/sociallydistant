@@ -14,21 +14,23 @@ namespace Core.Scripting.Parsing
 			this.body = body;
 		}
 		
-		public async Task<bool> ExecuteAsync(string name, string[] args, ITextConsole console)
+		public async Task<int> ExecuteAsync(string name, string[] args, ITextConsole console)
 		{
+			int exitCode = 0;
+			
 			try
 			{
-				await body.RunAsync(console);
+				exitCode = await body.RunAsync(console);
 			}
 			catch (ScriptEndException exit)
 			{
 				if (exit.LocalScope)
-					return true;
+					return exit.ExitCode;
 
 				throw;
 			}
 
-			return true;
+			return exitCode;
 		}
 	}
 }

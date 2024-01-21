@@ -30,18 +30,18 @@ namespace Core.Scripting
 		}
 
 		/// <inheritdoc />
-		public Task<bool> TryExecuteCommandAsync(string name, string[] args, ITextConsole console, IScriptExecutionContext? callSite = null)
+		public Task<int?> TryExecuteCommandAsync(string name, string[] args, ITextConsole console, IScriptExecutionContext? callSite = null)
 		{
 			ISystemProcess? commandProcess = FindProgram(this.process, console, name, args);
 			if (commandProcess == null)
-				return Task.FromResult(false);
+				return Task.FromResult<int?>(null);
 			
 			// special case for commands that kill the process IMMEDIATELY
 			// on the same frame this was called
 			if (commandProcess != null && !commandProcess.IsAlive)
-				return Task.FromResult(true);
+				return Task.FromResult<int?>(commandProcess.ExitCode);
 
-			var completionSource = new TaskCompletionSource<bool>();
+			var completionSource = new TaskCompletionSource<int?>();
 
 			commandProcess.Killed += HandleKill;
 
@@ -50,7 +50,7 @@ namespace Core.Scripting
 			void HandleKill(ISystemProcess killed)
 			{
 				killed.Killed -= HandleKill;
-				completionSource.SetResult(true);
+				completionSource.SetResult(killed.ExitCode);
 			}
 		}
 

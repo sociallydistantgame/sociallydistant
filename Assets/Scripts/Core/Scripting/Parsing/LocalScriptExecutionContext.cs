@@ -39,7 +39,7 @@ namespace Core.Scripting.Parsing
 		}
 
 		/// <inheritdoc />
-		public async Task<bool> TryExecuteCommandAsync(string name, string[] args, ITextConsole console, IScriptExecutionContext? callSite = null)
+		public async Task<int?> TryExecuteCommandAsync(string name, string[] args, ITextConsole console, IScriptExecutionContext? callSite = null)
 		{
 			callSite ??= this;
 			
@@ -55,7 +55,7 @@ namespace Core.Scripting.Parsing
 				for (var i = 0; i < args.Length; i++)
 					CurrentFrame?.SetVariableValue(i.ToString(), args[i]);
 				
-				bool result = await function.ExecuteAsync(name, args, console);
+				int result = await function.ExecuteAsync(name, args, console);
 
 				functionFrames.Pop();
 				

@@ -19,12 +19,15 @@ namespace Core.Scripting.Instructions
 		}
 
 		/// <inheritdoc />
-		public override async Task RunAsync(ITextConsole console)
+		public override async Task<int> RunAsync(ITextConsole console)
 		{
+			int result = 0;
 			foreach (ShellInstruction instruction in instructions)
 			{
-				await instruction.RunAsync(console);
+				result = await instruction.RunAsync(console);
 			}
+
+			return result;
 		}
 	}
 }

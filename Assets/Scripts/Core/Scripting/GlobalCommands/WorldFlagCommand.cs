@@ -58,7 +58,7 @@ namespace Core.Scripting.GlobalCommands
 					
 					commandName = args[2];
 
-					if (!await context.TryExecuteCommandAsync(commandName, args.Skip(3).ToArray(), console))
+					if (!(await context.TryExecuteCommandAsync(commandName, args.Skip(3).ToArray(), console)).HasValue)
 						context.HandleCommandNotFound(commandName, console);
 					
 					break;
@@ -71,7 +71,7 @@ namespace Core.Scripting.GlobalCommands
 					
 					commandName = args[2];
 					
-					if (!await context.TryExecuteCommandAsync(commandName, args.Skip(3).ToArray(), console))
+					if (!(await context.TryExecuteCommandAsync(commandName, args.Skip(3).ToArray(), console)).HasValue)
 						context.HandleCommandNotFound(commandName, console);
 
 					break;

@@ -87,15 +87,14 @@ namespace Core.Scripting
 		}
 
 		/// <inheritdoc />
-		public async Task<bool> TryExecuteCommandAsync(string name, string[] args, ITextConsole console, IScriptExecutionContext? callSite = null)
+		public async Task<int?> TryExecuteCommandAsync(string name, string[] args, ITextConsole console, IScriptExecutionContext? callSite = null)
 		{
 			switch (name)
 			{
 				case "test":
 				{
 					var shellTest = new ShellTester(args);
-					shellTest.Test();
-					return true;
+					return shellTest.Test();
 				}
 				case "exit":
 				case "return":
@@ -112,12 +111,12 @@ namespace Core.Scripting
 				}
 				case "clear":
 					console.ClearScreen();
-					return true;
+					return 0;
 				case "echo":
 				{
 					string text = string.Join(string.Empty, args);
 					console.WriteText(text + Environment.NewLine);
-					return true;
+					return 0;
 				}
 			}
 			

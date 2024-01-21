@@ -21,7 +21,7 @@ namespace Core.Scripting.Instructions
 		}
 		
 		/// <inheritdoc />
-		public override Task RunAsync(ITextConsole console)
+		public override Task<int> RunAsync(ITextConsole console)
 		{
 			// TODO: Async argument evaluation, e.g. command substitution
 			
@@ -32,7 +32,7 @@ namespace Core.Scripting.Instructions
 			string newValue = string.Join(string.Empty, args);
 			context.SetVariableValue(identifier, newValue);
 
-			return Task.CompletedTask;
+			return Task.FromResult(0);
 		}
 	}
 }
