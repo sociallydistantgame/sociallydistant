@@ -12,7 +12,11 @@ namespace Architecture
 		private readonly UniqueIntGenerator pidGenerator;
 		private readonly DeviceCoordinator coordinator;
 		private bool isAlive = true;
+		private int exitCode;
 
+		/// <inheritdoc />
+		public int ExitCode => exitCode;
+		
 		/// <inheritdoc />
 		public bool IsAlive => isAlive;
 		
@@ -85,11 +89,12 @@ namespace Architecture
 		public event Action<ISystemProcess>? Killed; 
 
 		/// <inheritdoc />
-		public void Kill()
+		public void Kill(int exitCode)
 		{
 			foreach (ISystemProcess child in Children.ToArray())
 				child.Kill();
 
+			this.exitCode = exitCode;
 			isAlive = false;
 			Killed?.Invoke(this);
 		}

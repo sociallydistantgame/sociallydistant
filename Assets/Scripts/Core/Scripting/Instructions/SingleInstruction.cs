@@ -18,9 +18,9 @@ namespace Core.Scripting.Instructions
 		}
 
 		/// <inheritdoc />
-		public override async Task RunAsync(ITextConsole console)
+		public override async Task<int> RunAsync(ITextConsole console)
 		{
-			await command.ExecuteAsync(console);
+			return await command.ExecuteAsync(console);
 		}
 	}
 }

@@ -17,7 +17,11 @@ namespace Core.Scripting
 		private readonly List<ISystemProcess> children = new List<ISystemProcess>();
         private readonly IUser user;
 		private bool alive = true;
+		private int exitCode;
 
+		/// <inheritdoc />
+		public int ExitCode => exitCode;
+		
 		/// <inheritdoc />
 		public int Id => id;
 
@@ -83,7 +87,7 @@ namespace Core.Scripting
 		}
 
 		/// <inheritdoc />
-		public void Kill()
+		public void Kill(int exitCode = 0)
 		{
 			if (!alive)
 				return;
@@ -91,6 +95,7 @@ namespace Core.Scripting
 			while (children.Count > 0)
 				children[0].Kill();
 
+			this.exitCode = exitCode;
 			idGenerator.DeclareUnused(id);
 			alive = false;
 			Killed?.Invoke(this);

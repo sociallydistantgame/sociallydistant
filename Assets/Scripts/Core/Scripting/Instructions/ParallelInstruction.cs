@@ -15,9 +15,10 @@ namespace Core.Scripting.Instructions
 		}
 		
 		/// <inheritdoc />
-		public override async Task RunAsync( ITextConsole console)
+		public override async Task<int> RunAsync( ITextConsole console)
 		{
 			await Task.WhenAll(first.RunAsync(console), next.RunAsync(console));
+			return 0;
 		}
 	}
 }

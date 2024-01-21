@@ -13,6 +13,11 @@ namespace Architecture
 		private IUser loginUser;
 		private readonly UniqueIntGenerator pidGenerator;
 		private bool isAlive = true;
+		private int exitCode;
+
+		/// <inheritdoc />
+		public int ExitCode => exitCode;
+		
 		/// <inheritdoc />"/>
 		public string Name { get; set; }
 
@@ -87,11 +92,12 @@ namespace Architecture
 		public event Action<ISystemProcess>? Killed; 
 
 		/// <inheritdoc />
-		public void Kill()
+		public void Kill(int exitCode = 0)
 		{
 			foreach (ISystemProcess child in Children.ToArray())
 				child.Kill();
 
+			this.exitCode = exitCode;
 			isAlive = false;
 			Killed?.Invoke(this);
 		}

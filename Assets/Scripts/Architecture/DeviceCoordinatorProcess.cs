@@ -13,10 +13,14 @@ namespace Architecture
 		private readonly UniqueIntGenerator pidGenerator = new UniqueIntGenerator();
 		private readonly SimpleEnvironmentVariableProvider environment = new SimpleEnvironmentVariableProvider();
 		private bool isAlive = true;
+		private int exitCode;
 
 		/// <inheritdoc />
 		public bool IsAlive => isAlive;
-		
+
+		/// <inheritdoc />
+		public int ExitCode => exitCode;
+        
 		/// <inheritdoc />
 		public string WorkingDirectory { get; set; } = "/";
 		
@@ -96,11 +100,12 @@ namespace Architecture
 		public event Action<ISystemProcess>? Killed; 
 
 		/// <inheritdoc />
-		public void Kill()
+		public void Kill(int exitCode = 0)
 		{
 			foreach (ISystemProcess child in Children.ToArray())
 				child.Kill();
 
+			this.exitCode = exitCode;
 			isAlive = false;
 			Killed?.Invoke(this);
 		}

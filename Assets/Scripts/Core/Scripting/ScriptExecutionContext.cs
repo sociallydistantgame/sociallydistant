@@ -33,7 +33,7 @@ namespace Core.Scripting
 		}
 
 		/// <inheritdoc />
-		public async Task<bool> TryExecuteCommandAsync(string name, string[] args, ITextConsole console, IScriptExecutionContext? callSite = null)
+		public async Task<int?> TryExecuteCommandAsync(string name, string[] args, ITextConsole console, IScriptExecutionContext? callSite = null)
 		{
 			callSite ??= this;
 			
@@ -48,7 +48,7 @@ namespace Core.Scripting
 				// and execute the command in it.
 				var localContext = new LocalScriptExecutionContext(callSite);
 				await globalCommand.ExecuteAsync(localContext, console, name, args);
-				return true;
+				return 0;
 			}
 			
 			// Then search for script assets in /Resources.
@@ -57,7 +57,7 @@ namespace Core.Scripting
 			if (scriptAsset != null)
 			{
 				await scriptAsset.ExecuteAsync(console);
-				return true;
+				return 0;
 			}
 
 			// If we're in Unity Editor, we do not cache script commands. Because if we do,
@@ -82,10 +82,10 @@ namespace Core.Scripting
 			{
 				var localContext = new LocalScriptExecutionContext(callSite);
 				await scriptCommand.ExecuteAsync(localContext, console, name, args);
-				return true;
+				return 0;
 			}
 			
-			return false;
+			return null;
 		}
 
 		/// <inheritdoc />

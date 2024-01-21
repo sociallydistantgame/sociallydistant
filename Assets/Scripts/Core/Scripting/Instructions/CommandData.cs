@@ -32,7 +32,7 @@ namespace Core.Scripting.Instructions
 			this.FilePath = path;
 		}
 		
-		public async Task ExecuteAsync(ITextConsole console)
+		public async Task<int> ExecuteAsync(ITextConsole console)
 		{
 			// Evaluate arguments now.
 			string[] args = ArgumentList.Select(x => x.GetArgumentText(this.context)).ToArray();
@@ -44,12 +44,14 @@ namespace Core.Scripting.Instructions
 			ShellUtility.TrimTrailingSpaces(ref args);
 			
 			// Hand execution off to the execution context.
-			bool wasCommandFound = await this.context.TryExecuteCommandAsync(this.Name, args, realConsole);
-			if (!wasCommandFound)
+			int? commandExitStatus = await this.context.TryExecuteCommandAsync(this.Name, args, realConsole);
+			if (!commandExitStatus.HasValue)
 				context.HandleCommandNotFound(this.Name, realConsole);
 			
 			if (realConsole is IDisposable disposable)
 				disposable.Dispose();
+
+			return commandExitStatus.HasValue ? commandExitStatus.Value : -1;
 		}
 	}
 }
