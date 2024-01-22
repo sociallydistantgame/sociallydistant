@@ -1,6 +1,7 @@
 ﻿#nullable enable
 
 using System;
+using System.Net.WebSockets;
 using System.Threading.Tasks;
 using Architecture;
 using Core.Scripting;
@@ -27,7 +28,7 @@ namespace UI.Applications.Terminal
 		private ISystemProcess? shellProcess;
 		private SimpleTerminalRenderer st = null!;
 		private ITextConsole? textConsole;
-		private ITerminalProcessController? shell;
+		private InteractiveShell? shell;
 		private DialogHelper dialogHelper = null!;
 		private bool isWaitingForInput;
 		private bool hasStartedShell;
@@ -59,9 +60,20 @@ namespace UI.Applications.Terminal
 			// TODO: Command-line arguments to specify the shell
 			// Create a shell.
 			this.shell = new InteractiveShell(context);
+			shell.HandleExceptionsGracefully = true;
 			shell.Setup(shellProcess, textConsole);
 
-			await shell.Run();
+			while (shellProcess.IsAlive)
+			{
+				try
+				{
+					await shell.Run();
+				}
+				catch (ScriptEndException endException)
+				{
+					shellProcess.Kill(endException.ExitCode);
+				}
+			}
 		}
 
 		private void Update()

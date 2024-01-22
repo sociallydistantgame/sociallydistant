@@ -22,7 +22,7 @@ namespace Core.Scripting.Instructions
 			foreach (ShellInstruction branch in cases)
 			{
 				int result = await branch.RunAsync(console);
-				if (result != 0)
+				if (result == 0)
 					return result;
 			}
 
