@@ -14,6 +14,10 @@ namespace Core.Scripting.Parsing
 	{
 		private readonly IScriptExecutionContext context;
 		private readonly Stack<LocalScriptExecutionContext> scopeStack = new Stack<LocalScriptExecutionContext>();
+		private readonly Stack<LanguageContext> languageContextSTack = new Stack<LanguageContext>();
+
+		private LanguageContext CurrentContext => languageContextSTack.Count > 0 ? languageContextSTack.Peek() : LanguageContext.None;
+		
 
 		public LocalScriptExecutionContext CurrentScope => scopeStack.Peek();
 
@@ -40,6 +44,16 @@ namespace Core.Scripting.Parsing
 			return new SequentialInstruction(instructions);
 
 			PopScope();
+		}
+
+		private void PushContext(LanguageContext context)
+		{
+			this.languageContextSTack.Push(context);
+		}
+
+		private void PopContext()
+		{
+			this.languageContextSTack.Pop();
 		}
 
 		private void Require(ArrayView<ShellToken> tokenView, ShellTokenType requiredType, string error)
@@ -108,12 +122,17 @@ namespace Core.Scripting.Parsing
 						return await ParseIfStatement(tokenView);
 					case "while":
 						return await ParseWhileLoop(tokenView);
-					case "elif":
-					case "else":
-					case "fi":
-					case "done":
-						return null;
 				}
+			}
+
+			if (CheckReserved(tokenView))
+				return null;
+			
+			// Special case: You can have functions without the "function" keyword. Because of course you can.
+			if (tokenView.Current.TokenType == ShellTokenType.Text && tokenView.Next?.TokenType == ShellTokenType.OpenParen)
+			{
+				await ParseFunction(tokenView);
+				return await ParseInstruction(tokenView);
 			}
 			
 			return await ParseParallelInstruction(tokenView);
@@ -123,10 +142,15 @@ namespace Core.Scripting.Parsing
 		{
 			RequireKeyword(tokenView, "while");
 
-			ShellInstruction condition = await ParseTest(tokenView);
+			PushContext(LanguageContext.LoopCondition);
+			ShellInstruction? condition = await ParseInstruction(tokenView);
+			if (condition == null)
+				throw new InvalidOperationException("Expected a condition instruction next to the while statement.");
+			PopContext();
 			
 			RequireKeyword(tokenView, "do");
 			
+			PushContext(LanguageContext.LoopBody);
 			PushScope();
 
 			var body = new List<ShellInstruction>();
@@ -140,6 +164,7 @@ namespace Core.Scripting.Parsing
 			}
             
 			PopScope();
+			PopContext();
 			
 			RequireKeyword(tokenView, "done");
 
@@ -149,9 +174,14 @@ namespace Core.Scripting.Parsing
 		private async Task<ShellInstruction> ParseIfStatement(ArrayView<ShellToken> tokenView)
 		{
 			RequireKeyword(tokenView, "if");
-
+			PushContext(LanguageContext.IfStatement);
+			
 			// TODO: Add support for && and || operators.
-			ShellInstruction condition = await ParseTest(tokenView);
+			PushContext(LanguageContext.IfCondition);
+			ShellInstruction? condition = await ParseInstruction(tokenView);
+			if (condition == null)
+				throw new InvalidOperationException("Expected a condition instruction next to the if statement.");
+			PopContext();
 			
 			RequireKeyword(tokenView, "then");
 			
@@ -187,8 +217,14 @@ namespace Core.Scripting.Parsing
 					break;
 				
 				RequireKeyword(tokenView, "elif");
+				PushContext(LanguageContext.ElifStatement);
 
-				ShellInstruction elifCondition = await ParseTest(tokenView);
+				PushContext(LanguageContext.IfCondition);
+				ShellInstruction? elifCondition = await ParseInstruction(tokenView);
+				if (elifCondition == null)
+					throw new InvalidOperationException("Expected a condition instruction next to the elif statement.");
+				PopContext();
+				
 				var elifBody = new List<ShellInstruction>();
 				
 				PushScope();
@@ -201,7 +237,7 @@ namespace Core.Scripting.Parsing
 							break;
 					}
 					
-					ShellInstruction instruction = await ParseInstruction(tokenView);
+					ShellInstruction? instruction = await ParseInstruction(tokenView);
 					if (instruction == null)
 						break;
 					
@@ -209,6 +245,7 @@ namespace Core.Scripting.Parsing
 				}
 
 				PopScope();
+				PopContext();
 				
 				branches.Add(new BranchInstruction(elifCondition, elifBody));
 			}
@@ -227,7 +264,7 @@ namespace Core.Scripting.Parsing
 					break;
 				
 				RequireKeyword(tokenView, "else");
-
+				PushContext(LanguageContext.ElseStatement);
 				while (!tokenView.EndOfArray)
 				{
 					if (tokenView.Current.TokenType == ShellTokenType.Text && tokenView.Current.Text == "fi")
@@ -239,8 +276,11 @@ namespace Core.Scripting.Parsing
 					
 					defaultBody.Add(instruction);
 				}
+
+				PopContext();
 			}
-			
+
+			PopContext();
 			RequireKeyword(tokenView, "fi");
 
 			return new BranchEvaluator(branches, defaultBody);
@@ -337,74 +377,78 @@ namespace Core.Scripting.Parsing
 		private async Task<ShellInstruction> ParseParallelInstruction(ArrayView<ShellToken> tokenView)
 		{
 			// Parse sequential command list
-			var commandSequence = await ParseCommandList(tokenView);
+			ShellInstruction leftSide = await ParseCommandList(tokenView);
 
-			// End of command-line, no parallel executions
 			if (tokenView.EndOfArray)
-				return commandSequence;
+				return leftSide;
 
-			// This should never execute
 			if (tokenView.Current.TokenType != ShellTokenType.ParallelExecute)
-				return commandSequence;
+				return leftSide;
 
 			tokenView.Advance();
 
-			// Parse another instruction
-			ShellInstruction nextInstruction = await ParseInstruction(tokenView);
-
-			return new ParallelInstruction(commandSequence, nextInstruction);
+			ShellInstruction? rightSide = await ParseInstruction(tokenView);
+			if (rightSide == null)
+				return leftSide;
+			
+			return new ParallelInstruction(leftSide, rightSide);
 		}
 		
 		private async Task<ShellInstruction> ParseCommandList(ArrayView<ShellToken> tokenView)
 		{
+			var instructionList = new List<ShellInstruction>();
+			
 			// Parse a pipe sequence
 			ShellInstruction pipeSequence = await ParsePipeSequence(tokenView);
-
-			// No more tokens
-			if (tokenView.EndOfArray)
-				return pipeSequence;
-
-			var instructionList = new List<ShellInstruction>();
 			instructionList.Add(pipeSequence);
-			while (!tokenView.EndOfArray && tokenView.Current.TokenType == ShellTokenType.SequentialExecute)
+			
+			while (!tokenView.EndOfArray)
 			{
-				// If we reach a newline, stop.
-				if (tokenView.Current.TokenType == ShellTokenType.Newline)
-				{
-					tokenView.Advance();
+				if (tokenView.Current.TokenType != ShellTokenType.SequentialExecute)
 					break;
-				}
 
-				// Special case when parsing blocks.
-				if (!tokenView.EndOfArray && tokenView.Current.TokenType == ShellTokenType.CloseCurly)
+				tokenView.Advance();
+				ShellInstruction? nextPipe = await ParsePipeSequence(tokenView);
+				if (nextPipe == null)
 					break;
 				
-				if (!tokenView.EndOfArray)
-					instructionList.Add(await ParsePipeSequence(tokenView));
+				instructionList.Add(nextPipe);
 			}
-
+			
 			return new SequentialInstruction(instructionList);
 		}
 		
-		private async Task<ShellInstruction> ParsePipeSequence(ArrayView<ShellToken> tokenView)
+		private async Task<ShellInstruction?> ParsePipeSequence(ArrayView<ShellToken> tokenView)
 		{
-			ShellInstruction commandInstruction = await ParseSingleInstruction(tokenView);
+			ShellInstruction? commandInstruction = await ParseSingleInstruction(tokenView);
+			if (commandInstruction == null)
+				return null;
 
 			if (tokenView.EndOfArray)
 				return commandInstruction;
-
+			
 			if (tokenView.Current.TokenType != ShellTokenType.Pipe)
 				return commandInstruction;
 
 			tokenView.Advance();
 
-			ShellInstruction pipeDestination = await ParsePipeSequence(tokenView);
+			ShellInstruction? pipeDestination = await ParsePipeSequence(tokenView);
+			if (pipeDestination == null)
+				return commandInstruction;
 
 			return new PipeInstruction(commandInstruction, pipeDestination);
 		}
 		
-		private async Task<ShellInstruction> ParseSingleInstruction(ArrayView<ShellToken> tokenView)
+		private async Task<ShellInstruction?> ParseSingleInstruction(ArrayView<ShellToken> tokenView)
 		{
+			if (tokenView.EndOfArray)
+				return null;
+			
+			// If we get an OpenSquare token, then we interpret it as an expression test.
+			// See https://man.sociallydistantgame.com/index.php/Shell_Expression_Tests
+			if (tokenView.Current.TokenType == ShellTokenType.OpenSquare)
+				return await ParseTest(tokenView);
+			
 			// We first try to parse a variable assignment instruction. If that fails, fall back to parsing a command.
 			ShellInstruction? assignment = await ParseVariableAssignment(tokenView);
 			if (assignment != null)
@@ -468,6 +512,9 @@ namespace Core.Scripting.Parsing
 		
 		private async Task<CommandData> ParseCommandWithArguments(ArrayView<ShellToken> tokenView)
 		{
+			if (tokenView.Current.TokenType != ShellTokenType.Text)
+				throw new InvalidOperationException($"Syntax error near unexpected token '{tokenView.Current.Text}'");
+			
 			string name = tokenView.Current.Text;
 			var arguments = new List<IArgumentEvaluator>();
 
@@ -489,6 +536,9 @@ namespace Core.Scripting.Parsing
 			if (tokenView.EndOfArray)
 				return null;
 
+			if (CheckReserved(tokenView))
+				return null;
+			
 			return tokenView.Current.TokenType switch
 			{
 				ShellTokenType.VariableAccess => await ParseVariableAccess(tokenView),
@@ -572,6 +622,74 @@ namespace Core.Scripting.Parsing
 				sb.Length--;
 
 			return sb.ToString();
+		}
+
+		private bool CheckReserved(ArrayView<ShellToken> tokenView)
+		{
+			if (tokenView.EndOfArray)
+				return false;
+			
+			var willThrow = false;
+			
+			if (tokenView.Current.TokenType == ShellTokenType.Text)
+			{
+				switch (tokenView.Current.Text)
+				{
+					case "do":
+						if (CurrentContext == LanguageContext.LoopCondition)
+							return true;
+
+						willThrow = true;
+						break;
+					case "done":
+						if (CurrentContext == LanguageContext.LoopBody)
+							return true;
+
+						willThrow = true;
+						break;
+					case "then":
+						if (CurrentContext == LanguageContext.IfCondition)
+							return true;
+
+						willThrow = true;
+						break;
+					case "if" when CurrentContext == LanguageContext.IfCondition || CurrentContext == LanguageContext.LoopCondition:
+						willThrow = true;
+						break;
+					case "elif" when CurrentContext == LanguageContext.ElseStatement:
+						willThrow = true;
+						break;
+					case "else":
+					case "elif":
+					case "fi":
+						if (CurrentContext == LanguageContext.IfStatement
+						    || CurrentContext == LanguageContext.ElifStatement
+						    || CurrentContext == LanguageContext.ElseStatement)
+							return true;
+
+						willThrow = true;
+						break;
+					case "function" when CurrentContext == LanguageContext.IfCondition || CurrentContext == LanguageContext.LoopCondition:
+						willThrow = true;
+						break;
+				}
+			}
+			
+			if (willThrow)
+				throw new InvalidOperationException($"syntax error near unexpected token '{tokenView.Current.Text}'");
+
+			return false;
+		}
+		
+		private enum LanguageContext
+		{
+			None,
+			IfCondition,
+			LoopCondition,
+			LoopBody,
+			IfStatement,
+			ElifStatement,
+			ElseStatement
 		}
 	}
 }

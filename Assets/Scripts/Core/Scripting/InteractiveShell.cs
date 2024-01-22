@@ -93,8 +93,8 @@ namespace Core.Scripting
 			{
 				case "test":
 				{
-					var shellTest = new ShellTester(args);
-					return shellTest.Test();
+					var shellTest = new ShellTester(args, console);
+					return shellTest.Test() ? 0 : 1;
 				}
 				case "exit":
 				case "return":
@@ -195,7 +195,7 @@ namespace Core.Scripting
 			return lineBuilder.ToString();
 		}
 
-		public async Task RunScript(string scriptText)
+		private async Task RunScriptInternal(string scriptText, bool isInteractive)
 		{
 			if (process == null)
 				return;
@@ -206,60 +206,10 @@ namespace Core.Scripting
 			if (!initialized)
 				return;
 
-			await ProcessTokens(scriptText);
-
-			while (pendingInstructions.Count > 0)
+			try
 			{
-				ShellInstruction? nextInstruction = pendingInstructions.Dequeue();
-				
-				try
-				{
-					await nextInstruction.RunAsync(this.consoleDevice);
-				}
-				catch (ScriptEndException)
-				{
-					pendingInstructions.Clear();
-					return;
-				}
-				catch (Exception ex)
-				{
-					if (!HandleExceptionsGracefully)
-						throw;
-					
-					// log the full error to Unity
-					Debug.LogException(ex);
-						
-					// Log a partial error to the console
-					this.consoleDevice.WriteText(ex.Message + Environment.NewLine);
-				}
-			}
-		}
-		
-		/// <inheritdoc />
-		public async Task Run()
-		{
-			if (process == null)
-				return;
-			
-			if (consoleDevice == null)
-				return;
-			
-			if (!initialized)
-				return;
+				await ProcessTokens(scriptText);
 
-			while (process.IsAlive)
-			{
-				lineBuilder.Length = 0;
-				
-				UpdateCommandCompletions();
-				
-				WritePrompt();
-				string nextLineToExecute = await ReadLine();
-
-				if (string.IsNullOrWhiteSpace(nextLineToExecute))
-					continue;
-				
-				await ProcessTokens(nextLineToExecute);
 
 				while (pendingInstructions.Count > 0)
 				{
@@ -269,21 +219,77 @@ namespace Core.Scripting
 					{
 						await nextInstruction.RunAsync(this.consoleDevice);
 					}
-					catch (ScriptEndException)
+					catch (ScriptEndException endException)
 					{
+						if (endException.LocalScope)
+						{
+							consoleDevice.WriteText($"-sh: return: can only `return' from a function or sourced script{Environment.NewLine}");
+							continue;
+						}
+
 						pendingInstructions.Clear();
-						return;
-					}
-					catch (Exception ex)
-					{
-						// log the full error to Unity
-						Debug.LogException(ex);
-						
-						// Log a partial error to the console
-						this.consoleDevice.WriteText(ex.Message + Environment.NewLine);
+
+						if (isInteractive) throw;
 					}
 				}
 			}
+			catch (ScriptEndException)
+			{
+				throw;
+			}
+			catch (Exception ex)
+			{
+				if (!HandleExceptionsGracefully)
+					throw;
+
+				// log the full error to Unity
+				Debug.LogException(ex);
+
+				// Log a partial error to the console
+				this.consoleDevice.WriteText(ex.Message + Environment.NewLine);
+			}
+		}
+		
+		public async Task RunScript(string scriptText)
+		{
+			await RunScriptInternal(scriptText, false);
+		}
+
+		/// <inheritdoc />
+		public async Task Run()
+		{
+			if (consoleDevice == null)
+				return;
+
+			if (!initialized)
+				return;
+
+			lineBuilder.Length = 0;
+
+			UpdateCommandCompletions();
+
+			WritePrompt();
+			var nextLineToExecute = string.Empty;
+
+			try
+			{
+				nextLineToExecute = await ReadLine();
+			}
+			catch (Exception ex)
+			{
+				if (!HandleExceptionsGracefully)
+					throw;
+				
+				Debug.LogException(ex);
+				
+				this.consoleDevice.WriteText($"-sh: {ex.Message}{Environment.NewLine}");
+				return;
+			}
+
+			if (string.IsNullOrWhiteSpace(nextLineToExecute))
+				return;
+
+			await RunScriptInternal(nextLineToExecute, true);
 		}
 
 		public string GetVariableValue(string name)

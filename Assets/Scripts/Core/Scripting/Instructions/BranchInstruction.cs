@@ -21,7 +21,7 @@ namespace Core.Scripting.Instructions
 		{
 			int conditionResult = await condition.RunAsync(console);
 
-			if (conditionResult != 0)
+			if (conditionResult == 0)
 			{
 				foreach (ShellInstruction instruction in body)
 					await instruction.RunAsync(console);
