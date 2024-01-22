@@ -33,7 +33,7 @@ namespace Core.Scripting
 		}
 
 		/// <inheritdoc />
-		public async Task<int?> TryExecuteCommandAsync(string name, string[] args, ITextConsole console, IScriptExecutionContext? callSite = null)
+		public virtual async Task<int?> TryExecuteCommandAsync(string name, string[] args, ITextConsole console, IScriptExecutionContext? callSite = null)
 		{
 			callSite ??= this;
 			
