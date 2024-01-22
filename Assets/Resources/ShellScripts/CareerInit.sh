@@ -31,3 +31,7 @@ else
 fi
 
 echo End of world update script
+
+# Execute the player update script
+# commented out because of missing parser features
+#ShellScripts/DeviceScripts/PlayerEnvironmentUpdate
