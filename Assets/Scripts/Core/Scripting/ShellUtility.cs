@@ -306,13 +306,22 @@ namespace Core.Scripting
 						break;
 					}
 					
-					// Parallel operator
+					// Parallel operator and logical AND
 					case '&':
 					{
 						if (tokenBuilder.Length > 0)
 							yield return EndTextToken();
 
-						yield return new ShellToken(ShellTokenType.ParallelExecute, charView.Current.ToString(), charView.CurrentIndex, 1);
+						if (charView.Next == charView.Current)
+						{
+							yield return new ShellToken(ShellTokenType.LogicalAnd, charView.Current.ToString() + charView.Next, charView.CurrentIndex, 2);
+							charView.Advance();
+						}
+						else
+						{
+							yield return new ShellToken(ShellTokenType.ParallelExecute, charView.Current.ToString(), charView.CurrentIndex, 1);
+						}
+
 						break;
 					}
 					
@@ -386,13 +395,21 @@ namespace Core.Scripting
 						break;
 					}
 					
-					// Pipe
+					// Pipe and logical OR
 					case '|':
 					{
 						if (tokenBuilder.Length > 0)
 							yield return EndTextToken();
 
-						yield return new ShellToken(ShellTokenType.Pipe, charView.Current.ToString(), charView.CurrentIndex, 1);
+						if (charView.Next == charView.Current)
+						{
+							yield return new ShellToken(ShellTokenType.LogicalOr, charView.Current.ToString() + charView.Next, charView.CurrentIndex, 2);
+							charView.Advance();
+						}
+						else
+						{
+							yield return new ShellToken(ShellTokenType.Pipe, charView.Current.ToString(), charView.CurrentIndex, 1);
+						}
 						break;
 					}
 					
@@ -515,6 +532,8 @@ namespace Core.Scripting
 		CloseCurly,
 		OpenSquare,
 		ClosedSquare,
-		Newline
+		Newline,
+		LogicalAnd,
+		LogicalOr
 	}
 }

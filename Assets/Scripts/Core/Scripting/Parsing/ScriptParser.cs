@@ -135,7 +135,7 @@ namespace Core.Scripting.Parsing
 				return await ParseInstruction(tokenView);
 			}
 			
-			return await ParseParallelInstruction(tokenView);
+			return await ParseLogicalAnd(tokenView);
 		}
 
 		private async Task<ShellInstruction> ParseWhileLoop(ArrayView<ShellToken> tokenView)
@@ -372,6 +372,61 @@ namespace Core.Scripting.Parsing
 			}
 			
 			return new SequentialInstruction(instructionList);
+		}
+
+		private async Task<ShellInstruction?> ParseGroup(ArrayView<ShellToken> tokenView)
+		{
+			if (tokenView.EndOfArray)
+				return null;
+
+			if (tokenView.Current.TokenType != ShellTokenType.OpenParen)
+				return await ParseParallelInstruction(tokenView);
+
+			tokenView.Advance();
+
+			ShellInstruction? groupedInstruction = await ParseInstruction(tokenView);
+			
+			Require(tokenView, ShellTokenType.CloseParen, "')' expected");
+
+			return groupedInstruction;
+		}
+
+		private async Task<ShellInstruction?> ParseLogicalAnd(ArrayView<ShellToken> tokenView)
+		{
+			ShellInstruction? left = await ParseLogicalOr(tokenView);
+
+			if (tokenView.EndOfArray)
+				return left;
+
+			if (tokenView.Current.TokenType != ShellTokenType.LogicalAnd)
+				return left;
+
+			tokenView.Advance();
+
+			ShellInstruction? right = await ParseInstruction(tokenView);
+			if (right == null)
+				throw new InvalidOperationException("Unexpected end of file");
+
+			return new LogicalAndInstruction(left, right);
+		}
+
+		private async Task<ShellInstruction?> ParseLogicalOr(ArrayView<ShellToken> tokenView)
+		{
+			ShellInstruction? left = await ParseGroup(tokenView);
+
+			if (tokenView.EndOfArray)
+				return left;
+
+			if (tokenView.Current.TokenType != ShellTokenType.LogicalOr)
+				return left;
+
+			tokenView.Advance();
+
+			ShellInstruction? right = await ParseInstruction(tokenView);
+			if (right == null)
+				throw new InvalidOperationException("Unexpected end of file");
+
+			return new LogicalOrInstruction(left, right);
 		}
 		
 		private async Task<ShellInstruction> ParseParallelInstruction(ArrayView<ShellToken> tokenView)

@@ -114,7 +114,7 @@ namespace Core.Scripting
 					return 0;
 				case "echo":
 				{
-					string text = string.Join(string.Empty, args);
+					string text = string.Join(" ", args);
 					console.WriteText(text + Environment.NewLine);
 					return 0;
 				}
@@ -346,12 +346,6 @@ namespace Core.Scripting
 				case "clear":
 					console.ClearScreen();
 					break;
-				case "echo":
-				{
-					string text = string.Join(string.Empty, arguments);
-					console.WriteText(text + Environment.NewLine);
-					break;
-				}
 				case "exit":
 					process.Kill();
 					break;
