@@ -1,5 +1,6 @@
 ﻿#nullable enable
 using System;
+using System.Text.RegularExpressions;
 using Codice.Client.BaseCommands;
 using OS.Devices;
 
@@ -148,6 +149,10 @@ namespace Core.Scripting
 					int b = TestSingleExpression(expr2);
 
 					return a != b;
+				}
+				case "=~":
+				{
+					return Regex.IsMatch(expr1, expr2);
 				}
 				default:
 					return false;

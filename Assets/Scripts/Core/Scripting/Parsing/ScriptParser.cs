@@ -289,9 +289,14 @@ namespace Core.Scripting.Parsing
 		private async Task<ShellInstruction> ParseTest(ArrayView<ShellToken> tokenView)
 		{
 			Require(tokenView, ShellTokenType.OpenSquare, $"Expected '['");
-
-			// Test expressions are just syntactic sugar for running the 'test' built-in command. 
-			var commandName = "test";
+			
+			// Nullability flout: This is guaranteed to be not null, because the previous Require() call would've failed.
+			int lastTokenLength = tokenView.Previous!.Text.Length;
+			
+			// If the expression test starts with [, we map to the built-in "test" command.
+			// If the expression test maps to [[, we map to the built-in [[ command because
+			// real-life bash has no named command for this.
+			string commandName = lastTokenLength == 2 ? "[[" : "test";
 
 			var argumentList = new List<IArgumentEvaluator>();
 			while (!tokenView.EndOfArray)
@@ -303,8 +308,16 @@ namespace Core.Scripting.Parsing
 				argumentList.Add(argumentEvaluator);
 			}
 			
-			Require(tokenView, ShellTokenType.ClosedSquare, $"Expected '['");
+			Require(tokenView, ShellTokenType.ClosedSquare, $"Expected ']'");
 
+			// Nullability flout: same as the last one.
+			int closingLength = tokenView.Previous.Text.Length;
+			if (lastTokenLength != closingLength)
+				throw new InvalidOperationException(lastTokenLength == 2
+					? $"Expected closing ]] but instead got '{tokenView.Previous.Text}'"
+					: $"Expected closing ] but instead got '{tokenView.Previous.Text}'");
+			
+			
 			var commandData = new CommandData(CurrentScope, commandName, argumentList, FileRedirectionType.None, string.Empty);
 
 			return new SingleInstruction(commandData);
@@ -557,8 +570,8 @@ namespace Core.Scripting.Parsing
 
 			if (argumentList.Count == 0)
 			{
-				tokenView.Previous();
-				tokenView.Previous();
+				tokenView.GoToPrevious();
+				tokenView.GoToPrevious();
 				return null;
 			}
 
