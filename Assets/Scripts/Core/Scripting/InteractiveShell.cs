@@ -91,6 +91,8 @@ namespace Core.Scripting
 		{
 			switch (name)
 			{
+				case "[":
+				case "[[":
 				case "test":
 				{
 					var shellTest = new ShellTester(args, console);

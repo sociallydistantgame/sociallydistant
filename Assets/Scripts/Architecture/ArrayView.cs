@@ -24,6 +24,17 @@ namespace Architecture
 			}
 		}
 
+		public TElementType? Previous
+		{
+			get
+			{
+				if (index - 1 < 0)
+					return default;
+
+				return collection[index - 1];
+			}
+		}
+
 		public TElementType? Next
 		{
 			get
@@ -46,7 +57,7 @@ namespace Architecture
 			index++;
 		}
 
-		public void Previous()
+		public void GoToPrevious()
 		{
 			ThrowIfBeginOfCollection();
 			index--;

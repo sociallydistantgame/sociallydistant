@@ -351,7 +351,16 @@ namespace Core.Scripting
 						if (tokenBuilder.Length > 0)
 							yield return EndTextToken();
 
-						yield return new ShellToken(ShellTokenType.OpenSquare, charView.Current.ToString(), charView.CurrentIndex, 1);
+						if (charView.Next == charView.Current)
+						{
+							yield return new ShellToken(ShellTokenType.OpenSquare, charView.Current.ToString() + charView.Current.ToString(), charView.CurrentIndex, 2);
+							charView.Advance();
+						}
+						else
+						{
+							yield return new ShellToken(ShellTokenType.OpenSquare, charView.Current.ToString(), charView.CurrentIndex, 1);
+						}
+
 						break;
 					}
 					
@@ -361,7 +370,15 @@ namespace Core.Scripting
 						if (tokenBuilder.Length > 0)
 							yield return EndTextToken();
 
-						yield return new ShellToken(ShellTokenType.ClosedSquare, charView.Current.ToString(), charView.CurrentIndex, 1);
+						if (charView.Next == charView.Current)
+						{
+							yield return new ShellToken(ShellTokenType.ClosedSquare, charView.Current.ToString() + charView.Current.ToString(), charView.CurrentIndex, 2);
+							charView.Advance();
+						}
+						else
+						{
+							yield return new ShellToken(ShellTokenType.ClosedSquare, charView.Current.ToString(), charView.CurrentIndex, 1);
+						}
 						break;
 					}
 					
@@ -386,7 +403,8 @@ namespace Core.Scripting
 					}
 					
 					// Assignment
-					case '=':
+					case '=' when charView.Next != '=' 
+					              && charView.Next != '~':
 					{
 						if (tokenBuilder.Length > 0)
 							yield return EndTextToken();
