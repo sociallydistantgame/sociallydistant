@@ -1,7 +1,7 @@
 ﻿#nullable enable
 
-using System;
 using System.Collections.Generic;
+using System;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -431,24 +431,31 @@ namespace Core.Scripting
 		{
 			insertionPoint = text.Length;
 
-			try
+			while (insertionPoint > 0)
 			{
-				IEnumerable<ShellToken>? tokens = ShellUtility.IdentifyTokens(text.ToString())?.ToArray();
+				char character = text[insertionPoint - 1];
+				if (!char.IsLetterOrDigit(character) && character != '_')
+					break;
 
-				if (tokens == null || !tokens.Any())
-					return Array.Empty<string>();
+				insertionPoint--;
+			}	;
 
-				ShellToken lastToken = tokens.Last();
+			string textToComplete = text.ToString().Substring(insertionPoint);
 
-				insertionPoint = lastToken.Start;
-				return GetAvailableCompletions(lastToken.Text).ToArray();
-			}
-			catch
-			{
-				// Likely a syntax error so assume there's no completions
-				insertionPoint = text.Length;
-				return Array.Empty<string>();
-			}
+			var completionList = new List<string>();
+
+			if (string.IsNullOrWhiteSpace(textToComplete))
+				return completionList;
+			
+			foreach (string staticCompletion in staticCompletions)
+				if (staticCompletion.StartsWith(textToComplete))
+					completionList.Add(staticCompletion);
+			
+			foreach (string command in commandCompletions)
+				if (command.StartsWith(textToComplete))
+					completionList.Add(command);
+
+			return completionList;
 		}
 	}
 } 
