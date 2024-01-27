@@ -376,7 +376,7 @@ namespace OS.Devices
             // Password masking
             if (UsePasswordChars)
 	            wordWrapped = MaskPassword(wordWrapped);
-            
+           
             // Determine if we need to scroll.
             int bottom = this.firstRow + lineCount;
             int previousBottom = this.firstRow + previousLineCount; 
