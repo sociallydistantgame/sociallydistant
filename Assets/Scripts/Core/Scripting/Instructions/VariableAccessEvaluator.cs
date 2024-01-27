@@ -1,4 +1,7 @@
 ﻿#nullable enable
+using OS.Devices;
+using System.Threading.Tasks;
+
 namespace Core.Scripting.Instructions
 {
 	public class VariableAccessEvaluator : IArgumentEvaluator
@@ -11,9 +14,9 @@ namespace Core.Scripting.Instructions
 		}
 		
 		/// <inheritdoc />
-		public string GetArgumentText(IScriptExecutionContext context)
+		public Task<string >GetArgumentText(IScriptExecutionContext context, ITextConsole console)
 		{
-			return context.GetVariableValue(variableName);
+			return Task.FromResult(context.GetVariableValue(variableName));
 		}
 	}
 }

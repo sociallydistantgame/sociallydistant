@@ -3,6 +3,7 @@ using System.Linq;
 using System.Threading.Tasks;
 using OS.Devices;
 using UI.Shell;
+using UniRx;
 
 namespace Core.Scripting.Instructions
 {
@@ -21,18 +22,22 @@ namespace Core.Scripting.Instructions
 		}
 		
 		/// <inheritdoc />
-		public override Task<int> RunAsync(ITextConsole console)
+		public override async Task<int> RunAsync(ITextConsole console)
 		{
 			// TODO: Async argument evaluation, e.g. command substitution
 			
 			// Evaluate the argument list
-			string[] args = argumentList.Select(x => x.GetArgumentText(context))
-				.ToArray();
+			var args = new string[argumentList.Length];
+			for (var i = 0; i < args.Length; i++)
+			{
+				IArgumentEvaluator expression = argumentList[i];
+				args[i] = await expression.GetArgumentText(context, console);
+			}
 
 			string newValue = string.Join(string.Empty, args);
 			context.SetVariableValue(identifier, newValue);
 
-			return Task.FromResult(0);
+			return 0;
 		}
 	}
 }

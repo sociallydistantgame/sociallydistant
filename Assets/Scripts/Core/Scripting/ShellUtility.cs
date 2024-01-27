@@ -255,6 +255,12 @@ namespace Core.Scripting
 						break;
 					}
 
+					case '\r':
+					{
+						// always ignored. Fuck carriage returns in the ass.
+						break;
+					}
+					
 					case '\n' when !inQuote:
 					{
 						if (tokenBuilder.Length > 0)
@@ -270,6 +276,7 @@ namespace Core.Scripting
 						if (tokenBuilder.Length > 0)
 							yield return EndTextToken();
 						
+						yield return new ShellToken(ShellTokenType.Whitespace, charView.Current.ToString(), charView.CurrentIndex, 1);
 						break;
 					}
 
@@ -285,8 +292,17 @@ namespace Core.Scripting
 						break;
 					}
 
-					// String literal start
+					// Expansion string
 					case '"' when !inQuote:
+					{
+						if (tokenBuilder.Length > 0)
+							yield return EndTextToken();
+
+						yield return new ShellToken(ShellTokenType.ExpansionString, charView.Current.ToString(), charView.CurrentIndex, 1);
+						break;
+					}
+
+					// String literal start
 					case '\'' when !inQuote:
 					{
 						quoteStart = charView.Current;
@@ -536,6 +552,7 @@ namespace Core.Scripting
 	public enum ShellTokenType
 	{
 		Text,
+		Whitespace,
 		Pipe,
 		Overwrite,
 		Append,
@@ -552,6 +569,7 @@ namespace Core.Scripting
 		ClosedSquare,
 		Newline,
 		LogicalAnd,
-		LogicalOr
+		LogicalOr,
+		ExpansionString
 	}
 }
