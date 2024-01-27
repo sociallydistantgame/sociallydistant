@@ -14,17 +14,14 @@ namespace Core.Scripting.Instructions
 	{
 		private readonly IScriptExecutionContext context;
 
-		public string Name { get; }
+		public IArgumentEvaluator Name { get; }
 		public IArgumentEvaluator[] ArgumentList { get; }
 		public FileRedirectionType RedirectionType { get; }
 		public string FilePath { get; }
 		
-		public CommandData(IScriptExecutionContext context, string name, IEnumerable<IArgumentEvaluator> argumentSource, FileRedirectionType redirectionType, string path)
+		public CommandData(IScriptExecutionContext context, IArgumentEvaluator name, IEnumerable<IArgumentEvaluator> argumentSource, FileRedirectionType redirectionType, string path)
 		{
 			this.context = context;
-
-			if (string.IsNullOrWhiteSpace(name))
-				throw new InvalidOperationException("Command name can't be whitespace. Likely a parser bug.");
 
 			Name = name;
 			ArgumentList = argumentSource.ToArray();
@@ -34,8 +31,15 @@ namespace Core.Scripting.Instructions
 		
 		public async Task<int> ExecuteAsync(ITextConsole console)
 		{
+			string realName = await Name.GetArgumentText(context, console);
+			
 			// Evaluate arguments now.
-			string[] args = ArgumentList.Select(x => x.GetArgumentText(this.context)).ToArray();
+			var args = new string[ArgumentList.Length];
+			for (var i = 0; i < args.Length; i++)
+			{
+				IArgumentEvaluator expr = ArgumentList[i];
+				args[i] = await expr.GetArgumentText(context, console);
+			}
 			
 			// What console are we going to send to the command?
 			ITextConsole realConsole = this.context.OpenFileConsole(console, this.FilePath, this.RedirectionType);
@@ -44,9 +48,9 @@ namespace Core.Scripting.Instructions
 			ShellUtility.TrimTrailingSpaces(ref args);
 			
 			// Hand execution off to the execution context.
-			int? commandExitStatus = await this.context.TryExecuteCommandAsync(this.Name, args, realConsole);
+			int? commandExitStatus = await this.context.TryExecuteCommandAsync(realName, args, realConsole);
 			if (!commandExitStatus.HasValue)
-				context.HandleCommandNotFound(this.Name, realConsole);
+				context.HandleCommandNotFound(realName, realConsole);
 			
 			if (realConsole is IDisposable disposable)
 				disposable.Dispose();

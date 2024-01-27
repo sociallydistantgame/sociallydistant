@@ -1,6 +1,8 @@
 ﻿#nullable enable
 using Core.Scripting;
 using Core.Scripting.Instructions;
+using System.Threading.Tasks;
+using OS.Devices;
 
 namespace UI.Shell
 {
@@ -14,10 +16,15 @@ namespace UI.Shell
 		}
 		
 		/// <inheritdoc />
-		public string GetArgumentText(IScriptExecutionContext context)
+		public Task<string>GetArgumentText(IScriptExecutionContext context, ITextConsole console)
 		{
 			// We add a trailing space for shell builtins to use, but the shell will automatically trim this.
-			return text + " ";
+			return Task.FromResult(text);
+		}
+
+		public static implicit operator TextArgumentEvaluator(string text)
+		{
+			return new TextArgumentEvaluator(text);
 		}
 	}
 }

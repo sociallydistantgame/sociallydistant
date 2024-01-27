@@ -12,12 +12,14 @@ namespace Core.Scripting.Parsing
 		private readonly Dictionary<string, string> localVariables = new Dictionary<string, string>();
 		private readonly Dictionary<string, ScriptFunction> functions = new Dictionary<string, ScriptFunction>();
 		private readonly Stack<FunctionFrame> functionFrames = new Stack<FunctionFrame>();
+		private readonly bool leakVariables;
 
 		public FunctionFrame? CurrentFrame => functionFrames.Count > 0 ? functionFrames.Peek() : null;
 		
-		public LocalScriptExecutionContext(IScriptExecutionContext underlyingContext)
+		public LocalScriptExecutionContext(IScriptExecutionContext underlyingContext, bool leakVariables = false)
 		{
 			this.underlyingContext = underlyingContext;
+			this.leakVariables = leakVariables;
 		}
 
 		/// <inheritdoc />
@@ -35,6 +37,12 @@ namespace Core.Scripting.Parsing
 		/// <inheritdoc />
 		public void SetVariableValue(string variableName, string value)
 		{
+			if (leakVariables)
+			{
+				this.underlyingContext.SetVariableValue(variableName, value);
+				return;
+			}
+			
 			localVariables[variableName] = value;
 		}
 

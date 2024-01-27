@@ -15,15 +15,17 @@ namespace Core.Scripting.Parsing
 		private readonly IScriptExecutionContext context;
 		private readonly Stack<LocalScriptExecutionContext> scopeStack = new Stack<LocalScriptExecutionContext>();
 		private readonly Stack<LanguageContext> languageContextSTack = new Stack<LanguageContext>();
+		private readonly bool scopedRootContext;
 
 		private LanguageContext CurrentContext => languageContextSTack.Count > 0 ? languageContextSTack.Peek() : LanguageContext.None;
 		
 
 		public LocalScriptExecutionContext CurrentScope => scopeStack.Peek();
 
-		public ScriptParser(IScriptExecutionContext context)
+		public ScriptParser(IScriptExecutionContext context, bool scopedRootContext)
 		{
 			this.context = context;
+			this.scopedRootContext = scopedRootContext;
 		}
 		
 		public async Task<ShellInstruction> ParseScript(ArrayView<ShellToken> script)
@@ -58,8 +60,7 @@ namespace Core.Scripting.Parsing
 
 		private void Require(ArrayView<ShellToken> tokenView, ShellTokenType requiredType, string error)
 		{
-			while (!tokenView.EndOfArray && tokenView.Current.TokenType == ShellTokenType.Newline)
-				tokenView.Advance();
+			SkipWhiteSpace(tokenView);
 			
 			if (tokenView.EndOfArray)
 				throw new InvalidOperationException(error);
@@ -72,8 +73,7 @@ namespace Core.Scripting.Parsing
 
 		private void RequireKeyword(ArrayView<ShellToken> tokenView, string expected)
 		{
-			while (!tokenView.EndOfArray && tokenView.Current.TokenType == ShellTokenType.Newline)
-				tokenView.Advance();
+			SkipWhiteSpace(tokenView);
 			
 			if (tokenView.EndOfArray)
 				throw new InvalidOperationException($"Expected {expected} but instead reached end of file");
@@ -88,7 +88,7 @@ namespace Core.Scripting.Parsing
 		{
 			if (scopeStack.Count == 0)
 			{
-				scopeStack.Push(new LocalScriptExecutionContext(this.context));
+				scopeStack.Push(new LocalScriptExecutionContext(this.context, !scopedRootContext));
 				return;
 			}
 			
@@ -318,7 +318,7 @@ namespace Core.Scripting.Parsing
 					: $"Expected closing ] but instead got '{tokenView.Previous.Text}'");
 			
 			
-			var commandData = new CommandData(CurrentScope, commandName, argumentList, FileRedirectionType.None, string.Empty);
+			var commandData = new CommandData(CurrentScope, new TextArgumentEvaluator(commandName), argumentList, FileRedirectionType.None, string.Empty);
 
 			return new SingleInstruction(commandData);
 		}
@@ -332,6 +332,7 @@ namespace Core.Scripting.Parsing
 				return;
 
 			tokenView.Advance();
+			SkipWhiteSpace(tokenView, false);
 
 			if (tokenView.EndOfArray || tokenView.Current.TokenType != ShellTokenType.Text)
 				throw new InvalidOperationException("Expected name of function");
@@ -509,6 +510,8 @@ namespace Core.Scripting.Parsing
 		
 		private async Task<ShellInstruction?> ParseSingleInstruction(ArrayView<ShellToken> tokenView)
 		{
+			SkipWhiteSpace(tokenView, false);
+			
 			if (tokenView.EndOfArray)
 				return null;
 			
@@ -577,16 +580,34 @@ namespace Core.Scripting.Parsing
 
 			return new AssignmentInstruction(CurrentScope, identifier, argumentList);
 		}
-		
-		private async Task<CommandData> ParseCommandWithArguments(ArrayView<ShellToken> tokenView)
-		{
-			if (tokenView.Current.TokenType != ShellTokenType.Text)
-				throw new InvalidOperationException($"Syntax error near unexpected token '{tokenView.Current.Text}'");
-			
-			string name = tokenView.Current.Text;
-			var arguments = new List<IArgumentEvaluator>();
 
-			tokenView.Advance();
+		private void SkipWhiteSpace(ArrayView<ShellToken> tokenView, bool includeNewLines = true)
+		{
+			while (!tokenView.EndOfArray)
+			{
+				if (includeNewLines)
+				{
+					if (tokenView.Current.TokenType != ShellTokenType.Whitespace
+					    && tokenView.Current.TokenType != ShellTokenType.Newline)
+						break;
+				}
+				else
+				{
+					if (tokenView.Current.TokenType != ShellTokenType.Whitespace)
+   						break;
+				}
+
+				tokenView.Advance();
+			}
+		}
+		
+		private async Task<CommandData?> ParseCommandWithArguments(ArrayView<ShellToken> tokenView)
+		{
+			IArgumentEvaluator? name = await ParseArgument(tokenView);
+			if (name == null)
+				return null;
+			
+			var arguments = new List<IArgumentEvaluator>();
 
 			IArgumentEvaluator? nextEvaulator = await ParseArgument(tokenView);
 			while (nextEvaulator != null)
@@ -598,21 +619,52 @@ namespace Core.Scripting.Parsing
 			// If we have tokens remaining, we will need to check for redirection markers.
 			return await ParseRedirection(tokenView, name, arguments);
 		}
-		
-		private async Task<IArgumentEvaluator?> ParseArgument(ArrayView<ShellToken> tokenView)
+
+		private async Task<IArgumentEvaluator> ParseExpansionString(ArrayView<ShellToken> tokenView)
 		{
+			Require(tokenView, ShellTokenType.ExpansionString, "\" expected");
+
+			var expressions = new List<IArgumentEvaluator>();
+			while (!tokenView.EndOfArray)
+			{
+				if (tokenView.Current.TokenType == ShellTokenType.ExpansionString)
+					break;
+
+				IArgumentEvaluator? expr = await ParseArgument(tokenView, true);
+				if (expr == null)
+					break;
+
+				expressions.Add(expr);
+			}
+			
+			Require(tokenView, ShellTokenType.ExpansionString, "\" expected");
+			return new ExpressionEvaluator(expressions);
+		}
+		
+		private async Task<IArgumentEvaluator?> ParseArgument(ArrayView<ShellToken> tokenView, bool allowWhiteSpace = false)
+		{
+			if (!allowWhiteSpace)
+				SkipWhiteSpace(tokenView, false);
+			
 			if (tokenView.EndOfArray)
 				return null;
 
 			if (CheckReserved(tokenView))
 				return null;
 			
-			return tokenView.Current.TokenType switch
+			IArgumentEvaluator? result = tokenView.Current.TokenType switch
 			{
+				ShellTokenType.ExpansionString => await ParseExpansionString(tokenView),
 				ShellTokenType.VariableAccess => await ParseVariableAccess(tokenView),
-				ShellTokenType.Text => await ParseTextArgument(tokenView),
+				ShellTokenType.Whitespace when allowWhiteSpace => await ParseTextArgument(tokenView),
+				ShellTokenType.Text => await ParseTextArgument(tokenView, allowWhiteSpace),
 				_ => null
 			};
+
+			if (!allowWhiteSpace)
+				SkipWhiteSpace(tokenView, false);
+			
+			return result;
 		}
 		
 		private async Task<IArgumentEvaluator?> ParseVariableAccess(ArrayView<ShellToken> tokenView)
@@ -626,17 +678,38 @@ namespace Core.Scripting.Parsing
 			return new VariableAccessEvaluator(text);
 		}
 		
-		private async Task<IArgumentEvaluator?> ParseTextArgument(ArrayView<ShellToken> tokenView)
+		private async Task<IArgumentEvaluator?> ParseTextArgument(ArrayView<ShellToken> tokenView, bool allowWhiteSpace = true)
 		{
-			if (tokenView.EndOfArray || tokenView.Current.TokenType != ShellTokenType.Text)
+			if (tokenView.EndOfArray)
 				return null;
 
-			string text = tokenView.Current.Text;
-			tokenView.Advance();
-			return new TextArgumentEvaluator(text);
+			var sb = new StringBuilder();
+
+			while (!tokenView.EndOfArray)
+			{
+				if (allowWhiteSpace)
+				{
+					if (tokenView.Current.TokenType != ShellTokenType.Text
+					    && tokenView.Current.TokenType != ShellTokenType.Whitespace)
+						break;
+				}
+				else
+				{
+					if (tokenView.Current.TokenType != ShellTokenType.Text)
+						break;
+				}
+
+				sb.Append(tokenView.Current.Text);
+				tokenView.Advance();
+			}
+
+			if (sb.Length == 0)
+				return null;
+
+			return new TextArgumentEvaluator(sb.ToString());
 		}
 		
-		private async Task<CommandData> ParseRedirection(ArrayView<ShellToken> tokenView, string name, List<IArgumentEvaluator> arguments)
+		private async Task<CommandData> ParseRedirection(ArrayView<ShellToken> tokenView, IArgumentEvaluator  name, List<IArgumentEvaluator> arguments)
 		{
 			// No tokens left.
 			if (tokenView.Next == null)

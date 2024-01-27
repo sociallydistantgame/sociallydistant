@@ -210,7 +210,7 @@ namespace Core.Scripting
 
 			try
 			{
-				await ProcessTokens(scriptText);
+				await ProcessTokens(scriptText, !isInteractive);
 
 
 				while (pendingInstructions.Count > 0)
@@ -299,7 +299,7 @@ namespace Core.Scripting
 			return scriptContext.GetVariableValue(name);
 		}
 
-		private async Task ProcessTokens(string nextLineToExecute)
+		private async Task ProcessTokens(string nextLineToExecute, bool useLocalExecutionContext)
 		{
 			// The first tokenization pass we do, before executing this function,
 			// only deals with quotes and escape sequences. It also ignores comments,
@@ -313,7 +313,7 @@ namespace Core.Scripting
 			// Create a view over this array that we can advance during parsing
 			var view = new ArrayView<ShellToken>(typedTokens.ToArray());
 
-			var parser = new ScriptParser(this);
+			var parser = new ScriptParser(this, useLocalExecutionContext);
 			
 			pendingInstructions.Enqueue(await parser.ParseScript(view));
 		}
