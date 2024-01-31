@@ -61,7 +61,7 @@ namespace UI.Applications.Terminal
 			// Create a shell.
 			this.shell = new InteractiveShell(context);
 			shell.HandleExceptionsGracefully = true;
-			shell.Setup(shellProcess, textConsole);
+			shell.Setup(textConsole);
 
 			while (shellProcess.IsAlive)
 			{

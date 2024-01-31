@@ -25,7 +25,6 @@ namespace Core.Scripting
 		IScriptExecutionContext
 	{
 		private readonly IScriptExecutionContext scriptContext;
-		private ISystemProcess? process;
 		private ITextConsole? consoleDevice;
 		private bool initialized;
 		private ShellState shellState;
@@ -33,7 +32,6 @@ namespace Core.Scripting
 		private readonly List<string> tokenList = new List<string>();
 		private readonly Queue<ShellInstruction> pendingInstructions = new Queue<ShellInstruction>();
 		private ShellInstruction? currentInstruction = null;
-		private IVirtualFileSystem vfs = null!;
 		private readonly List<string> commandCompletions = new List<string>();
 		private readonly string[] staticCompletions = new string[]
 		{
@@ -46,12 +44,6 @@ namespace Core.Scripting
 		/// <inheritdoc />
 		public bool IsExecutionHalted => currentInstruction != null;
 
-		/// <inheritdoc />
-		public string CurrentWorkingDirectory => process?.WorkingDirectory ?? "/";
-		
-		/// <inheritdoc />
-		public string CurrentHomeDirectory => process?.User?.Home ?? "/";
-		
 		public bool HandleExceptionsGracefully { get; set; }
 		
 		public InteractiveShell(IScriptExecutionContext context)
@@ -60,24 +52,12 @@ namespace Core.Scripting
 		}
 
 		/// <inheritdoc />
-		public void Setup(ISystemProcess process, ITextConsole consoleDevice)
+		public void Setup(ITextConsole consoleDevice)
 		{
-			this.process = process;
 			this.consoleDevice = consoleDevice;
-			this.vfs = process.User.Computer.GetFileSystem(process.User);
-
-			if (consoleDevice is IAutoCompletedConsole autocompleteConsole)
-				autocompleteConsole.AutoCompleteSource = this;
 			
 			initialized = true;
 			
-			// Execute the .shrc file if it exists. We don't really have support for scripts yet so
-			// this is temporary.
-			string homeFolder = process.User.Home;
-			string shrcPath = PathUtility.Combine(homeFolder, ".shrc");
-			if (!vfs.FileExists(shrcPath))
-				return;
-            
 			shellState = ShellState.Executing;
 		}
 
@@ -140,26 +120,6 @@ namespace Core.Scripting
 		private void UpdateCommandCompletions()
 		{
 			this.commandCompletions.Clear();
-
-			if (this.process == null)
-				return;
-			
-			string path = this.process.Environment["PATH"];
-
-			string[] directories = path.Split(':');
-
-			IVirtualFileSystem fs = process.User.Computer.GetFileSystem(process.User);
-			foreach (string directory in directories)
-			{
-				if (!fs.DirectoryExists(directory))
-					return;
-
-				foreach (string file in fs.GetFiles(directory))
-				{
-					string filename = PathUtility.GetFileName(file);
-					commandCompletions.Add(filename);
-				}
-			}
 		}
 
 		private async Task<string> ReadLineFromConsole()
@@ -199,9 +159,6 @@ namespace Core.Scripting
 
 		private async Task RunScriptInternal(string scriptText, bool isInteractive)
 		{
-			if (process == null)
-				return;
-			
 			if (consoleDevice == null)
 				return;
 			
@@ -270,7 +227,7 @@ namespace Core.Scripting
 
 			UpdateCommandCompletions();
 
-			WritePrompt();
+			await WritePrompt();
 			var nextLineToExecute = string.Empty;
 
 			try
@@ -358,12 +315,19 @@ namespace Core.Scripting
 			return true;
 		}
 
-		private void WritePrompt()
+		private async Task WritePrompt()
 		{
-			if (consoleDevice == null || process == null)
+			if (consoleDevice == null)
 				return;
-			
-			consoleDevice.WriteText($"{process.User.UserName}@{process.User.Computer.Name}:{process.WorkingDirectory}$ ");
+
+			if (this.scriptContext is IInteractiveShellContext interactiveContext)
+			{
+				await interactiveContext.WritePrompt(this.consoleDevice);
+			}
+			else
+			{
+				this.consoleDevice.WriteText("$ ");
+			}
 		}
 
 		private enum ShellState
@@ -372,58 +336,6 @@ namespace Core.Scripting
 			Reading,
 			Processing,
 			Executing
-		}
-
-		private IEnumerable<string> GetAvailableCompletions(string token)
-		{
-			foreach (string staticCompletion in staticCompletions)
-				if (staticCompletion.StartsWith(token) && staticCompletion.Length > token.Length)
-					yield return staticCompletion;
-			
-			foreach (string completion in commandCompletions)
-				if (completion.Length > token.Length && completion.StartsWith(token))
-					yield return completion;
-
-			if (process == null)
-				yield break;
-			
-			// Environment variables.
-			if (token.StartsWith("$"))
-			{
-				foreach (string key in process.Environment.Keys)
-				{
-					if (key.StartsWith("$" + token) && key.Length + 1 > token.Length)
-						yield return "$" + key;
-				}
-			}
-
-			IVirtualFileSystem fs = process.User.Computer.GetFileSystem(process.User);
-
-			string fullPath = ShellUtility.MakeAbsolutePath(PathUtility.Combine(process.WorkingDirectory, token), process.User.Home);
-			string directory = PathUtility.GetDirectoryName(fullPath);
-
-			if (fs.DirectoryExists(fullPath))
-				directory = fullPath;
-			
-			if (!fs.DirectoryExists(directory))
-				yield break;
-			
-			foreach (string subdir in fs.GetDirectories(directory))
-			{
-				if (subdir.Length > fullPath.Length && subdir.StartsWith(fullPath))
-				{
-					yield return token + subdir.Substring(fullPath.Length);
-				}
-			}
-			
-			foreach (string subdir in fs.GetFiles(directory))
-			{
-				if (subdir.Length > fullPath.Length && subdir.StartsWith(fullPath))
-				{
-					yield return token + subdir.Substring(fullPath.Length);
-				}
-			}
-
 		}
 
 		/// <inheritdoc />

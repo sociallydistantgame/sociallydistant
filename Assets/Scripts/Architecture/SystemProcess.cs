@@ -82,6 +82,12 @@ namespace Architecture
 			ISystemProcess forked = Fork();
 
 			this.User = previousUser;
+
+			if (this.User != user)
+			{
+				this.coordinator.CopyEnvironment(user, forked);
+			}
+			
 			return forked;
 		}
 		

@@ -24,8 +24,6 @@ namespace Core.Scripting.Instructions
 		/// <inheritdoc />
 		public override async Task<int> RunAsync(ITextConsole console)
 		{
-			// TODO: Async argument evaluation, e.g. command substitution
-			
 			// Evaluate the argument list
 			var args = new string[argumentList.Length];
 			for (var i = 0; i < args.Length; i++)

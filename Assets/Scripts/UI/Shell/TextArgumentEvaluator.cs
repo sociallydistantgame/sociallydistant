@@ -10,6 +10,8 @@ namespace UI.Shell
 	{
 		private readonly string text;
 
+		public string Text => text;
+		
 		public TextArgumentEvaluator(string text)
 		{
 			this.text = text;

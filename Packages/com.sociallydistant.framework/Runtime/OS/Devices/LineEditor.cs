@@ -163,7 +163,12 @@ namespace OS.Devices
 					lastCursorY = screen.CursorTop;
 					firstColumn = lastCursorX;
 					firstRow = lastCursorY;
-					hasChanged = true;
+
+					// in case the cursor changed position but we haven't actually started getting input yet,
+					// check to make sure the current line buffer is empty. If it is, then we don't force a re-render
+					// since doing so would cause us to delete output when the "clear" command is run in the shell.
+					if (lineBuilder.Length>0)
+						hasChanged = true;
 				}
 				
 				return hasChanged;
@@ -354,7 +359,10 @@ namespace OS.Devices
 		}
 		
 		private void RenderLineEditor()
-        {
+		{
+			if (this.state != State.Editing)
+				return;
+	        
 	        string wordWrapped = lineWrapper.Wrap(this.lineBuilder, firstColumn, firstRow, width, this.caretIndex, selectionStart, selectionEnd, out int cx, out int cy, out int lineCount, out int lastLineWidth, out int selStart, out int selEnd);
             var completionIndicator = string.Empty;
             var completionsOnNewLine = false;
@@ -402,8 +410,9 @@ namespace OS.Devices
             this.WriteText($"\x1b[{this.firstRow + 1};{this.firstColumn + 1}H");
 
             // If we have previous text, then we need to delete it
-            int linesToDelete = Math.Max(this.previousLineCount, lineCount);
-            if (linesToDelete > 0) this.WriteText("\x1b[0J");
+            int linesToDelete = this.previousLineCount - lineCount;
+            if (linesToDelete >= 0) 
+	            this.WriteText("\x1b[0J");
 
             if (selEnd < selStart)
 	            (selStart, selEnd) = (selEnd, selStart);
@@ -541,6 +550,7 @@ namespace OS.Devices
 	        if (length == 0)
 		        return;
 
+	        caretIndex = start;
 	        lineBuilder.Remove(start, length);
 	        completionsAreDirty = true;
         }

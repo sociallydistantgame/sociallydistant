@@ -108,7 +108,7 @@ namespace UI.Terminal.SimpleTerminal
 				if (term.Selected(x, y))
 					reverse = !reverse;
 				
-				Color foregroundColor = GetColor(reverse ? glyph.bg : glyph.fg, reverse ? default : glyph.fgRgb);
+				Color foregroundColor = GetColor(glyph.fg, glyph.fgRgb);
 				Color backgroundColor;
 				
 				if (!reverse && glyph.bg == DefaultBackgroundId)
@@ -117,7 +117,18 @@ namespace UI.Terminal.SimpleTerminal
 				}
 				else
 				{
-					backgroundColor = GetColor(reverse ? glyph.fg : glyph.bg, default);
+					backgroundColor = GetColor(glyph.bg, glyph.bgRgb);
+				}
+
+				if (reverse)
+				{
+					(backgroundColor, foregroundColor) = (foregroundColor, backgroundColor);
+				}
+				
+				if ((glyph.mode & GlyphAttribute.ATTR_FAINT) != 0)
+				{
+					foregroundColor.a *= 0.5f;
+					backgroundColor.a *= 0.5f;
 				}
 
 				int cellIndex = (y * term.Columns) + x;
@@ -208,7 +219,7 @@ namespace UI.Terminal.SimpleTerminal
 			if (index == -1)
 				return rgbColor;
 
-			return !colors.TryGetValue(index, out Color color) ? default : color;
+			return colors[index];
 		}
 		
 		public string GetColorOld(int c, Color rgbColor = default)
@@ -364,22 +375,23 @@ namespace UI.Terminal.SimpleTerminal
 					this.stringBuilder.Append(isBold ? "<b>" : "</b>");
 				
 				if (isItalic != italic)
-					this.stringBuilder.Append(isBold ? "<i>" : "</i>");
+					this.stringBuilder.Append(isItalic ? "<i>" : "</i>");
 				
 				if (isUnderline != underline)
-					this.stringBuilder.Append(isBold ? "<u>" : "</u>");
+					this.stringBuilder.Append(isUnderline ? "<u>" : "</u>");
 				
 				if (isStrikethrough != strikethrough)
-					this.stringBuilder.Append(isBold ? "<s>" : "</s>");
+					this.stringBuilder.Append(isStrikethrough ? "<s>" : "</s>");
 				
 				bool isWhitespace = char.IsWhiteSpace(cell.Character);
 
 				if (color != newColor)
 				{
-					if (newColor == fgColor)
-					{
+					if (color != fgColor)
+						stringBuilder.Append("</color>");
+					
+					if (newColor == fgColor || newColor == default)
 						this.stringBuilder.Append("</color>");
-					}
 					else
 					{
 						string hex = LookupHexColor(newColor);
@@ -387,9 +399,9 @@ namespace UI.Terminal.SimpleTerminal
 						this.stringBuilder.Append("<color=#");
 						this.stringBuilder.Append(hex);
 						this.stringBuilder.Append('>');
-
-						color = newColor;
 					}
+					
+					color = newColor;
 				}
 				
 				if (isWhitespace)
@@ -411,6 +423,11 @@ namespace UI.Terminal.SimpleTerminal
 				italic = isItalic;
 				underline = isUnderline;
 				strikethrough = isStrikethrough;
+
+				if (i == colorCells.Length - 1 && color != fgColor)
+				{
+					stringBuilder.Append("</color>");
+				}
 			}
             
 			this.textMeshPro.SetText(stringBuilder);

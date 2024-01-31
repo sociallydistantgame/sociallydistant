@@ -354,7 +354,8 @@ namespace UI.Terminal.SimpleTerminal
 				written = this.TerminalWrite(this.ttybuf, this.ttybuflen, false);
 				this.ttybuflen -= written;
 
-				if (this.ttybuflen > 0) Buffer.BlockCopy(this.ttybuf, 0, this.ttybuf, written, this.ttybuflen);
+				if (this.ttybuflen > 0)
+					Buffer.BlockCopy(this.ttybuf, 0, this.ttybuf, written, this.ttybuflen);
 			}
 
 			return ret;
@@ -396,7 +397,7 @@ namespace UI.Terminal.SimpleTerminal
 				this.PutChar(u);
 			}
 
-			return n;
+			return buflen;
 		}
 		
 		
@@ -1642,8 +1643,8 @@ namespace UI.Terminal.SimpleTerminal
 									this.ClearRegion(0, 0, this.term.col - 1, this.term.row - 1, true);
 									break;
 								}
-								/* vte does this:
-                                tscrollup(0, term.row-1, term.row, SCROLL_SAVEHIST); */
+								// vte does this:
+                                ScrollUp(0, term.row-1, term.row, ScrollMode.SCROLL_NOSAVEHIST); 
 
 								/* alacritty does this: */
 								for (n = this.term.row - 1;

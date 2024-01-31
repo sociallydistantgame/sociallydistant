@@ -2,6 +2,7 @@
 
 using System.Collections.Generic;
 using OS.Devices;
+using System.Threading.Tasks;
 
 namespace OS.Tasks
 {
@@ -11,6 +12,11 @@ namespace OS.Tasks
 		IEnumerable<ISystemProcess> GetTasksOnComputer(IComputer computer);
 		IEnumerable<ISystemProcess> GetChildProcesses(ISystemProcess parent);
 
-		IInitProcess SetUpComputer(IComputer computer);
+		IInitProcess SetUpComputer(IComputer computer, IShellScript loginScript);
+	}
+
+	public interface IShellScript
+	{
+		Task Run(ISystemProcess process, string[] args, ITextConsole console);
 	}
 }

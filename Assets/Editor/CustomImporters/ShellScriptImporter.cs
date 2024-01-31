@@ -23,6 +23,8 @@ namespace Editor.CustomImporters
 			var sb = new StringBuilder();
 
 			ScriptExecutionContext? executionContext = null;
+
+			var useOSContext = false;
 			using (Stream stream = System.IO.File.OpenRead(path))
 			{
 				using var streamReader = new StreamReader(stream);
@@ -35,7 +37,10 @@ namespace Editor.CustomImporters
 
 					if (line.StartsWith("#!") && sb.Length == 0)
 					{
-						executionContext = FindScriptExecutionContext(line.Substring(2));
+						if (line.Substring(2).Trim() == "/bin/sh")
+							useOSContext = true;
+						else 
+							executionContext = FindScriptExecutionContext(line.Substring(2));
 						continue;
 					}
 
@@ -43,17 +48,30 @@ namespace Editor.CustomImporters
 				}
 			}
 
-			if (executionContext == null)
+			if (executionContext == null && !useOSContext)
 				return;
 
-			var scriptAsset = ScriptableObject.CreateInstance<ShellScriptAsset>();
+			if (useOSContext)
+			{
+				var scriptAsset = ScriptableObject.CreateInstance<OperatingSystemScript>();
+                
+    			scriptAsset.name = Path.GetFileName(path);
+                scriptAsset.SetScriptText(sb.ToString());
+                
+                ctx.AddObjectToAsset(scriptAsset.name, scriptAsset);
+                ctx.SetMainObject(scriptAsset);
+			}
+			else
+			{
+				var scriptAsset = ScriptableObject.CreateInstance<ShellScriptAsset>();
 
-			scriptAsset.name = Path.GetFileName(path);
-			scriptAsset.SetScriptContext(executionContext);
-			scriptAsset.SetScriptText(sb.ToString());
-			
-			ctx.AddObjectToAsset(scriptAsset.name, scriptAsset);
-			ctx.SetMainObject(scriptAsset);
+				scriptAsset.name = Path.GetFileName(path);
+				scriptAsset.SetScriptContext(executionContext);
+				scriptAsset.SetScriptText(sb.ToString());
+
+				ctx.AddObjectToAsset(scriptAsset.name, scriptAsset);
+				ctx.SetMainObject(scriptAsset);
+			}
 		}
 
 		private ScriptExecutionContext FindScriptExecutionContext(string shebang)

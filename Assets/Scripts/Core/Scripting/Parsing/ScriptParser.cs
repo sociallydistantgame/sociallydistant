@@ -7,7 +7,7 @@ using System.Threading.Tasks;
 using Architecture;
 using Core.Scripting.Instructions;
 using UI.Shell;
-
+// hello world
 namespace Core.Scripting.Parsing
 {
 	public class ScriptParser
@@ -151,7 +151,6 @@ namespace Core.Scripting.Parsing
 			RequireKeyword(tokenView, "do");
 			
 			PushContext(LanguageContext.LoopBody);
-			PushScope();
 
 			var body = new List<ShellInstruction>();
 			while (!tokenView.EndOfArray)
@@ -163,7 +162,6 @@ namespace Core.Scripting.Parsing
 				body.Add(instruction);
 			}
             
-			PopScope();
 			PopContext();
 			
 			RequireKeyword(tokenView, "done");
@@ -187,7 +185,6 @@ namespace Core.Scripting.Parsing
 			
 			var mainBody = new List<ShellInstruction>();
 
-			PushScope();
 			while (!tokenView.EndOfArray)
 			{
 				if (tokenView.Current.TokenType == ShellTokenType.Text)
@@ -203,8 +200,6 @@ namespace Core.Scripting.Parsing
 				
 				mainBody.Add(instruction);
 			}
-
-			PopScope();
 
 			var branches = new List<ShellInstruction>();
 			branches.Add(new BranchInstruction(condition, mainBody));
@@ -227,7 +222,6 @@ namespace Core.Scripting.Parsing
 				
 				var elifBody = new List<ShellInstruction>();
 				
-				PushScope();
 				while (!tokenView.EndOfArray)
 				{
 					if (tokenView.Current.TokenType == ShellTokenType.Text)
@@ -244,7 +238,6 @@ namespace Core.Scripting.Parsing
 					elifBody.Add(instruction);
 				}
 
-				PopScope();
 				PopContext();
 				
 				branches.Add(new BranchInstruction(elifCondition, elifBody));
@@ -525,7 +518,10 @@ namespace Core.Scripting.Parsing
 			if (assignment != null)
 				return assignment;
 			
-			CommandData command = await ParseCommandWithArguments(tokenView);
+			CommandData? command = await ParseCommandWithArguments(tokenView);
+			if (command == null)
+				return null;
+				
 			return new SingleInstruction(command);
 		}
 		
@@ -535,9 +531,7 @@ namespace Core.Scripting.Parsing
 			if (tokenView.EndOfArray)
 				return null;
 			
-			// Only parse assignments if the current token is either Text or VariableAccess,
-			// and is an identifier.
-			if (tokenView.Current.TokenType != ShellTokenType.Text && tokenView.Current.TokenType != ShellTokenType.VariableAccess)
+			if (tokenView.Current.TokenType != ShellTokenType.Text && tokenView.Next?.Text != "=")
 				return null;
 
 			if (!tokenView.Current.Text.IsIdentifier())
@@ -548,7 +542,7 @@ namespace Core.Scripting.Parsing
 				return null;
 			
 			// Only parse assignments if the assignment operator is present as the next token
-			if (tokenView.Next.TokenType != ShellTokenType.AssignmentOperator)
+			if (tokenView.Next.TokenType != ShellTokenType.Text || tokenView.Next.Text!="=")
 				return null;
 			
 			// get identifier
@@ -666,19 +660,67 @@ namespace Core.Scripting.Parsing
 			
 			return result;
 		}
-		
+
+		private async Task<IArgumentEvaluator> ParseVariableExpansion(ArrayView<ShellToken> tokenView)
+		{
+			Require(tokenView, ShellTokenType.OpenCurly, "'{' expected");
+
+			TextArgumentEvaluator? text = await ParseTextArgument(tokenView, true);
+			if (text == null)
+				text = new TextArgumentEvaluator("");
+			
+			Require(tokenView, ShellTokenType.CloseCurly, "'}' expected");
+			return new VariableAccessEvaluator(text.Text);
+		}
+
+		private async Task<IArgumentEvaluator> ParseCommandExpansion(ArrayView<ShellToken> tokenView)
+		{
+			Require(tokenView, ShellTokenType.OpenParen, "'(' expected");
+
+			var sb = new StringBuilder();
+			while (!tokenView.EndOfArray)
+			{
+				if (tokenView.Current.TokenType == ShellTokenType.CloseParen)
+					break;
+
+				sb.Append(tokenView.Current.Text);
+				tokenView.Advance();
+			}
+			
+			Require(tokenView, ShellTokenType.CloseParen, "')' expected");
+			return new CommandExpansion(sb.ToString());
+		}
+
 		private async Task<IArgumentEvaluator?> ParseVariableAccess(ArrayView<ShellToken> tokenView)
 		{
 			if (tokenView.EndOfArray || tokenView.Current.TokenType != ShellTokenType.VariableAccess)
 				return null;
 
-			string text = tokenView.Current.Text;
+			if (tokenView.Next != null)
+			{
+				if (tokenView.Next.TokenType == ShellTokenType.OpenCurly)
+				{
+					tokenView.Advance();
+					return await ParseVariableExpansion(tokenView);
+				}
+
+				if (tokenView.Next.TokenType == ShellTokenType.OpenParen)
+				{
+					tokenView.Advance();
+					return await ParseCommandExpansion(tokenView);
+				}
+			}
+
 			tokenView.Advance();
 
-			return new VariableAccessEvaluator(text);
+			TextArgumentEvaluator? text = await ParseTextArgument(tokenView, false);
+			if (text == null)
+				text = new TextArgumentEvaluator(string.Empty);
+
+			return new VariableAccessEvaluator(text.Text);
 		}
 		
-		private async Task<IArgumentEvaluator?> ParseTextArgument(ArrayView<ShellToken> tokenView, bool allowWhiteSpace = true)
+		private async Task<TextArgumentEvaluator?> ParseTextArgument(ArrayView<ShellToken> tokenView, bool allowWhiteSpace = true)
 		{
 			if (tokenView.EndOfArray)
 				return null;

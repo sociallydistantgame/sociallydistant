@@ -1,4 +1,5 @@
-﻿using OS.Devices;
+﻿using System;
+using OS.Devices;
 using System.Threading.Tasks;
 
 namespace Core.Scripting.Instructions
@@ -15,6 +16,8 @@ namespace Core.Scripting.Instructions
 		public SingleInstruction(CommandData command)
 		{
 			this.command = command;
+			if (this.command == null)
+				throw new InvalidOperationException("JESUS FUCKING CHRIST WHY DID THIS COME IN AS A NULL POINTER");
 		}
 
 		/// <inheritdoc />

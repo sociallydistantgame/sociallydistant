@@ -8,7 +8,7 @@ namespace UI.Shell
 	{
 		bool IsExecutionHalted { get; }
 		
-		void Setup(ISystemProcess process, ITextConsole consoleDevice);
+		void Setup(ITextConsole consoleDevice);
 
 		Task Run();
 	}
