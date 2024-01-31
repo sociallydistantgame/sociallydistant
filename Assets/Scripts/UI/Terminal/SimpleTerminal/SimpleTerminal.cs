@@ -142,6 +142,7 @@ namespace UI.Terminal.SimpleTerminal
 		public void SetFocus(bool focus)
 		{
 			this.isFocused = focus;
+			this.screen.SetFocus(this.isFocused);
 		}
 		
 		public void MouseScroll(float delta)
