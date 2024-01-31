@@ -26,7 +26,7 @@ namespace Core.Scripting
 			var shell =  new InteractiveShell(context);
 			var process = new HypervisorProcess();
 			
-			shell.Setup(process, console);
+			shell.Setup(console);
 
 			await shell.RunScript(this.scriptText);
 		}

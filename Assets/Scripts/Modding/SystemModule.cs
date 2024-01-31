@@ -38,18 +38,23 @@ namespace Modding
 
 		/// <inheritdoc />
 		public override string ModuleId => "com.sociallydistant.system";
-		
+
+		public SystemModule()
+		{
+			if (currentSystemModule != null)
+				throw new InvalidOperationException("Multiple instances of the Socially Distant system module were loaded. This is a bug.");
+
+			currentSystemModule = this;
+		}
+
 		/// <inheritdoc />
 		protected override async Task OnInitialize()
 		{
 			RegisterHooks();
 			
-			if (currentSystemModule != null)
-				throw new InvalidOperationException("Multiple instances of the Socially Distant system module were loaded. This is a bug.");
-
+		
 			RegisterGlobalCommands();
 			
-			currentSystemModule = this;
 			
 			// System settings modules
 			graphicsSettings = Context.SettingsManager.RegisterSettingsCategory<GraphicsSettings>();

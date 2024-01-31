@@ -53,6 +53,7 @@ namespace GamePlatform
 		private SocialServiceHolder socialHolder = null!;
 
 		private readonly UnityTextConsole unityConsole = new UnityTextConsole();
+		private bool areModulesLoaded = false;
 		private IScriptSystem scriptSystem;
 		private TabbedToolCollection availableTools;
 		private GameMode currentGameMode;
@@ -73,6 +74,8 @@ namespace GamePlatform
 
 		public IInfoPanelService InfoPanelService => this.infoPanelService;
 
+		private event Action? ModulesLoaded;
+		
 		/// <inheritdoc />
 		public TabbedToolCollection AvailableTools => availableTools;
         
@@ -143,6 +146,7 @@ namespace GamePlatform
 			
 			// Initial ContentManager database rebuild.
 			await ContentManager.RefreshContentDatabaseAsync();
+			ModulesLoaded?.Invoke();
 			
 			// Settings refresh, in case anything relies on content manager
 			settingsManager.ForceChangeNotify();
@@ -338,6 +342,24 @@ namespace GamePlatform
 			LoginScreen,
 			MostRecentSave,
 			DebugWorld
+		}
+
+		public Task WaitForModulesToLoad()
+		{
+			if (areModulesLoaded)
+				return Task.CompletedTask;
+
+			var completionSource =  new TaskCompletionSource<bool>();
+
+			ModulesLoaded += HandleModulesLoaded;
+			
+			return completionSource.Task;
+
+			void HandleModulesLoaded()
+			{
+				completionSource.SetResult(true);
+				ModulesLoaded -= HandleModulesLoaded;
+			}
 		}
 	}
 }

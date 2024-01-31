@@ -54,7 +54,7 @@ namespace GameplaySystems.NonPlayerComputers
 			this.su = new SuperUser(this);
 			RebuildVfs();
 			
-			this.initProcess = this.deviceCoordinator.SetUpComputer(this);
+			this.initProcess = this.deviceCoordinator.SetUpComputer(this, null);
 			this.systemd = this.initProcess.Fork();
 			this.systemd.Name = "systemd";
 			

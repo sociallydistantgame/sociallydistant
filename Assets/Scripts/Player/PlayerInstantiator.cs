@@ -1,18 +1,15 @@
 ﻿#nullable enable
 
-using System;
 using System.Collections.Generic;
 using Architecture;
+using Core.Scripting;
 using GamePlatform;
 using GameplaySystems.Networld;
 using OS.Devices;
 using OS.FileSystems;
-using UI.Backdrop;
 using UI.PlayerUI;
 using UnityEngine;
-using UnityEngine.EventSystems;
 using UnityExtensions;
-using Utility;
 
 namespace Player
 {
@@ -38,8 +35,11 @@ namespace Player
 		[Header("Prefabs")]
 		[SerializeField]
 		private GameObject uiRootPrefab = null!;
-        
+
 		[Header("Environment")]
+		[SerializeField]
+		private OperatingSystemScript loginScript = null!;
+		
 		[SerializeField]
 		private EnvironmentVariablesAsset environmentVariables = null!;
 
@@ -52,14 +52,16 @@ namespace Player
 			this.AssertAllFieldsAreSerialized(typeof(PlayerInstantiator));
 		}
 
-		private void Start()
+		private async void Start()
 		{
+			await gameManager.Value.WaitForModulesToLoad();
+			
 			// Create a ghost LAN for the player
 			LocalAreaNetwork playerLan = networkSimulation.Value.CreateLocalAreaNetwork();
 
 
 			var fileOverrider = new PlayerFileOverrider();
-			var playerComputer = new PlayerComputer(gameManager.Value, playerLan, fileOverrider);
+			var playerComputer = new PlayerComputer(gameManager.Value, playerLan, fileOverrider, this.loginScript);
 			var player = new PlayerInstance();
 
 			player.FileOverrider = fileOverrider;
@@ -68,7 +70,7 @@ namespace Player
 			FileSystemTable.MountFileSystemsToComputer(playerComputer, fstab);
 			
 			player.Computer = playerComputer;
-			player.OsInitProcess = deviceCoordinator.SetUpComputer(playerComputer);
+			player.OsInitProcess = deviceCoordinator.SetUpComputer(playerComputer, loginScript);
 
 			playerComputer.SetInitProcess(player.OsInitProcess);
 			
@@ -82,7 +84,7 @@ namespace Player
             
 			player.UiRoot = uiRootGameObject;
 			player.UiManager = uiRootGameObject.MustGetComponent<UiManager>();
-            
+			
 			this.playerInstanceHolder.Value = player;
 		}
 		

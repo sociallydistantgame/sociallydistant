@@ -3,15 +3,20 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using Core.Systems;
+using GamePlatform;
 using OS.Devices;
+using OS.Tasks;
+using UnityEngine.Assertions;
 
 namespace Architecture
 {
 	public class DeviceCoordinatorProcess : IInitProcess
 	{
+		private readonly Dictionary<IUser, ISystemProcess> userProcesses = new Dictionary<IUser, ISystemProcess>();
 		private readonly DeviceCoordinator coordinator;
 		private readonly UniqueIntGenerator pidGenerator = new UniqueIntGenerator();
 		private readonly SimpleEnvironmentVariableProvider environment = new SimpleEnvironmentVariableProvider();
+		private readonly IShellScript loginScript;
 		private bool isAlive = true;
 		private int exitCode;
 
@@ -42,11 +47,12 @@ namespace Architecture
 		/// <inheritdoc />
 		public IEnumerable<ISystemProcess> Children => coordinator.GetChildProcesses(this);
 
-		public DeviceCoordinatorProcess(DeviceCoordinator coordinator, IComputer computer)
+		public DeviceCoordinatorProcess(DeviceCoordinator coordinator, IComputer computer, IShellScript loginScript)
 		{
 			this.Id = pidGenerator.GetNextValue();
 			Name = "init";
 			this.coordinator = coordinator;
+			this.loginScript = loginScript;
 			
 			// Find a root user, throw if we can't.
 			if (!computer.FindUserById(0, out IUser? root) || root == null)
@@ -61,39 +67,38 @@ namespace Architecture
 		/// <inheritdoc />
 		public ISystemProcess Fork()
 		{
-			return new SystemProcess(
-				pidGenerator,
-				coordinator,
-				this,
-				User
-			);
+			return ForkAsUser(this.User);
 		}
 		
 		/// <inheritdoc />
 		public ISystemProcess ForkAsUser(IUser user)
 		{
-			if (user == User)
-				return Fork();
-			
 			// Prevent users not from the same computer from
 			// executing processes on it.
 			if (user.Computer != User.Computer)
 				throw new InvalidOperationException("An invalid attempt was made to execute a process on one computer by the user of another computer.");
 
-			IUser previousUser = this.User;
-			this.User = user;
-			ISystemProcess forked = Fork();
 
-			this.User = previousUser;
-			return forked;
+			return CreateLoginProcess(user).Fork();
 		}
 
 		/// <inheritdoc />
 		public ISystemProcess CreateLoginProcess(IUser user)
 		{
-			var proc = new LoginProcess(pidGenerator, coordinator, this, user);
-			coordinator.DeclareProcess(proc);
-			return proc;
+			if (!userProcesses.TryGetValue(user, out ISystemProcess userProcess))
+			{
+				userProcess = new LoginProcess(pidGenerator, coordinator, this, user);
+				
+				loginScript.Run(userProcess, Array.Empty<string>(), new UnityTextConsole())
+					.GetAwaiter()
+					.GetResult();
+
+				this.userProcesses.Add(user, userProcess);			
+				
+				coordinator.DeclareProcess(userProcess);
+			}
+			
+			return userProcess;
 		}
 		
 		/// <inheritdoc />

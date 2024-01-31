@@ -39,9 +39,11 @@ Administrator. It usually boils down to these three things:
 
 			ISystemProcess fork = Process.ForkAsUser(Process.User.Computer.SuperUser);
 
-			var shell = new InteractiveShell(null);
+			var context = new OperatingSystemExecutionContext(fork);
+			var shell = new InteractiveShell(context);
 
-			shell.Setup(fork, this.Console.Device);
+			shell.HandleExceptionsGracefully = true;
+			shell.Setup(this.Console.Device);
 
 			if (Arguments.Length > 0)
 			{
@@ -49,7 +51,17 @@ Administrator. It usually boils down to these three things:
 			}
 			else
 			{
-				await shell.Run();
+				while (fork.IsAlive)
+				{
+					try
+					{
+						await shell.Run();
+					}
+					catch (ScriptEndException endException)
+					{
+						fork.Kill(endException.ExitCode);
+					}
+				}
 			}
 		}
 

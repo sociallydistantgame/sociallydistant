@@ -3,6 +3,7 @@ using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
+using Core.Scripting;
 using GamePlatform;
 using GameplaySystems.Networld;
 using OS.FileSystems;
@@ -31,9 +32,11 @@ namespace OS.Devices
 		/// <inheritdoc />
 		public string Name => "ritchie-pc";
 		public PlayerUser PlayerUser => playerUser;
+		private OperatingSystemScript loginScript = null!;
 		
-		public PlayerComputer(GameManager gameManager, LocalAreaNetwork playerLan, PlayerFileOverrider fileOverrider)
+		public PlayerComputer(GameManager gameManager, LocalAreaNetwork playerLan, PlayerFileOverrider fileOverrider, OperatingSystemScript loginScript)
 		{
+			this.loginScript = loginScript;
 			this.playerLan = playerLan;
 			this.Network = this.playerLan.CreateDevice(this);
 			this.gameManager = gameManager;

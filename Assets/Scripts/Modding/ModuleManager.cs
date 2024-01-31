@@ -9,14 +9,16 @@ using System.Runtime.CompilerServices;
 using System.Threading.Tasks;
 using Core;
 using Core.Config;
+using DevTools;
 using GamePlatform;
 using Modules;
+using Shell.Commands;
 using UnityEngine;
 using UniRx;
 
 namespace Modding
 {
-	public class ModuleManager
+	public class ModuleManager : IModuleManager
 	{
 		private readonly string modsDirectory = Path.Combine(Application.persistentDataPath, "mods");
 		private readonly List<GameModule> allModules = new List<GameModule>();
@@ -24,6 +26,7 @@ namespace Modding
 		private readonly IGameContext gameContext;
 		private readonly ModdingSettings moddingSettings;
 		private readonly IDisposable gameModeObserver;
+		private readonly CustomCommandManager customCommandManager;
 
 		private GameMode gameMode;
 		
@@ -32,6 +35,9 @@ namespace Modding
 			this.gameContext = context;
 			moddingSettings = this.gameContext.SettingsManager.RegisterSettingsCategory<ModdingSettings>();
 			this.gameModeObserver = context.GameModeObservable.Subscribe(OnGameModeChanged);
+			this.customCommandManager = new CustomCommandManager(this);
+
+			this.gameContext.ContentManager.AddContentSource(customCommandManager);
 		}
 		
 		internal async Task LocateAllGameModules()
@@ -187,5 +193,8 @@ namespace Modding
 				module.OnGameModeChanged(gameMode);
 			}
 		}
+
+		/// <inheritdoc />
+		public IEnumerable<GameModule> Modules => this.allModules;
 	}
 }

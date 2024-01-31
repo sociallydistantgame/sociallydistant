@@ -9,5 +9,6 @@ namespace UI.Terminal.SimpleTerminal.Data
         public int bg;
         public int fg;
         public Color fgRgb;
+        public Color bgRgb;
     }
 }

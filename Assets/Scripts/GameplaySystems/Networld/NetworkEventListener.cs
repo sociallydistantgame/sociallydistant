@@ -275,4 +275,9 @@ namespace GameplaySystems.Networld
 			
 		}
 	}
+
+	public class MalwareState
+	{
+		
+	}
 }

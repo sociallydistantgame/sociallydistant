@@ -24,13 +24,13 @@ Transform:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 8024698940115404258}
-  serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
   m_LocalPosition: {x: 0, y: 0, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
   m_Father: {fileID: 0}
+  m_RootOrder: 0
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!114 &8870500384274637185
 MonoBehaviour:
@@ -50,5 +50,6 @@ MonoBehaviour:
   deviceCoordinator: {fileID: 11400000, guid: aaa2ed62d698c314f96dbf5e0b134aad, type: 2}
   fstab: {fileID: 11400000, guid: 5f07683a37747fb4aa3eb1a9988eb20c, type: 2}
   uiRootPrefab: {fileID: 6404087894138473668, guid: 59522fc76d98843479569295ef34bcef, type: 3}
+  loginScript: {fileID: -8885089472414712051, guid: f6497409cc214176b0e8cdc36482c391, type: 3}
   environmentVariables: {fileID: 11400000, guid: 66aac6d84e661da45acad8d220849082, type: 2}
   defaultBackdrop: {fileID: 0}

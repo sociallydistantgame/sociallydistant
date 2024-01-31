@@ -3,9 +3,11 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Runtime.CompilerServices;
+using Core.Scripting;
 using OS.Devices;
 using OS.Tasks;
 using UnityEngine;
+using UnityEngine.Assertions;
 
 namespace Architecture
 {
@@ -36,13 +38,13 @@ namespace Architecture
 		}
 
 		/// <inheritdoc />
-		public IInitProcess SetUpComputer(IComputer computer)
+		public IInitProcess SetUpComputer(IComputer computer, IShellScript loginScript)
 		{
 			// Throw if the computer is already set up.
 			if (computers.ContainsKey(computer))
 				throw new InvalidOperationException("The specified computer has already been registered with the device coordinator.");
 
-			var initProcess = new DeviceCoordinatorProcess(this, computer);
+			var initProcess = new DeviceCoordinatorProcess(this, computer, loginScript);
 			this.computers.Add(computer, initProcess);
 
 			DeclareProcess(initProcess);
@@ -77,6 +79,19 @@ namespace Architecture
 		public IEnumerable<IInitProcess> GetAllRootTasks()
 		{
 			return this.computers.Values;
+		}
+
+		internal void CopyEnvironment(IUser user, ISystemProcess process)
+		{
+			Assert.IsTrue(user.Computer==process.User.Computer);
+
+			if (!this.computers.TryGetValue(user.Computer, out IInitProcess initProcess) || initProcess is not DeviceCoordinatorProcess deviceCoordinatorProcess)
+				throw new InvalidOperationException("Computer is being used but was not set up with DeviceCoordinator.");
+
+			ISystemProcess loginProcess = deviceCoordinatorProcess.CreateLoginProcess(user);
+
+			foreach (string key in loginProcess.Environment.Keys)
+				process.Environment[key] = loginProcess.Environment[key];
 		}
 	}
 }

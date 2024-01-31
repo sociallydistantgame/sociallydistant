@@ -204,7 +204,7 @@ namespace Core.Scripting
 				switch (charView.Current)
 				{
 					// Comment, skip until a carriage return or newline
-					case '#':
+					case '#' when !inQuote:
 					{
 						if (tokenBuilder.Length > 0)
 							yield return EndTextToken();
@@ -313,7 +313,7 @@ namespace Core.Scripting
 					}
 					
 					// Sequential operator
-					case ';':
+					case ';' when !inQuote:
 					{
 						if (tokenBuilder.Length > 0)
 							yield return EndTextToken();
@@ -323,7 +323,7 @@ namespace Core.Scripting
 					}
 					
 					// Parallel operator and logical AND
-					case '&':
+					case '&' when !inQuote:
 					{
 						if (tokenBuilder.Length > 0)
 							yield return EndTextToken();
@@ -342,7 +342,7 @@ namespace Core.Scripting
 					}
 					
 					// Open paren
-					case '(':
+					case '(' when !inQuote:
 					{
 						if (tokenBuilder.Length > 0)
 							yield return EndTextToken();
@@ -352,7 +352,7 @@ namespace Core.Scripting
 					}
 					
 					// Close paren
-					case ')':
+					case ')' when !inQuote:
 					{
 						if (tokenBuilder.Length > 0)
 							yield return EndTextToken();
@@ -362,7 +362,7 @@ namespace Core.Scripting
 					}
 					
 					// Open square
-					case '[':
+					case '[' when !inQuote:
 					{
 						if (tokenBuilder.Length > 0)
 							yield return EndTextToken();
@@ -381,7 +381,7 @@ namespace Core.Scripting
 					}
 					
 					// Close square
-					case ']':
+					case ']' when !inQuote:
 					{
 						if (tokenBuilder.Length > 0)
 							yield return EndTextToken();
@@ -399,7 +399,7 @@ namespace Core.Scripting
 					}
 					
 					// Open curly
-					case '{':
+					case '{' when !inQuote:
 					{
 						if (tokenBuilder.Length > 0)
 							yield return EndTextToken();
@@ -409,7 +409,7 @@ namespace Core.Scripting
 					}
 					
 					// Close curly
-					case '}':
+					case '}' when !inQuote:
 					{
 						if (tokenBuilder.Length > 0)
 							yield return EndTextToken();
@@ -419,18 +419,17 @@ namespace Core.Scripting
 					}
 					
 					// Assignment
-					case '=' when charView.Next != '=' 
-					              && charView.Next != '~':
+					case '=' when !inQuote:
 					{
 						if (tokenBuilder.Length > 0)
 							yield return EndTextToken();
 
-						yield return new ShellToken(ShellTokenType.AssignmentOperator, charView.Current.ToString(), charView.CurrentIndex, 1);
+						yield return new ShellToken(ShellTokenType.Text, charView.Current.ToString(), charView.CurrentIndex, 1);
 						break;
 					}
 					
 					// Pipe and logical OR
-					case '|':
+					case '|' when !inQuote:
 					{
 						if (tokenBuilder.Length > 0)
 							yield return EndTextToken();
@@ -448,7 +447,7 @@ namespace Core.Scripting
 					}
 					
 					// Append to File
-					case '>' when charView.Next == charView.Current:
+					case '>' when charView.Next == charView.Current && !inQuote:
 					{
 						if (tokenBuilder.Length > 0)
 							yield return EndTextToken();
@@ -463,39 +462,17 @@ namespace Core.Scripting
 					//	- we're in a double-quote literal, and
 					//	- the next character is an identifier char, or
 					//	- the next character is an opening curly brace
-					case '$' when
-						IsIdentifier(charView.Next)
-						|| charView.Next == '{'
-						&& (!inQuote || quoteStart != '\''):
+					case '$' when !inQuote:
 					{
 						if (tokenBuilder.Length > 0)
 							yield return EndTextToken();
-
-						// if next char is an opening curly brace, advance one char and check for an identifier
-						if (charView.Next == '{')
-						{
-							charView.Advance();
-							if (!IsIdentifier(charView.Next))
-								throw new InvalidOperationException("Identifier expected");
-						}
 						
-						do
-						{
-							charView.Advance();
-							tokenBuilder.Append(charView.Current);
-						} while (IsIdentifier(charView.Next));
-
-						// if next char is a closing curly, skip
-						if (charView.Next == '}')
-							charView.Advance();
-
-						yield return new ShellToken(ShellTokenType.VariableAccess, tokenBuilder.ToString(), lastTokenStart, (charView.CurrentIndex + 1) - lastTokenStart);
-						tokenBuilder.Length = 0;
-						break;
+						yield return new ShellToken(ShellTokenType.VariableAccess, charView.Current.ToString(), charView.CurrentIndex, 1);
+                     	break;
 					}
 
 					// Overwrite File
-					case '>':
+					case '>' when !inQuote:
 					{
 						if (tokenBuilder.Length > 0)
 							yield return EndTextToken();
@@ -505,7 +482,7 @@ namespace Core.Scripting
 					}
 					
 					// File Input
-					case '<':
+					case '<' when !inQuote:
 					{
 						if (tokenBuilder.Length > 0)
 							yield return EndTextToken();
