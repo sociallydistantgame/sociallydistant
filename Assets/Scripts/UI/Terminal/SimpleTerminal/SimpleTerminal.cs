@@ -2450,14 +2450,6 @@ namespace UI.Terminal.SimpleTerminal
 			if (this.term.scr > 0 && this.term.scr < HISTSIZE)
 				this.term.scr = Math.Min(this.term.scr + n, HISTSIZE - 1);
 
-			// SD bugfix: cursor not updating properly
-			ref Glyph cursorGlyph = ref Tlineabs(this.term.c.y).glyphs[this.term.c.x];
-			if ((cursorGlyph.mode & GlyphAttribute.ATTR_REVERSE) != 0)
-			{
-				cursorGlyph.mode &= ~GlyphAttribute.ATTR_REVERSE;
-				this.term.dirty[this.term.c.y] = 1;
-			}
-            
 			if (savehist)
 			{
 				for (i = 0; i < n; i++)
@@ -2625,9 +2617,6 @@ namespace UI.Terminal.SimpleTerminal
 			if ((this.term.line[cy].glyphs[cx].mode & GlyphAttribute.ATTR_WDUMMY) != 0)
 				cx--;
 
-			this.UpdateCursorRect(cx, cy, ref this.term.line[cy].glyphs[cx], ocx,
-				ocy, ref this.term.line[ocy].glyphs[ocx]);
-
 			this.DrawRegion(0, 0, this.term.col, this.term.row);
             
 			this.term.ocx = cx;
@@ -2636,7 +2625,7 @@ namespace UI.Terminal.SimpleTerminal
 			// if (ocx != term.ocx || ocy != term.ocy)
 			//    xximspot(term.ocx, term.ocy);
 
-			screen.AfterRender();
+			screen.AfterRender(cx, cy);
 		}
 
 		private void DrawRegion(int x1, int y1, int x2, int y2)
