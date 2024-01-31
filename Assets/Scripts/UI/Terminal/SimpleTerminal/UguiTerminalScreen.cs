@@ -4,6 +4,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+using Cysharp.Threading.Tasks;
 using TMPro;
 using TrixelCreative.TrixelAudio;
 using TrixelCreative.TrixelAudio.Data;
@@ -39,6 +40,8 @@ namespace UI.Terminal.SimpleTerminal
 		private int rowCount;
 		private int columnCount;
 		private bool textIsDirty;
+		private int cursorX = -1;
+		private int cursorY = -1;
 		private LayoutElement layoutElement;
 
 		[Header("Color Plotters")]
@@ -309,8 +312,16 @@ namespace UI.Terminal.SimpleTerminal
 		}
 
 		/// <inheritdoc />
-		public void AfterRender()
+		public void AfterRender(int cursorX, int cursorY)
 		{
+			if (this.cursorX != cursorX || this.cursorY != cursorY)
+			{
+				this.cursorX = cursorX;
+				this.cursorY = cursorY;
+				this.textIsDirty = true;
+				this.plottersAreDirty = true;
+			}
+			
 			if (textIsDirty)
 			{
 				UpdateText();
@@ -355,6 +366,7 @@ namespace UI.Terminal.SimpleTerminal
 				ref ColorCell cell = ref colorCells[i];
 
 				int cellRow = i / columnCount;
+				int cellColumn = i % columnCount;
 
 				// End of a row.
 				if (cellRow > currentRow)
@@ -364,7 +376,8 @@ namespace UI.Terminal.SimpleTerminal
 					this.stringBuilder.AppendLine();
 				}
 
-				Color newColor = cell.Foreground;
+				bool isCursor = cellRow == cursorY && cellColumn == cursorX;
+				Color newColor = isCursor ? cell.Background : cell.Foreground;
 				
 				bool isBold = cell.Bold;
 				bool isItalic = cell.Italic;
@@ -390,7 +403,7 @@ namespace UI.Terminal.SimpleTerminal
 					if (color != fgColor)
 						stringBuilder.Append("</color>");
 					
-					if (newColor == fgColor || newColor == default)
+					if (newColor == fgColor)
 						this.stringBuilder.Append("</color>");
 					else
 					{
@@ -467,14 +480,17 @@ namespace UI.Terminal.SimpleTerminal
 	                rect.y += lineHeight;
 	                rect.x = 0;
                 }
+
+                bool isCursor = cellRow == cursorY && cellColumn == cursorX;
+                Color newColor = isCursor ? currentCell.Foreground : currentCell.Background;
                 
                 // Color has changed.
-                if (currentCell.Background != color)
+                if (newColor != color)
                 {
 	                backgroundColorPlotter.Plot(rect, color);
 	                rect.width = 0;
 	                rect.x = cellColumn * characterWidth;
-	                color = currentCell.Background;
+	                color = newColor;
                 }
 
                 rect.width += characterWidth;
