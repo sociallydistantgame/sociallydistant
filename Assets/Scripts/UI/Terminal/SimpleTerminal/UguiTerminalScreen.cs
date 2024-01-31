@@ -47,6 +47,8 @@ namespace UI.Terminal.SimpleTerminal
 		private int cursorY = -1;
 		private LayoutElement layoutElement;
 		private float cursorBlinkTimer;
+		private float blinkTimer;
+		private bool hideBlinking;
 
 		[Header("Color Plotters")]
 		[SerializeField]
@@ -58,6 +60,9 @@ namespace UI.Terminal.SimpleTerminal
 
 		[SerializeField]
 		private float cursorBlinkInterval = 0.5f;
+
+		[SerializeField]
+		private float blinkInterval = 0.75f;
 		
 		[SerializeField]
 		private int fontSize;
@@ -156,6 +161,7 @@ namespace UI.Terminal.SimpleTerminal
 					plottersAreDirty = true;
 				}
 
+				bool blink = (glyph.mode & GlyphAttribute.ATTR_BLINK) != 0;
 				bool bold = (glyph.mode & GlyphAttribute.ATTR_BOLD) != 0;
 				bool italic = (glyph.mode & GlyphAttribute.ATTR_ITALIC) != 0;
 				bool underline = (glyph.mode & GlyphAttribute.ATTR_UNDERLINE) != 0;
@@ -165,7 +171,8 @@ namespace UI.Terminal.SimpleTerminal
 				    || bold != cell.Bold
 				    || italic != cell.Italic
 				    || underline != cell.Underline
-				    || strikethrough != cell.Strikethrough)
+				    || strikethrough != cell.Strikethrough
+					|| blink != cell.Blinking)
 				{
 					textIsDirty = true;
 
@@ -173,6 +180,7 @@ namespace UI.Terminal.SimpleTerminal
 					cell.Italic = italic;
 					cell.Underline = underline;
 					cell.Strikethrough = strikethrough;
+					cell.Blinking = blink;
 
 					cell.Character = glyph.character;
 				}
@@ -302,7 +310,15 @@ namespace UI.Terminal.SimpleTerminal
 		{
 			this.backgroundGraphic.color = bgColor;
 			this.cursorBlinkTimer += Time.deltaTime;
+			this.blinkTimer += Time.deltaTime;
 
+			if (this.blinkTimer >= this.blinkInterval)
+			{
+				this.blinkTimer = 0;
+				this.textIsDirty = true;
+				this.hideBlinking = !this.hideBlinking;
+			}
+			
 			if (this.cursorBlinkTimer >= cursorBlinkInterval)
 			{
 				this.cursorBlinkTimer = 0;
@@ -463,7 +479,7 @@ namespace UI.Terminal.SimpleTerminal
 					color = newColor;
 				}
 				
-				if (isWhitespace)
+				if (isWhitespace || (cell.Blinking && hideBlinking))
 					collectedWhitespace++;
 				else
 				{
@@ -595,6 +611,7 @@ namespace UI.Terminal.SimpleTerminal
 			public bool Italic;
 			public bool Underline;
 			public bool Strikethrough;
+			public bool Blinking;
 		}
 	}
 }
