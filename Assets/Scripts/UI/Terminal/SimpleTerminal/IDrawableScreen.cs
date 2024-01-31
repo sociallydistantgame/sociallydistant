@@ -13,5 +13,6 @@ namespace UI.Terminal.SimpleTerminal
 		void ScreenPointToCell(SimpleTerminal term, float x, float y, out int column, out int row);
 
 		void AfterRender(int cursorX, int cursorY);
+		void SetFocus(bool isFocused);
 	}
 }

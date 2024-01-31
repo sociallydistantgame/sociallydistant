@@ -4,6 +4,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+using Codice.CM.Common.Merge;
 using Cysharp.Threading.Tasks;
 using TMPro;
 using TrixelCreative.TrixelAudio;
@@ -29,6 +30,8 @@ namespace UI.Terminal.SimpleTerminal
 		private ColorCell[] colorCells = Array.Empty<ColorCell>();
 
 		public Color fgColor;
+		private bool hasFocus;
+		private bool showCursor;
 		private Color bgColor;
 		private Texture2D? bgImage;
 		private TrixelAudioSource trixelAudio;
@@ -43,6 +46,7 @@ namespace UI.Terminal.SimpleTerminal
 		private int cursorX = -1;
 		private int cursorY = -1;
 		private LayoutElement layoutElement;
+		private float cursorBlinkTimer;
 
 		[Header("Color Plotters")]
 		[SerializeField]
@@ -52,6 +56,9 @@ namespace UI.Terminal.SimpleTerminal
 		[SerializeField]
 		private TMP_FontAsset font;
 
+		[SerializeField]
+		private float cursorBlinkInterval = 0.5f;
+		
 		[SerializeField]
 		private int fontSize;
 
@@ -294,12 +301,35 @@ namespace UI.Terminal.SimpleTerminal
 		private void Update()
 		{
 			this.backgroundGraphic.color = bgColor;
+			this.cursorBlinkTimer += Time.deltaTime;
 
-			this.textRenderer?.Update();
+			if (this.cursorBlinkTimer >= cursorBlinkInterval)
+			{
+				this.cursorBlinkTimer = 0;
+				this.showCursor = !this.showCursor;
+
+				// For performance reasons, don't actually refresh the blinking cursor
+				// when we don't have focus. This is because the cursor never renders when we
+				// aren't focused.
+				if (this.hasFocus)
+				{
+					this.textIsDirty = true;
+					this.plottersAreDirty = true;
+				}
+			}
 		}
 
 		public void Bell()
 		{
+			if (!showCursor)
+			{
+				this.textIsDirty = true;
+				this.plottersAreDirty = true;
+			}
+			
+			this.showCursor = true;
+			this.cursorBlinkTimer = 0;
+			
 			if (this.asciiBeep != null)
 				this.trixelAudio.Play(this.asciiBeep);
 		}
@@ -316,6 +346,8 @@ namespace UI.Terminal.SimpleTerminal
 		{
 			if (this.cursorX != cursorX || this.cursorY != cursorY)
 			{
+				this.showCursor = true;
+				this.cursorBlinkTimer = 0;
 				this.cursorX = cursorX;
 				this.cursorY = cursorY;
 				this.textIsDirty = true;
@@ -334,6 +366,19 @@ namespace UI.Terminal.SimpleTerminal
 			UpdateBackgroundCells();
 			
 			plottersAreDirty = false;
+		}
+
+		/// <inheritdoc />
+		public void SetFocus(bool isFocused)
+		{
+			if (this.hasFocus == isFocused)
+				return;
+
+			this.hasFocus = isFocused;
+			this.textIsDirty = true;
+			this.plottersAreDirty = true;
+			this.cursorBlinkTimer = 0;
+			this.showCursor = isFocused;
 		}
 
 		private string LookupHexColor(Color color)
@@ -376,7 +421,8 @@ namespace UI.Terminal.SimpleTerminal
 					this.stringBuilder.AppendLine();
 				}
 
-				bool isCursor = cellRow == cursorY && cellColumn == cursorX;
+				bool isCursor = cellRow == cursorY && cellColumn == cursorX
+				                                   && hasFocus && showCursor;
 				Color newColor = isCursor ? cell.Background : cell.Foreground;
 				
 				bool isBold = cell.Bold;
@@ -481,7 +527,9 @@ namespace UI.Terminal.SimpleTerminal
 	                rect.x = 0;
                 }
 
-                bool isCursor = cellRow == cursorY && cellColumn == cursorX;
+                bool isCursor = cellRow == cursorY && cellColumn == cursorX
+                                                   && hasFocus && showCursor;
+                
                 Color newColor = isCursor ? currentCell.Foreground : currentCell.Background;
                 
                 // Color has changed.

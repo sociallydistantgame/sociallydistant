@@ -18,14 +18,14 @@ namespace UI.CustomGraphics
 		/// <inheritdoc />
 		protected override void OnPopulateMesh(VertexHelper vh)
 		{
+			vh.Clear();
+			
 			if (this.rectangles.Count == 0)
 			{
 				RenderDefaultGraphic(vh);
 				return;
 			}
 			
-            vh.Clear();
-
             Vector3 scale = rectTransform.lossyScale;
             
             Rect pixelRect = GetPixelAdjustedRect();
