@@ -73,6 +73,40 @@ namespace Core.Scripting
 		{
 			switch (name)
 			{
+				case "pwd":
+				{
+					console.WriteText(process.WorkingDirectory + Environment.NewLine);
+					return true;
+				}
+				case "cd":
+				{
+					if (args.Length == 0)
+					{
+						process.WorkingDirectory = process.User.Home;
+						return true;
+					}
+					
+					string relativePath = string.Join(" ", args);
+
+					string fullPath = ShellUtility.MakeAbsolutePath(PathUtility.Combine(process.WorkingDirectory, relativePath), process.User.Home);
+					
+					IVirtualFileSystem vfs = process.User.Computer.GetFileSystem(process.User);
+
+					if (vfs.FileExists(fullPath))
+					{
+						console.WriteText($"-sh: cd: {fullPath}: Not a directory.{Environment.NewLine}");
+					}
+					else if (!vfs.DirectoryExists(fullPath))
+					{
+						console.WriteText($"-sh: cd: {fullPath}: No such file or directory.{Environment.NewLine}");
+					}
+					else
+					{
+						process.WorkingDirectory = fullPath;
+					}
+					
+					return true;
+				}
 				case "export":
 					if (args.Length == 1)
 					{

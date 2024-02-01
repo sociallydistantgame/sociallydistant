@@ -24,5 +24,15 @@ fi
 # set the prompt as an environment variable
 export PS1
 
+# Set the environment variable for the user's home directory.
+if [ "$(whoami)" = "root" ]
+then
+  HOME="/root"
+else
+  HOME="/home/$(whoami)"
+fi
+
+export HOME;
+
 # set PATH
 export PATH='/bin:/sbin:/usr/bin:/usr/sbin'
