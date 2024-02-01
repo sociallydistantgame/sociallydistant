@@ -1,7 +1,6 @@
 ﻿#nullable enable
 using System;
 using System.Text.RegularExpressions;
-using Codice.Client.BaseCommands;
 using OS.Devices;
 
 namespace Core.Scripting

@@ -2,7 +2,6 @@
 using System;
 using System.Collections;
 using System.Collections.Generic;
-using Codice.CM.Common.Serialization;
 using Core.Serialization;
 
 namespace Core.WorldData
