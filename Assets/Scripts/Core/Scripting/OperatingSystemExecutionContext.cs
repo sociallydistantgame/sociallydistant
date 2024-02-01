@@ -159,8 +159,17 @@ namespace Core.Scripting
 			console.WriteText(ps1);
 		}
 
+		private DateTime GetCurrentTime()
+		{
+			var system = SystemModule.GetSystemModule();
+			IWorld world = system.Context.WorldManager.World;
+
+			return world.GlobalWorldState.Value.Now;
+		}
+		
 		private string GetPromptString()
 		{
+			DateTime date = GetCurrentTime();
 			string ps1 = GetVariableValue("PS1");
 
 			string workingDirectory = process.WorkingDirectory.StartsWith(process.User.Home)
@@ -171,6 +180,9 @@ namespace Core.Scripting
 			values.Add("%u", this.process.User.UserName);
 			values.Add("%h", process.User.Computer.Name);
 			values.Add("%w", workingDirectory);
+			values.Add("%d", FormattedDay(date));
+			values.Add("%t", FormattedTime(date));
+			
 			values.Add("%$", process.User.PrivilegeLevel == PrivilegeLevel.Root ? "#" : "$");
 			
 			foreach (string key in values.Keys)
@@ -182,6 +194,26 @@ namespace Core.Scripting
 			}
 
 			return ps1;
+		}
+
+		private string FormattedTime(DateTime date)
+		{
+			return date.ToShortTimeString();
+		}
+		
+		private string FormattedDay(DateTime date)
+		{
+			return date.DayOfWeek switch
+			{
+				DayOfWeek.Friday => "Friday",
+				DayOfWeek.Monday => "Monday",
+				DayOfWeek.Saturday => "Saturday",
+				DayOfWeek.Sunday => "Sunday",
+				DayOfWeek.Thursday => "Thursday",
+				DayOfWeek.Tuesday => "Tuesday",
+				DayOfWeek.Wednesday => "Wednesday",
+				_ => "Glitchday"
+			};
 		}
 
 		private ISystemProcess? FindProgram(ISystemProcess shellProcess, ITextConsole console, string name, string[] args)
