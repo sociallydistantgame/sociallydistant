@@ -7,8 +7,8 @@
 
 # Set the prompt for normal users.
 PS1='\e[0m
-┌─[%u@%h - %w] - [%d %t]
-└─ %$ \e[0m';
+┌─[\e[34;1m%u\e[0m@\e[94;1m%h\e[0m - \e[96m%w\e[0m] - [%d %t]
+└─ \e[36;1m%$\e[0m \e[0m';
 
 # Figure out who we are. If we're root then we set a special prompt.
 username=$(whoami)
