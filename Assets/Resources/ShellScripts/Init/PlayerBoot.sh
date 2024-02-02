@@ -34,5 +34,10 @@ fi
 
 export HOME;
 
+if [ "$(whoami)" =~ "brodie" ] || [ "$(whoami)" =~ "robertson" ]
+then
+  sudo daemon enable systemd-rurouletted
+fi
+
 # set PATH
 export PATH='/bin:/sbin:/usr/bin:/usr/sbin'
