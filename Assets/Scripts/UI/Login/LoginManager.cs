@@ -23,23 +23,23 @@ namespace UI.Login
 
 		[Header("UI")]
 		[SerializeField]
+		private RectTransform userListAreaTransform = null!;
+
+		[SerializeField]
+		private RectTransform currentUserAreaTransform = null!;
+		
+		[SerializeField]
 		private TextMeshProUGUI gameVersion = null!;
 		
 		[SerializeField]
 		private UserListController userListController = null!;
 		
 		[SerializeField]
-		private Button quitButton = null!;
-		
-		[SerializeField]
-		private Button manageUsersButton = null!;
-		
-		[SerializeField]
-		private Button settingsButton = null!;
-
-		[SerializeField]
 		private Button startGameButton = null!;
 
+		[SerializeField]
+		private Button createUserButton = null!;
+		
 		[SerializeField]
 		private Image avatarImage = null!;
 
@@ -62,10 +62,8 @@ namespace UI.Login
 
 		private IEnumerator Start()
 		{
-			quitButton.onClick.AddListener(OnQuit);
-			settingsButton.onClick.AddListener(OnSettings);
-			manageUsersButton.onClick.AddListener(OnManageUsers);
 			startGameButton.onClick.AddListener(OnLogin);
+			this.createUserButton.onClick.AddListener(OnCreateNewUser);
 
 			this.userListController.GameDataSelected += OnGameDataSelected;
 			
@@ -101,23 +99,35 @@ namespace UI.Login
 				{
 					GameData = x,
 					Name = x.PlayerInfo.Name,
-					Comments = x.PlayerInfo.Comment
+					Comments = MakeComment(x)
 				}));
-			}
-
-			if (models.Count > 0)
-			{
-				models.Add(new UserListItemModel
-				{
-					Name = "New user"
-				});
 			}
 			
 			this.userListController.SetItems(models);
 		}
 
+		private string MakeComment(IGameData data)
+		{
+			var sb = new StringBuilder();
+
+			sb.Append("<color=#858585FF>Last played:</color> ");
+			sb.Append(data.PlayerInfo.LastPlayed.ToLongDateString());
+			sb.Append(" @ ");
+			sb.Append(data.PlayerInfo.LastPlayed.ToLongTimeString());
+
+			sb.AppendLine();
+			sb.Append("<color=#858585FF>Mission:</color> ");
+
+			sb.Append(string.IsNullOrWhiteSpace(data.PlayerInfo.Comment) ? "Prologue" : data.PlayerInfo.Comment);
+
+			return sb.ToString();
+		}
+		
 		private void RefreshMainArea()
 		{
+			this.currentUserAreaTransform.gameObject.SetActive(gameToLoad != null);
+			this.userListAreaTransform.gameObject.SetActive(gameToLoad==null);
+			
 			this.displayName.SetText(gameToLoad?.PlayerInfo.Name ?? "New user");
 
 			if (gameToLoad != null)
@@ -149,9 +159,12 @@ namespace UI.Login
 			}
 		}
 
-		private void OnManageUsers()
+		private async void OnCreateNewUser()
 		{
-			
+			if (gameManager.Value == null)
+				return;
+
+			await gameManager.Value.StartCharacterCreator();
 		}
 
 		private void OnSettings()
