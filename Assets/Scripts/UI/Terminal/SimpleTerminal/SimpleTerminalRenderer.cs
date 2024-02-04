@@ -237,10 +237,11 @@ namespace UI.Terminal.SimpleTerminal
                                      || alt
                                      || shift;
 
-
+                    bool bullshit = Application.platform == RuntimePlatform.WindowsEditor
+                                    || Application.platform == RuntimePlatform.WindowsPlayer;
 
                     // KeyCode.None means we're getting text, send a character instead.
-                    if (ev.keyCode == KeyCode.None)
+                    if (ev.keyCode == KeyCode.None && bullshit)
                     {
                         simpleTerminal.Input.Char(ev.character);
                         continue;
@@ -251,8 +252,13 @@ namespace UI.Terminal.SimpleTerminal
                     bool isPrintable = !char.IsControl((char) ev.keyCode);
 
                     if (isPrintable && !isFunctionKey && !isSpecial)
+                    {
+                        if (!bullshit)
+                            simpleTerminal.Input.Char(ev.character);
+                        
                         continue;
-                    
+                    }
+
                     simpleTerminal.Input.Raw(ev.keyCode, control, alt, shift);
                 }
 
