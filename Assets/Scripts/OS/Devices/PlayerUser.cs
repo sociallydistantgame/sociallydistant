@@ -1,4 +1,7 @@
 ﻿#nullable enable
+using Core;
+using Palmmedia.ReportGenerator.Core.Reporting.Builders.Rendering;
+
 namespace OS.Devices
 {
 	public class PlayerUser : IUser
@@ -27,9 +30,21 @@ namespace OS.Devices
 
 		public PlayerUser(PlayerComputer computer, string username)
 		{
+			if (string.IsNullOrWhiteSpace(username))
+				username = "user";
+			
 			Computer = computer;
 			UserName = username;
 			Home = $"/home/{username}";
+		}
+
+		internal void Rename(string newUsername)
+		{
+			if (string.IsNullOrWhiteSpace(newUsername))
+				newUsername = "user";
+			
+			this.UserName = newUsername;
+			this.Home = $"/home/{newUsername.Replace("/", "_")}";
 		}
 	}
 }

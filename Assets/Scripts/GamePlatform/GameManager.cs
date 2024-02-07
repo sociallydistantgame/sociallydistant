@@ -65,7 +65,9 @@ namespace GamePlatform
 		private PlayerInfo loadedPlayerInfo;
 		private Subject<bool> panicSubject = new Subject<bool>();
 		private bool panicking;
+		private Subject<PlayerInfo> playerInfoSubject = new Subject<PlayerInfo>();
 
+		public IObservable<PlayerInfo> PlayerInfoObservable => playerInfoSubject;
 		public IObservable<GameMode> GameModeObservable { get; private set; }
 		public IObservable<bool> PanicObservable { get; private set; }
 
@@ -273,6 +275,7 @@ namespace GamePlatform
 				return;
 			}
 
+			playerInfoSubject.OnNext(this.loadedPlayerInfo);
 			SetGameMode(GameMode.OnDesktop);
 		}
 
@@ -312,6 +315,8 @@ namespace GamePlatform
 				await SaveCurrentGame(true);
 
 			this.currentGameData = null;
+			this.loadedPlayerInfo = default;
+			this.playerInfoSubject.OnNext(this.loadedPlayerInfo);
 		}
 
 		/// <inheritdoc />
