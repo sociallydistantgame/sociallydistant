@@ -3,6 +3,7 @@ using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
+using System.Runtime.CompilerServices;
 using Core.Scripting;
 using GamePlatform;
 using GameplaySystems.Networld;
@@ -12,6 +13,7 @@ using OS.Network;
 using Player;
 using UnityEngine;
 using UnityEngine.Assertions;
+using UniRx;
 
 namespace OS.Devices
 {
@@ -28,11 +30,13 @@ namespace OS.Devices
 		private LocalAreaNetwork playerLan;
 		private ISystemProcess? initProcess;
 		private ISystemProcess? systemd;
+		private PlayerInfo playerInfo;
 
 		/// <inheritdoc />
-		public string Name => "ritchie-pc";
+		public string Name { get; private set; } = "localhost";
 		public PlayerUser PlayerUser => playerUser;
 		private OperatingSystemScript loginScript = null!;
+		private IDisposable playerInfoObserver;
 		
 		public PlayerComputer(GameManager gameManager, LocalAreaNetwork playerLan, PlayerFileOverrider fileOverrider, OperatingSystemScript loginScript)
 		{
@@ -45,10 +49,12 @@ namespace OS.Devices
 			su = new SuperUser(this);
 			this.AddUser(su);
 
-			this.playerUser = new PlayerUser(this, "ritchie");
+			this.playerUser = new PlayerUser(this, playerInfo.UserName);
 			this.AddUser(this.playerUser);
 
 			this.RebuildVfs();
+			
+			this.playerInfoObserver = gameManager.PlayerInfoObservable.Subscribe(OnPlayerInfoChanged);
 		}
 
 		public void RebuildVfs()
@@ -141,6 +147,26 @@ namespace OS.Devices
 			this.systemd = this.initProcess.Fork();
 			systemd.Name = "systemd";
 
+		}
+
+		private void OnPlayerInfoChanged(PlayerInfo playerData)
+		{
+			string? oldUsername = playerUser?.UserName;
+			
+			this.playerInfo = playerData;
+			this.Name = playerData.HostName;
+			this.playerUser?.Rename(playerData.UserName);
+
+			if (this.playerUser != null)
+			{
+				if (!string.IsNullOrEmpty(oldUsername) && usernameMap.ContainsKey(oldUsername))
+				{
+					usernameMap.Remove(oldUsername);
+					usernameMap.Add(this.playerUser.UserName, this.playerUser.Id);
+				}
+				
+				this.RebuildVfs();
+			}
 		}
 	}
 }
