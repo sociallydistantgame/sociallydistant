@@ -167,6 +167,9 @@ namespace OS.Devices
 				
 				this.RebuildVfs();
 			}
+
+			if (string.IsNullOrWhiteSpace(this.Name))
+				this.Name = "localhost";
 		}
 	}
 }
