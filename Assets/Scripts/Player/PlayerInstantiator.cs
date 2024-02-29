@@ -61,13 +61,11 @@ namespace Player
 
 
 			var fileOverrider = new PlayerFileOverrider();
-			var playerComputer = new PlayerComputer(gameManager.Value, playerLan, fileOverrider, this.loginScript);
+			var playerComputer = new PlayerComputer(gameManager.Value, playerLan, fileOverrider, this.loginScript, fstab);
 			var player = new PlayerInstance();
 
 			player.FileOverrider = fileOverrider;
 			player.PlayerLan = playerLan;
-			
-			FileSystemTable.MountFileSystemsToComputer(playerComputer, fstab);
 			
 			player.Computer = playerComputer;
 			player.OsInitProcess = deviceCoordinator.SetUpComputer(playerComputer, loginScript);
