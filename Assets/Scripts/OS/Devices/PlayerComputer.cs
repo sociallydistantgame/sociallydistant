@@ -4,6 +4,7 @@ using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
 using System.Runtime.CompilerServices;
+using Architecture;
 using Core.Scripting;
 using GamePlatform;
 using GameplaySystems.Networld;
@@ -20,6 +21,7 @@ namespace OS.Devices
 	public class PlayerComputer : IComputer
 	{
 		private readonly GameManager gameManager;
+		private readonly FileSystemTableAsset fstab;
 		private readonly IUser su;
 		private string hostHomeDirectory = string.Empty;
 		private readonly PlayerFileOverrider fileOverrider;
@@ -38,8 +40,9 @@ namespace OS.Devices
 		private OperatingSystemScript loginScript = null!;
 		private IDisposable playerInfoObserver;
 		
-		public PlayerComputer(GameManager gameManager, LocalAreaNetwork playerLan, PlayerFileOverrider fileOverrider, OperatingSystemScript loginScript)
+		public PlayerComputer(GameManager gameManager, LocalAreaNetwork playerLan, PlayerFileOverrider fileOverrider, OperatingSystemScript loginScript, FileSystemTableAsset fstab)
 		{
+			this.fstab = fstab;
 			this.loginScript = loginScript;
 			this.playerLan = playerLan;
 			this.Network = this.playerLan.CreateDevice(this);
@@ -67,6 +70,8 @@ namespace OS.Devices
 			
 			GetFileSystem(su)
 				.Mount(playerUser.Home, new HostJail(hostHomeDirectory));
+			
+			FileSystemTable.MountFileSystemsToComputer(this, fstab);
 		}
 		
 		/// <inheritdoc />
