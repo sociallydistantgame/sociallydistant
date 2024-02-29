@@ -13,6 +13,9 @@ namespace GamePlatform
 		public PlayerInfo PlayerInfo { get; private set; }
 
 		/// <inheritdoc />
+		public string? LocalFilePath => null;
+
+		/// <inheritdoc />
 		public Task<Texture2D> GetPlayerAvatar()
 		{
 			return Task.FromResult<Texture2D>(null);
