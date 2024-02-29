@@ -18,6 +18,9 @@ namespace GamePlatform
 		/// <inheritdoc />
 		public PlayerInfo PlayerInfo { get; private set; }
 
+		/// <inheritdoc />
+		public string? LocalFilePath => this.directory;
+
 		private readonly string directory;
 		
 		private LocalGameData(string directory)

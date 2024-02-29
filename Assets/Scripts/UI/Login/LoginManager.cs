@@ -7,8 +7,11 @@ using System.Linq;
 using System.Text;
 using GamePlatform;
 using Player;
+using Shell.Windowing;
 using TMPro;
+using UI.Windowing;
 using UnityEngine;
+using UnityEngine.Assertions;
 using Utility;
 using UnityEngine.UI;
 using UnityExtensions;
@@ -21,6 +24,9 @@ namespace UI.Login
 		[SerializeField]
 		private GameManagerHolder gameManager = null!;
 
+		[SerializeField]
+		private PlayerInstanceHolder playerHolder = null!;
+		
 		[Header("UI")]
 		[SerializeField]
 		private RectTransform userListAreaTransform = null!;
@@ -38,6 +44,9 @@ namespace UI.Login
 		private Button startGameButton = null!;
 
 		[SerializeField]
+		private Button manageUserButton = null!;
+		
+		[SerializeField]
 		private Button createUserButton = null!;
 		
 		[SerializeField]
@@ -49,6 +58,10 @@ namespace UI.Login
 		[SerializeField]
 		private TextMeshProUGUI usernameText = null!;
 
+		[Header("Prefabs")]
+		[SerializeField]
+		private UserSettingsWindow userSettingsWindowPrefab = null!;
+		
 		private IGameData? gameToLoad;
 		private TextMeshProUGUI buttonText;
 		
@@ -64,6 +77,7 @@ namespace UI.Login
 		{
 			startGameButton.onClick.AddListener(OnLogin);
 			this.createUserButton.onClick.AddListener(OnCreateNewUser);
+			this.manageUserButton.onClick.AddListener(ManageUser);
 
 			this.userListController.GameDataSelected += OnGameDataSelected;
 			
@@ -167,9 +181,29 @@ namespace UI.Login
 			await gameManager.Value.StartCharacterCreator();
 		}
 
-		private void OnSettings()
+		private void ManageUser()
 		{
+			if (this.gameToLoad == null)
+				return;
+
+			if (playerHolder.Value.UiManager == null)
+				return;
 			
+			if (playerHolder.Value.UiManager.WindowManager == null)
+				return;
+
+			// create the window
+			WindowManager wm = playerHolder.Value.UiManager.WindowManager;
+			OverlayWorkspace overlay = wm.CreateSystemOverlay();
+			IFloatingGui window = overlay.CreateFloatingGui($"Manage User: {gameToLoad.PlayerInfo.Name}");
+			
+			// create the window's content
+			var rectContent = new RectTransformContent();
+			var userSettingsWindow = Instantiate(userSettingsWindowPrefab, rectContent.RectTransform);
+			Assert.IsNotNull(rectContent.RectTransform);
+
+			window.ActiveContent.Content = rectContent;
+			userSettingsWindow.User = gameToLoad;
 		}
 		
 		private void OnQuit()

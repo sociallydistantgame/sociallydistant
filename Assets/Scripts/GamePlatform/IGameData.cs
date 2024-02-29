@@ -15,6 +15,8 @@ namespace GamePlatform
 	{
 		PlayerInfo PlayerInfo { get; }
 
+		string? LocalFilePath { get; }
+		
 		Task<Texture2D> GetPlayerAvatar();
 		Task<Texture2D> GetPlayerCoverPhoto();
 

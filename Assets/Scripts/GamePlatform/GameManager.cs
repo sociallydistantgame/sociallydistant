@@ -45,7 +45,7 @@ namespace GamePlatform
 		
 		[SerializeField]
 		private WorldManagerHolder worldManager = null!;
-
+		
 		[SerializeField]
 		private InfoPanelService infoPanelService = null!;
 
