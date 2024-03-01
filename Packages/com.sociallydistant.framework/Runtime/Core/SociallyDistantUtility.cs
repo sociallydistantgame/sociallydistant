@@ -6,6 +6,8 @@ using System.IO;
 using System.Linq;
 using System.Runtime.InteropServices;
 using System.Text;
+using ContentManagement;
+using Modules;
 using UnityEngine;
 using UnityEngine.Analytics;
 
@@ -13,6 +15,8 @@ namespace Core
 {
 	public static class SociallyDistantUtility
 	{
+		public static readonly string PlayerHomeId = "player";
+		
 		public static bool IsPosixName(string? text)
 		{
 			if (string.IsNullOrWhiteSpace(text))
@@ -38,6 +42,31 @@ namespace Core
 			return true;
 		}
 
+		public static string GetHomeDirectoryHostPath(IGameContext sociallyDistant, string deviceId, int userId)
+		{
+			if (string.IsNullOrWhiteSpace(deviceId))
+				throw new InvalidOperationException("deviceId may not be whitespace.");
+			
+			string? currentSavePath = sociallyDistant.CurrentSaveDataDirectory;
+			if (string.IsNullOrWhiteSpace(currentSavePath))
+				throw new InvalidOperationException("Game isn't loaded or isn't a persistent save file");
+
+			string homesPath = Path.Combine(currentSavePath, "homes");
+			string devicePath = Path.Combine(homesPath, deviceId);
+
+			if (!Directory.Exists(homesPath))
+				Directory.CreateDirectory(homesPath);
+
+			if (!Directory.Exists(devicePath))
+				Directory.CreateDirectory(devicePath);
+
+			string userPath = Path.Combine(devicePath, userId.ToString());
+			if (!Directory.Exists(userPath))
+				Directory.CreateDirectory(userPath);
+
+			return userPath;
+		}
+		
 		public static string GetFriendlyFileSize(ulong numberOfBytes)
 		{
 			var fractionalValue = (double) numberOfBytes;

@@ -54,7 +54,8 @@ namespace Player
 
 		private async void Start()
 		{
-			await gameManager.Value.WaitForModulesToLoad();
+			if (gameManager.Value != null)
+				await gameManager.Value.WaitForModulesToLoad();
 			
 			// Create a ghost LAN for the player
 			LocalAreaNetwork playerLan = networkSimulation.Value.CreateLocalAreaNetwork();

@@ -102,6 +102,9 @@ namespace GamePlatform
 		/// <inheritdoc />
 		public IScriptSystem ScriptSystem => scriptSystem;
 
+		/// <inheritdoc />
+		public string? CurrentSaveDataDirectory => this.currentGameData?.LocalFilePath;
+		
 		private void Awake()
 		{
 			scriptSystem = new ScriptSystem(this);
