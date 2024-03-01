@@ -311,7 +311,7 @@ namespace Core.Scripting.Parsing
 					: $"Expected closing ] but instead got '{tokenView.Previous.Text}'");
 			
 			
-			var commandData = new CommandData(CurrentScope, new TextArgumentEvaluator(commandName), argumentList, FileRedirectionType.None, string.Empty);
+			var commandData = new CommandData(CurrentScope, new TextArgumentEvaluator(commandName), argumentList, FileRedirectionType.None, null);
 
 			return new SingleInstruction(commandData);
 		}
@@ -755,18 +755,18 @@ namespace Core.Scripting.Parsing
 		{
 			// No tokens left.
 			if (tokenView.Next == null)
-				return new CommandData(CurrentScope, name, arguments, FileRedirectionType.None, string.Empty);
+				return new CommandData(CurrentScope, name, arguments, FileRedirectionType.None, null);
 
-			FileRedirectionType redirectionType = GetRedirectionTypeAndPath(tokenView, out string filePath);
+			(FileRedirectionType redirectionType, IArgumentEvaluator? filePath) = await GetRedirectionTypeAndPath(tokenView);
 			return new CommandData(CurrentScope, name, arguments, redirectionType, filePath);
 		}
 		
-		private FileRedirectionType GetRedirectionTypeAndPath(ArrayView<ShellToken> tokenView, out string filePath)
+		private async Task<(FileRedirectionType, IArgumentEvaluator?)> GetRedirectionTypeAndPath(ArrayView<ShellToken> tokenView)
 		{
-			filePath = string.Empty;
+			IArgumentEvaluator? filePath = default;
 
 			if (tokenView.EndOfArray)
-				return FileRedirectionType.None;
+				return (FileRedirectionType.None, filePath);
 
 			FileRedirectionType redirectionType = tokenView.Current.TokenType switch
 			{
@@ -780,33 +780,12 @@ namespace Core.Scripting.Parsing
 			if (redirectionType != FileRedirectionType.None)
 			{
 				tokenView.Advance();
-				filePath = MustReadMany(tokenView, ShellTokenType.Text);
+				filePath = await ParseArgument(tokenView, true);
 			}
 
-			return redirectionType;
+			return (redirectionType, filePath);
 		}
 		
-		private string MustReadMany(ArrayView<ShellToken> tokenView, ShellTokenType expectedType)
-		{
-			if (tokenView.Current.TokenType != expectedType)
-				throw new InvalidOperationException($"Expected at least one {expectedType} token");
-
-			var sb = new StringBuilder();
-
-			while (!tokenView.EndOfArray && tokenView.Current.TokenType == expectedType)
-			{
-				sb.Append(tokenView.Current.Text);
-				sb.Append(" ");
-				tokenView.Advance();
-			}
-
-			// Removes the trailing space
-			if (sb.Length > 0)
-				sb.Length--;
-
-			return sb.ToString();
-		}
-
 		private bool CheckReserved(ArrayView<ShellToken> tokenView)
 		{
 			if (tokenView.EndOfArray)
