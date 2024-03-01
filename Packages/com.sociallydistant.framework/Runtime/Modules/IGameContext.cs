@@ -23,6 +23,12 @@ namespace Modules
 		ISocialService SocialService { get; }
 		
 		/// <summary>
+		///		Gets the path on the filesystem to where the current save's data is stored. Will return null if no save data is loaded
+		///		or if the current save isn't local and persistent (i.e, if we are a client on a network game or if the current game is in-memory.)
+		/// </summary>
+		string? CurrentSaveDataDirectory { get; }
+		
+		/// <summary>
 		///		Gets a reference to the player kernel.
 		/// </summary>
 		IKernel Kernel { get; }

@@ -5,6 +5,7 @@ using System.Diagnostics;
 using System.IO;
 using System.Runtime.CompilerServices;
 using Architecture;
+using Core;
 using Core.Scripting;
 using GamePlatform;
 using GameplaySystems.Networld;
@@ -60,8 +61,21 @@ namespace OS.Devices
 			this.playerInfoObserver = gameManager.PlayerInfoObservable.Subscribe(OnPlayerInfoChanged);
 		}
 
+		private IFileSystem GetHomeMount()
+		{
+			if (this.gameManager == null)
+				return new InMemoryFileSystem();
+			
+			if (string.IsNullOrWhiteSpace(gameManager.CurrentSaveDataDirectory) || !Directory.Exists(gameManager.CurrentSaveDataDirectory))
+				return new InMemoryFileSystem();
+
+			string homePath = SociallyDistantUtility.GetHomeDirectoryHostPath(gameManager, SociallyDistantUtility.PlayerHomeId, playerUser.Id);
+			return new HostJail(homePath);
+		}
+		
 		public void RebuildVfs()
 		{
+			
 			string homeParent = Application.persistentDataPath;
 			string homePath = Path.Combine(homeParent, "home");
 			hostHomeDirectory = homePath;
