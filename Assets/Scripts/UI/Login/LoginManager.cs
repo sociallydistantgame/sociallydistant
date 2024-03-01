@@ -39,6 +39,9 @@ namespace UI.Login
 		
 		[SerializeField]
 		private UserListController userListController = null!;
+
+		[SerializeField]
+		private Button backButton = null!;
 		
 		[SerializeField]
 		private Button startGameButton = null!;
@@ -78,6 +81,7 @@ namespace UI.Login
 			startGameButton.onClick.AddListener(OnLogin);
 			this.createUserButton.onClick.AddListener(OnCreateNewUser);
 			this.manageUserButton.onClick.AddListener(ManageUser);
+			this.backButton.onClick.AddListener(GoBack);
 
 			this.userListController.GameDataSelected += OnGameDataSelected;
 			
@@ -139,6 +143,10 @@ namespace UI.Login
 		
 		private void RefreshMainArea()
 		{
+			bool isUserSelected = this.gameToLoad != null;
+			this.createUserButton.gameObject.SetActive(!isUserSelected);
+			this.backButton.gameObject.SetActive(isUserSelected);
+			
 			this.currentUserAreaTransform.gameObject.SetActive(gameToLoad != null);
 			this.userListAreaTransform.gameObject.SetActive(gameToLoad==null);
 			
@@ -206,9 +214,9 @@ namespace UI.Login
 			userSettingsWindow.User = gameToLoad;
 		}
 		
-		private void OnQuit()
+		private void GoBack()
 		{
-			
+			this.OnGameDataSelected(null);
 		}
 
 		private void OnGameDataSelected(IGameData? data)
