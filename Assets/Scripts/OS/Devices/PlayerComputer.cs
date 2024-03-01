@@ -24,7 +24,6 @@ namespace OS.Devices
 		private readonly GameManager gameManager;
 		private readonly FileSystemTableAsset fstab;
 		private readonly IUser su;
-		private string hostHomeDirectory = string.Empty;
 		private readonly PlayerFileOverrider fileOverrider;
 		private Dictionary<int, IUser> users = new Dictionary<int, IUser>();
 		private Dictionary<string, int> usernameMap = new Dictionary<string, int>();
@@ -75,15 +74,11 @@ namespace OS.Devices
 		
 		public void RebuildVfs()
 		{
-			
-			string homeParent = Application.persistentDataPath;
-			string homePath = Path.Combine(homeParent, "home");
-			hostHomeDirectory = homePath;
-
+			IFileSystem playerHome = GetHomeMount();
 			this.playerFileSystem = new PlayerFileSystem(this);
-			
+
 			GetFileSystem(su)
-				.Mount(playerUser.Home, new HostJail(hostHomeDirectory));
+				.Mount(playerUser.Home, playerHome);
 			
 			FileSystemTable.MountFileSystemsToComputer(this, fstab);
 		}

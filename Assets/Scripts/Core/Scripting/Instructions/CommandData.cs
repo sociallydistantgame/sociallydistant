@@ -1,4 +1,5 @@
-﻿using System;
+﻿#nullable enable
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using Core.Scripting.Consoles;
@@ -17,9 +18,9 @@ namespace Core.Scripting.Instructions
 		public IArgumentEvaluator Name { get; }
 		public IArgumentEvaluator[] ArgumentList { get; }
 		public FileRedirectionType RedirectionType { get; }
-		public string FilePath { get; }
+		public IArgumentEvaluator? FilePath { get; }
 		
-		public CommandData(IScriptExecutionContext context, IArgumentEvaluator name, IEnumerable<IArgumentEvaluator> argumentSource, FileRedirectionType redirectionType, string path)
+		public CommandData(IScriptExecutionContext context, IArgumentEvaluator name, IEnumerable<IArgumentEvaluator> argumentSource, FileRedirectionType redirectionType, IArgumentEvaluator? path)
 		{
 			this.context = context;
 
@@ -31,7 +32,11 @@ namespace Core.Scripting.Instructions
 		
 		public async Task<int> ExecuteAsync(ITextConsole console)
 		{
+			string evaluatedFilePath = string.Empty;
 			string realName = await Name.GetArgumentText(context, console);
+
+			if (this.FilePath != null && this.RedirectionType != FileRedirectionType.None)
+				evaluatedFilePath = (await this.FilePath.GetArgumentText(context, console)).Trim();
 			
 			// Evaluate arguments now.
 			var args = new string[ArgumentList.Length];
@@ -42,7 +47,7 @@ namespace Core.Scripting.Instructions
 			}
 			
 			// What console are we going to send to the command?
-			ITextConsole realConsole = this.context.OpenFileConsole(console, this.FilePath, this.RedirectionType);
+			ITextConsole realConsole = this.context.OpenFileConsole(console, evaluatedFilePath, this.RedirectionType);
 			
 			// Process text arguments to make sure we remove their trailing spaces
 			ShellUtility.TrimTrailingSpaces(ref args);
