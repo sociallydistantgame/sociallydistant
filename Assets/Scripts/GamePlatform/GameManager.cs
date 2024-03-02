@@ -304,10 +304,11 @@ namespace GamePlatform
 			
 			await currentGameData.UpdatePlayerInfo(loadedPlayerInfo);
 			await currentGameData.SaveWorld(worldManager.Value);
-
+			await contentManager.RefreshContentDatabaseAsync();
+			
 			if (silent)
 				return;
-
+			
 			await gameInitializationScript.ExecuteAsync(unityConsole);
 		}
 
