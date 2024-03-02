@@ -103,7 +103,7 @@ namespace UI.Login
 			gameVersion.SetText(sb);
 		}
 		
-		private void RefreshUserList()
+		private async void RefreshUserList()
 		{
 			var models = new List<UserListItemModel>();
 			
@@ -119,6 +119,13 @@ namespace UI.Login
 					Name = x.PlayerInfo.Name,
 					Comments = MakeComment(x)
 				}));
+			}
+
+			if (models.Count == 0)
+			{
+				if (gameManager.Value!=null)
+					await gameManager.Value.StartCharacterCreator();
+				return;
 			}
 			
 			this.userListController.SetItems(models);
@@ -212,6 +219,17 @@ namespace UI.Login
 
 			window.ActiveContent.Content = rectContent;
 			userSettingsWindow.User = gameToLoad;
+			
+			window.WindowClosed += OnUserSettingsClosed;
+		}
+		
+		private async void OnUserSettingsClosed(IWindow obj)
+		{
+			if (gameManager.Value != null)
+				await gameManager.Value.ContentManager.RefreshContentDatabaseAsync();
+			
+			this.GoBack();
+			this.RefreshUserList();
 		}
 		
 		private void GoBack()
