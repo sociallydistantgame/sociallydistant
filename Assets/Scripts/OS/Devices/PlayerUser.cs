@@ -1,6 +1,4 @@
 ﻿#nullable enable
-using Core;
-using Palmmedia.ReportGenerator.Core.Reporting.Builders.Rendering;
 
 namespace OS.Devices
 {
