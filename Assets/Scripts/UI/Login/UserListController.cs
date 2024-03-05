@@ -22,6 +22,9 @@ namespace UI.Login
 
 		public void SetItems(IList<UserListItemModel> userList)
 		{
+			if (!this.IsInitialized)
+				this.Init();
+			
 			this.users.ResetItems(userList);
 		}
         

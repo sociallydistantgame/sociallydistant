@@ -7,10 +7,12 @@ using UnityExtensions;
 using Utility;
 using System;
 using GamePlatform;
+using Shell;
+using UI.Shell.InfoPanel;
 
 namespace UI.Login
 {
-	public class UserViewsHolder : BaseItemViewsHolder
+	public class UserViewsHolder : AutoSizedItemsViewsHolder
 	{
 		private Button button;
 		private TwoLineButtonWithIcon view;
@@ -21,8 +23,8 @@ namespace UI.Login
 		/// <inheritdoc />
 		public override void CollectViews()
 		{
-			root.MustGetComponent(out button);
-			root.MustGetComponent(out view);
+			root.MustGetComponentInChildren(out button);
+			root.MustGetComponentInChildren(out view);
 			
 			button.onClick.AddListener(OnClick);
 			
@@ -31,6 +33,7 @@ namespace UI.Login
 
 		public void UpdateView(UserListItemModel model)
 		{
+			view.Icon = MaterialIcons.AccountCircle;
 			view.FirstLine = model.Name;
 			view.SecondLine = model.Comments;
 

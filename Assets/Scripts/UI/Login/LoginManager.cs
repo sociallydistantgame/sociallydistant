@@ -136,9 +136,9 @@ namespace UI.Login
 			var sb = new StringBuilder();
 
 			sb.Append("<color=#858585FF>Last played:</color> ");
-			sb.Append(data.PlayerInfo.LastPlayed.ToLongDateString());
+			sb.Append(data.PlayerInfo.LastPlayed.ToShortDateString());
 			sb.Append(" @ ");
-			sb.Append(data.PlayerInfo.LastPlayed.ToLongTimeString());
+			sb.Append(data.PlayerInfo.LastPlayed.ToShortTimeString());
 
 			sb.AppendLine();
 			sb.Append("<color=#858585FF>Mission:</color> ");

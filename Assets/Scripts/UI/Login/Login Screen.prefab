@@ -244,8 +244,8 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 0}
   m_AnchorMax: {x: 0, y: 0}
-  m_AnchoredPosition: {x: 0, y: 0}
-  m_SizeDelta: {x: 0, y: 0}
+  m_AnchoredPosition: {x: 140.5, y: 0}
+  m_SizeDelta: {x: 275, y: 0}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &3518113735838226256
 MonoBehaviour:
@@ -800,8 +800,8 @@ MonoBehaviour:
       _KeepItemsPoolOnEmptyList: 0
       _KeepItemsPoolOnLayoutRebuild: 0
       _KeepItemsSizesOnLayoutRebuild: 0
-    _ItemPrefab: {fileID: 161783660736786883, guid: f4f458048b7a18549abbb10c1b2eeb92, type: 3}
-    _PrefabControlsDefaultItemSize: 1
+    _ItemPrefab: {fileID: 473945571560783155, guid: 7e1098812ca16445fa03d1253d60002b, type: 3}
+    _PrefabControlsDefaultItemSize: 0
     _AlsoControlItemTransversalSize: 0
 --- !u!114 &5441155321863523577
 MonoBehaviour:

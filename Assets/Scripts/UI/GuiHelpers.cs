@@ -38,6 +38,11 @@ namespace UI
 				alpha / 255f
 			);
 		}
+
+		public static Color AlphaAdjust(this Color color, float multiplier)
+		{
+			return new Color(color.r, color.g, color.b, Mathf.Clamp(color.a * multiplier, 0, 1));
+		}
 		
 		public static Color GetColor(this CommonColor commonColor)
 		{
