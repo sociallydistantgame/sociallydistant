@@ -30,6 +30,8 @@ namespace Core.WorldData
 		private readonly WorldDataTable<WorldGuildData> guilds;
 		private readonly WorldDataTable<WorldMemberData> members;
 		private readonly WorldDataTable<WorldRelationshipData> relationships;
+		private readonly WorldDataTable<WorldDomainNameData> domains;
+		
 		
         /// <inheritdoc />
         public IWorldDataObject<GlobalWorldData> GlobalWorldState => globalWorldState;
@@ -78,6 +80,9 @@ namespace Core.WorldData
 
         /// <inheritdoc />
         public IWorldTable<WorldMemberData> Members => members;
+        
+        /// <inheritdoc />
+        public IWorldTable<WorldDomainNameData> Domains => domains;
 
         /// <inheritdoc />
         public IWorldTable<WorldRelationshipData> Relationships => relationships;
@@ -101,6 +106,7 @@ namespace Core.WorldData
         	guilds = new WorldDataTable<WorldGuildData>(instanceIdGenerator, eventDispatcher);
 			members = new WorldDataTable<WorldMemberData>(instanceIdGenerator, eventDispatcher);
 			relationships = new WorldDataTable<WorldRelationshipData>(instanceIdGenerator, eventDispatcher);
+			domains = new WorldDataTable<WorldDomainNameData>(instanceIdGenerator, eventDispatcher);
 		}
 
 		public void Serialize(IWorldSerializer serializer)
@@ -128,12 +134,14 @@ namespace Core.WorldData
 			guilds.Serialize(serializer, WorldRevision.ChatAndSocialMedia);
 			members.Serialize(serializer, WorldRevision.ChatAndSocialMedia);
 			relationships.Serialize(serializer, WorldRevision.ChatAndSocialMedia);
+			domains.Serialize(serializer, WorldRevision.DomainNames);
 		}
 
 		public void Wipe()
 		{
 			// You must wipe the world in reverse order of how you would create or serialize it.
 			// This ensures proper handling of deleting objects that depend on other objects.
+			domains.Clear();
 			relationships.Clear();
 			members.Clear();
 			guilds.Clear();

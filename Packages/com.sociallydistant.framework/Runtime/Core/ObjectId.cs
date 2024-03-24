@@ -65,5 +65,7 @@ namespace Core
 
 			return Id.ToString();
 		}
+		
+		
 	}
 }

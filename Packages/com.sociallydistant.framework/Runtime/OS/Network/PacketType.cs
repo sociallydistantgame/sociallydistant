@@ -9,6 +9,10 @@ namespace OS.Network
 		ConnectAccept,
 		Disconnect,
 		Transmission,
-		Refusal
+		Refusal,
+		IcmpPing,
+		IcmpAck,
+		IcmpReject,
+		Void
 	}
 }

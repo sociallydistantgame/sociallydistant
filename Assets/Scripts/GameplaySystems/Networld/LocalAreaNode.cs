@@ -1,6 +1,8 @@
 ﻿using System;
+using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Linq;
+using System.Threading.Tasks;
 using OS.Devices;
 using OS.Network;
 
@@ -8,6 +10,7 @@ namespace GameplaySystems.Networld
 {
 	public class LocalAreaNode : INetworkSwitch<NetworkInterface>
 	{
+		private readonly IHostNameResolver hostResolver;
 		private readonly Dictionary<INetworkConnection, DeviceNode> connections = new Dictionary<INetworkConnection, DeviceNode>();
 		private List<NetworkInterface> insideInterfaces = new List<NetworkInterface>();
 		private NetworkInterface outboundInterface = new NetworkInterface();
@@ -15,43 +18,41 @@ namespace GameplaySystems.Networld
 		private Subnet insideNetwork;
 		private Dictionary<uint, DeviceNode> reservations = new Dictionary<uint, DeviceNode>();
 		private uint simulatedDefaultGatewayAddress;
-		private Queue<Packet> receivedPackets = new Queue<Packet>();
-		private Queue<Packet> sendQueue = new Queue<Packet>();
 		private List<PortForwardingRule> forwardingTable = new List<PortForwardingRule>();
 		private Dictionary<(uint, ushort), ushort> portTranslations = new Dictionary<(uint, ushort), ushort>();
 
-		public LocalAreaNode(Subnet insideLocalSubnet)
+		public LocalAreaNode(Subnet insideLocalSubnet, IHostNameResolver worldHostResolver)
 		{
 			this.insideNetwork = insideLocalSubnet;
 			this.simulatedDefaultGatewayAddress = this.insideNetwork.FirstHost;
-			
+			this.hostResolver = worldHostResolver;
 		}
 
 		/// <inheritdoc />
-		public void NetworkUpdate()
+		public async Task NetworkUpdate()
 		{
-			// Read packets from all interfaces
-			ReadPackets(this.outboundInterface);
-			foreach (NetworkInterface iface in insideInterfaces)
-				ReadPackets(iface);
-			
-			// Process all received packets
-			while (receivedPackets.TryDequeue(out Packet packet))
-				ProcessPacket(packet);
+			// Update all devices
+			await Task.WhenAll(devices.Select(n => n.NetworkUpdate())
+				.Append(Task.Run(() =>
+				{
+					var continueREading = false;
+					do
+					{
+						continueREading = false;
 
-			// Dispatch packets in the send queue
-			while (sendQueue.TryDequeue(out Packet packetToSend))
-				Dispatch(packetToSend);
-			
-				// Update all devices
-			for (var i = 0; i < devices.Count; i++)
-				devices[i].NetworkUpdate();
+						// Read packets from all interfaces
+						continueREading |= ReadPackets(this.outboundInterface);
+						foreach (NetworkInterface iface in insideInterfaces)
+							continueREading |= ReadPackets(iface);
+					} while (continueREading);
+				}))
+			);
 		}
 
 		private void Dispatch(Packet packet)
 		{
 			// Is the destination in our network?
-			if ((packet.DestinationAddress & insideNetwork.Mask) == insideNetwork.NetworkAddress)
+			if ((packet.DestinationAddress & insideNetwork.mask) == insideNetwork.networkAddress)
 			{
 				// Find a matching interface
 				foreach (NetworkInterface iface in this.insideInterfaces)
@@ -63,6 +64,14 @@ namespace GameplaySystems.Networld
 					}
 				}
 
+				// If this was an ICMP ping, and no device handled the packet, send back an ICMP reject.
+				if (packet.PacketType == PacketType.IcmpPing)
+				{
+					packet.SwapSourceAndDestination();
+					packet.PacketType = PacketType.IcmpReject;
+					Dispatch(packet);
+				}
+				
 				return;
 			}
 			
@@ -146,7 +155,7 @@ namespace GameplaySystems.Networld
 		{
 			// If the packet is destined to us and is from within the LAN, handle
 			// the packet as our own.
-			if ((packet.SourceAddress & this.insideNetwork.Mask) == insideNetwork.NetworkAddress
+			if ((packet.SourceAddress & this.insideNetwork.mask) == insideNetwork.networkAddress
 			    && packet.DestinationAddress == insideNetwork.FirstHost)
 			{
 				if(HandleOwnPacket(packet, true))
@@ -159,7 +168,7 @@ namespace GameplaySystems.Networld
 			// Note: We don't accept these packets if they originate from inside the LAN. IT'S NOT A BUG!
 			// The intended behaviour is for the packet to be scooped up by the Internet Service Node and
 			// sent straight back to us.
-			if ((packet.SourceAddress & this.insideNetwork.Mask) != insideNetwork.NetworkAddress
+			if ((packet.SourceAddress & this.insideNetwork.mask) != insideNetwork.networkAddress
 			    && outboundInterface.Addressable
 			    && packet.DestinationAddress == outboundInterface.NetworkAddress)
 			{
@@ -168,9 +177,9 @@ namespace GameplaySystems.Networld
 			}
 			
 			// For packets originating within our network, leave them as-is.
-			if ((packet.SourceAddress & this.insideNetwork.Mask) == insideNetwork.NetworkAddress)
+			if ((packet.SourceAddress & this.insideNetwork.mask) == insideNetwork.networkAddress)
 			{
-				sendQueue.Enqueue(packet);
+				Dispatch(packet);
 				return;
 			}
 
@@ -184,15 +193,19 @@ namespace GameplaySystems.Networld
 			if (rule == null)
 			{
 				packet.SwapSourceAndDestination();
-				packet.PacketType = PacketType.Refusal;
-				sendQueue.Append(packet);
+				// for ICMP pings we send an ICMP reject in this case
+				if (packet.PacketType == PacketType.IcmpPing)
+					packet.PacketType = PacketType.IcmpReject;
+				else 
+					packet.PacketType = PacketType.Refusal;
+				Dispatch(packet);
 				return;
 			}
 			
 			// Apply the translation as per the rule
 			packet.DestinationAddress = rule.InsideAddress;
 			packet.DestinationPort = rule.InsidePort;
-			sendQueue.Enqueue(packet);
+			Dispatch(packet);
 		}
 
 		private bool HandleOwnPacket(Packet packet, bool refuseUnrecognized)
@@ -203,6 +216,19 @@ namespace GameplaySystems.Networld
 				{
 					packet.SwapSourceAndDestination();
 					packet.PacketType = PacketType.Pong;
+					break;
+				}
+				case PacketType.IcmpPing:
+				{
+					bool isPortOpen = this.forwardingTable.Any(x => x.GlobalPort == packet.DestinationPort);
+					
+					packet.SwapSourceAndDestination();
+
+					if (isPortOpen)
+						packet.PacketType = PacketType.IcmpAck;
+					else
+						packet.PacketType = PacketType.IcmpReject;
+					
 					break;
 				}
 				default:
@@ -217,19 +243,27 @@ namespace GameplaySystems.Networld
 				}
 			}
 
-			sendQueue.Enqueue(packet);
+			Dispatch(packet);
 			return true;
 		}
 		
-		private void ReadPackets(NetworkInterface iface)
+		private bool ReadPackets(NetworkInterface iface)
 		{
-			Packet? packet = iface.Receive();
-			if (packet != null)
-				this.receivedPackets.Enqueue(packet.Value);
+			Packet? packet = null;
+			if ((packet = iface.Receive()) != null)
+			{
+				ProcessPacket(packet.Value);
+				return true;
+			}
+
+			return false;
 		}
 		
 		/// <inheritdoc />
 		public IEnumerable<NetworkInterface> Neighbours => insideInterfaces;
+
+		/// <inheritdoc />
+		public IHostNameResolver HostResolver => hostResolver;
 
 		/// <inheritdoc />
 		public NetworkInterface NetworkInterface => outboundInterface;
@@ -247,7 +281,7 @@ namespace GameplaySystems.Networld
 			// Create the new device node... pretend this line of code just magically bought a computer.
 			// We don't know what computer it is but it has an Ethernet port and it's our job to
 			// wire it up.
-			var deviceNode = new DeviceNode(insideNetwork, simulatedDefaultGatewayAddress, networkAddress, computer);
+			var deviceNode = new DeviceNode(insideNetwork, simulatedDefaultGatewayAddress, networkAddress, computer, hostResolver);
 			devices.Add(deviceNode);
 			reservations.Add(networkAddress, deviceNode);
 

@@ -23,7 +23,7 @@ namespace GameplaySystems.Networld
 			return lan.InternetServiceProvider == this;
 		}
 		
-		public void ConnectLan(Edge<LocalAreaNetwork, InternetServiceProvider> connection)
+		public void ConnectLan(Edge<LocalAreaNetwork, InternetServiceProvider> connection, uint publicAddress)
 		{
 			if (connection.Side1 == null)
 				return;
@@ -41,7 +41,7 @@ namespace GameplaySystems.Networld
 			if (!simulation.LookupLanNode(connection.Side1, out LocalAreaNode localAreaNode))
 				return;
 			
-			coreRouter.MakeRealNetwork(localAreaNode, this.node);
+			coreRouter.MakeRealNetwork(localAreaNode, this.node, publicAddress);
 		}
 
 		public void DisconnectLan(LocalAreaNetwork lan)

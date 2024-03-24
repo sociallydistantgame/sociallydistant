@@ -4,6 +4,9 @@ using System.Collections.Generic;
 using System.Linq;
 using Core.Serialization;
 using Core.Systems;
+using PlasticPipe.PlasticProtocol.Messages;
+using UnityEngine.AI;
+using UnityEngine.Assertions;
 
 namespace Core.DataManagement
 {
@@ -54,9 +57,22 @@ namespace Core.DataManagement
 			if (!dataIndexMap.TryGetValue(data.InstanceId, out int index))
 				throw new InvalidOperationException($"Instance ID not found: {data.InstanceId.Id}");
 
+			instanceIdGenerator.DeclareUnused(data.InstanceId.Id);
+            
 			dataElements.RemoveAt(index);
 			dataIndexMap.Remove(data.InstanceId);
 			eventDispatcher.Delete.Invoke(data);
+
+			ShiftIndices(index);
+		}
+
+		private void ShiftIndices(int index)
+		{
+			foreach (ObjectId objectId in this.dataIndexMap.Keys.ToArray())
+			{
+				if (dataIndexMap[objectId] > index)
+					dataIndexMap[objectId]--;
+			}
 		}
 
 		public void Modify(TDataElement data)
@@ -66,7 +82,6 @@ namespace Core.DataManagement
 
 			TDataElement previous = dataElements[index];
 			dataElements[index] = data;
-			instanceIdGenerator.DeclareUnused(data.InstanceId.Id);
 			eventDispatcher.Modify.Invoke(previous, data);
 		}
 
@@ -77,6 +92,9 @@ namespace Core.DataManagement
 				TDataElement element = dataElements[0];
 				Remove(element);
 			}
+			
+			Assert.IsFalse(dataElements.Count > 0);
+			Assert.IsFalse(this.dataIndexMap.Count > 0);
 		}
 		
 		public void Serialize(TSerializer serializer, TRevision revision)
@@ -116,12 +134,7 @@ namespace Core.DataManagement
 
 				instanceIdGenerator.ClaimUsedValue(element.InstanceId.Id);
 
-				this.dataIndexMap.Add(element.InstanceId, i);
-				
-				dataElements.Add(element);
-				
-				// Fire the Create event for this data element.
-				this.eventDispatcher.Create.Invoke(element);
+				Add(element);
 			}
 		}
 

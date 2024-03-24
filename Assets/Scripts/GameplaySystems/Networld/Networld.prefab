@@ -45,6 +45,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: d181afce70894e5cbb85463e372d7677, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  gameManager: {fileID: 11400000, guid: 872374c25807361459f4e174bb460b2c, type: 2}
+  worldHolder: {fileID: 11400000, guid: 6ddfb5183f8225440a5d156e7fb16747, type: 2}
   holder: {fileID: 11400000, guid: 6fee4a465da4dd349b98f36a9ac9ec26, type: 2}
 --- !u!114 &1645213139813719407
 MonoBehaviour:

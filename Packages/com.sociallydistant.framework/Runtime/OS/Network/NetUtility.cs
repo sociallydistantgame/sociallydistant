@@ -7,15 +7,51 @@ namespace OS.Network
 {
 	public static class NetUtility
 	{
+		/// <summary>
+		///		The maximum number of packets a given network node will process during a single simulation update.
+		///		Queueing more than this amount of packets before the next simulation update may cause the game to lag.
+		/// </summary>
+		public const int MaxPacketsPerSimulation = 16384;
+		
 		public static readonly Subnet LoopbackSubnet = new Subnet
 		{
-			NetworkAddress = 0x7f000000,
-			Mask = 0xfffffff0,
-			LowerRange = 0x7f000000,
-			HigherRange = 0x7f00000f
+			networkAddress = 0x7f000000,
+			mask = 0xfffffff0,
+			lowerRange = 0x7f000000,
+			higherRange = 0x7f00000f
 		};
 
 		public static uint LoopbackAddress => LoopbackSubnet.FirstHost;
+
+		public static ServerType DetectServerType(ushort port)
+		{
+			return port switch
+			{
+				80 => ServerType.Web,
+				443 => ServerType.WebSecured,
+				21 => ServerType.FileTransfer,
+				22 => ServerType.Shell,
+				3389 => ServerType.Database,
+				5432 => ServerType.Database,
+				3900 => ServerType.Desktop,
+				25 => ServerType.Email,
+				465 => ServerType.Email,
+				587 => ServerType.Email,
+				10060 => ServerType.GameServer,
+				10061 => ServerType.GameServer,
+				6667 => ServerType.Chat,
+				6697 => ServerType.Chat,
+				_ => ServerType.Unknown
+			};
+		}
+
+		public static long GetRandomMacAddress()
+		{
+			ushort firstPart = (ushort) UnityEngine.Random.Range(0, ushort.MaxValue);
+			uint secondPart = (uint) UnityEngine.Random.Range(0, uint.MaxValue);
+
+			return ((long) firstPart) | ((long) secondPart) << 32;
+		}
 		
 		public static bool TryParseNetworkAddress(string networkAddressString, out uint networkAddress)
 		{
@@ -137,10 +173,10 @@ namespace OS.Network
 
 			subnet = new Subnet
 			{
-				NetworkAddress = address & mask,
-				Mask = mask,
-				LowerRange = lowerRange,
-				HigherRange = higherRange
+				networkAddress = address & mask,
+				mask = mask,
+				lowerRange = lowerRange,
+				higherRange = higherRange
 			};
 			
 			return true;

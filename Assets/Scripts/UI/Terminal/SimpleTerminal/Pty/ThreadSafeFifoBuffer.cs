@@ -1,10 +1,14 @@
 using System;
+using System.Collections.Concurrent;
 using System.IO;
+using UnityEngine.Assertions;
 
 namespace UI.Terminal.SimpleTerminal.Pty
 {
     internal class ThreadSafeFifoBuffer : Stream
     {
+        private readonly ConcurrentQueue<byte[]> queuedData = new ConcurrentQueue<byte[]>();
+        
         private byte[] realBuffer = new byte[1024];
         private int length;
 
@@ -18,32 +22,36 @@ namespace UI.Terminal.SimpleTerminal.Pty
 
         public override long Position
         {
-            get => this.length;
+            get
+            {
+                return -1;
+            }
             set => throw new NotSupportedException(); // No.
         }
 
         public override void Flush()
-        {
-        }
+        { }
 
         internal bool ThrowOnTerminationRequest { get; set; }
 
         public override int Read(byte[] buffer, int offset, int count)
         {
+            Assert.IsFalse(count < 0);
+            Assert.IsFalse(offset < 0);
+            Assert.IsFalse(offset + count > buffer.Length);
+            
             var bytesRead = 0;
 
-            int c = Math.Min(this.length, count);
-
-            if (c > 0)
+            while (queuedData.TryDequeue(out byte[] block) && bytesRead < count)
             {
-                Buffer.BlockCopy(this.realBuffer, 0, buffer, offset, c);
+                int copyCount = Math.Min(count, block.Length);
+                
+                Buffer.BlockCopy(block, 0, buffer, offset + bytesRead, copyCount);
 
-                if (this.length > c) Buffer.BlockCopy(this.realBuffer, c, this.realBuffer, 0, this.length - c);
-
-                this.length -= c;
+                count -= copyCount;
+                bytesRead += copyCount;
             }
-
-            bytesRead = c;
+            
             return bytesRead;
         }
 
@@ -59,12 +67,19 @@ namespace UI.Terminal.SimpleTerminal.Pty
 
         public override void Write(byte[] buffer, int offset, int count)
         {
-            if (this.length + count >= this.realBuffer.Length)
-                Array.Resize(ref this.realBuffer, this.realBuffer.Length * 2);
+            Assert.IsFalse(count < 0);
+            Assert.IsFalse(offset < 0);
+            Assert.IsFalse(offset + count > buffer.Length);
 
-            Buffer.BlockCopy(buffer, offset, this.realBuffer, this.length, count);
-
-            this.length += count;
+            const int blockSize = 1024;
+            for (int i = offset; i < count; i += blockSize)
+            {
+                var block = new byte[Math.Min(blockSize, count - i)];
+             
+                Buffer.BlockCopy(buffer, i, block, 0, block.Length);
+                
+                this.queuedData.Enqueue(block);
+            }
         }
     }
 

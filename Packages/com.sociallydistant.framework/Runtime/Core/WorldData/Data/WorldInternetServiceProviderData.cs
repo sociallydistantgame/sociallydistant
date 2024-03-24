@@ -9,6 +9,7 @@ namespace Core.WorldData.Data
 	{
 		private ObjectId instanceId;
 		private string name;
+		private string narrativeId;
 		private string cidrNetwork;
 		
 		/// <inheritdoc />
@@ -18,6 +19,12 @@ namespace Core.WorldData.Data
 			set => instanceId = value;
 		}
 
+		public string NarrativeId
+		{
+			get => narrativeId;
+			set => narrativeId = value;
+		}
+		
 		public string Name
 		{
 			get => name;
@@ -34,6 +41,7 @@ namespace Core.WorldData.Data
 		public void Serialize(IWorldSerializer serializer)
 		{
 			SerializationUtility.SerializeAtRevision(ref instanceId, serializer, WorldRevision.AddedInternetServiceProviders, default);
+			SerializationUtility.SerializeAtRevision(ref narrativeId, serializer, WorldRevision.LocalNetworkNarrativeIds, default);
 			SerializationUtility.SerializeAtRevision(ref name, serializer, WorldRevision.AddedInternetServiceProviders, default);
 			SerializationUtility.SerializeAtRevision(ref cidrNetwork, serializer, WorldRevision.AddedInternetServiceProviders, default);
 		}

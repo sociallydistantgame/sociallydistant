@@ -2,6 +2,7 @@
 
 using System.Collections.Generic;
 using System;
+using System.Diagnostics;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -11,10 +12,10 @@ using OS.Devices;
 using OS.FileSystems;
 using OS.FileSystems.Host;
 using UI.Shell;
-using UnityEngine;
 using Utility;
 using Core.Scripting.Instructions;
 using Core.Scripting.Parsing;
+using Debug = UnityEngine.Debug;
 
 namespace Core.Scripting
 {
@@ -165,9 +166,12 @@ namespace Core.Scripting
 			if (!initialized)
 				return;
 
+			var stopwatch = new Stopwatch();
+			stopwatch.Start();
+			
 			try
 			{
-				await ProcessTokens(scriptText, !isInteractive);
+				await ProcessTokens(scriptText.Trim(), !isInteractive);
 
 
 				while (pendingInstructions.Count > 0)
@@ -194,18 +198,56 @@ namespace Core.Scripting
 			}
 			catch (ScriptEndException)
 			{
+				stopwatch.Stop();
+				PrintTimeDiagnostics(stopwatch.Elapsed, isInteractive);
 				throw;
 			}
 			catch (Exception ex)
 			{
 				if (!HandleExceptionsGracefully)
+				{
+					stopwatch.Stop();
+					PrintTimeDiagnostics(stopwatch.Elapsed, isInteractive);
 					throw;
+				}
 
 				// log the full error to Unity
 				Debug.LogException(ex);
 
 				// Log a partial error to the console
 				this.consoleDevice.WriteText(ex.Message + Environment.NewLine);
+			}
+			
+			stopwatch.Stop();
+			PrintTimeDiagnostics(stopwatch.Elapsed, isInteractive);
+		}
+
+		private void PrintTimeDiagnostics(TimeSpan time, bool isInteractive)
+		{
+			var sb = new StringBuilder();
+			sb.Append("Script execution took ");
+			sb.AppendLine(time.ToString());
+
+			if (isInteractive)
+				this.consoleDevice?.WriteText(sb.ToString());
+
+			switch (time)
+			{
+				case { } when time.TotalSeconds > 5:
+				{
+					Debug.LogError(sb.ToString());
+					break;
+				}
+				case { } when time.TotalSeconds > 1:
+				{
+					Debug.LogWarning(sb.ToString());
+					break;
+				}
+				default:
+				{
+					Debug.Log(sb.ToString());
+					break;
+				}
 			}
 		}
 		
@@ -256,8 +298,37 @@ namespace Core.Scripting
 			return scriptContext.GetVariableValue(name);
 		}
 
+		private void StripComments(ref string text)
+		{
+			string[] lines = text.Split('\n', StringSplitOptions.RemoveEmptyEntries);
+			var stringBuilder = new StringBuilder(text.Length);
+
+			for (int i = 0; i < lines.Length; i++)
+			{
+				string line = lines[i];
+				int commentIndex = line.IndexOf('#', StringComparison.Ordinal);
+				if (commentIndex == -1 && !string.IsNullOrWhiteSpace(line))
+				{
+					stringBuilder.AppendLine(line);
+					continue;
+				}
+
+				string strippedLine = line.Substring(0, commentIndex).Trim();
+				if (string.IsNullOrWhiteSpace(strippedLine))
+					continue;
+
+				stringBuilder.AppendLine(strippedLine);
+			}
+
+			text = stringBuilder.ToString().Trim();
+		}
+		
 		private async Task ProcessTokens(string nextLineToExecute, bool useLocalExecutionContext)
 		{
+			StripComments(ref nextLineToExecute);
+			if (string.IsNullOrWhiteSpace(nextLineToExecute))
+				return;
+			
 			// The first tokenization pass we do, before executing this function,
 			// only deals with quotes and escape sequences. It also ignores comments,
 			// but it has no concept of the actual syntax of the shell language.

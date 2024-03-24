@@ -76,7 +76,7 @@ namespace GameplaySystems.Networld
 					return;
 				
 				playerInstance.Value.PlayerLan.DisconnectFromInternet();
-				playerInstance.Value.PlayerLan.ConnectToInternet(isp);
+				playerInstance.Value.PlayerLan.ConnectToInternet(isp, subjectnew.PublicNetworkAddress);
 			}
 			else
 			{
@@ -269,7 +269,7 @@ namespace GameplaySystems.Networld
 				if (!isp.IsConnectedWithLAN(lan))
 				{
 					lan.DisconnectFromInternet();
-					lan.ConnectToInternet(isp);
+					lan.ConnectToInternet(isp, data.PublicNetworkAddress);
 				}
 			}
 			

@@ -1,5 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
+using System.Threading.Tasks;
 using OS.Network;
 using Utility;
 
@@ -7,14 +9,17 @@ namespace GameplaySystems.Networld
 {
 	public sealed class CoreRouter : IRouter<NetworkInterface>
 	{
+		private readonly IHostNameResolver hostResolver;
 		private readonly List<Subnet> localSubnetTemplates = new List<Subnet>();
 		private int templateIndex;
 		private readonly List<LocalAreaNode> localAreaNodes = new List<LocalAreaNode>();
 		private readonly List<InternetServiceNode> neighbours = new List<InternetServiceNode>();
 		private readonly List<NetworkInterface> neighbourInterfaces = new List<NetworkInterface>();
 
-		public CoreRouter()
+		public CoreRouter(IHostNameResolver worldHostResolver)
 		{
+			this.hostResolver = worldHostResolver;
+			
 			// Create some subnets to use as local address spaces
 			var localAddressSpaces = new string[]
 			{
@@ -33,22 +38,20 @@ namespace GameplaySystems.Networld
 		}
 		
 		/// <inheritdoc />
-		public void NetworkUpdate()
+		public async Task NetworkUpdate()
 		{
-			// Update any local area nodes not connected to a router.
-			// This lets us create networks, like the player's, that don't
-			// get immediately connected to the Internet.
-			for (var i = 0; i < localAreaNodes.Count; i++)
-				localAreaNodes[i].NetworkUpdate();
-			
-			// Update our neighbours. This updates all ISPs in the world.
-			for (var i = 0; i < neighbours.Count; i++)
-				neighbours[i].NetworkUpdate();
+			await Task.WhenAll(
+				Task.WhenAll(localAreaNodes.Select(n => n.NetworkUpdate())),
+				Task.WhenAll(neighbours.Select(n => n.NetworkUpdate()))
+			);
 		}
 
 		/// <inheritdoc />
 		public IEnumerable<NetworkInterface> Neighbours => neighbourInterfaces;
-		
+
+		/// <inheritdoc />
+		public IHostNameResolver HostResolver => hostResolver;
+
 		public LocalAreaNode CreateGhostLan()
 		{
 			Subnet subnet = localSubnetTemplates[templateIndex];
@@ -56,12 +59,12 @@ namespace GameplaySystems.Networld
 			if (templateIndex == localSubnetTemplates.Count)
 				templateIndex = 0;
 			
-			var node = new LocalAreaNode(subnet);
+			var node = new LocalAreaNode(subnet, this.hostResolver);
 			this.localAreaNodes.Add(node);
 			return node;
 		}
 
-		public void MakeRealNetwork(LocalAreaNode ghostNode, InternetServiceNode internetServiceProvider)
+		public void MakeRealNetwork(LocalAreaNode ghostNode, InternetServiceNode internetServiceProvider, uint publicAddress)
 		{
 			if (!this.localAreaNodes.Contains(ghostNode))
 				throw new InvalidOperationException("Cannot turn the specified LAN into a real network inside this network world, because it is not a ghost node created by this networld.");
@@ -73,7 +76,7 @@ namespace GameplaySystems.Networld
 			this.localAreaNodes.Remove(ghostNode);
 			
 			// Connect the LAN to the ISP.
-			internetServiceProvider.ConnectLan(ghostNode);
+			internetServiceProvider.ConnectLan(ghostNode, publicAddress);
 		}
 
 		public InternetServiceNode CreateServiceProvider(string cidrAddressRange)
@@ -84,7 +87,7 @@ namespace GameplaySystems.Networld
 			if (localSubnetTemplates.Contains(subnet))
 				throw new InvalidOperationException("Cannot use a local address space for an internet service provider.");
 
-			var node = new InternetServiceNode(subnet);
+			var node = new InternetServiceNode(subnet, this.hostResolver);
 			var neighbourInterface = new NetworkInterface();
 			neighbourInterface.MakeAddressable(subnet, subnet.FirstHost);
 			node.NetworkInterface.Connect(neighbourInterface);

@@ -26,14 +26,15 @@ namespace UI.PrefabCommands.Ping
 			}
 
 			string host = Arguments[0];
-			if (!NetUtility.TryParseNetworkAddress(host, out uint address))
+			if (!Network.Resolve(host, out uint address))
 			{
-				Console.WriteLine("ping: Usage: ping <host>");
+				Console.WriteLine($"ping: could not resolve host {host}");
 				EndProcess();
 				return;
 			}
 
 			await Ping(address, 32);
+			EndProcess();
 		}
 
 		private async Task Ping(uint address, int amountToPing)
@@ -47,7 +48,7 @@ namespace UI.PrefabCommands.Ping
 					return;
 				}
 
-				var result = await Network.Ping(address, 30);
+				PingResult result = await Network.Ping(address, 4, false);
 
 				switch (result)
 				{
@@ -56,6 +57,7 @@ namespace UI.PrefabCommands.Ping
 						break;
 					case PingResult.Pong:
 						Console.WriteLine($"Reply from {NetUtility.GetNetworkAddressString(address)}");
+						await Task.Delay(100);
 						break;
 				}
 			}

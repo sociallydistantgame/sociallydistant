@@ -1,5 +1,8 @@
 ﻿using System;
+using System.Collections.Concurrent;
 using System.Collections.Generic;
+using System.Linq;
+using System.Threading.Tasks;
 using OS.Network;
 using Utility;
 
@@ -7,46 +10,70 @@ namespace GameplaySystems.Networld
 {
 	public class InternetServiceNode : INetworkSwitch<NetworkInterface>
 	{
+		private readonly IHostNameResolver hostResolver;
 		private readonly List<NetworkInterface> neighbourInterfaces = new List<NetworkInterface>();
 		private readonly List<LocalAreaNode> localAreaNodes = new List<LocalAreaNode>();
 		private readonly Dictionary<LocalAreaNode, int> lanInterfaces = new Dictionary<LocalAreaNode, int>();
 		private readonly NetworkInterface coreRouter = new NetworkInterface();
-		private readonly Queue<Packet> packetQueue = new Queue<Packet>();
 		private readonly Subnet addressRange;
 
 		/// <inheritdoc />
 		public NetworkInterface NetworkInterface => coreRouter;
 
-		public InternetServiceNode(Subnet addressRange)
+		public InternetServiceNode(Subnet addressRange, IHostNameResolver hostResolver)
 		{
 			this.addressRange = addressRange;
 			this.NetworkInterface.MakeAddressable(addressRange, addressRange.FirstHost);
+			this.hostResolver = hostResolver;
 		}
-		
-		/// <inheritdoc />
-		public void NetworkUpdate()
-		{
-			Packet? corePacket = NetworkInterface.Receive();
-			if (corePacket != null)
-				packetQueue.Enqueue(corePacket.Value);
-			
-			foreach (NetworkInterface iface in this.Neighbours)
-			{
-				Packet? packet = iface.Receive();
-				if (packet == null)
-					continue;
 
-				packetQueue.Enqueue(packet.Value);
+		/// <inheritdoc />
+		public async Task NetworkUpdate()
+		{
+			await Task.WhenAll(localAreaNodes.Select(n => n.NetworkUpdate())
+				.Append(Task.Run(() =>
+				{
+					var continueReading = false;
+
+					do
+					{
+						continueReading = false;
+
+						continueReading |= ReadCorePackets();
+						continueReading |= ReadNeighbours();
+					} while (continueReading);
+				}))
+			);
+		}
+
+		private bool ReadCorePackets()
+		{
+			Packet? corePacket = null;
+			if ((corePacket = NetworkInterface.Receive()) != null)
+			{
+				ProcessPacket(corePacket.Value);
+				return true;
 			}
 
-			while (packetQueue.TryDequeue(out Packet packet))
-				ProcessPacket(packet);
-			
-			// Update all connected LANs
-			for (var i = 0; i < localAreaNodes.Count; i++)
-				localAreaNodes[i].NetworkUpdate();
+			return false;
 		}
 
+		private bool ReadNeighbours()
+		{
+			var result = false;
+			foreach (NetworkInterface iface in this.Neighbours)
+			{
+				Packet? nextPacket = null;
+				if ((nextPacket = iface.Receive()) != null)
+				{
+					ProcessPacket(nextPacket.Value);
+					result |= true;
+				}
+			}
+
+			return result;
+		}
+		
 		private void ProcessPacket(Packet packet)
 		{
 			uint destination = packet.DestinationAddress;
@@ -72,11 +99,23 @@ namespace GameplaySystems.Networld
 					continue;
 				}
 
-				mostSpecificNetwork = iface;
+				//mostSpecificNetwork = iface;
 			}
 
 			if (mostSpecificNetwork == null)
-				mostSpecificNetwork = NetworkInterface;
+			{
+				// TODO: Allow core router to handle sending packets to other ISPs in the game world.
+				// mostSpecificNetwork = NetworkInterface;
+				
+				// Instead of doing what's described above, send a void packet back to whoever sent this packet.
+				Packet voidPacket = packet.Clone();
+				voidPacket.PacketType = PacketType.Void;
+				voidPacket.SwapSourceAndDestination();
+
+				// immediately send this void packet
+				ProcessPacket(voidPacket);
+				return;
+			}
 
 			mostSpecificNetwork.Send(packet);
 		}
@@ -84,13 +123,16 @@ namespace GameplaySystems.Networld
 		/// <inheritdoc />
 		public IEnumerable<NetworkInterface> Neighbours => neighbourInterfaces;
 
+		/// <inheritdoc />
+		public IHostNameResolver HostResolver => hostResolver;
+
 		private uint? GetNextPublicAddress()
 		{
 			uint firstPublic = addressRange.FirstHost + 1;
 
 			foreach (NetworkInterface neighbour in Neighbours)
 			{
-				if ((neighbour.NetworkAddress & neighbour.SubnetMask) != addressRange.NetworkAddress)
+				if ((neighbour.NetworkAddress & neighbour.SubnetMask) != addressRange.networkAddress)
 					continue;
 
 				if (neighbour.NetworkAddress == firstPublic)
@@ -103,12 +145,8 @@ namespace GameplaySystems.Networld
 			return firstPublic;
 		}
 		
-		public void ConnectLan(LocalAreaNode node)
+		public void ConnectLan(LocalAreaNode node, uint publicAddress)
 		{
-			uint? addr = GetNextPublicAddress();
-			if (addr == null)
-				throw new InvalidOperationException("Maximum LAN count reached.");
-
 			// Create an interface for the LAN to connect to
 			lanInterfaces.Add(node, neighbourInterfaces.Count);
 			var networkInterface = new NetworkInterface();
@@ -118,8 +156,8 @@ namespace GameplaySystems.Networld
 			node.NetworkInterface.Connect(networkInterface);
 			
 			// Make the two interfaces addressable
-			networkInterface.MakeAddressable(addressRange, addr.Value);
-			node.NetworkInterface.MakeAddressable(addressRange, addr.Value);
+			networkInterface.MakeAddressable(addressRange, publicAddress);
+			node.NetworkInterface.MakeAddressable(addressRange, publicAddress);
 			
 			// Keep track of the LAN so we can update it
 			this.localAreaNodes.Add(node);

@@ -1,8 +1,12 @@
 ﻿using System;
 using System.Collections;
+using System.Collections.Concurrent;
 using System.Collections.Generic;
+using System.Threading.Tasks;
+using GamePlatform;
 using OS.Devices;
 using OS.Network;
+using Steamworks;
 using UnityEngine.InputSystem.LowLevel;
 using Utility;
 
@@ -13,15 +17,13 @@ namespace GameplaySystems.Networld
 		INetworkNode
 	{
 		private NetworkInterface deviceInterface = new NetworkInterface();
-		private NetworkInterface loopbackInterface;
+		private LoopbackInterface loopbackInterface = new LoopbackInterface();
 		private readonly NetworkConnection connection;
 		private Subnet localSubnet;
 		private uint defaultGateway;
 		private uint localAddress;
-		private NetworkInterface loopbackOutput;
-		private readonly Queue<Packet> sendQueue = new Queue<Packet>();
 
-		public NetworkInterface LoopbackInterface => loopbackInterface;
+		public LoopbackInterface LoopbackInterface => loopbackInterface;
 		public uint DefaultGateway => defaultGateway;
 
 		public event Action<PacketEvent> UnhandledPacketReceived; 
@@ -29,7 +31,7 @@ namespace GameplaySystems.Networld
 		public NetworkConnection NetworkConnection => connection;
 		public IComputer Computer { get; }
 
-		public DeviceNode(Subnet localSubnet, uint defaultGateway, uint localAddress, IComputer computer)
+		public DeviceNode(Subnet localSubnet, uint defaultGateway, uint localAddress, IComputer computer, IHostNameResolver hostResolver)
 		{
 			Computer = computer;
 			
@@ -40,74 +42,47 @@ namespace GameplaySystems.Networld
 			// Make the interface addressable
 			this.deviceInterface.MakeAddressable(localSubnet, localAddress);
 			
-			// Create a loopback interface that...loops back to us.
-			this.loopbackInterface = new NetworkInterface("lo");
-			this.loopbackInterface.MakeAddressable(NetUtility.LoopbackSubnet, NetUtility.LoopbackAddress);
-
-			// The loopback output interface is how we actually read what's sent to 127.0.0.1.
-			// It's confusing as fuck but essentially:
-			// - Game exposes the 127.0.0.1 iface we created above
-			// - Game sends packet through that interface
-			// - We read that packet through loopback output
-			// - We send packet to the relevant Listener based solely on the port.
-			this.loopbackOutput = new NetworkInterface("lo");
-			this.loopbackOutput.Connect(this.loopbackInterface);
-			
 			// Create the NetworkConnection that controls us.
-			var newConnection = new NetworkConnection(this);
+			var newConnection = new NetworkConnection(this, new DeviceHostResolver(hostResolver, this));
 			this.connection = newConnection;
 		}
 
-		public void EnqueuePacketForDelivery(Packet packet)
+		public void EnqueuePacketForDelivery(Packet packetToSend)
 		{
-			this.sendQueue.Enqueue(packet);
+			// If destination matches loopback address, set source address to match it...
+			// and send it to the loopback interface.
+			if ((packetToSend.DestinationAddress & 0xff000000) == (loopbackInterface.NetworkAddress & 0xff000000))
+			{
+				packetToSend.SourceAddress = packetToSend.DestinationAddress;
+				loopbackInterface.Send(packetToSend);
+			}
+
+			// Otherwise we set the source to our LAN address and send the packet to our gateway.
+			else
+			{
+				packetToSend.SourceAddress = this.deviceInterface.NetworkAddress;
+				this.deviceInterface.Send(packetToSend);
+			}
 		}
-		
+
 		/// <inheritdoc />
-		public void NetworkUpdate()
+		public async Task NetworkUpdate()
 		{
-			// Dispatch packets in the send queue
-			while (sendQueue.TryDequeue(out Packet packetToSend))
-			{
-				// If destination matches loopback address, set source address to match it...
-				// and send it to the loopback interface.
-				if (packetToSend.DestinationAddress == loopbackInterface.NetworkAddress)
-				{
-					packetToSend.SourceAddress = packetToSend.DestinationAddress;
-					loopbackInterface.Send(packetToSend);
-				}
-				
-				// Otherwise we set the source to our LAN address and send the packet to our gateway.
-				else
-				{
-					packetToSend.SourceAddress = this.deviceInterface.NetworkAddress;
-					this.deviceInterface.Send(packetToSend);
-				}
-			}
-			
-			// Anything that comes out of loopback-out, goes right back in.
-			Packet? loopbackOutputPacket = null;
-			while ((loopbackOutputPacket = loopbackOutput.Receive()) != null)
-			{
-				loopbackOutput.Send(loopbackOutputPacket.Value);
-			}
-			
 			// Receive from the loopback interface.
 			Packet? loopbackPacket = null;
-			while ((loopbackPacket = loopbackInterface.Receive()) != null)
+			if ((loopbackPacket = loopbackInterface.Receive()) != null)
 			{
 				OnReceivePacket(loopbackPacket.Value, loopbackInterface);
 			}
-			
 			// Receive from the gateway interface
-			Packet? gatewayPacket= null;
-			while ((gatewayPacket = deviceInterface.Receive()) != null)
+			Packet? gatewayPacket = null;
+			if ((gatewayPacket = deviceInterface.Receive()) != null)
 			{
 				OnReceivePacket(gatewayPacket.Value, deviceInterface);
 			}
 		}
 
-		private void OnReceivePacket(Packet packet, NetworkInterface sourceInterface)
+		private void OnReceivePacket(Packet packet, ISimulationNetworkInterface sourceInterface)
 		{
 			switch (packet.PacketType)
 			{
@@ -121,20 +96,46 @@ namespace GameplaySystems.Networld
 					sourceInterface.Send(response);
 					break;
 				}
+				case PacketType.IcmpPing:
+				{
+					Packet response = packet.Clone();
+					response.SwapSourceAndDestination();
+
+					if (this.connection.IsListening(packet.DestinationPort))
+					{
+						response.PacketType = PacketType.IcmpAck;
+					}
+					// TODO: Hackables
+					// TODO: Firewalls
+					else
+					{
+						response.PacketType = PacketType.IcmpReject;
+					}
+					
+					sourceInterface.Send(response);
+					break;
+				}
 				default:
 				{
-					var packetEvent = new PacketEvent(packet, sendQueue);
-
-					UnhandledPacketReceived?.Invoke(packetEvent);
-
-					if (packetEvent.Refused)
+					GameManager.ScheduleAction(() =>
 					{
-						Packet response = packet.Clone();
-						response.SwapSourceAndDestination();
-						response.PacketType = PacketType.Refusal;
-						sourceInterface.Send(response);
-					}
+						var packetEvent = new PacketEvent(packet, this);
 
+						UnhandledPacketReceived?.Invoke(packetEvent);
+
+						if (packetEvent.Refused)
+						{
+							Packet response = packet.Clone();
+							response.SwapSourceAndDestination();
+							response.PacketType = PacketType.Refusal;
+							sourceInterface.Send(response);
+						}
+						else if (!packetEvent.Handled)
+						{
+							// the packet went unhandled so we'll try again in another simulation tick
+							EnqueuePacketForDelivery(packet);
+						}
+					});
 					break;
 				}
 			}
@@ -142,5 +143,51 @@ namespace GameplaySystems.Networld
 
 		/// <inheritdoc />
 		public NetworkInterface NetworkInterface => deviceInterface;
+	}
+
+	public sealed class DeviceHostResolver : IHostNameResolver
+	{
+		private readonly DeviceNode deviceNode;
+		private readonly IHostNameResolver upstreamResolver;
+
+		public DeviceHostResolver(IHostNameResolver upstreamResolver, DeviceNode deviceNode)
+		{
+			this.upstreamResolver = upstreamResolver;
+			this.deviceNode = deviceNode;
+		}
+
+		/// <inheritdoc />
+		public bool IsValidSubnet(uint address)
+		{
+			// 127.0.0.0/8
+			if ((address & 0xff000000) == (NetUtility.LoopbackAddress & 0xff000000))
+				return true;
+
+			NetworkInterface deviceInterface = deviceNode.NetworkInterface;
+
+			// anything in the device's current LAN is valid.
+			if ((address & deviceInterface.SubnetMask) == (deviceInterface.NetworkAddress & deviceInterface.SubnetMask))
+				return true;
+
+			return upstreamResolver.IsValidSubnet(address);
+		}
+
+		/// <inheritdoc />
+		public string ReverseHostLookup(uint networkAddress)
+		{
+			if (networkAddress == NetUtility.LoopbackAddress)
+				return "localhost";
+
+			return upstreamResolver.ReverseHostLookup(networkAddress);
+		}
+
+		/// <inheritdoc />
+		public uint? HostLookup(string hostname)
+		{
+			if (hostname == "localhost")
+				return NetUtility.LoopbackAddress;
+
+			return upstreamResolver.HostLookup(hostname);
+		}
 	}
 }

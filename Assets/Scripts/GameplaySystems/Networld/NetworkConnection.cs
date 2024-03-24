@@ -1,8 +1,12 @@
 ﻿using System;
 using System.Collections;
+using System.Collections.Concurrent;
 using System.Collections.Generic;
+using System.Linq;
+using System.Threading;
 using System.Threading.Tasks;
 using Cysharp.Threading.Tasks;
+using GamePlatform;
 using OS.Network;
 using UnityEngine;
 using Utility;
@@ -12,6 +16,9 @@ namespace GameplaySystems.Networld
 	public class NetworkConnection : 
 		INetworkConnection
 	{
+		private readonly object sync = new object();
+		private readonly List<PacketQueue> queues = new List<PacketQueue>();
+		private readonly IHostNameResolver hostResolver;
 		private DeviceNode deviceNode;
 		private const ushort MaximumOutboundConnections = 1024;
 		private readonly Dictionary<ushort, Listener> listeners = new Dictionary<ushort, Listener>();
@@ -23,12 +30,30 @@ namespace GameplaySystems.Networld
 		public string LoopbackAddress => NetUtility.GetNetworkAddressString(deviceNode.LoopbackInterface.NetworkAddress);
 		
 		
-		public NetworkConnection(DeviceNode node)
+		public NetworkConnection(DeviceNode node, IHostNameResolver hostResolver)
 		{
+			this.hostResolver = hostResolver;
+
 			if (node.NetworkConnection != null)
 				throw new InvalidOperationException("Cannot create a NetworkConnection object outside of the constructor of a DeviceNode.");
 			
 			this.deviceNode = node;
+			this.deviceNode.UnhandledPacketReceived += HandlePacketReceived;
+		}
+
+		private void HandlePacketReceived(PacketEvent packetEvent)
+		{
+			lock (sync)
+			{
+				Packet packet = packetEvent.Packet;
+				for (int i = 0; i < queues.Count; i++)
+				{
+					PacketQueue queue = queues[i];
+					queue.Enqueue(packet);
+				}
+
+				packetEvent.Handle();
+			}
 		}
 
 		/// <inheritdoc />
@@ -41,11 +66,28 @@ namespace GameplaySystems.Networld
 			yield return mainInfo;
 		}
 
-		public Task<PingResult> Ping(uint address, float timeuotInSeconds)
+		/// <inheritdoc />
+		public bool Connected => this.deviceNode.NetworkInterface.Connected;
+
+		public async Task<PingResult> Ping(uint address, float timeuotInSeconds, bool acceptVoidPackets)
 		{
-			// Completion source for the ping result
-			var completionSource = new TaskCompletionSource<PingResult>();
+			// Find out if the address is actually a real one in the world. No need to use the network simulation if that's the case, we can
+			// fake a timeout depending on whether we accept void packets.
+			//
+			// For known non-existent addresses, waiting for simulation is a waste of time and CPU.
+			if (!this.hostResolver.IsValidSubnet(address))
+			{
+				// if we aren't accepting void packets from the simulation, we fake a full timeout because that's
+				// what the simulation would do.
+				if (!acceptVoidPackets)
+					await Task.Delay((int) Mathf.Round(timeuotInSeconds * 1000));
+
+				return PingResult.TimedOut;
+			}
 			
+			using var queue = new PacketQueue(this, acceptVoidPackets);
+			var tokenSource = new CancellationTokenSource();
+
 			// Create the ping packet
 			var pingPacket = new Packet
 			{
@@ -55,50 +97,47 @@ namespace GameplaySystems.Networld
 
 			// Send it to the net simulation node
 			this.deviceNode.EnqueuePacketForDelivery(pingPacket);
-			
+
 			// Event for handling Pong packets
-			PingResult pingResult = default;
-			var handled = false;
-			void HandlePongPacket(PacketEvent packetEvent)
+			var pingResult = PingResult.Pong;
+
+			Task<bool> pingTask = WaitForPong(address, queue, tokenSource.Token);
+			
+			bool receivedPong = await Task.WhenAny(pingTask, Task.Delay((int) Mathf.Round(timeuotInSeconds * 1000))) == pingTask;
+
+			if (!receivedPong || !pingTask.Result)
 			{
-				if (handled)
-					return;
-				
-				// Packet was already handled
-				if (packetEvent.Handled)
-					return;
-				
-				// Not a pong packet
-				if (packetEvent.Packet.PacketType != PacketType.Pong)
-					return;
-				
-				// Done!
-				packetEvent.Handle();
-				pingResult = PingResult.Pong;
-				handled = true;
-				
-				completionSource.SetResult(pingResult);
-				deviceNode.UnhandledPacketReceived -= HandlePongPacket;
+				tokenSource.Cancel();
+				pingResult = PingResult.TimedOut;
 			}
-
-			// Subscribe to unhandled packet events
-			deviceNode.UnhandledPacketReceived += HandlePongPacket;
-
-			Task.Run(async () =>
-			{
-				await Task.Delay((int) Mathf.Round(timeuotInSeconds * 1000));
-				if (!handled)
-				{
-					pingResult = PingResult.TimedOut;
-					handled = true;
-					completionSource.SetResult(pingResult);
-					deviceNode.UnhandledPacketReceived -= HandlePongPacket;
-				}
-			});
-
-			return completionSource.Task;
+			
+			return pingResult;
 		}
 
+		private async Task<bool> WaitForPong(uint address, PacketQueue queue, CancellationToken cancelToken)
+		{
+			while (true)
+			{
+				cancelToken.ThrowIfCancellationRequested();
+				Packet packet = await queue.Dequeue(cancelToken);
+				
+				// not for us
+				if (packet.SourceAddress != address)
+					continue;
+
+				if (packet.PacketType == PacketType.Void)
+					return false;
+				
+				// Not a pong packet
+				if (packet.PacketType != PacketType.Pong)
+					continue;
+
+				break;
+			}
+
+			return true;
+		}
+		
 		private Listener ListenInternal(ushort port, ServerType serverType, SecurityLevel secLevel)
 		{
 			if (listeners.ContainsKey(port))
@@ -117,6 +156,87 @@ namespace GameplaySystems.Networld
 				Debug.LogWarning("Creating a listener on port " + port + " for in-bound connections is generally not advised. You are taking up one of the " + MaximumOutboundConnections + " reserved ports for out-bound traffic.");
 
 			return ListenInternal(port, serverType, secLevel);
+		}
+
+		/// <inheritdoc />
+		public bool Resolve(string host, out uint address)
+		{
+			uint? result = hostResolver.HostLookup(host);
+
+			address = result.GetValueOrDefault();
+
+			return result.HasValue;
+		}
+
+		/// <inheritdoc />
+		public async Task<PortScanResult> ScanPort(uint address, ushort port)
+		{
+			// Ping the host first. No sense scanning a port if the host is down.
+			PingResult pingResult = await Ping(address, 4, true);
+			if (pingResult != PingResult.Pong)
+				return new PortScanResult(port, PortStatus.Closed, ServerType.Unknown);
+
+			using var queue = new PacketQueue(this, true);
+			
+			// Create the ping packet
+			var pingPacket = new Packet
+			{
+				PacketType = PacketType.IcmpPing,
+				DestinationAddress = address,
+				DestinationPort = port
+			};
+
+			// Send it to the net simulation node
+			this.deviceNode.EnqueuePacketForDelivery(pingPacket);
+			
+			// Event for handling Pong packets
+			var tokenSource = new CancellationTokenSource();
+			Task<PortScanResult> waitTask = WaitForIcmpPacket(address, port, queue, tokenSource.Token);
+
+			bool success = await Task.WhenAny(waitTask, Task.Delay(4000)) == waitTask;
+
+			if (!success)
+			{
+				tokenSource.Cancel();
+				return new PortScanResult(port, PortStatus.Closed, ServerType.Unknown);
+			}
+
+			return waitTask.Result;
+		}
+
+		private async Task<PortScanResult> WaitForIcmpPacket(uint address, ushort port, PacketQueue queue, CancellationToken token)
+		{
+			while (true)
+			{
+				token.ThrowIfCancellationRequested();
+				Packet packet = await queue.Dequeue(token);
+
+				if (packet.SourceAddress != address && packet.SourcePort != port)
+					continue;
+
+				// Not a pong packet
+				if (packet.PacketType != PacketType.IcmpAck && packet.PacketType != PacketType.IcmpReject)
+					continue;
+				
+				// Done!
+				return new PortScanResult(
+					packet.SourcePort,
+					packet.PacketType == PacketType.IcmpAck ? PortStatus.Open : PortStatus.Closed,
+					NetUtility.DetectServerType(packet.SourcePort)
+				);
+			}
+		}
+
+		/// <inheritdoc />
+		public bool IsListening(ushort port)
+		{
+			return listeners.ContainsKey(port);
+		}
+
+		/// <inheritdoc />
+		public string GetHostName(uint address)
+		{
+			return hostResolver.ReverseHostLookup(address) ?? NetUtility.GetNetworkAddressString(address);
 		}
 
 		public async Task<ConnectionResult> Connect(uint remoteAddress, ushort port)
@@ -175,6 +295,64 @@ namespace GameplaySystems.Networld
 			}
 
 			return result;
+		}
+
+		private sealed class PacketQueue : IDisposable
+		{
+			private volatile bool deleted;
+			
+			private readonly bool acceptVoidPackets;
+			private readonly NetworkConnection connection;
+			private readonly ConcurrentQueue<Packet> queue = new ConcurrentQueue<Packet>();
+
+			public bool Deleted => deleted;
+			
+			public PacketQueue(NetworkConnection connection, bool acceptVoidPackets = false)
+			{
+				this.connection = connection;
+				lock (connection.sync)
+					this.connection.queues.Add(this);
+				this.acceptVoidPackets = acceptVoidPackets;
+			}
+			
+			public void Enqueue(Packet packet)
+			{
+				if (deleted)
+					return;
+				
+				if (packet.PacketType == PacketType.Void && !acceptVoidPackets)
+					return;
+				
+				queue.Enqueue(packet);
+			}
+
+			public async Task<Packet> Dequeue(CancellationToken token)
+			{
+				if (deleted)
+					return default;
+				
+				Packet packet = default;
+
+				while (!queue.TryDequeue(out packet))
+				{
+					if (deleted)
+						break;
+					
+					token.ThrowIfCancellationRequested();
+					await Task.Yield();
+				}
+
+				return packet;
+			}
+
+			/// <inheritdoc />
+			public async void Dispose()
+			{
+				deleted = true;
+
+				lock (connection.sync)
+					connection.queues.Remove(this);
+			}
 		}
 	}
 }

@@ -35,6 +35,9 @@ namespace Core.Scripting.Instructions
 			string evaluatedFilePath = string.Empty;
 			string realName = await Name.GetArgumentText(context, console);
 
+			if (string.IsNullOrWhiteSpace(realName))
+				return 0;
+			
 			if (this.FilePath != null && this.RedirectionType != FileRedirectionType.None)
 				evaluatedFilePath = (await this.FilePath.GetArgumentText(context, console)).Trim();
 			

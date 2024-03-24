@@ -2,6 +2,7 @@
 
 using System;
 using System.Collections;
+using System.Collections.Concurrent;
 using System.Collections.Generic;
 
 namespace OS.Network.MessageTransport
@@ -10,11 +11,11 @@ namespace OS.Network.MessageTransport
 			IDisposable,
 			IReadOnlyCollection<T>
 	{
-		private Queue<T> outputQueue;
-		private Queue<T> inputQueue;
+		private ConcurrentQueue<T> outputQueue;
+		private ConcurrentQueue<T> inputQueue;
 		private Wire<T>? wire;
 
-		public WireTerminal(Queue<T> input, Queue<T> output, Wire<T> wire)
+		public WireTerminal(ConcurrentQueue<T> input, ConcurrentQueue<T> output, Wire<T> wire)
 		{
 			if (wire.TerminalA != null || wire.TerminalB != null)
 				throw new InvalidOperationException("Cannot create a wire terminal for an existing wire! You are using this API incorrectly. Just create a new Wire<T> and it will create the corresponding WireTerminals for you.");
@@ -63,12 +64,6 @@ namespace OS.Network.MessageTransport
 		{
 			ThrowIfDisposed();
 			outputQueue.Enqueue(value);
-		}
-
-		public T Dequeue()
-		{
-			ThrowIfDisposed();
-			return inputQueue.Dequeue();
 		}
 
 		public bool TryDequeue(out T value)
