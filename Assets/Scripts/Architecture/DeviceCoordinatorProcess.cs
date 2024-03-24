@@ -6,6 +6,7 @@ using Core.Systems;
 using GamePlatform;
 using OS.Devices;
 using OS.Tasks;
+using UnityEngine;
 using UnityEngine.Assertions;
 
 namespace Architecture
@@ -88,10 +89,17 @@ namespace Architecture
 			if (!userProcesses.TryGetValue(user, out ISystemProcess userProcess))
 			{
 				userProcess = new LoginProcess(pidGenerator, coordinator, this, user);
-				
-				loginScript.Run(userProcess, Array.Empty<string>(), new UnityTextConsole())
-					.GetAwaiter()
-					.GetResult();
+
+				if (loginScript == null)
+				{
+					Debug.LogWarning("loginScript is null for this device, users won't get any default settings.");
+				}
+				else
+				{
+					loginScript.Run(userProcess, Array.Empty<string>(), new UnityTextConsole())
+						.GetAwaiter()
+						.GetResult();
+				}
 
 				this.userProcesses.Add(user, userProcess);			
 				

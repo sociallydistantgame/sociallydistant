@@ -1,11 +1,12 @@
-﻿using System.Collections.Generic;
+﻿using System.Collections.Concurrent;
+using System.Collections.Generic;
 using OS.Network;
 
 namespace GameplaySystems.Networld
 {
 	public sealed class PacketEvent
 	{
-		private readonly Queue<Packet> sendQueue;
+		private readonly DeviceNode deviceNode;
 		private readonly Packet packet;
 		private bool refused;
 		private bool handled;
@@ -21,10 +22,10 @@ namespace GameplaySystems.Networld
 
 		public Packet Packet => packet;
 
-		public PacketEvent(Packet packet, Queue<Packet> sendQueue)
+		public PacketEvent(Packet packet, DeviceNode deviceNode)
 		{
 			this.packet = packet;
-			this.sendQueue = sendQueue;
+			this.deviceNode = deviceNode;
 		}
 
 		public void Handle(Packet responsePacket)
@@ -33,7 +34,7 @@ namespace GameplaySystems.Networld
 				return;
 			
 			handled = true;
-			this.sendQueue.Enqueue(responsePacket);
+			this.deviceNode.EnqueuePacketForDelivery(responsePacket);
 		}
 
 		public void Handle()

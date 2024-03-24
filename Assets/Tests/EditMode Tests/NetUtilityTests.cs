@@ -72,28 +72,28 @@ namespace Tests.EditMode_Tests
 				
 				// Check the masks are equal and that they have the same number of bits
 				// as expected by the CIDR notation.
-				Assert.AreEqual(expectedSubnet.SubnetMask, subnet.Mask);
-				Assert.AreEqual(expectedSubnet.CidrBits, NetUtility.CountBits(subnet.Mask));
+				Assert.AreEqual(expectedSubnet.SubnetMask, subnet.mask);
+				Assert.AreEqual(expectedSubnet.CidrBits, NetUtility.CountBits(subnet.mask));
 				
 				// Check the network address itself!
-				Assert.AreEqual(expectedSubnet.NetworkAddress, subnet.NetworkAddress);
+				Assert.AreEqual(expectedSubnet.NetworkAddress, subnet.networkAddress);
 				
 				// Lower ranges must be equal, and must be equal to the network address.
-				Assert.AreEqual(expectedSubnet.LowerRange, subnet.LowerRange);
-				Assert.AreEqual(subnet.NetworkAddress, subnet.LowerRange);
+				Assert.AreEqual(expectedSubnet.LowerRange, subnet.lowerRange);
+				Assert.AreEqual(subnet.networkAddress, subnet.lowerRange);
 				
 				// Group size must be equal
 				Assert.AreEqual(expectedSubnet.GroupSize, subnet.GroupSize);
 
 				// Higher ranges must be equal, and must be equal to lower range + group size - 1.
-				Assert.AreEqual(expectedSubnet.HigherRange, subnet.HigherRange);
-				Assert.AreEqual(subnet.LowerRange + subnet.GroupSize - 1, subnet.HigherRange);
+				Assert.AreEqual(expectedSubnet.HigherRange, subnet.higherRange);
+				Assert.AreEqual(subnet.lowerRange + subnet.GroupSize - 1, subnet.higherRange);
 				
 				// First host must be the lower range + 1
-				Assert.AreEqual(subnet.LowerRange + 1, subnet.FirstHost);
+				Assert.AreEqual(subnet.lowerRange + 1, subnet.FirstHost);
 				
 				// Last host must be higher range - 1
-				Assert.AreEqual(subnet.HigherRange - 1, subnet.LastHost);
+				Assert.AreEqual(subnet.higherRange - 1, subnet.LastHost);
 				
 				// Host count must be exactly the group size - 2
 				Assert.AreEqual(subnet.GroupSize - 2, subnet.UsableAddressSize);

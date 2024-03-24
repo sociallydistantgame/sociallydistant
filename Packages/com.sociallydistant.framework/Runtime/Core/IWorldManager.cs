@@ -1,5 +1,7 @@
 ﻿#nullable enable
 
+using OS.Network;
+
 namespace Core
 {
 	public interface IWorldManager
@@ -9,5 +11,7 @@ namespace Core
 		IWorldDataCallbacks Callbacks { get; }
 		
 		ObjectId GetNextObjectId();
+		string GetNextIspRange();
+		uint GetNextPublicAddress(ObjectId ispId);
 	}
 }

@@ -2,6 +2,7 @@
 {
 	public enum ServerType
 	{
+		Unknown,
 		Netcat,
 		Shell,
 		FileTransfer,

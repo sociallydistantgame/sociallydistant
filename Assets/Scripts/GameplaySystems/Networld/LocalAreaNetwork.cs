@@ -21,11 +21,11 @@ namespace GameplaySystems.Networld
 			this.connection.Side1 = this;
 		}
 		
-		public void ConnectToInternet(InternetServiceProvider isp)
+		public void ConnectToInternet(InternetServiceProvider isp, uint publicAddress)
 		{
 			DisconnectFromInternet();
 
-			isp.ConnectLan(this.connection);
+			isp.ConnectLan(this.connection, publicAddress);
 		}
 
 		public void DisconnectFromInternet()

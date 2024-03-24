@@ -14,6 +14,8 @@ namespace OS.Network
 		///		may be used to connect neighbouring devices or networks together.
 		/// </summary>
 		IEnumerable<TNetworkInterface> Neighbours { get; }
+		
+		IHostNameResolver HostResolver { get; }
 	}
 
 	public interface ISimulationNetworkPort<TCompatibleInterfaceType> :

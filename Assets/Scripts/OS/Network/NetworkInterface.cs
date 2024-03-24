@@ -1,5 +1,6 @@
 ﻿#nullable enable
 using System;
+using System.Collections.Concurrent;
 using System.IO;
 using System.Text;
 using Core.Serialization.Binary;
@@ -15,13 +16,8 @@ namespace OS.Network
 		private Subnet subnet;
 		private uint address;
 		private NetworkInterface? otherInterface;
-		private Wire<byte>? cable;
-		private WireTerminal<byte>? ourTerminal;
-		private WireTerminalStream? stream;
-		private BinaryReader? bReader;
-		private BinaryWriter? bWriter;
-		private BinaryDataWriter? writer;
-		private BinaryDataReader? reader;
+		private Wire<Packet>? cable;
+		private WireTerminal<Packet>? ourTerminal;
 		private bool addressable = false;
 
 		public bool Connected => otherInterface != null;
@@ -30,7 +26,7 @@ namespace OS.Network
 
 		public string Name { get; }
 		public uint NetworkAddress => address;
-		public uint SubnetMask => subnet.Mask;
+		public uint SubnetMask => subnet.mask;
 
 		public long MacAddress { get; }
 		
@@ -49,11 +45,8 @@ namespace OS.Network
 		
 		public void MakeAddressable(Subnet subnet, uint address)
 		{
-			if ((address & subnet.Mask) != subnet.NetworkAddress)
-				throw new InvalidOperationException("Addressable NetworkInterface address must be in the specified subnet's IP range.");
-
 			this.subnet = subnet;
-			this.address = address;
+			this.address = (subnet.networkAddress & subnet.mask) | (address & ~subnet.mask);
 			this.addressable = true;
 		}
 
@@ -71,28 +64,12 @@ namespace OS.Network
 			this.otherInterface.otherInterface = this; // Because we can do this.
 			
 			// Create a virtual cable for both interfaces to share.
-			this.cable = new Wire<byte>();
+			this.cable = new Wire<Packet>();
 			this.otherInterface.cable = this.cable;
 			
 			// We get terminal A, they get terminal B.
 			this.ourTerminal = this.cable.TerminalA;
 			this.otherInterface.ourTerminal = this.cable.TerminalB;
-			
-			// Set up our comm streams.
-			this.CreateStream();
-			this.otherInterface.CreateStream();
-		}
-
-		private void CreateStream()
-		{
-			if (ourTerminal == null)
-				throw new InvalidOperationException("Cannot create a communication stream between two NetworkInterfaces if one of the interfaces is disconnected!");
-			
-			this.stream = new WireTerminalStream(ourTerminal);
-			this.bReader = new BinaryReader(stream, Encoding.UTF8);
-			this.bWriter = new BinaryWriter(stream, Encoding.UTF8);
-			this.reader = new BinaryDataReader(bReader);
-			this.writer = new BinaryDataWriter(bWriter);
 		}
 		
 		public void Disconnect()
@@ -107,40 +84,29 @@ namespace OS.Network
 			this.cable = null;
 			this.ourTerminal = null;
 
-			this.bReader?.Dispose();
-			this.bWriter?.Dispose();
-			this.reader?.Dispose();
-			this.writer?.Dispose();
-			this.reader = null;
-			this.writer = null;
-			this.bReader = null;
-			this.bWriter = null;
-
 			other?.Disconnect();
 		}
 
 		public void Send(Packet packet)
 		{
 			// if we're not connected, drop it.
-			if (this.writer == null)
+			if (this.ourTerminal == null)
 				return;
 
-			packet.Write(this.writer);
+			ourTerminal.Enqueue(packet);
 		}
 
 		public Packet? Receive()
 		{
-			if (reader == null)
-				return null;
-
 			if (ourTerminal == null)
 				return null;
-
+			
 			if (ourTerminal.Count == 0)
 				return null;
-			
-			var packet = new Packet();
-			packet.Read(reader);
+
+			if (!ourTerminal.TryDequeue(out Packet packet))
+				return null;
+
 			return packet;
 		}
 
@@ -153,6 +119,68 @@ namespace OS.Network
 				MacAddress = NetUtility.GetMacAddressString(this.MacAddress),
 				SubnetMask = NetUtility.GetNetworkAddressString(this.SubnetMask)
 			};
+		}
+	}
+
+	public sealed class LoopbackInterface : ISimulationNetworkInterface
+	{
+		private readonly ConcurrentQueue<Packet> packets = new ConcurrentQueue<Packet>();
+		
+		/// <inheritdoc />
+		public bool Connected => true;
+
+		/// <inheritdoc />
+		public bool Addressable => true;
+
+		/// <inheritdoc />
+		public string Name => "lo";
+
+		/// <inheritdoc />
+		public uint NetworkAddress => NetUtility.LoopbackAddress;
+
+		/// <inheritdoc />
+		public uint SubnetMask => 0xff000000;
+
+		/// <inheritdoc />
+		public long MacAddress => long.MaxValue;
+
+		/// <inheritdoc />
+		public void Send(Packet packet)
+		{
+			packets.Enqueue(packet);
+		}
+
+		/// <inheritdoc />
+		public Packet? Receive()
+		{
+			if (packets.TryDequeue(out Packet packet))
+				return packet;
+
+			return null;
+		}
+
+		/// <inheritdoc />
+		public NetworkInterfaceInformation GetInterfaceInformation()
+		{
+			return new NetworkInterfaceInformation()
+			{
+				Name = Name,
+				MacAddress = string.Empty,
+				LocalAddress = NetUtility.GetNetworkAddressString(NetworkAddress),
+				SubnetMask = NetUtility.GetNetworkAddressString(this.SubnetMask)
+			};
+		}
+
+		/// <inheritdoc />
+		public void MakeUnaddressable()
+		{
+			throw new NotSupportedException();
+		}
+
+		/// <inheritdoc />
+		public void MakeAddressable(Subnet subnet, uint address)
+		{
+			throw new NotSupportedException();
 		}
 	}
 }

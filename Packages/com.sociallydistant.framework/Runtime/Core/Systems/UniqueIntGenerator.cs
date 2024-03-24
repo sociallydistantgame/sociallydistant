@@ -1,5 +1,6 @@
 ﻿#nullable enable
 
+using System;
 using System.Collections.Generic;
 
 namespace Core.Systems
@@ -12,7 +13,7 @@ namespace Core.Systems
 		public void DeclareUnused(int value)
 		{
 			if (!usedValues.Contains(value))
-				return;
+				throw new InvalidOperationException($"Value {value} isn't claimed.");
 
 			usedValues.Remove(value);
 			nextValue = value;
@@ -21,7 +22,7 @@ namespace Core.Systems
 		public void ClaimUsedValue(int value)
 		{
 			if (usedValues.Contains(value))
-				return;
+				throw new InvalidOperationException($"Value {value} already claimed.");
 
 			usedValues.Add(value);
 

@@ -5,12 +5,14 @@ namespace GameplaySystems.Networld
 	public sealed class NetworkSimulationController
 	{
 		private CoreRouter coreRouter;
+		private readonly SimulationThread simulation;
 		private readonly Dictionary<InternetServiceProvider, InternetServiceNode> isps = new Dictionary<InternetServiceProvider, InternetServiceNode>();
 		private readonly Dictionary<LocalAreaNetwork, LocalAreaNode> lans = new Dictionary<LocalAreaNetwork, LocalAreaNode>();
 
 		public NetworkSimulationController(CoreRouter coreRouter)
 		{
 			this.coreRouter = coreRouter;
+			this.simulation = new SimulationThread(coreRouter);
 		}
 
 		internal bool LookupLanNode(LocalAreaNetwork lan, out LocalAreaNode node)
@@ -65,6 +67,16 @@ namespace GameplaySystems.Networld
 				coreRouter.DeleteLocalNode(lanNode);
 				lans.Remove(lan);
 			}
+		}
+
+		internal void EnableSimulation()
+		{
+			simulation.StartSimulation();
+		}
+
+		internal void DisableSimulation()
+		{
+			simulation.StopSimulation();
 		}
 	}
 }

@@ -1,6 +1,7 @@
 ﻿#nullable enable
 
 using System;
+using System.Collections.Concurrent;
 using System.IO;
 using System.Linq;
 using System.Text;
@@ -52,6 +53,8 @@ namespace GamePlatform
 		[SerializeField]
 		private SocialServiceHolder socialHolder = null!;
 
+		private static readonly ConcurrentQueue<Action> staticActionQueue = new ConcurrentQueue<Action>();
+		
 		private readonly UnityTextConsole unityConsole = new UnityTextConsole();
 		private bool areModulesLoaded = false;
 		private IScriptSystem scriptSystem;
@@ -213,60 +216,61 @@ namespace GamePlatform
 			
 			SetGameMode(GameMode.Loading);
 
-			this.loadedPlayerInfo = gameToLoad.PlayerInfo;
-			this.loadedPlayerInfo.LastPlayed = DateTime.UtcNow;
-
-			await gameToLoad.UpdatePlayerInfo(this.loadedPlayerInfo);
-
-			// Load world data
-			if (worldManager.Value != null)
-			{
-				using var memory = new MemoryStream();
-				bool result = await gameToLoad.ExtractWorldData(memory);
-				if (!result)
-				{
-					// Couldn't extract a world, fail and bail.
-					await GoToLoginScreen();
-					return;
-				}
-
-				memory.Seek(0, SeekOrigin.Begin);
-
-				this.worldManager.Value.WipeWorld();
-				
-				if (memory.Length > 0)
-				{
-					using var binaryReader = new BinaryReader(memory, Encoding.UTF8);
-					using var worldReader = new BinaryDataReader(binaryReader);
-
-					this.worldManager.Value.LoadWorld(worldReader);
-				}
-				
-				// Create player profile data if it's missing
-				WorldPlayerData playerData = this.worldManager.Value.World.PlayerData.Value;
-                
-				WorldProfileData profile = default;
-				if (!worldManager.Value.World.Profiles.ContainsId(playerData.PlayerProfile))
-				{
-					profile.InstanceId = worldManager.Value.GetNextObjectId();
-					playerData.PlayerProfile = profile.InstanceId;
-					
-					// Sync the profile data with the save's metadata
-					// We only sync the gender and full names.
-					profile.Gender = this.loadedPlayerInfo.PlayerGender;
-					profile.SocialName = this.loadedPlayerInfo.Name;
-					profile.ChatName = this.loadedPlayerInfo.Name;
-					profile.MailName = this.loadedPlayerInfo.Name;
-					
-					worldManager.Value.World.Profiles.Add(profile);
-					worldManager.Value.World.PlayerData.Value = playerData;
-				}
-			}
-
-			this.currentGameData = gameToLoad;
-
 			try
 			{
+				this.loadedPlayerInfo = gameToLoad.PlayerInfo;
+				this.loadedPlayerInfo.LastPlayed = DateTime.UtcNow;
+
+				await gameToLoad.UpdatePlayerInfo(this.loadedPlayerInfo);
+
+				// Load world data
+				if (worldManager.Value != null)
+				{
+					using var memory = new MemoryStream();
+					bool result = await gameToLoad.ExtractWorldData(memory);
+					if (!result)
+					{
+						// Couldn't extract a world, fail and bail.
+						await GoToLoginScreen();
+						return;
+					}
+
+					memory.Seek(0, SeekOrigin.Begin);
+
+					this.worldManager.Value.WipeWorld();
+
+					if (memory.Length > 0)
+					{
+						using var binaryReader = new BinaryReader(memory, Encoding.UTF8);
+						using var worldReader = new BinaryDataReader(binaryReader);
+
+						this.worldManager.Value.LoadWorld(worldReader);
+					}
+
+					// Create player profile data if it's missing
+					WorldPlayerData playerData = this.worldManager.Value.World.PlayerData.Value;
+
+					WorldProfileData profile = default;
+					if (!worldManager.Value.World.Profiles.ContainsId(playerData.PlayerProfile))
+					{
+						profile.InstanceId = worldManager.Value.GetNextObjectId();
+						playerData.PlayerProfile = profile.InstanceId;
+
+						// Sync the profile data with the save's metadata
+						// We only sync the gender and full names.
+						profile.Gender = this.loadedPlayerInfo.PlayerGender;
+						profile.SocialName = this.loadedPlayerInfo.Name;
+						profile.ChatName = this.loadedPlayerInfo.Name;
+						profile.MailName = this.loadedPlayerInfo.Name;
+
+						worldManager.Value.World.Profiles.Add(profile);
+						worldManager.Value.World.PlayerData.Value = playerData;
+					}
+				}
+
+				this.currentGameData = gameToLoad;
+
+
 				await gameInitializationScript.ExecuteAsync(unityConsole);
 			}
 			catch (Exception ex)
@@ -280,6 +284,12 @@ namespace GamePlatform
 
 			playerInfoSubject.OnNext(this.loadedPlayerInfo);
 			SetGameMode(GameMode.OnDesktop);
+		}
+
+		private void Update()
+		{
+			while (staticActionQueue.TryDequeue(out Action action))
+				action();
 		}
 
 		public async Task QuitVM()
@@ -318,9 +328,14 @@ namespace GamePlatform
 			if (save)
 				await SaveCurrentGame(true);
 
+			// we do this to disable the simulation
+			SetGameMode(GameMode.Loading);
+			
 			this.currentGameData = null;
 			this.loadedPlayerInfo = default;
 			this.playerInfoSubject.OnNext(this.loadedPlayerInfo);
+
+			this.worldManager.Value?.WipeWorld();
 		}
 
 		/// <inheritdoc />
@@ -369,6 +384,11 @@ namespace GamePlatform
 				completionSource.SetResult(true);
 				ModulesLoaded -= HandleModulesLoaded;
 			}
+		}
+
+		public static void ScheduleAction(Action action)
+		{
+			staticActionQueue.Enqueue(action);
 		}
 	}
 }
