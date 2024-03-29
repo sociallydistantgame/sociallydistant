@@ -26,6 +26,12 @@ namespace Core.Config.SystemConfigCategories
 			get => GetValue(nameof(VSync), true);
 			set => SetValue(nameof(VSync), value);
 		}
+
+		public bool BloomEffect
+		{
+			get => GetValue(nameof(BloomEffect), true);
+			set => SetValue(nameof(BloomEffect), value);
+		}
 		
 		/// <inheritdoc />
 		public GraphicsSettings(ISettingsManager settingsManager) : base(settingsManager)
@@ -82,8 +88,13 @@ namespace Core.Config.SystemConfigCategories
 					x => VSync = x,
 					display
 				);
-			
-			
+
+			uiBuilder.AddSection("Desktop Effects", out int effects)
+				.WithToggle("Bloom",
+					"Adds subtle glow to brighter UI elements and text",
+					BloomEffect,
+					x => BloomEffect = x,
+					effects);
 		}
 		
 		#if UNITY_EDITOR

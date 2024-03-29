@@ -7,6 +7,9 @@ namespace GamePlatform
 	public class UnityTextConsole : ITextConsole
 	{
 		/// <inheritdoc />
+		public string WindowTitle { get; set; }
+
+		/// <inheritdoc />
 		public bool IsInteractive => false;
 
 		/// <inheritdoc />

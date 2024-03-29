@@ -9,20 +9,18 @@ namespace Core.Scripting.Instructions
 {
 	public class AssignmentInstruction : ShellInstruction
 	{
-		private readonly IScriptExecutionContext context;
 		private readonly string identifier;
 		private readonly IArgumentEvaluator[] argumentList;
 		private bool isComplete;
 
 		public AssignmentInstruction(IScriptExecutionContext context, string identifier, IEnumerable<IArgumentEvaluator> argumentSource)
 		{
-			this.context = context;
 			this.identifier = identifier;
 			this.argumentList = argumentSource.ToArray();
 		}
 		
 		/// <inheritdoc />
-		public override async Task<int> RunAsync(ITextConsole console)
+		public override async Task<int> RunAsync(ITextConsole console, IScriptExecutionContext context)
 		{
 			// Evaluate the argument list
 			var args = new string[argumentList.Length];

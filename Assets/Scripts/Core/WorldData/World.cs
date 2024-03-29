@@ -1,6 +1,7 @@
 ﻿#nullable enable
 
 using System;
+using System.Linq;
 using Architecture;
 using Core.DataManagement;
 using Core.Serialization;
@@ -31,14 +32,23 @@ namespace Core.WorldData
 		private readonly WorldDataTable<WorldMemberData> members;
 		private readonly WorldDataTable<WorldRelationshipData> relationships;
 		private readonly WorldDataTable<WorldDomainNameData> domains;
-		
+		private readonly WorldDataTable<WorldMailData> emails;
+
+
+		internal IWorldDataObject<ProtectedWorldState> ProtectedWorldData => this.protectedWorldState;
 		
         /// <inheritdoc />
         public IWorldDataObject<GlobalWorldData> GlobalWorldState => globalWorldState;
 
         /// <inheritdoc />
         public IWorldFlagCollection WorldFlags => worldFlags;
-        
+
+        /// <inheritdoc />
+        public bool IsMissionCompleted(string missionId)
+        {
+	        return this.ProtectedWorldData.Value.CompletedMissions.Contains(missionId);
+        }
+
         /// <inheritdoc />
         public IWorldDataObject<WorldPlayerData> PlayerData => playerData;
 		
@@ -86,6 +96,7 @@ namespace Core.WorldData
 
         /// <inheritdoc />
         public IWorldTable<WorldRelationshipData> Relationships => relationships;
+        public IWorldTable<WorldMailData> Emails => emails;
         
         public World(UniqueIntGenerator instanceIdGenerator, DataEventDispatcher eventDispatcher)
 		{
@@ -107,6 +118,7 @@ namespace Core.WorldData
 			members = new WorldDataTable<WorldMemberData>(instanceIdGenerator, eventDispatcher);
 			relationships = new WorldDataTable<WorldRelationshipData>(instanceIdGenerator, eventDispatcher);
 			domains = new WorldDataTable<WorldDomainNameData>(instanceIdGenerator, eventDispatcher);
+			emails = new WorldDataTable<WorldMailData>(instanceIdGenerator, eventDispatcher);
 		}
 
 		public void Serialize(IWorldSerializer serializer)
@@ -135,12 +147,15 @@ namespace Core.WorldData
 			members.Serialize(serializer, WorldRevision.ChatAndSocialMedia);
 			relationships.Serialize(serializer, WorldRevision.ChatAndSocialMedia);
 			domains.Serialize(serializer, WorldRevision.DomainNames);
+			emails.Serialize(serializer, WorldRevision.Email);
+			
 		}
 
 		public void Wipe()
 		{
 			// You must wipe the world in reverse order of how you would create or serialize it.
 			// This ensures proper handling of deleting objects that depend on other objects.
+			emails.Clear();
 			domains.Clear();
 			relationships.Clear();
 			members.Clear();

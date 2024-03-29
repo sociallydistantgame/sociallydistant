@@ -25,6 +25,9 @@ namespace Architecture
 		private string windowTitle = string.Empty;
 
 		[SerializeField]
+		private bool canCloseTabs = true;
+		
+		[SerializeField]
 		private RectTransform programGuiPrefab = null!;
 		
 		[SerializeField]
@@ -53,8 +56,10 @@ namespace Architecture
 			process.Name = binaryName;
 			
 			// Set window attributes
+			window.CanClose = this.canCloseTabs;
 			window.Title = this.WindowTitle;
 			window.Icon = this.Icon;
+			window.Window.SetWindowHints(default);
 			
 			// Find a ProcessKillHandler component on the spawned program. If
 			// we don't find one, we must add one.

@@ -1,6 +1,7 @@
 ﻿#nullable enable
 using System;
 using System.Collections.Generic;
+using Player;
 using Shell.Common;
 using Shell.Windowing;
 using UI.Widgets;
@@ -24,7 +25,13 @@ namespace UI.Windowing
 		[SerializeField]
 		private WindowFocusService focusService = null!;
 
+		[SerializeField]
+		private PlayerInstanceHolder player = null!;
+		
 		[Header("UI")]
+		[SerializeField]
+		private DecorationManager decorationManager = null!;
+		
 		[SerializeField]
 		private CompositeIconWidget iconWidget = null!;
 		
@@ -50,6 +57,13 @@ namespace UI.Windowing
 		[SerializeField]
 		private bool allowMinimizing = true;
 
+		[SerializeField]
+		private WindowHints defaultWindowHints;
+
+		[Header("Prefabs")]
+		[SerializeField]
+		private RectTransform windowOverlayPrefab = null!;
+		
 		private static UguiWindow? firstWindow = null!;
 		private bool isFirstWindow = false;
 		private GameObject? eventSystemFocusedGameObject;
@@ -62,6 +76,7 @@ namespace UI.Windowing
 		private Vector2 anchorMinBackup;
 		private Vector2 anchorMaxBackup;
 		private Vector2 alignmentBackup;
+		private WindowHints hints;
 		private readonly List<IWindowCloseBlocker> closeBlockers = new List<IWindowCloseBlocker>();
 		
 		public WindowFocusService FocusService => focusService;
@@ -78,6 +93,9 @@ namespace UI.Windowing
 			get => iconWidget.Icon;
 			set => iconWidget.Icon = value;
 		}
+
+		/// <inheritdoc />
+		public WindowHints Hints => hints;
 
 		/// <inheritdoc />
 		public IWorkspaceDefinition? Workspace { get; set; }
@@ -124,7 +142,20 @@ namespace UI.Windowing
 		/// <inheritdoc />
 		public IWorkspaceDefinition CreateWindowOverlay()
 		{
-			throw new NotImplementedException();
+			RectTransform overlayInstance = Instantiate(windowOverlayPrefab, this.transform);
+			UguiWorkspaceDefinition workspace = player.Value.UiManager.WindowManager.DefineWorkspace(overlayInstance);
+
+			if (!overlayInstance.TryGetComponent(out UguiOverlay uguiOverlay))
+				return workspace;
+
+			return new OverlayWorkspace(uguiOverlay, workspace);
+		}
+
+		/// <inheritdoc />
+		public void SetWindowHints(WindowHints hints)
+		{
+			this.hints = hints;
+			ApplyHints();
 		}
 
 		public Vector2 Position
@@ -160,6 +191,8 @@ namespace UI.Windowing
 			this.minimizeButton.onClick.AddListener(Minimize);
 			this.closeButton.onClick.AddListener(Close);
 
+			this.SetWindowHints(defaultWindowHints);
+			
 			if (firstWindow == null)
 			{
 				firstWindow = this;
@@ -213,7 +246,7 @@ namespace UI.Windowing
 		}
 
 		/// <inheritdoc />
-		public bool CanClose { get; }
+		public bool CanClose { get; set; }
 
 		public void Close()
 		{
@@ -337,6 +370,11 @@ namespace UI.Windowing
 			this.Workspace = workspace;
 		}
 
+		private void ApplyHints()
+		{
+			this.decorationManager.UseClientBackground = !hints.ClientRendersWindowBackground;
+		}
+		
 		/// <inheritdoc />
 		public void OnPointerDown(PointerEventData eventData)
 		{

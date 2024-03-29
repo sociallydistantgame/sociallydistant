@@ -23,5 +23,6 @@ namespace Social
 		IEnumerable<IUserMessage> GetTimeline(IProfile profile);
 
 		IProfile GetProfileById(ObjectId id);
+		IProfile GetNarrativeProfile(string narrativeIdentifier);
 	}
 }

@@ -33,6 +33,7 @@ namespace Core.Scripting
 		private readonly List<string> tokenList = new List<string>();
 		private readonly Queue<ShellInstruction> pendingInstructions = new Queue<ShellInstruction>();
 		private ShellInstruction? currentInstruction = null;
+		private string title = "Terminal";
 		private readonly List<string> commandCompletions = new List<string>();
 		private readonly string[] staticCompletions = new string[]
 		{
@@ -72,6 +73,22 @@ namespace Core.Scripting
 		{
 			switch (name)
 			{
+				case "title":
+				{
+					string userTitle = string.Join(" ", args);
+
+					if (string.IsNullOrWhiteSpace(userTitle))
+					{
+						this.title = "Terminal";
+					}
+					else
+					{
+						this.title = userTitle;
+					}
+
+					this.UpdateTitleOnConsole(console);
+					return 0;
+				}
 				case "[":
 				case "[[":
 				case "test":
@@ -103,9 +120,14 @@ namespace Core.Scripting
 				}
 			}
 			
-			return await this.scriptContext.TryExecuteCommandAsync(name, args, console, callSite);
+			return await this.scriptContext.TryExecuteCommandAsync(name, args, console, callSite ?? this);
 		}
 
+		private void UpdateTitleOnConsole(ITextConsole console)
+		{
+			console.WindowTitle = $"{this.title} ({this.scriptContext.Title})";
+		}
+		
 		/// <inheritdoc />
 		public ITextConsole OpenFileConsole(ITextConsole realConsole, string filePath, FileRedirectionType mode)
 		{
@@ -116,6 +138,12 @@ namespace Core.Scripting
 		public void HandleCommandNotFound(string name, ITextConsole console)
 		{
 			scriptContext.HandleCommandNotFound(name, console);
+		}
+
+		/// <inheritdoc />
+		public void DeclareFunction(string name, IScriptFunction body)
+		{
+			this.scriptContext.DeclareFunction(name, body);
 		}
 
 		private void UpdateCommandCompletions()
@@ -180,7 +208,7 @@ namespace Core.Scripting
 
 					try
 					{
-						await nextInstruction.RunAsync(this.consoleDevice);
+						await nextInstruction.RunAsync(this.consoleDevice, this);
 					}
 					catch (ScriptEndException endException)
 					{
@@ -267,6 +295,8 @@ namespace Core.Scripting
 
 			lineBuilder.Length = 0;
 
+			this.UpdateTitleOnConsole(this.consoleDevice);
+			
 			UpdateCommandCompletions();
 
 			await WritePrompt();
@@ -293,6 +323,9 @@ namespace Core.Scripting
 			await RunScriptInternal(nextLineToExecute, true);
 		}
 
+		/// <inheritdoc />
+		public string Title => scriptContext.Title;
+
 		public string GetVariableValue(string name)
 		{
 			return scriptContext.GetVariableValue(name);
@@ -307,12 +340,13 @@ namespace Core.Scripting
 			{
 				string line = lines[i];
 				int commentIndex = line.IndexOf('#', StringComparison.Ordinal);
-				if (commentIndex == -1 && !string.IsNullOrWhiteSpace(line))
+				if (commentIndex == -1)
 				{
-					stringBuilder.AppendLine(line);
+					if (!string.IsNullOrWhiteSpace(line))
+						stringBuilder.AppendLine(line);
 					continue;
 				}
-
+				
 				string strippedLine = line.Substring(0, commentIndex).Trim();
 				if (string.IsNullOrWhiteSpace(strippedLine))
 					continue;

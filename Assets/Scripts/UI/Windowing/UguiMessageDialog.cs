@@ -28,7 +28,7 @@ namespace UI.Windowing
 		private TrixelAudioSource trixelAudio = null!;
 
 		/// <inheritdoc />
-		public bool CanClose => true;
+		public bool CanClose { get; set; } = true;
 
 		/// <inheritdoc />
 		public void Close()
@@ -48,6 +48,9 @@ namespace UI.Windowing
 				parentWindow!.WindowClosed -= value;
 			}
 		}
+
+		/// <inheritdoc />
+		public WindowHints Hints => parentWindow.Hints;
 
 		/// <inheritdoc />
 		public IWorkspaceDefinition? Workspace
@@ -89,6 +92,12 @@ namespace UI.Windowing
 		public IWorkspaceDefinition CreateWindowOverlay()
 		{
 			return this.parentWindow!.CreateWindowOverlay();
+		}
+
+		/// <inheritdoc />
+		public void SetWindowHints(WindowHints hints)
+		{
+			this.parentWindow.SetWindowHints(hints);
 		}
 
 		/// <inheritdoc />

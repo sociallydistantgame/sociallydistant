@@ -5,7 +5,7 @@ using OS.Devices;
 
 namespace Core.Scripting.Parsing
 {
-	public class ScriptFunction
+	public class ScriptFunction : IScriptFunction
 	{
 		private readonly ShellInstruction body;
 
@@ -14,13 +14,14 @@ namespace Core.Scripting.Parsing
 			this.body = body;
 		}
 		
-		public async Task<int> ExecuteAsync(string name, string[] args, ITextConsole console)
+		public async Task<int> ExecuteAsync(string name, string[] args, ITextConsole console, IScriptExecutionContext callSite)
 		{
 			int exitCode = 0;
 			
 			try
 			{
-				exitCode = await body.RunAsync(console);
+				var scope = new LocalScriptExecutionContext(callSite, false);
+				exitCode = await body.RunAsync(console, scope);
 			}
 			catch (ScriptEndException exit)
 			{

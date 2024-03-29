@@ -86,7 +86,7 @@ namespace DevTools.Social
 				if (blockedIds.Contains(profile.InstanceId))
 					continue;
 
-				if (GUILayout.Button($"{profile.InstanceId}: {profile.SocialName}"))
+				if (GUILayout.Button($"{profile.InstanceId}: {profile.ChatName}"))
 				{
 					world.World.Relationships.Add(new WorldRelationshipData
 					{

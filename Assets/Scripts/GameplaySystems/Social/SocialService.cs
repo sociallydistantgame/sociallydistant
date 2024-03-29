@@ -7,6 +7,7 @@ using Core.WorldData.Data;
 using Player;
 using Social;
 using UnityEngine;
+using UnityEngine.Analytics;
 using UnityExtensions;
 
 namespace GameplaySystems.Social
@@ -306,6 +307,25 @@ namespace GameplaySystems.Social
 		public IProfile GetProfileById(ObjectId id)
 		{
 			return profiles[id];
+		}
+
+		/// <inheritdoc />
+		public IProfile GetNarrativeProfile(string narrativeIdentifier)
+		{
+			WorldProfileData profileDAta = worldManager.Value!.World.Profiles.FirstOrDefault(x => x.NarrativeId == narrativeIdentifier);
+
+			if (profileDAta.NarrativeId != narrativeIdentifier)
+			{
+				profileDAta.InstanceId = worldManager.Value.GetNextObjectId();
+				profileDAta.NarrativeId = narrativeIdentifier;
+				profileDAta.ChatName = narrativeIdentifier;
+				profileDAta.ChatUsername = narrativeIdentifier;
+				profileDAta.Gender = Gender.Unknown;
+				
+				worldManager.Value.World.Profiles.Add(profileDAta);
+			}
+
+			return profiles[profileDAta.InstanceId];
 		}
 	}
 }

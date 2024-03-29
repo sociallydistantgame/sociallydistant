@@ -41,9 +41,13 @@ namespace GameplaySystems.Networld
 		public async Task NetworkUpdate()
 		{
 			await Task.WhenAll(
-				Task.WhenAll(localAreaNodes.Select(n => n.NetworkUpdate())),
-				Task.WhenAll(neighbours.Select(n => n.NetworkUpdate()))
-			);
+				localAreaNodes.Select<LocalAreaNode, Func<Task>>(x => x.NetworkUpdate)
+					.Union(neighbours.Select<InternetServiceNode, Func<Task>>(x => x.NetworkUpdate))
+						.Select(x => Task.Run(async () =>
+						{
+							await x();
+						}))
+					);
 		}
 
 		/// <inheritdoc />

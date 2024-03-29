@@ -44,12 +44,15 @@ namespace GameplaySystems.Hacking.Commands
 			{
 				await ScanPorts(interfaceInfo, hostToScan);
 			}
-			
+
+			Console.ResetWindowTitle();
 			this.EndProcess();
 		}
 
 		private async Task ScanSubnet(Subnet subnet)
 		{
+			Console.SetWindowTitle($"Scanning {subnet.CidrNotation} - nmap");
+			
 			Console.WriteLine("Scanning subnet: " + subnet.CidrNotation);
 			Console.WriteLine();
 			

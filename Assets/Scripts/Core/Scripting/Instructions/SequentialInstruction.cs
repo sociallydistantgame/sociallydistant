@@ -15,16 +15,16 @@ namespace Core.Scripting.Instructions
 
 		public SequentialInstruction(IEnumerable<ShellInstruction> instructionSource)
 		{
-			instructions = instructionSource.ToArray();
+			instructions = instructionSource.Where(x=>x is not null).ToArray();
 		}
 
 		/// <inheritdoc />
-		public override async Task<int> RunAsync(ITextConsole console)
+		public override async Task<int> RunAsync(ITextConsole console, IScriptExecutionContext context)
 		{
 			int result = 0;
 			foreach (ShellInstruction instruction in instructions)
 			{
-				result = await instruction.RunAsync(console);
+				result = await instruction.RunAsync(console, context);
 			}
 
 			return result;

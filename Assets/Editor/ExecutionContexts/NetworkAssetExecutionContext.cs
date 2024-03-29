@@ -13,12 +13,16 @@ namespace Editor.ExecutionContexts
 	public class NetworkAssetExecutionContext : IScriptExecutionContext
 	{
 		private readonly NetworkAsset networkAsset;
+		private readonly ScriptFunctionManager functions = new();
 
 		public NetworkAssetExecutionContext(NetworkAsset asset)
 		{
 			this.networkAsset = asset;
 		}
-		
+
+		/// <inheritdoc />
+		public string Title => "Network";
+
 		/// <inheritdoc />
 		public string GetVariableValue(string variableName)
 		{
@@ -32,11 +36,15 @@ namespace Editor.ExecutionContexts
 		}
 
 		/// <inheritdoc />
-		public Task<int?> TryExecuteCommandAsync(string name, string[] args, ITextConsole console, IScriptExecutionContext? callSite = null)
+		public async Task<int?> TryExecuteCommandAsync(string name, string[] args, ITextConsole console, IScriptExecutionContext? callSite = null)
 		{
+			int? functionResult = await functions.CallFunction(name, args, console, callSite ?? this);
+			if (functionResult != null)
+				return functionResult;
+			
 			bool result = TryExecuteBuiltin(name, args);
 
-			return Task.FromResult<int?>(result ? 0 : null);
+			return result ? 0 : null;
 		}
 
 		/// <inheritdoc />
@@ -52,6 +60,12 @@ namespace Editor.ExecutionContexts
 		public void HandleCommandNotFound(string name, ITextConsole console)
 		{
 			throw new InvalidOperationException($"Command not found: {name}");
+		}
+
+		/// <inheritdoc />
+		public void DeclareFunction(string name, IScriptFunction body)
+		{
+			functions.DeclareFunction(name, body);
 		}
 
 		private void CheckArgs(string[] args, int expectedLength, string error)

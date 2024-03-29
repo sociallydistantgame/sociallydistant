@@ -17,6 +17,9 @@ namespace UI.Windowing
 	{
 		[SerializeField]
 		private PlayerInstanceHolder playerHolder = null!;
+
+		[SerializeField]
+		private bool recreateWindowOnClose = false;
 		
 		private RectTransform rectTRansform;
 		private IWorkspaceDefinition workspace;
@@ -25,7 +28,11 @@ namespace UI.Windowing
 		private CanvasGroup canvasGroup = null!;
 
 		/// <inheritdoc />
-		public bool CanClose => window.CanClose;
+		public bool CanClose
+		{
+			get => window.CanClose;
+			set => window.CanClose = value;
+		}
 
 		/// <inheritdoc />
 		public void Close()
@@ -40,11 +47,10 @@ namespace UI.Windowing
 		}
 
 		/// <inheritdoc />
-		public event Action<IWindow>? WindowClosed
-		{
-			add => window.WindowClosed += value;
-			remove => window.WindowClosed -= value;
-		}
+		public event Action<IWindow>? WindowClosed;
+
+		/// <inheritdoc />
+		public WindowHints Hints => window.Hints;
 
 		/// <inheritdoc />
 		public IWorkspaceDefinition? Workspace
@@ -70,6 +76,12 @@ namespace UI.Windowing
 		}
 
 		/// <inheritdoc />
+		public void SetWindowHints(WindowHints hints)
+		{
+			window.SetWindowHints(hints);
+		}
+
+		/// <inheritdoc />
 		public IContentPanel ActiveContent => window.ActiveContent;
 
 		/// <inheritdoc />
@@ -91,6 +103,12 @@ namespace UI.Windowing
 		public void SwitchTab(int index)
 		{
 			tabManager.SwitchTab(index);
+		}
+
+		/// <inheritdoc />
+		public void CloseTab(int index)
+		{
+			this.tabManager.CloseTab(index);
 		}
 
 		/// <inheritdoc />
@@ -132,19 +150,21 @@ namespace UI.Windowing
 			
 			// Creates the underlying tile window
 			this.workspace = this.playerHolder.Value.UiManager.WindowManager.DefineWorkspace(this.rectTRansform);
-			this.window = this.workspace.CreateFloatingGui(string.Empty);
+			CreateWindow();
+		}
 
-			// Sets it up as a maximized window
-			this.window.WindowState = WindowState.Maximized;
-			
-			// Prevents user resizing and hiding
-			window.EnableCloseButton = false;
-			window.EnableMaximizeButton = false;
-			window.EnableMinimizeButton = false;
-			
-			// Cursed shit to get the tab manager for the underlying window.
-			// You shouldn't do this unless your name is Ritchie and you're the lead programmer of the game.
-			tabManager = (window as MonoBehaviour)!.MustGetComponent<WindowTabManager>();
+		/// <inheritdoc />
+		public Action? NewTabCallback
+		{
+			get => tabManager.NewTabCallback;
+			set => tabManager.NewTabCallback = value;
+		}
+
+		/// <inheritdoc />
+		public bool ShowNewTab
+		{
+			get => tabManager.ShowNewTab;
+			set => tabManager.ShowNewTab = value;
 		}
 
 		/// <inheritdoc />
@@ -161,6 +181,37 @@ namespace UI.Windowing
 			canvasGroup.interactable = true;
 			canvasGroup.blocksRaycasts = true;
 			canvasGroup.alpha = 1;
+		}
+
+		private void CreateWindow()
+		{
+			this.window = this.workspace.CreateFloatingGui("Tile title");
+
+			// Sets it up as a maximized window
+			this.window.WindowState = WindowState.Maximized;
+			
+			// Prevents user resizing and hiding
+			window.EnableCloseButton = false;
+			window.EnableMaximizeButton = false;
+			window.EnableMinimizeButton = false;
+			
+			// Cursed shit to get the tab manager for the underlying window.
+			// You shouldn't do this unless your name is Ritchie and you're the lead programmer of the game.
+			tabManager = (window as MonoBehaviour)!.MustGetComponent<WindowTabManager>();
+
+			window.WindowClosed += OnUnderlyingWindowClosed;
+		}
+
+		private void OnUnderlyingWindowClosed(IWindow win)
+		{
+			this.window.WindowClosed -= OnUnderlyingWindowClosed;
+			this.WindowClosed?.Invoke(this);
+
+			if (recreateWindowOnClose)
+			{
+				Hide();
+				this.CreateWindow();
+			}
 		}
 	}
 }

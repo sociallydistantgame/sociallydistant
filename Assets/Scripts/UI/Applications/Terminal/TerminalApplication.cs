@@ -1,10 +1,12 @@
 ﻿#nullable enable
 
 using System;
+using System.Linq;
 using System.Net.WebSockets;
 using System.Threading.Tasks;
 using Architecture;
 using Core.Scripting;
+using Modding;
 using OS.Devices;
 using Shell.Windowing;
 using UI.Shell;
@@ -57,6 +59,10 @@ namespace UI.Applications.Terminal
 			// Create a shell execution context for the in-game OS.
 			this.context = new OperatingSystemExecutionContext(shellProcess);
 			
+			#if DEBUG
+			context.DeclareFunction("cheat", new CheatFunction());
+			#endif
+			
 			// TODO: Command-line arguments to specify the shell
 			// Create a shell.
 			this.shell = new InteractiveShell(context);
@@ -85,7 +91,14 @@ namespace UI.Applications.Terminal
 			}
 
 			if (shellTask.IsCompleted)
+			{
 				this.process.Kill();
+				return;
+			}
+
+			string title = this.st.WindowTitle;
+			if (!string.Equals(title, this.window.Title))
+				this.window.Title = title;
 		}
 
 		/// <inheritdoc />
@@ -122,5 +135,23 @@ namespace UI.Applications.Terminal
 
 			return true;
 		}
+		
+		#if DEBUG
+		private sealed class CheatFunction : IScriptFunction
+		{
+			/// <inheritdoc />
+			public async Task<int> ExecuteAsync(string name, string[] args, ITextConsole console, IScriptExecutionContext callSite)
+			{
+				if (args.Length < 1)
+					return 0;
+				
+				var systemModule = SystemModule.GetSystemModule();
+				IScriptSystem scriptSystem = systemModule.Context.ScriptSystem;
+				
+				await scriptSystem.RunCommandAsync(args[0], args.Skip(1).ToArray(), callSite, console);
+				return 0;
+			}
+		}
+		#endif
 	}
 }

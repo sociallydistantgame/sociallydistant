@@ -36,6 +36,12 @@ namespace Core
 				_ => throw new FormatException($"{hex} is not a hex digit")
 			};
 		}
+
+		public static string StripNewLines(this string text)
+		{
+			return text.Replace("\r", string.Empty)
+				.Replace("\n", string.Empty);
+		}
 		
 		public static void TrimEnd(this StringBuilder stringBuilder)
 		{

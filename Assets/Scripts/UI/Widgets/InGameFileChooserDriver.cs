@@ -18,7 +18,13 @@ namespace UI.Widgets
 			this.user = process.User;
 			this.fs = user.Computer.GetFileSystem(user);
 		}
-		
+
+		/// <inheritdoc />
+		public string PathCombine(params string[] paths)
+		{
+			return PathUtility.Combine(paths);
+		}
+
 		/// <inheritdoc />
 		public bool DirectoryExists(string path)
 		{

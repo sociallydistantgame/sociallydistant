@@ -34,6 +34,13 @@ namespace Core.Scripting.Consoles
 		}
 
 		/// <inheritdoc />
+		public string WindowTitle
+		{
+			get => input.WindowTitle;
+			set => input.WindowTitle = value;
+		}
+
+		/// <inheritdoc />
 		public bool IsInteractive => input.IsInteractive;
 
 		/// <inheritdoc />

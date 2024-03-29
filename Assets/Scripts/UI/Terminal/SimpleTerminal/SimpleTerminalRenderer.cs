@@ -1,334 +1,531 @@
 using System;
-using System.Linq.Expressions;
-using System.Reflection;
-using System.Runtime.InteropServices;
+using System.Diagnostics;
 using System.Text;
+using System.Threading;
 using OS.Devices;
 using TMPro;
-using UI.Terminal.SimpleTerminal.Data;
 using UI.Terminal.SimpleTerminal.Pty;
 using UnityEngine;
-using UnityEngine.Assertions;
 using UnityEngine.EventSystems;
 using UnityEngine.UI;
-using UnityEngine.UIElements;
 using UnityExtensions;
 using Utility;
-using static UI.Terminal.SimpleTerminal.Data.EmulatorConstants;
-using BinaryExpression = System.Linq.Expressions.BinaryExpression;
-using Expression = System.Linq.Expressions.Expression;
-using Image = UnityEngine.UI.Image;
+using TrixelCreative.TrixelAudio;
+using TrixelCreative.TrixelAudio.Data;
+using OS.Network.MessageTransport;
+using UI.CustomGraphics;
+using UI.PlayerUI;
+using Debug = UnityEngine.Debug;
 
 namespace UI.Terminal.SimpleTerminal
 {
-    public class SimpleTerminalRenderer :
-        MonoBehaviour,
-        IUpdateSelectedHandler,
-        IPointerDownHandler,
-        IPointerUpHandler,
-        IPointerMoveHandler,
-        ISelectHandler,
-        IDeselectHandler,
-        IScrollHandler,
-        IClipboard
-    {
-        private UguiTerminalScreen screen;
-        private SimpleTerminal simpleTerminal;
-        
-        private RectTransform rectTransform;
-        private Camera myCamera;
-        private LayoutElement layoutElement;
-        private RectTransform parentRectTransform;
-        private int tickInterval;
-        private RectTransform parentRect;
-        private RectTransform rect;
-        private TerminalOptions ptyOptions = new TerminalOptions();
-        private PseudoTerminal master;
-        private PseudoTerminal slave;
-        private bool isFocused;
-        private int oldRows;
-        private int oldColumns;
-        private int rowCount = 43;
-        private int columnCount = 132;
-        
+	public class SimpleTerminalRenderer :
+		MonoBehaviour,
+		IUpdateSelectedHandler,
+		IPointerDownHandler,
+		IPointerUpHandler,
+		IPointerMoveHandler,
+		ISelectHandler,
+		IDeselectHandler,
+		IScrollHandler,
+		IClipboard
+	{
+		[Header("Color Plotters")]
+		[SerializeField]
+		private RectanglePlotter backgroundColorPlotter = null!;
+
+		[Header("Text")]
+		[SerializeField]
+		private TMP_FontAsset font;
+		
+		[SerializeField]
+		private int fontSize;
+
+		[SerializeField]
+		private TextMeshProUGUI textMeshPro = null!;
+
+		[Header("Sound Effects")]
+		[SerializeField]
+		private SoundEffectAsset asciiBeep = null!;
+
+		[Header("Appearance")]
+		[SerializeField]
+		private int minimumColumnCount = 132;
+		
+		[SerializeField]
+		private int minimumRowCount = 43;
+		
+		[Header("Settings")]
+		[SerializeField]
+		private bool allowAltScreen = true;
+
+		[SerializeField]
+		private string vtiden = "st";
+		
+		[Header("Timing")]
+		[SerializeField]
+		private float minLatency;
+
+		[SerializeField]
+		private float doubleClickTime = 0;
+
+		[SerializeField]
+		private float trippleClickTime = 0;
+
+		[SerializeField]
+		private float maxLatency;
+
+		[SerializeField]
+		private float blinkTimeout;
+
+		[SerializeField]
+		private int mouseScrollLineCount = 3;
+
+		[Header("Layout")]
+		[SerializeField]
+		private VerticalLayoutGroup textAreaGroup = null!;
+
+		private readonly WorkQueue workQueue = new WorkQueue();
+		private readonly WorkQueue emulatorWorkQueue = new WorkQueue();
+		private readonly MultiCancellationTokenSource tokenSource = new MultiCancellationTokenSource();
+
+		private int clickCount;
+		private int mainThreadId;
+		private ThreadSafeTerminalRenderer terminalRenderer;
+		private TrixelAudioSource trixelAudio;
+		private float characterWidth;
+		private float lineHeight;
+		private int rowCount;
+		private int columnCount;
+		private LayoutElement layoutElement;
+		private float ww;
+		private float wh;
+		private SimpleTerminal simpleTerminal;
+		private RectTransform parentRectTransform;
+		private RectTransform rectTransform;
+		private TerminalOptions ptyOptions = new TerminalOptions();
+		private PseudoTerminal master;
+		private PseudoTerminal slave;
+		private ITextConsole console;
+		private Thread? emulatorThread;
+		private ManualResetEvent emulatorShutdownCompleted = new ManualResetEvent(false);
+		private volatile bool emulatorEnabled = false;
+		private float clickTime = 0;
+		private float clickDoubleTime = 0;
+		
+		public RectTransform TextAreaTransform => textAreaGroup.transform as RectTransform;
+		public int DefaultRowCount => this.rowCount;
+		public int DefaultColumnCount => this.columnCount;
+		public int DefaultBackgroundId => SimpleTerminal.defaultbg;
+		public int DefaultForegroundId => SimpleTerminal.defaultfg;
+		public float LineHeight => lineHeight;
+		public float CharacterWidth => characterWidth;
+		public float UnscaledLineHeight { get; private set; }
+		public float UnscaledCharacterWidth { get; private set; }
+
+		public string WindowTitle => this.simpleTerminal.WindowTitle;
+		
+
+		private void Awake()
+		{
+			mainThreadId = Thread.CurrentThread.ManagedThreadId;
+			
+			this.MustGetComponent(out rectTransform);
+			this.MustGetComponent(out layoutElement);
+			this.MustGetComponent(out trixelAudio);
+			this.MustGetComponent(out layoutElement);
+
+			this.terminalRenderer = new ThreadSafeTerminalRenderer(
+				this,
+				workQueue,
+				this.layoutElement,
+				this.textMeshPro,
+				backgroundColorPlotter
+			);
+			
+			textMeshPro.font = this.font;
+			textMeshPro.fontSize = this.fontSize;
+
+			this.CalculateTextSize();
+			
+			this.transform.parent.MustGetComponent(out parentRectTransform);
+			
+			this.simpleTerminal = new SimpleTerminal(this, terminalRenderer, minLatency, maxLatency, this.minimumColumnCount, this.minimumRowCount);
+			this.simpleTerminal.BlinkTimeout = blinkTimeout;
+			this.simpleTerminal.DoubleClickTime = doubleClickTime;
+			this.simpleTerminal.TripleClickTime = trippleClickTime;
+			this.simpleTerminal.MouseScrollLinesCount = mouseScrollLineCount;
+			this.simpleTerminal.TerminalIdentifier = vtiden;
+			this.simpleTerminal.AllowAltScreen = allowAltScreen;
+			
+			this.TtyInit();
+		}
+
+		private void OnEnable()
+		{
+			emulatorEnabled = true;
+			emulatorShutdownCompleted.Reset();
+
+			emulatorThread = new Thread(EmulatorUpdate);
+			emulatorThread.Start();
+		}
+
+		private void OnDisable()
+		{
+			emulatorEnabled = false;
+			emulatorShutdownCompleted.WaitOne();
+			emulatorThread = null;
+		}
+		
+		private void OnDestroy()
+		{
+			this.master.Close();
+			this.slave.Close();
+
+			this.master = null;
+			this.slave = null;
+		}
+
+		private void Update()
+		{
+			if (this.master is null)
+				return;
+
+			if (font == null)
+				return;
+			
+			Rect parentArea = this.parentRectTransform.rect;
+			float nww = parentArea.width;
+			float nwh = parentArea.height;
+			const float tolerance = 0.001f;
+			if (Math.Abs(this.ww - nww) > tolerance || Math.Abs(this.wh - nwh) > tolerance)
+			{
+				this.ww = nww;
+				this.wh = nwh;
+
+				float cw = UnscaledCharacterWidth;
+				float ch = UnscaledLineHeight;
+
+				int r = (int)Math.Ceiling(this.wh / ch) - 1;
+				int c = (int)Math.Ceiling(this.ww / cw) - 1;
+
+				r = Math.Max(r, this.DefaultRowCount);
+				c = Math.Max(c, this.DefaultColumnCount);
+
+				this.layoutElement.minWidth = DefaultColumnCount * cw;
+				this.layoutElement.minHeight = this.DefaultRowCount * ch;
+				if (r != simpleTerminal.Rows || c != simpleTerminal.Columns)
+				{
+					// Must be executed on the emulator thread since the emulator itself is not threadsafe
+					emulatorWorkQueue.EnqueueAsync(() => { simpleTerminal.Resize(c, r); }).Wait();
+				}
+			}
+		}
+
+		private void EmulatorUpdate()
+		{
+			var stopwatch = new Stopwatch();
+
+			var lastTime = 0f;
+			while (emulatorEnabled)
+			{
+				if (this.simpleTerminal == null)
+					break;
+				
+				stopwatch.Start();
+
+				emulatorWorkQueue.RunPendingWork();
+				
+				this.simpleTerminal.Update(lastTime);
+
+				stopwatch.Stop();
+
+				lastTime = (float) stopwatch.Elapsed.TotalSeconds;
+				
+				stopwatch.Reset();
+			}
+
+			emulatorShutdownCompleted.Set();
+		}
+
+		private void LateUpdate()
+		{
+			workQueue.RunPendingWork();
+			terminalRenderer.Present();
+		}
+
+		public void Bell()
+		{
+			if (this.asciiBeep != null)
+				this.trixelAudio.Play(this.asciiBeep);
+		}
+		
+		private void TtyInit()
+		{
+			// Enforce CRLF
+			this.ptyOptions.LFlag = 0;
+
+			// Control codes
+			this.ptyOptions.C_cc[PtyConstants.VERASE] = (byte)'\b';
+
+			PseudoTerminal.CreatePair(out this.master, out this.slave, this.ptyOptions);
+
+			this.simpleTerminal.SetTty(new SociallyDistantTty(this.master));
+			this.console = new SimpleTerminalSession(this.simpleTerminal, this.slave, new RepeatableCancellationToken(tokenSource));
+		}
+
+		public ITextConsole StartSession()
+		{
+			return console;
+		}
 
 
-        public int DefaultBackgroundId => SimpleTerminal.defaultbg;
-        public int DefaultForegroundId => SimpleTerminal.defaultfg;
 
-        private float ww;
-        private float wh;
 
-        [Header("Settings")]
-        [SerializeField]
-        private TMP_FontAsset font = null!;
+		#region Unity UI Event Handlers
 
-        [SerializeField]
-        private int fontSize = 12;
-        
-        [SerializeField]
-        private bool allowAltScreen = true;
+		public void OnPointerMove(PointerEventData eventData)
+		{
+			RectTransformUtility.ScreenPointToLocalPointInRectangle(rectTransform, eventData.position, UiManager.UiCamera, out Vector2 localPosition);
 
-        [SerializeField]
-        private string vtiden = "st";
-        
-        [SerializeField]
-        private int tabSpaces = 8;
+			if (localPosition.x < 0 || localPosition.y < 0)
+				return;
 
-        [Header("Timing")]
-        [SerializeField]
-        private float minLatency;
+			float x = Math.Abs(localPosition.x);
+			float y = Math.Abs(localPosition.y);
 
-        [SerializeField]
-        private float doubleClickTime = 0;
+			this.emulatorWorkQueue.Enqueue(() =>
+			{
+				simpleTerminal.MouseMove(x, y);
+			});
+		}
 
-        [SerializeField]
-        private float trippleClickTime = 0;
+		public void OnScroll(PointerEventData eventData)
+		{
+			float delta = eventData.scrollDelta.y;
 
-        [SerializeField]
-        private float maxLatency;
+			emulatorWorkQueue.Enqueue(() =>
+			{
+				simpleTerminal.MouseScroll(delta);
+			});
+		}
 
-        [SerializeField]
-        private float blinkTimeout;
+		public void OnUpdateSelected(BaseEventData eventData)
+		{
+			if (!simpleTerminal.IsFocused)
+				return;
 
-        [SerializeField]
-        private int mouseScrollLineCount = 3;
+			var ev = new Event();
+			while (Event.PopEvent(ev))
+				if (ev.rawType == EventType.KeyDown)
+				{
+					// Force redraw on keyboard events, just like st does
+					simpleTerminal.Redraw();
 
-        [Header("Layout")]
-        [SerializeField]
-        private VerticalLayoutGroup textAreaGroup = null!;
-        
-        public RectTransform TextAreaTransform => textAreaGroup.transform as RectTransform;
-        public int DefaultRowCount => this.rowCount;
-        public int DefaultColumnCount => this.columnCount;
-        
-        private void Awake()
-        {
-            this.MustGetComponentInChildren(out screen);
-            this.MustGetComponent(out rectTransform);
-            this.MustGetComponent(out layoutElement);
+					bool control = (ev.modifiers & (EventModifiers.Control | EventModifiers.Command)) != 0;
+					bool alt = (ev.modifiers & EventModifiers.Alt) != 0;
+					bool shift = (ev.modifiers & EventModifiers.Shift) != 0;
+					bool modifiers = control
+					                 || alt
+					                 || shift;
 
-            this.myCamera = Camera.main;
-            
-            this.transform.parent.MustGetComponent(out parentRectTransform);
-        }
+					bool bullshit = Application.platform == RuntimePlatform.WindowsEditor
+					                || Application.platform == RuntimePlatform.WindowsPlayer;
 
-        private void Start()
-        {
-            this.simpleTerminal = new SimpleTerminal(this, screen, minLatency, maxLatency, this.columnCount, this.rowCount);
-            this.simpleTerminal.BlinkTimeout = blinkTimeout;
-            this.simpleTerminal.DoubleClickTime = doubleClickTime;
-            this.simpleTerminal.TripleClickTime = trippleClickTime;
-            this.simpleTerminal.MouseScrollLinesCount = mouseScrollLineCount;
-            this.simpleTerminal.TerminalIdentifier = vtiden;
-            this.simpleTerminal.AllowAltScreen = allowAltScreen;
-        }
+					// KeyCode.None means we're getting text, send a character instead.
+					if (ev.keyCode == KeyCode.None && bullshit)
+					{
+						simpleTerminal.Input.Char(ev.character);
+						continue;
+					}
 
-        private void OnDestroy()
-        {
-            this.master.Close();
-            this.slave.Close();
+					bool isFunctionKey = ev.functionKey;
+					bool isSpecial = control || alt;
+					bool isPrintable = !char.IsControl((char) ev.keyCode);
 
-            this.master = null;
-            this.slave = null;
-        }
+					if (isPrintable && !isFunctionKey && !isSpecial)
+					{
+						if (!bullshit)
+							simpleTerminal.Input.Char(ev.character);
 
-        private void Update()
-        {
-            if (this.master is null)
-                return;
+						continue;
+					}
 
-            if (font == null)
-                return;
-            
-            float nww = this.parentRectTransform.rect.width;
-            float nwh = this.parentRectTransform.rect.height;
-            if (this.ww != nww || this.wh != nwh)
-            {
-                this.ww = nww;
-                this.wh = nwh;
+					if (control && !alt && !shift && ev.keyCode == KeyCode.C)
+					{
+						this.console.WriteText("^C");
+						tokenSource.CancelAll();
+						return;
+					}
+					
+					simpleTerminal.Input.Raw(ev.keyCode, control, alt, shift);
+				}
 
-                float cw = screen.UnscaledCharacterWidth;
-                float ch = screen.UnscaledLineHeight;
+			eventData.Use();
+		}
 
-                int r = (int)Math.Ceiling(this.wh / ch) - 1;
-                int c = (int)Math.Ceiling(this.ww / cw) - 1;
+		public void OnPointerUp(PointerEventData eventData)
+		{
+			RectTransformUtility.ScreenPointToLocalPointInRectangle(rectTransform, eventData.position, UiManager.UiCamera, out Vector2 localPosition);
 
-                r = Math.Max(r, this.DefaultRowCount);
-                c = Math.Max(c, this.DefaultColumnCount);
+			if (localPosition.x < 0 || localPosition.y < 0)
+				return;
 
-                this.layoutElement.minWidth = DefaultColumnCount * cw;
-                this.layoutElement.minHeight = this.DefaultRowCount * ch;
-                if (r != simpleTerminal.Rows || c != simpleTerminal.Columns)
-                {
-                    simpleTerminal.Resize(c, r);
-                }
-            }
+			float x = Math.Abs(localPosition.x);
+			float y = Math.Abs(localPosition.y);
 
-            this.simpleTerminal.Update(Time.deltaTime);
-        }
-        
-        public bool Selected(int x, int y)
-        {
-            return simpleTerminal.Selected(x, y);
-        }
-        
-        private void TtyInit()
-        {
-            // Enforce CRLF
-            this.ptyOptions.LFlag = 0;
+			if (eventData.button == PointerEventData.InputButton.Left)
+			{
+				emulatorWorkQueue.Enqueue(() => 
+				{
+					this.simpleTerminal.MouseUp(MouseButton.Left, x, y);
+				});
+			}
+		}
 
-            // Control codes
-            this.ptyOptions.C_cc[PtyConstants.VERASE] = (byte)'\b';
+		public void OnPointerDown(PointerEventData eventData)
+		{
+			if (EventSystem.current == null)
+				return;
 
-            PseudoTerminal.CreatePair(out this.master, out this.slave, this.ptyOptions);
+			EventSystem.current.SetSelectedGameObject(this.gameObject);
 
-            this.simpleTerminal.SetTty(new SociallyDistantTty(this.master));
-        }
+			var clickMode = ClickMode.Single;
+			if (eventData.button == PointerEventData.InputButton.Left)
+			{
+				if (clickDoubleTime > 0)
+				{
+					if (Time.time - clickDoubleTime <= trippleClickTime)
+						clickMode = ClickMode.Triple;
 
-        public ITextConsole StartSession()
-        {
-            this.TtyInit();
+					clickTime = 0;
+					clickDoubleTime = 0;
+				}
+				else if (clickTime > 0)
+				{
+					if (Time.time - clickTime <= trippleClickTime)
+					{
+						clickDoubleTime = Time.time;
+						clickMode = ClickMode.Double;
+					}
 
-            return new SimpleTerminalSession(this.simpleTerminal, this.slave);
-        }
+					clickTime = 0;
+				}
+				else
+				{
+					clickDoubleTime = 0;
+					clickTime = Time.time;
+					clickMode = ClickMode.Single;
+				}
+				
+				Debug.LogError(clickMode);
+			}
+			else
+			{
+				this.clickCount = 0;
+			}
+			
+			RectTransformUtility.ScreenPointToLocalPointInRectangle(this.rectTransform, eventData.position, UiManager.UiCamera, out Vector2 localPosition);
 
-        
-        
+			if (localPosition.x < 0 || localPosition.y < 0)
+				return;
 
-        #region Unity UI Event Handlers
-        
-        public void OnPointerMove(PointerEventData eventData)
-        {
-            RectTransformUtility.ScreenPointToLocalPointInRectangle(rectTransform, eventData.position, null, out Vector2 localPosition);
+			float x = Math.Abs(localPosition.x);
+			float y = Math.Abs(localPosition.y);
 
-            if (localPosition.x < 0 || localPosition.y < 0)
-                return;
+			if (eventData.button == PointerEventData.InputButton.Left)
+			{
+				emulatorWorkQueue.Enqueue(() => 
+				{
+					simpleTerminal.MouseDown(MouseButton.Left, x, y, clickMode);
+				});
+			}
 
-            float x = Math.Abs(localPosition.x);
-            float y = Math.Abs(localPosition.y);
+			if (eventData.button == PointerEventData.InputButton.Right)
+			{
+				emulatorWorkQueue.Enqueue(() => 
+				{
+					simpleTerminal.MouseDown(MouseButton.Right, x, y, ClickMode.Single);
+				});
+			}
+		}
 
-            simpleTerminal.MouseMove(x, y);
-        }
+		public void OnSelect(BaseEventData eventData)
+		{
+			simpleTerminal.SetFocus(true);
+		}
 
-        public void OnScroll(PointerEventData eventData)
-        {
-            float delta = eventData.scrollDelta.y;
+		public void OnDeselect(BaseEventData eventData)
+		{
+			simpleTerminal.SetFocus(false);
+		}
 
-            simpleTerminal.MouseScroll(delta);
-        }
-        
-        public void OnUpdateSelected(BaseEventData eventData)
-        {
-            if (!simpleTerminal.IsFocused)
-                return;
+		#endregion
 
-            var ev = new Event();
-            while (Event.PopEvent(ev))
-                if (ev.rawType == EventType.KeyDown)
-                {
-                    // Force redraw on keyboard events, just like st does
-                    simpleTerminal.Redraw();
+		/// <inheritdoc />
+		public string GetText()
+		{
+			// marijuana may be needed to comprehend this cursed shit
+			if (Thread.CurrentThread.ManagedThreadId != mainThreadId)
+			{
+				var threadedResult = string.Empty;
+				workQueue.EnqueueAsync(() =>
+				{
+					threadedResult = GetText();
+				}).Wait();
+				return threadedResult;
+			}
+			
+			return PlatformHelper.GetClipboardText();
+		}
 
-                    bool control = (ev.modifiers & (EventModifiers.Control | EventModifiers.Command)) != 0;
-                    bool alt = (ev.modifiers & EventModifiers.Alt) != 0;
-                    bool shift = (ev.modifiers & EventModifiers.Shift) != 0;
-                    bool modifiers = control
-                                     || alt
-                                     || shift;
+		/// <inheritdoc />
+		public void SetText(string text)
+		{
+			if (Thread.CurrentThread.ManagedThreadId != mainThreadId)
+			{
+				workQueue.Enqueue(() =>
+				{
+					SetText(text);
+				});
+				return;
+			}
+			
+			PlatformHelper.SetClipboardText(text);
+		}
 
-                    bool bullshit = Application.platform == RuntimePlatform.WindowsEditor
-                                    || Application.platform == RuntimePlatform.WindowsPlayer;
+		private void CalculateTextSize()
+		{
+			char ch = '#';
+			var style = FontStyles.Normal;
+			float fs = fontSize;
 
-                    // KeyCode.None means we're getting text, send a character instead.
-                    if (ev.keyCode == KeyCode.None && bullshit)
-                    {
-                        simpleTerminal.Input.Char(ev.character);
-                        continue;
-                    }
+			// Compute scale of the target point size relative to the sampling point size of the font asset.
+			float pointSizeScale = fs / (font.faceInfo.pointSize * font.faceInfo.scale);
+			float emScale = fs * 0.01f;
 
-                    bool isFunctionKey = ev.functionKey;
-                    bool isSpecial = control || alt;
-                    bool isPrintable = !char.IsControl((char) ev.keyCode);
 
-                    if (isPrintable && !isFunctionKey && !isSpecial)
-                    {
-                        if (!bullshit)
-                            simpleTerminal.Input.Char(ev.character);
-                        
-                        continue;
-                    }
 
-                    simpleTerminal.Input.Raw(ev.keyCode, control, alt, shift);
-                }
+			float styleSpacingAdjustment = (style & FontStyles.Bold) == FontStyles.Bold ? font.boldSpacing : 0;
+			float normalSpacingAdjustment = font.normalSpacingOffset;
 
-            eventData.Use();
-        }
+			// Make sure the given unicode exists in the font asset.
+			font.TryAddCharacters(ch.ToString());
+			if (!font.characterLookupTable.TryGetValue(ch, out TMP_Character character))
+				character = font.characterLookupTable['?'];
+			float width = (character.glyph.metrics.horizontalAdvance * pointSizeScale +
+			               (styleSpacingAdjustment + normalSpacingAdjustment) * emScale);
 
-        public void OnPointerUp(PointerEventData eventData)
-        {
-            RectTransformUtility.ScreenPointToLocalPointInRectangle(rectTransform, eventData.position, null, out Vector2 localPosition);
+			Vector3 scale = transform.lossyScale;
 
-            if (localPosition.x < 0 || localPosition.y < 0)
-                return;
+			float height = font.faceInfo.lineHeight
+			               / font.faceInfo.pointSize
+			               * fs;
 
-            float x = Math.Abs(localPosition.x);
-            float y = Math.Abs(localPosition.y);
-            
-            if (eventData.button == PointerEventData.InputButton.Left)
-            {
-                this.simpleTerminal.MouseUp(MouseButton.Left, x, y);
-            }
-        }
-        
-        public void OnPointerDown(PointerEventData eventData)
-        {
-            if (EventSystem.current == null)
-                return;
-            
-            EventSystem.current.SetSelectedGameObject(this.gameObject);
-
-            RectTransformUtility.ScreenPointToLocalPointInRectangle(this.rectTransform, eventData.position, null, out Vector2 localPosition);
-
-            if (localPosition.x < 0 || localPosition.y < 0)
-                return;
-
-            float x = Math.Abs(localPosition.x);
-            float y = Math.Abs(localPosition.y);
-
-            if (eventData.button == PointerEventData.InputButton.Left)
-            {
-                simpleTerminal.MouseDown(MouseButton.Left, x, y);
-            }
-
-            if (eventData.button == PointerEventData.InputButton.Right)
-            {
-                simpleTerminal.MouseDown(MouseButton.Right, x, y);
-            }
-        }
-        
-        public void OnSelect(BaseEventData eventData)
-        {
-            simpleTerminal.SetFocus(true);
-        }
-
-        public void OnDeselect(BaseEventData eventData)
-        {
-            simpleTerminal.SetFocus(false);
-        }
-        
-        #endregion
-
-        /// <inheritdoc />
-        public string GetText()
-        {
-            return PlatformHelper.GetClipboardText();
-        }
-
-        /// <inheritdoc />
-        public void SetText(string text)
-        {
-            PlatformHelper.SetClipboardText(text);
-        }
-    }
+			this.characterWidth = width / scale.x;
+			this.lineHeight = height / scale.y;
+			UnscaledLineHeight = height;
+			UnscaledCharacterWidth = width;
+		}
+	}
 }

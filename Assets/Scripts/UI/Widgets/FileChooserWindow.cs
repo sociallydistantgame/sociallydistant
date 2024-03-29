@@ -335,7 +335,7 @@ namespace UI.Widgets
 
 			selectButton.enabled = false;
 
-			string path = Path.Combine(Directory, nameInput.text);
+			string path = driver.PathCombine(Directory, nameInput.text);
 
 			if (System.IO.Directory.Exists(path))
 			{

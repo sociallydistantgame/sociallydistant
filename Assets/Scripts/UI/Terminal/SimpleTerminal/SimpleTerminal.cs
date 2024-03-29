@@ -9,7 +9,7 @@ namespace UI.Terminal.SimpleTerminal
 {
 	public class SimpleTerminal
 	{
-		private static readonly char[] vt100_0 = new char[62]
+		private readonly char[] vt100_0 = new char[62]
 		{
 			/* 0x41 - 0x7e */
 			'↑', '↓', '→', '←', '█', '▚', '☃', /* A - G */
@@ -64,7 +64,20 @@ namespace UI.Terminal.SimpleTerminal
 		private string vtiden;
 		private bool allowAltScreen;
 		private bool isFocused;
+		private string windowTitle = "Terminal";
 
+		private readonly object lockObject = new object();
+		
+
+		public string WindowTitle
+		{
+			get => windowTitle;
+			set
+			{
+				lock (lockObject) windowTitle = value;
+			}
+		}
+		
 		public bool UseUtf8 => IS_SET(TermMode.MODE_UTF8);
 		public int Rows => term.row;
 		public int Columns => term.col;
@@ -178,7 +191,7 @@ namespace UI.Terminal.SimpleTerminal
 			}
 		}
 		
-		public void MouseDown(MouseButton button, float x, float y)
+		public void MouseDown(MouseButton button, float x, float y, ClickMode clickMode)
 		{
 			screen.ScreenPointToCell(this, x,y,out int col, out int row);
 
@@ -187,13 +200,10 @@ namespace UI.Terminal.SimpleTerminal
 				case MouseButton.Left:
 				{
 					SelectionSnap snap = SelectionSnap.NONE;
-
-					float clickDelta = this.now - this.lastClick;
-					float doubleClickDelta = this.now - this.earlierClick;
-
-					if (doubleClickDelta <= this.tripleClickTime)
+					
+					if (clickMode == ClickMode.Triple)
 						snap = SelectionSnap.SNAP_LINE;
-					else if (clickDelta <= this.doubleClickTime)
+					else if (clickMode == ClickMode.Double)
 						snap = SelectionSnap.SNAP_WORD;
 
 					this.earlierClick = this.lastClick;
@@ -2029,8 +2039,8 @@ namespace UI.Terminal.SimpleTerminal
 			var delim = false;
 			var prevdelim = false;
 
-			ref Glyph prevgp = ref this.term.line[0].glyphs[0];
-			ref Glyph gp = ref this.term.line[0].glyphs[0];
+			Glyph prevgp = this.term.line[0].glyphs[0];
+			Glyph gp = this.term.line[0].glyphs[0];
 
 			if (!this.IS_SET(TermMode.MODE_ALTSCREEN))
 			{
@@ -2045,7 +2055,7 @@ namespace UI.Terminal.SimpleTerminal
                      * Snap around if the word wraps around at the end or
                      * beginning of a line.
                      */
-					prevgp = ref this.Tline(y).glyphs[x];
+					prevgp = this.Tline(y).glyphs[x];
 					prevdelim = Isdelim(prevgp.character);
 					for (;;)
 					{
@@ -2076,7 +2086,7 @@ namespace UI.Terminal.SimpleTerminal
 						if (newx >= this.LineLength(ref this.Tline(newy)))
 							break;
 
-						gp = ref this.Tline(newy).glyphs[newx];
+						gp = this.Tline(newy).glyphs[newx];
 						delim = Isdelim(gp.character);
 						if ((gp.mode & GlyphAttribute.ATTR_WDUMMY) == 0 && (delim != prevdelim ||
 						                                                    (delim && !(gp.character == ' ' &&

@@ -13,6 +13,7 @@ GameObject:
   - component: {fileID: 7884398169161428897}
   - component: {fileID: 6535055903319226498}
   - component: {fileID: 994447856181209830}
+  - component: {fileID: 3114160343674035800}
   m_Layer: 5
   m_Name: Backdrop Canvas
   m_TagString: Untagged
@@ -51,7 +52,7 @@ Canvas:
   m_GameObject: {fileID: 1876961014414637132}
   m_Enabled: 1
   serializedVersion: 3
-  m_RenderMode: 0
+  m_RenderMode: 1
   m_Camera: {fileID: 0}
   m_PlaneDistance: 100
   m_PixelPerfect: 0
@@ -59,6 +60,7 @@ Canvas:
   m_OverrideSorting: 0
   m_OverridePixelPerfect: 0
   m_SortingBucketNormalizedSize: 0
+  m_VertexColorAlwaysGammaSpace: 0
   m_AdditionalShaderChannelsFlag: 0
   m_SortingLayerID: 0
   m_SortingOrder: -1
@@ -118,6 +120,21 @@ MonoBehaviour:
   nightTime: {fileID: 2800000, guid: 5c897359a9ff5a948be54f9aec1c1e7d, type: 3}
   dayTimePanic: {fileID: 2800000, guid: 7a25451e1865c334f89caeaa682b092d, type: 3}
   nightTimePanic: {fileID: 2800000, guid: e034165fa0137494eb9a1dd4435b640f, type: 3}
+--- !u!114 &3114160343674035800
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1876961014414637132}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 7db550bd52394ced8f3952cfb1563d17, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  gameManagerHolder: {fileID: 11400000, guid: 872374c25807361459f4e174bb460b2c, type: 2}
+  visualLayer: 0
+  layerOffset: -500
 --- !u!1 &1950767313297915128
 GameObject:
   m_ObjectHideFlags: 0

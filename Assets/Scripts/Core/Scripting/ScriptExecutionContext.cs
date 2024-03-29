@@ -19,8 +19,12 @@ namespace Core.Scripting
 		private ScriptCommandProvider contextCommandProvider = null!;
 
 		private readonly Dictionary<string, IScriptCommand> contextCommandCache = new Dictionary<string, IScriptCommand>();
+		private readonly ScriptFunctionManager functions = new();
 		private bool isCacheReady;
-		
+
+		/// <inheritdoc />
+		public string Title => name;
+
 		/// <inheritdoc />
 		public string GetVariableValue(string variableName)
 		{
@@ -36,6 +40,10 @@ namespace Core.Scripting
 		public virtual async Task<int?> TryExecuteCommandAsync(string name, string[] args, ITextConsole console, IScriptExecutionContext? callSite = null)
 		{
 			callSite ??= this;
+
+			int? functionResult = await functions.CallFunction(name, args, console, callSite);
+			if (functionResult != null)
+				return functionResult;
 			
 			var system = SystemModule.GetSystemModule();
 			IGameContext gameContext = system.Context;
@@ -102,6 +110,12 @@ namespace Core.Scripting
 		{
 			// Throw it as an exception.
 			throw new InvalidOperationException($"Script execution error: Command {name} not found.");
+		}
+
+		/// <inheritdoc />
+		public void DeclareFunction(string name, IScriptFunction body)
+		{
+			functions.DeclareFunction(name, body);
 		}
 	}
 }

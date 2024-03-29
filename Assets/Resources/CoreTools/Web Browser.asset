@@ -12,7 +12,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 0b8c0d44fdef4e948af2278c2583340e, type: 3}
   m_Name: Web Browser
   m_EditorClassIdentifier: 
-  binaryName: airhawk
+  binaryName: web
   windowTitle: Airhawk Web Browser
   programGuiPrefab: {fileID: 480238177846311317, guid: 00ef2dc5a9c942148ab96681b91194a5, type: 3}
   programIcon:

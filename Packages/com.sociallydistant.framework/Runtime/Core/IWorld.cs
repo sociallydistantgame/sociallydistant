@@ -27,8 +27,11 @@ namespace Core
 		IWorldTable<WorldMemberData> Members { get; }
 		IWorldTable<WorldRelationshipData> Relationships { get; }
 		IWorldTable<WorldDomainNameData> Domains { get; }
+		IWorldTable<WorldMailData> Emails { get; }
 		
 		
 		IWorldFlagCollection WorldFlags { get; }
+
+		bool IsMissionCompleted(string missionId);
 	}
 }

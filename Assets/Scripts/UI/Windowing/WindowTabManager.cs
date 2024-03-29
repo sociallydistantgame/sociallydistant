@@ -7,6 +7,7 @@ using UnityEngine;
 using UnityEngine.EventSystems;
 using UnityExtensions;
 using UniRx;
+using UnityEngine.UI;
 
 namespace UI.Windowing
 {
@@ -19,14 +20,35 @@ namespace UI.Windowing
 
 		[SerializeField]
 		private WindowTabRenderer tabRenderer = null!;
-
+		
 		private readonly Dictionary<RectTransformContentPanel, IDisposable> titleObservers = new Dictionary<RectTransformContentPanel, IDisposable>();
 		private readonly List<RectTransformContentPanel> panels = new List<RectTransformContentPanel>();
+		private bool closeOnEmpty = true;
 		private IWindow window;
 		private int tabIndex = 0;
-
+		
+		internal bool CloseWhenAllTabsAreClosed
+		{
+			get => closeOnEmpty;
+			set => closeOnEmpty = value;
+		}
+		
 		/// <inheritdoc />
 		public IContentPanel ActiveContent => panels[tabIndex];
+
+		/// <inheritdoc />
+		public Action? NewTabCallback
+		{
+			get => tabRenderer.NewTabCallback;
+			set => tabRenderer.NewTabCallback = value;
+		}
+		
+		/// <inheritdoc />
+		public bool ShowNewTab
+		{
+			get => this.tabRenderer.ShowNewTab;
+			set => this.tabRenderer.ShowNewTab = value;
+		}
 
 		/// <inheritdoc />
 		public IReadOnlyList<IContentPanel> Tabs => panels;
@@ -41,6 +63,12 @@ namespace UI.Windowing
 		public void PreviousTab()
 		{
 			SwitchTab(tabIndex - 1);
+		}
+
+		/// <inheritdoc />
+		public async void CloseTab(int index)
+		{
+			await this.RemoveTab(this.Tabs[index]);
 		}
 
 		/// <inheritdoc />
@@ -81,7 +109,10 @@ namespace UI.Windowing
 				{
 					if (tabIndex == 0)
 					{
-						this.window.ForceClose();
+						if (closeOnEmpty)
+							this.window?.ForceClose();
+						
+						tabRenderer.UpdateTabs();
 						return true;
 					}
 
@@ -90,7 +121,13 @@ namespace UI.Windowing
 				
 				EnableCurrentTab();
 			}
+			else if (tabIndex > index)
+			{
+				tabIndex--;
+			}
 
+			tabRenderer.UpdateTabs();
+			
 			return true;
 		}
 
@@ -100,6 +137,8 @@ namespace UI.Windowing
 			this.AssertAllFieldsAreSerialized(typeof(WindowTabManager));
 			base.Awake();
 
+			this.MustGetComponentInParent(out window);
+			
 			tabRenderer.TabbedContent = this;
 			
 			CreateTabInternal(0);
@@ -113,6 +152,8 @@ namespace UI.Windowing
 			var rt = go.AddComponent<RectTransform>();
 			rt.SetParent(this.windowContentArea);
 
+			go.layer = this.windowContentArea.gameObject.layer;
+			
 			rt.localScale = Vector3.one;
 
 			var panel = go.AddComponent<RectTransformContentPanel>();

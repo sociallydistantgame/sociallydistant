@@ -15,11 +15,15 @@ namespace Core.Scripting
 	public class OperatingSystemExecutionContext : IInteractiveShellContext
 	{
 		private readonly ISystemProcess process;
+		private readonly ScriptFunctionManager functions = new();
 
 		public OperatingSystemExecutionContext(ISystemProcess process)
 		{
 			this.process = process;
 		}
+
+		/// <inheritdoc />
+		public string Title => $"{process.User.UserName} on {process.User.Computer.Name}";
 
 		/// <inheritdoc />
 		public string GetVariableValue(string variableName)
@@ -34,31 +38,40 @@ namespace Core.Scripting
 		}
 
 		/// <inheritdoc />
-		public Task<int?> TryExecuteCommandAsync(string name, string[] args, ITextConsole console, IScriptExecutionContext? callSite = null)
+		public async Task<int?> TryExecuteCommandAsync(string name, string[] args, ITextConsole console, IScriptExecutionContext? callSite = null)
 		{
+			int? functionResult = await functions.CallFunction(name, args, console, callSite ?? this);
+			if (functionResult != null)
+				return functionResult;
+
 			if (HandleBuiltin(name, args, console, callSite ?? this))
-				return Task.FromResult<int?>(0);
+				return 0;
 			
 			var sys = SystemModule.GetSystemModule();
 			CustomCommandAsset? customCommand = sys.Context.ContentManager.GetContentOfType<CustomCommandAsset>()
 				.FirstOrDefault(x => x.Name == name);
 
 			if (customCommand != null)
-				return HandleCustomCommand(customCommand, name, args, console);
+				return await HandleCustomCommand(customCommand, name, args, console);
 				
 			
 			ISystemProcess? commandProcess = FindProgram(this.process, console, name, args);
 			if (commandProcess == null)
-				return Task.FromResult<int?>(null);
+				return null;
 			
 			// special case for commands that kill the process IMMEDIATELY
 			// on the same frame this was called
 			if (commandProcess != null && !commandProcess.IsAlive)
-				return Task.FromResult<int?>(commandProcess.ExitCode);
+				return commandProcess.ExitCode;
 
+			return await WaitForProcessKill(commandProcess);
+		}
+
+		private Task<int?> WaitForProcessKill(ISystemProcess process)
+		{
 			var completionSource = new TaskCompletionSource<int?>();
 
-			commandProcess.Killed += HandleKill;
+			process.Killed += HandleKill;
 
 			return completionSource.Task;
 			
@@ -68,7 +81,7 @@ namespace Core.Scripting
 				completionSource.SetResult(killed.ExitCode);
 			}
 		}
-
+		
 		private bool HandleBuiltin(string name, string[] args, ITextConsole console, IScriptExecutionContext callSite)
 		{
 			switch (name)
@@ -175,6 +188,12 @@ namespace Core.Scripting
 		public void HandleCommandNotFound(string name, ITextConsole console)
 		{
 			console.WriteText($"sh: \x1b[1m{name}\x1b[0m: \x1b[91mCommand not found.\x1b[0m{Environment.NewLine}");
+		}
+
+		/// <inheritdoc />
+		public void DeclareFunction(string name, IScriptFunction body)
+		{
+			functions.DeclareFunction(name, body);
 		}
 
 		/// <inheritdoc />

@@ -10,6 +10,13 @@ namespace UI.Widgets
 	public class HostFileChooserDriver : IFileChooserDriver
 	{
 		/// <inheritdoc />
+		public string PathCombine(params string[] paths)
+		{
+			// just let .NET do it
+			return Path.Combine(paths);
+		}
+
+		/// <inheritdoc />
 		public bool DirectoryExists(string path)
 		{
 			return Directory.Exists(path);

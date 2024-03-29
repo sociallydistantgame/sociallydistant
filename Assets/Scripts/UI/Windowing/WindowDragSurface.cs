@@ -2,6 +2,7 @@
 
 using System;
 using Shell.Windowing;
+using UI.PlayerUI;
 using UnityEngine;
 using UnityEngine.EventSystems;
 using UnityEngine.UI;
@@ -35,7 +36,8 @@ namespace UI.Windowing
 		{
 			if (isDragging)
 			{
-                this.window.Position += eventData.delta  / this.window.RectTransform.lossyScale;
+				Vector2 delta = Bullshit.GetGuiMouseCoords(rootCanvas, eventData.delta);
+				this.window.Position += delta;
 			}
 		}
 

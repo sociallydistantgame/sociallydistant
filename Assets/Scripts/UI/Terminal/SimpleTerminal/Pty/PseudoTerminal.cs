@@ -13,6 +13,9 @@ namespace UI.Terminal.SimpleTerminal.Pty
         private ThreadSafeFifoBuffer inputStream;
         private ThreadSafeFifoBuffer outputStream;
 
+        private readonly object inputMutex;
+        private readonly object outputMutex;
+        
         /// <inheritdoc/>
         public override bool CanRead => true;
 
@@ -43,8 +46,12 @@ namespace UI.Terminal.SimpleTerminal.Pty
         private PseudoTerminal(TerminalOptions ptyOptions,
             ThreadSafeFifoBuffer inputPipe,
             ThreadSafeFifoBuffer outputPipe,
+            object inputMutex,
+            object outputMutex,
             bool isMaster)
         {
+            this.inputMutex = inputMutex;
+            this.outputMutex = outputMutex;
             this.inputStream = inputPipe;
             this.outputStream = outputPipe;
             this.inputStream.ThrowOnTerminationRequest = true;
@@ -58,7 +65,8 @@ namespace UI.Terminal.SimpleTerminal.Pty
         {
             if (c == '\n' && (this.options.OFlag & PtyConstants.ONLCR) != 0) this.outputStream.WriteByte((byte)'\r');
 
-            this.outputStream.WriteByte(c);
+            lock (outputMutex)
+                this.outputStream.WriteByte(c);
         }
 
         private void WriteInput(byte c)
@@ -100,8 +108,9 @@ namespace UI.Terminal.SimpleTerminal.Pty
 
                 return;
             }
-
-            this.inputStream.WriteByte(c);
+            
+            lock (inputMutex)
+                this.inputStream.WriteByte(c);
         }
 
         private void FlushLineBuffer()
@@ -119,9 +128,20 @@ namespace UI.Terminal.SimpleTerminal.Pty
         /// <inheritdoc/>
         public override int Read(byte[] buffer, int offset, int count)
         {
-            if (this.isMaster) return this.outputStream.Read(buffer, offset, count);
+            int readCount = 0;
 
-            return this.inputStream.Read(buffer, offset, count);
+            if (this.isMaster)
+            {
+                lock (outputMutex)
+                    readCount = this.outputStream.Read(buffer, offset, count);
+            }
+            else
+            {
+                lock (inputMutex)
+                    readCount = this.inputStream.Read(buffer, offset, count);
+            }
+
+            return readCount;
         }
 
         /// <inheritdoc/>
@@ -139,21 +159,23 @@ namespace UI.Terminal.SimpleTerminal.Pty
         public override void Write(byte[] buffer, int offset, int count)
         {
             if (this.isMaster)
-                for (int i = offset; i < offset + count; i++)
-                    this.WriteInput(buffer[i]);
+                lock (inputMutex)
+                    inputStream.Write(buffer, offset, count);
             else
-                for (int i = offset; i < offset + count; i++)
-                    this.WriteOutput(buffer[i]);
+                lock (outputMutex)
+                    outputStream.Write(buffer, offset, count);
         }
 
         /// <inheritdoc/>
         public static void CreatePair(out PseudoTerminal master, out PseudoTerminal slave, TerminalOptions options)
         {
+            var inputMutex = new object();
+            var outputMutex = new object();
             var inputStream = new ThreadSafeFifoBuffer();
             var outputStream = new ThreadSafeFifoBuffer();
-
-            master = new PseudoTerminal(options, inputStream, outputStream, true);
-            slave = new PseudoTerminal(options, inputStream, outputStream, false);
+            
+            master = new PseudoTerminal(options, inputStream, outputStream, inputMutex, outputMutex, true);
+            slave = new PseudoTerminal(options, inputStream, outputStream,  outputMutex, inputMutex,false);
         }
     }
 }

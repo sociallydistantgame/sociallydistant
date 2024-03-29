@@ -6,6 +6,7 @@ namespace Core.Scripting
 {
 	public interface IScriptExecutionContext
 	{
+		string Title { get; }
 		string GetVariableValue(string variableName);
 		void SetVariableValue(string variableName, string value);
 
@@ -14,5 +15,6 @@ namespace Core.Scripting
 		ITextConsole OpenFileConsole(ITextConsole realConsole, string filePath, FileRedirectionType mode);
 
 		void HandleCommandNotFound(string name, ITextConsole console);
+		void DeclareFunction(string name, IScriptFunction body);
 	}
 }

@@ -45,6 +45,13 @@ namespace OS.FileSystems.Host
 		}
 
 		/// <inheritdoc />
+		public string WindowTitle
+		{
+			get => output.WindowTitle;
+			set => output.WindowTitle = value;
+		}
+
+		/// <inheritdoc />
 		public bool IsInteractive => false;
 
 		/// <inheritdoc />

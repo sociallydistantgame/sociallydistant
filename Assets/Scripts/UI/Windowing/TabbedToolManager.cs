@@ -7,6 +7,7 @@ using GamePlatform;
 using OS.Devices;
 using Shell;
 using Shell.Windowing;
+using UI.Applications.WebBrowser;
 using UI.Shell;
 using UnityEngine;
 using UnityEngine.EventSystems;
@@ -24,6 +25,9 @@ namespace UI.Windowing
 
 		[SerializeField]
 		private MainToolGroup terminal = null!;
+
+		[SerializeField]
+		private MainToolGroup browser = null!;
 		
 		private Desktop shell;
 		private readonly List<TabbedTool> tools = new List<TabbedTool>();
@@ -36,6 +40,7 @@ namespace UI.Windowing
 			this.AssertAllFieldsAreSerialized(typeof(TabbedToolManager));
 			this.MustGetComponent(out tile);
 			this.MustGetComponentInParent(out shell);
+			this.tile.WindowClosed += OnTileClosed;
 			base.Awake();
 		}
 
@@ -63,7 +68,7 @@ namespace UI.Windowing
 			
 			this.SwitchTools(tools[0]);
 		}
-
+		
 		private void BuildDock()
 		{
 			// We only ever execute this once during the game session, or very rarely if a skill is unlocked that adds a new tool.
@@ -83,6 +88,26 @@ namespace UI.Windowing
 			}
 		}
 
+		private void MustGetToolGui<T>(out T behaviour) where T : MonoBehaviour
+		{
+			if (this.tile.ActiveContent is not RectTransformContentPanel contentPanel)
+				throw new InvalidOperationException("The current active tool is not a Unity UI-based tool.");
+
+			contentPanel.RectTransform.MustGetComponentInChildren(out behaviour);
+		}
+		
+		public void OpenWebBrowser(Uri uri)
+		{
+			if (uri.Scheme != "web")
+				throw new InvalidOperationException("You cannot open a URL with this scheme in the Web Browser.");
+
+			this.SwitchTools(browser);
+
+			this.MustGetToolGui(out WebBrowserController webBrowserController);
+
+			webBrowserController.Navigate(uri);
+		}
+		
 		private void UpdateDockActiveStates()
 		{
 			int activeIndex = -1;
@@ -148,6 +173,36 @@ namespace UI.Windowing
 
 			ActivateCurrentTool();
 		}
+
+		public void SwitchTools(string toolId)
+		{
+			if (this.currentTool != null && this.currentTool.Definition.Program.BinaryName == toolId)
+				return;
+			
+			TabbedTool? tool = tools.FirstOrDefault(x => x.Definition.Program.BinaryName == toolId);
+			if (tool == null)
+				throw new InvalidOperationException($"Tool not found: {toolId}");
+			
+			this.SwitchTools(tool);
+		}
+		
+		public void SwitchTools(ITabbedToolDefinition tool)
+		{
+			if (TryMapPrimaryTool(tool, out TabbedTool mainTool))
+			{
+				SwitchTools(mainTool);
+				return;
+			}
+			
+			// TODO: Support temporary tools
+			throw new NotImplementedException();
+		}
+
+		private bool TryMapPrimaryTool(ITabbedToolDefinition definition, out TabbedTool? tool)
+		{
+			tool = this.tools.FirstOrDefault(x => x.Definition == definition);
+			return tool != null;
+		}
 		
 		private class TabbedTool
 		{
@@ -186,7 +241,11 @@ namespace UI.Windowing
 
 			public void RestoreState(ITile tile)
 			{
+				tile.SetWindowHints(default);
+				
 				tile.Icon = Definition.Program.Icon;
+				tile.ShowNewTab = definition.AllowUserTabs;
+				tile.NewTabCallback = () => OpenNewTab(tile);
 				
 				if (savedTabs.Count == 0)
 				{
@@ -240,6 +299,12 @@ namespace UI.Windowing
 			public bool IsActiveTab;
 			public IContent? Content;
 			public ISystemProcess Process;
+		}
+
+		private void OnTileClosed(IWindow window)
+		{
+			this.currentTool = null;
+			this.UpdateDockActiveStates();
 		}
 	}
 }

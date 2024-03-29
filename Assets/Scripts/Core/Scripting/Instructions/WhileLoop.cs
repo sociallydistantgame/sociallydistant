@@ -19,11 +19,11 @@ namespace Core.Scripting.Instructions
 		}
 
 		/// <inheritdoc />
-		public override async Task<int> RunAsync(ITextConsole console)
+		public override async Task<int> RunAsync(ITextConsole console, IScriptExecutionContext context)
 		{
 			var iterations = 0;
 			var exitCode = 0;
-			while (await condition.RunAsync(console) == 0)
+			while (await condition.RunAsync(console, context) == 0)
 			{
 				iterations++;
 				if (iterations == maxLoopIterations)
@@ -35,7 +35,7 @@ namespace Core.Scripting.Instructions
 				await Task.Yield();
 				
 				foreach (ShellInstruction instruction in body)
-					exitCode = await instruction.RunAsync(console);
+					exitCode = await instruction.RunAsync(console, context);
 			}
 
 			return exitCode;

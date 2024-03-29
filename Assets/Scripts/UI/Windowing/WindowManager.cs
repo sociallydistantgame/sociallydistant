@@ -28,6 +28,9 @@ namespace UI.Windowing
 		[SerializeField]
 		private UguiMessageDialog messageDialogPrefab = null!;
 
+		[SerializeField]
+		private UguiOverlay overlayPrefab = null!;
+		
 		/// <inheritdoc />
 		public IReadOnlyList<UguiWorkspaceDefinition> WorkspaceList => workspaces;
 
@@ -53,29 +56,11 @@ namespace UI.Windowing
 
 		public OverlayWorkspace CreateSystemOverlay()
 		{
-			var go = new GameObject("Overlay workspace");
-
-			var rt = go.AddComponent<RectTransform>();
-
-			rt.SetParent(this.transform);
-
-			rt.localPosition = Vector3.zero;
-			rt.anchorMin = new Vector2(0, 0);
-			rt.anchorMax = new Vector2(1, 1);
-			rt.pivot = Vector2.zero;
-			rt.sizeDelta = Vector2.zero;
-			rt.anchoredPosition = Vector3.zero;
-			rt.localScale = Vector3.one;
-
-			go.AddComponent<CanvasRenderer>();
-
-			var image = go.AddComponent<Image>();
-
-			image.color = new Color(0, 0, 0, 0.75f);
-
-			UguiWorkspaceDefinition workspace = DefineWorkspace(rt);
+			UguiOverlay? overlayGui = Instantiate(overlayPrefab, transform.parent);
 			
-			return new OverlayWorkspace(go, workspace);
+			UguiWorkspaceDefinition workspace = DefineWorkspace(overlayGui.RectTransform);
+			
+			return new OverlayWorkspace(overlayGui, workspace);
 		}
 		
 		/// <inheritdoc />

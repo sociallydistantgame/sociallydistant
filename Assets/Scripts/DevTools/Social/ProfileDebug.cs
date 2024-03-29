@@ -36,7 +36,7 @@ namespace DevTools.Social
 			
 			foreach (var profile in world.World.Profiles)
 			{
-				if (GUILayout.Button($"{profile.InstanceId}: {profile.SocialName}"))
+				if (GUILayout.Button($"{profile.InstanceId}: {profile.ChatName}"))
 					devMenu.PushMenu(new ProfileViewer(world, profile.InstanceId));
 			}
 		}

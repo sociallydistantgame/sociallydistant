@@ -8,7 +8,14 @@ namespace Core.Scripting.Instructions
 	{
 		private readonly ITextConsole underlyingConsole;
 		private readonly StringBuilder text = new StringBuilder();
-		
+
+
+		/// <inheritdoc />
+		public string WindowTitle
+		{
+			get => underlyingConsole.WindowTitle;
+			set => underlyingConsole.WindowTitle = value;
+		}
 
 		/// <inheritdoc />
 		public bool IsInteractive => false;

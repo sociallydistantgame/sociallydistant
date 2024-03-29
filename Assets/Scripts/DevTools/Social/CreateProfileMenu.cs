@@ -46,11 +46,9 @@ namespace DevTools.Social
 			GUILayout.EndHorizontal();
 			GUILayout.BeginHorizontal();
 			GUILayout.Label("Email");
-			profile.MailUsername = GUILayout.TextField(profile.MailUsername);
 			GUILayout.EndHorizontal();
 			GUILayout.BeginHorizontal();
 			GUILayout.Label("Social Media");
-			profile.SocialUsername = GUILayout.TextField(profile.SocialUsername);
 			GUILayout.EndHorizontal();
 
 			GUILayout.Label("Display Names");
@@ -61,11 +59,9 @@ namespace DevTools.Social
 			GUILayout.EndHorizontal();
 			GUILayout.BeginHorizontal();
 			GUILayout.Label("Email");
-			profile.MailName = GUILayout.TextField(profile.MailName);
 			GUILayout.EndHorizontal();
 			GUILayout.BeginHorizontal();
 			GUILayout.Label("Social Media");
-			profile.SocialName = GUILayout.TextField(profile.SocialName);
 			GUILayout.EndHorizontal();
 			
 			GUILayout.Label("Social Bio");

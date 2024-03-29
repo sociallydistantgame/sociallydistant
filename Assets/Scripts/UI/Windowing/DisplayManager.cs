@@ -114,6 +114,7 @@ namespace UI.Windowing
 			if (this.appLauncherProcess != null)
 			{
 				this.appLauncherProcess.Kill();
+				this.appLauncherProcess = null;
 				return;
 			}
 			

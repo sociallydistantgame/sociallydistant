@@ -4,6 +4,7 @@ namespace OS.Devices
 {
 	public interface ITextConsole
 	{
+		string WindowTitle { get; set; }
 		bool IsInteractive { get; }
 		
 		void ClearScreen();
@@ -13,6 +14,9 @@ namespace OS.Devices
 
 	public sealed class NullConsole : ITextConsole
 	{
+		/// <inheritdoc />
+		public string WindowTitle { get; set; }
+
 		/// <inheritdoc />
 		public bool IsInteractive => false;
 

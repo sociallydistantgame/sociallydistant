@@ -23,7 +23,7 @@ namespace Core.Scripting.Instructions
 		}
 		
 		/// <inheritdoc />
-		public override async Task<int> RunAsync(ITextConsole console)
+		public override async Task<int> RunAsync(ITextConsole console, IScriptExecutionContext context)
 		{
 			// Pipe instructions are weird.
 			//
@@ -77,8 +77,8 @@ namespace Core.Scripting.Instructions
 			if (pipeOutConsole == null)
 				return -1;
 
-			await pipeIn.RunAsync(pipeInConsole);
-			return await pipeOut.RunAsync(pipeOutConsole);
+			await pipeIn.RunAsync(pipeInConsole, context);
+			return await pipeOut.RunAsync(pipeOutConsole, context);
 		}
 
 		private ITextConsole CreateSlavePipe(ITextConsole input, ITextConsole masterOutput)
