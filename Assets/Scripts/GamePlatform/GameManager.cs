@@ -68,6 +68,7 @@ namespace GamePlatform
 		private PlayerInfo loadedPlayerInfo;
 		private Subject<bool> panicSubject = new Subject<bool>();
 		private bool panicking;
+		private IUriManager uriManager;
 		private Subject<PlayerInfo> playerInfoSubject = new Subject<PlayerInfo>();
 
 		public IObservable<PlayerInfo> PlayerInfoObservable => playerInfoSubject;
@@ -106,12 +107,16 @@ namespace GamePlatform
 		public IScriptSystem ScriptSystem => scriptSystem;
 
 		/// <inheritdoc />
+		public IUriManager UriManager => uriManager;
+		
+		/// <inheritdoc />
 		public string? CurrentSaveDataDirectory => this.currentGameData?.LocalFilePath;
 		
 		private void Awake()
 		{
 			scriptSystem = new ScriptSystem(this);
 			availableTools = new TabbedToolCollection(this);
+			uriManager = new UriManager(this);
 			
 			GameModeObservable = Observable.Create<GameMode>(observer =>
 			{
@@ -259,10 +264,8 @@ namespace GamePlatform
 						// Sync the profile data with the save's metadata
 						// We only sync the gender and full names.
 						profile.Gender = this.loadedPlayerInfo.PlayerGender;
-						profile.SocialName = this.loadedPlayerInfo.Name;
 						profile.ChatName = this.loadedPlayerInfo.Name;
-						profile.MailName = this.loadedPlayerInfo.Name;
-
+						
 						worldManager.Value.World.Profiles.Add(profile);
 						worldManager.Value.World.PlayerData.Value = playerData;
 					}
@@ -340,6 +343,15 @@ namespace GamePlatform
 
 		/// <inheritdoc />
 		public bool IsDebugWorld => currentGameData is DebugGameData;
+
+		/// <inheritdoc />
+		public async void SetPlayerHostname(string hostname)
+		{
+			this.loadedPlayerInfo.HostName = hostname;
+			this.playerInfoSubject.OnNext(this.loadedPlayerInfo);
+
+			await this.SaveCurrentGame(true);
+		}
 
 		private void SetGameMode(GameMode newGameMode)
 		{

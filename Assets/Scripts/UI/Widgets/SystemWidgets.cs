@@ -58,6 +58,10 @@ namespace UI.Widgets
 		[Header("Steam Workshop Editors")]
 		[SerializeField]
 		private GraphicPickerWidgetController graphicPickerPrefab = null!;
+
+		[Header("Rich Embeds")]
+		[SerializeField]
+		private RichEmbedWidgetController richEmbedPrefab = null!;
 		
 		/// <inheritdoc />
 		public WidgetRecycleBin RecycleBin
@@ -146,6 +150,11 @@ namespace UI.Widgets
 		public GraphicPickerWidgetController GetGraphicPicker(RectTransform destination)
 		{
 			return RecycleOrInstantiate(this.graphicPickerPrefab, destination);
+		}
+		
+		public RichEmbedWidgetController GetRichEmbed(RectTransform destination)
+		{
+			return RecycleOrInstantiate(this.richEmbedPrefab, destination);
 		}
 		
 		private T RecycleOrInstantiate<T>(T prefabToInstantiate, RectTransform rectTransform)

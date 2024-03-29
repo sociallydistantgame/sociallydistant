@@ -54,10 +54,17 @@ namespace UI.Windowing
 				this.gameObject.transform.SetParent(null);
 				return;
 			}
-			
+		
 			this.rectTransform.SetParent(rtParent.RectTransform);
 			this.rectTransform.localScale = Vector3.one;
+			
+			// Depth fix
+			Vector3 anchoredPos = rectTransform.anchoredPosition3D;
+			anchoredPos.z = 0;
+			rectTransform.anchoredPosition3D = anchoredPos;
+			
 			this.gameObject.SetActive(true);
+			this.gameObject.layer = rtParent.RectTransform.gameObject.layer;
 		}
 	}
 }

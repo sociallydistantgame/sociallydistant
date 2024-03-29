@@ -40,7 +40,7 @@ namespace GameplaySystems.WebPages
 				if (this.currentState != null)
 					pagePath = currentState.Path;
 
-				return $"https://{baseUrl}{pagePath}";
+				return $"web://{baseUrl}{pagePath}";
 			}
 		}
 		

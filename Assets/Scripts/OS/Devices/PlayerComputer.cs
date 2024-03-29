@@ -25,6 +25,7 @@ namespace OS.Devices
 		private readonly FileSystemTableAsset fstab;
 		private readonly IUser su;
 		private readonly PlayerFileOverrider fileOverrider;
+		private readonly SettingsFileSystem settingsFileSystem;
 		private Dictionary<int, IUser> users = new Dictionary<int, IUser>();
 		private Dictionary<string, int> usernameMap = new Dictionary<string, int>();
 		private PlayerUser playerUser;
@@ -48,6 +49,7 @@ namespace OS.Devices
 			this.Network = this.playerLan.CreateDevice(this);
 			this.gameManager = gameManager;
 			this.fileOverrider = fileOverrider;
+			this.settingsFileSystem = new SettingsFileSystem(this, this.gameManager);
 
 			su = new SuperUser(this);
 			this.AddUser(su);
@@ -79,6 +81,10 @@ namespace OS.Devices
 
 			GetFileSystem(su)
 				.Mount(playerUser.Home, playerHome);
+			
+			// Allows access to game settings and player settings via the filesystem and thus the shell
+			GetFileSystem(su)
+				.Mount("/etc", settingsFileSystem);
 			
 			FileSystemTable.MountFileSystemsToComputer(this, fstab);
 		}

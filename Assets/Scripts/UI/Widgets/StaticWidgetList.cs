@@ -35,6 +35,7 @@ namespace UI.Widgets
 				var holder = new StaticWidgetHolder();
 
 				var go = new GameObject("StaticWidgetHolder");
+				go.layer = this.gameObject.layer;
 				holder.ViewRoot = go.AddComponent<RectTransform>();
 				
 				holder.ViewRoot.SetParent((RectTransform) this.transform, false);

@@ -2,6 +2,8 @@
 
 using System;
 using Architecture;
+using GamePlatform;
+using Modules;
 using OS.Devices;
 using Player;
 using Shell;
@@ -24,12 +26,18 @@ namespace UI.Shell
 	{
 		[Header("Dependencies")]
 		[SerializeField]
+		private GameManagerHolder gameManager = null!;
+		
+		[SerializeField]
 		private PlayerInstanceHolder playerHolder = null!;
 
 		[Header("UI")]
 		[SerializeField]
 		private RectTransform workspaceArea = null!;
 
+		[SerializeField]
+		private TabbedToolManager toolManager = null!;
+		
 		[SerializeField]
 		private StatusBarController statusBarController = null!;
 		
@@ -46,6 +54,24 @@ namespace UI.Shell
 		{
 			this.AssertAllFieldsAreSerialized(typeof(Desktop));
 			this.MustGetComponentInParent(out uiManager);
+		}
+
+		private void OnEnable()
+		{
+			if (gameManager.Value != null)
+			{
+				gameManager.Value.UriManager.RegisterSchema("web", new BrowserSchemeHandler(this));
+				gameManager.Value.UriManager.RegisterSchema("shell", new ShellUriSchemeHandler(this));
+			}
+		}
+
+		private void OnDisable()
+		{
+			if (gameManager.Value != null)
+			{
+				gameManager.Value.UriManager.UnregisterSchema("web");
+				gameManager.Value.UriManager.UnregisterSchema("shell");
+			}
 		}
 
 		private void Start()
@@ -73,12 +99,41 @@ namespace UI.Shell
 			return windowProcess;
 		}
 
+		public void OpenWebBrowser(Uri uri)
+		{
+			this.toolManager.OpenWebBrowser(uri);
+		}
+
 		private void UpdateUserDisplay()
 		{
 			string username = this.loginUser.UserName;
 			string hostname = this.loginUser.Computer.Name;
 			
 			statusBarController.UserInfo = $"{username}@{hostname}";
+		}
+
+		private sealed class ShellUriSchemeHandler : IUriSchemeHandler
+		{
+			private readonly Desktop shell;
+
+			public ShellUriSchemeHandler(Desktop shell)
+			{
+				this.shell = shell;
+			}
+			
+			/// <inheritdoc />
+			public void HandleUri(Uri uri)
+			{
+				switch (uri.Host)
+				{
+					case "tool":
+					{
+						string toolId = uri.AbsolutePath.Substring(1);
+						shell.toolManager.SwitchTools(toolId);
+						break;
+					}
+				}
+			}
 		}
 	}
 }

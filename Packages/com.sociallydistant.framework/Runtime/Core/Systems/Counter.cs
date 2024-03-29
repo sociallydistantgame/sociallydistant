@@ -16,5 +16,11 @@ namespace Core.Systems
 		{
 			value++;
 		}
+		
+		public void CountDown()
+		{
+			value--;
+		}
+		
 	}
 }

@@ -61,6 +61,12 @@ namespace Core.Config.SystemConfigCategories
 			set => SetValue(nameof(SaveAudioTranscripts), value);
 		}
 
+		public bool DisableTerminalBackgroundBlur
+		{
+			get => GetValue(nameof(DisableTerminalBackgroundBlur), false);
+			set => SetValue(nameof(DisableTerminalBackgroundBlur), value);
+		}
+		
 		/// <inheritdoc />
 		public AccessibilitySettings(ISettingsManager settingsManager) : base(settingsManager)
 		{
@@ -84,6 +90,13 @@ namespace Core.Config.SystemConfigCategories
 					x => UseHyperlegibleFont = x,
 					vision
                 )
+				.WithToggle(
+					"Disable terminal blur",
+					"Disable the translucent background blur of the Terminal.",
+					DisableTerminalBackgroundBlur,
+					x => DisableTerminalBackgroundBlur = x,
+					vision
+				)
 				.WithToggle(
 					"Opaque Info Panel",
 					"Use an opaque background color for the desktop's Info Panel. This may improve the contrast of Info Panel text against the desktop background.",

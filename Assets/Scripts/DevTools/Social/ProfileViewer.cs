@@ -37,11 +37,7 @@ namespace DevTools.Social
 			GUILayout.Label($"Private: {profile.IsSocialPrivate}");
 			GUILayout.Label($"Chat name: {profile.ChatName}");
 			GUILayout.Label($"Chat username: {profile.ChatUsername}");
-			GUILayout.Label($"Mail name: {profile.MailName}");
-			GUILayout.Label($"Mail username: {profile.MailUsername}");
-			GUILayout.Label($"Social name: {profile.SocialName}");
-			GUILayout.Label($"Social username: {profile.SocialUsername}");
-
+			
 			GUILayout.Label("Bio");
 			GUILayout.Label(profile.SocialBio);
 

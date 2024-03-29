@@ -1,5 +1,6 @@
 ﻿#nullable enable
 using System;
+using Core;
 using ThisOtherThing.UI.Shapes;
 using TMPro;
 using UnityEngine;
@@ -22,6 +23,9 @@ namespace UI.Windowing
 		[SerializeField]
 		private TextMeshProUGUI label = null!;
 
+		[SerializeField]
+		private Button closeButton = null!;
+		
 		private readonly Color normalBackgroundColor = GuiHelpers.GetPackedColor(0x444444ff);
 		private readonly Color normalHoveredBackgroundColor = GuiHelpers.GetPackedColor(0x0F73A9ff);
 		private readonly Color normalPressedBackgroundColor = GuiHelpers.GetPackedColor(0x08537Bff);
@@ -38,7 +42,8 @@ namespace UI.Windowing
 		private readonly Color activePanicHoveredBackgroundColor = GuiHelpers.GetPackedColor(0x444444ff);
 		private readonly Color activePanicPressedBackgroundColor = GuiHelpers.GetPackedColor(0x444444ff);
 		private readonly Color activePanicFocusedBackgroundColor = GuiHelpers.GetPackedColor(0xFA5353ff);
-		
+
+		private bool canBeClosed;
 		private Rectangle rectangle;
 		private Button button;
 		private bool isActiveTab;
@@ -49,7 +54,7 @@ namespace UI.Windowing
 		public string Title
 		{
 			get => label.text;
-			set => label.SetText(value);
+			set => label.SetText(value.StripNewLines());
 		}
 
 		public bool IsActiveTab
@@ -64,8 +69,24 @@ namespace UI.Windowing
 				UpdateRectangle();
 			}
 		}
+
+		public bool CanBeClosed
+		{
+			get => this.canBeClosed;
+			set
+			{
+				if (this.canBeClosed == value)
+					return;
+
+				this.canBeClosed = value;
+				UpdateRectangle();
+			}
+		}
+		
 		public int TabIndex { get; set; }
 
+		public Action<int>? Closed { get; set; }
+		
 		public Action<int>? Clicked { get; set; } 
 		
 		/// <inheritdoc />
@@ -78,6 +99,7 @@ namespace UI.Windowing
 			this.MustGetComponent(out button);
 			
 			button.onClick.AddListener(OnClick);
+			closeButton.onClick.AddListener(OnClose);
 		}
 
 		/// <inheritdoc />
@@ -94,6 +116,11 @@ namespace UI.Windowing
 			base.OnDisable();
 		}
 
+		private void OnClose()
+		{
+			Closed?.Invoke(this.TabIndex);
+		}
+		
 		private void OnClick()
 		{
 			Clicked?.Invoke(this.TabIndex);
@@ -101,6 +128,8 @@ namespace UI.Windowing
 
 		private void UpdateRectangle()
 		{
+			this.closeButton.gameObject.SetActive(this.canBeClosed);
+			
 			Color backgroundColor = IsActiveTab ? activeBackgroundColor : normalBackgroundColor;
 			Color textColor = enabled ? Color.white : Color.gray;
 			Color borderColor = backgroundColor;

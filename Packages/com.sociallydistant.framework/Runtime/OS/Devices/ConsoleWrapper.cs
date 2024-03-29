@@ -12,6 +12,16 @@ namespace OS.Devices
 
 		public ITextConsole Device => textConsole;
 		public bool IsInteractive => textConsole.IsInteractive;
+
+		public void SetWindowTitle(string windowTitle)
+		{
+			this.textConsole.WindowTitle = windowTitle;
+		}
+
+		public void ResetWindowTitle()
+		{
+			this.textConsole.WindowTitle = string.Empty;
+		}
 		
 		public ConsoleWrapper(ITextConsole textConsole)
 		{

@@ -1,11 +1,9 @@
 ﻿#nullable enable
-
 using System;
-using System.Linq;
 using System.Text;
+using System.Threading.Tasks;
 using Core;
 using Core.Config;
-using Core.Config.SystemConfigCategories;
 using GamePlatform;
 using Shell;
 using Shell.Windowing;
@@ -19,8 +17,6 @@ using UI.Widgets;
 using UI.Windowing;
 using UnityEngine;
 using UniRx;
-using UnityEngine.EventSystems;
-using UnityEngine.UI;
 using UnityExtensions;
 using Utility;
 
@@ -70,7 +66,8 @@ namespace UI.PlayerUI
 		[SerializeField]
 		private TMP_FontAsset monospaceFont = null!;
 
-		private Camera mainCamera = null!;
+		private static Camera mainCamera = null!;
+		
 		private string? lastThemeName;
 		private IFloatingGui? settingsWindow;
 		private OverlayWorkspace? overlayWorkspace;
@@ -94,7 +91,7 @@ namespace UI.PlayerUI
 		{
 			this.AssertAllFieldsAreSerialized(typeof(UiManager));
 
-			this.mainCamera = Camera.main;
+			mainCamera = Camera.main;
 			
 			Instantiate(backdropPrefab, this.transform).MustGetComponent(out backdrop);
 			Instantiate(this.popoverLayerPrefab, this.transform).MustGetComponent(out popoverLayer);
@@ -250,38 +247,6 @@ namespace UI.PlayerUI
 	                HideDesktop();
 	                break;
 			}
-
-			FixCanvasCameras();
-		}
-
-		private void FixCanvasScaler(CanvasScaler scaler)
-		{
-			scaler.uiScaleMode = CanvasScaler.ScaleMode.ScaleWithScreenSize;
-
-			scaler.referenceResolution = new Vector2(1920, 1080);
-			scaler.matchWidthOrHeight = 1;
-		}
-		
-		private void FixCanvasCameras()
-		{
-			Canvas[]? canvases = this.GetComponentsInChildren<Canvas>();
-
-			if (canvases == null)
-				return;
-
-			foreach (Canvas canvas in canvases)
-			{
-				if (canvas.transform.parent != this.transform)
-					continue;
-
-				if (!canvas.TryGetComponent(out CanvasScaler scaler))
-					scaler = canvas.gameObject.AddComponent<CanvasScaler>();
-
-				FixCanvasScaler(scaler);
-				
-				canvas.worldCamera = null;
-				canvas.renderMode = RenderMode.ScreenSpaceOverlay;
-			}
 		}
 		
 		private void OnSettingsUpdated(ISettingsManager settingsManager)
@@ -305,6 +270,28 @@ namespace UI.PlayerUI
 			dialog.Message = sb.ToString();
 			
 			dialog.Buttons.Add("OK");
+		}
+
+		public static Camera UiCamera => mainCamera;
+
+		/// <inheritdoc />
+		public Task ShowInfoDialog(string title, string message)
+		{
+			var completionSource = new TaskCompletionSource<bool>();
+			
+			IMessageDialog dialog = windowManager.CreateMessageDialog(title);
+
+			dialog.Title = title;
+			dialog.Message = message;
+		
+			dialog.Buttons.Add("OK");
+
+			dialog.DismissCallback = result =>
+			{
+				completionSource.SetResult(true);
+			};
+
+			return completionSource.Task;
 		}
 	}
 }

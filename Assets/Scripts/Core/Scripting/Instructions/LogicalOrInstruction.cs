@@ -16,13 +16,13 @@ namespace Core.Scripting.Instructions
 		}
 
 		/// <inheritdoc />
-		public override async Task<int> RunAsync(ITextConsole console)
+		public override async Task<int> RunAsync(ITextConsole console, IScriptExecutionContext context)
 		{
-			int exitCode = await left.RunAsync(console);
+			int exitCode = await left.RunAsync(console, context);
 			if (exitCode == 0)
 				return exitCode;
 			
-			return await right.RunAsync(console);
+			return await right.RunAsync(console, context);
 		}
 	}
 }

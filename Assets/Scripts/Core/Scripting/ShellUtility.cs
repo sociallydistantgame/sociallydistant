@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using Architecture;
+using UnityExtensions;
 
 namespace Core.Scripting
 {
@@ -174,10 +175,13 @@ namespace Core.Scripting
 		
 		public static IEnumerable<ShellToken> IdentifyTokens(string rawInput)
 		{
-			int lastTokenStart = 0;
+			var lastTokenStart = 0;
+			
+			// normalize line endings because nobody can fucking agree on a standard, god I hate this
+			string normalizedInput = rawInput.ReplaceLineEndings();
 			
 			// Convert the string to a char array so we can create an ArrayView over it.
-			char[] characters = rawInput.ToString().ToCharArray();
+			char[] characters = normalizedInput.ToCharArray();
 
 			var charView = new ArrayView<char>(characters);
 
@@ -186,6 +190,7 @@ namespace Core.Scripting
 			
 			// are we in a quoted string?
 			var inQuote = false;
+			var inExpansionString = false;
 			
 			// easy short-hand for ending a text token
 			ShellToken EndTextToken()
@@ -224,10 +229,11 @@ namespace Core.Scripting
 							switch (charView.Current)
 							{
 								case '\r':
+								case '\n':
+									break;
 								case 'r':
 									tokenBuilder.Append('\r');
 									break;
-								case '\n':
 								case 'n':
 									tokenBuilder.Append('\n');
 									break;
@@ -298,6 +304,7 @@ namespace Core.Scripting
 						if (tokenBuilder.Length > 0)
 							yield return EndTextToken();
 
+						inExpansionString = !inExpansionString;
 						yield return new ShellToken(ShellTokenType.ExpansionString, charView.Current.ToString(), charView.CurrentIndex, 1);
 						break;
 					}
@@ -323,7 +330,7 @@ namespace Core.Scripting
 					}
 					
 					// Parallel operator and logical AND
-					case '&' when !inQuote:
+					case '&' when !inQuote && !inExpansionString:
 					{
 						if (tokenBuilder.Length > 0)
 							yield return EndTextToken();
@@ -429,7 +436,7 @@ namespace Core.Scripting
 					}
 					
 					// Pipe and logical OR
-					case '|' when !inQuote:
+					case '|' when !inQuote && !inExpansionString:
 					{
 						if (tokenBuilder.Length > 0)
 							yield return EndTextToken();
@@ -447,7 +454,7 @@ namespace Core.Scripting
 					}
 					
 					// Append to File
-					case '>' when charView.Next == charView.Current && !inQuote:
+					case '>' when charView.Next == charView.Current && !inQuote && !inExpansionString:
 					{
 						if (tokenBuilder.Length > 0)
 							yield return EndTextToken();
@@ -472,7 +479,7 @@ namespace Core.Scripting
 					}
 
 					// Overwrite File
-					case '>' when !inQuote:
+					case '>' when !inQuote && !inExpansionString:
 					{
 						if (tokenBuilder.Length > 0)
 							yield return EndTextToken();
@@ -482,7 +489,7 @@ namespace Core.Scripting
 					}
 					
 					// File Input
-					case '<' when !inQuote:
+					case '<' when !inQuote && !inExpansionString:
 					{
 						if (tokenBuilder.Length > 0)
 							yield return EndTextToken();

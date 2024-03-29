@@ -6,6 +6,7 @@ namespace UI.Widgets
 {
 	public interface IFileChooserDriver
 	{
+		string PathCombine(params string[] paths);
 		bool DirectoryExists(string path);
 		bool FileExists(string path);
 		

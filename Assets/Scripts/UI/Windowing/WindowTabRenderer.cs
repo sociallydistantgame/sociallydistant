@@ -4,7 +4,9 @@ using Shell.Windowing;
 using UniRx.Triggers;
 using UnityEngine;
 using UnityEngine.EventSystems;
+using UnityEngine.UI;
 using UnityExtensions;
+using System;
 
 namespace UI.Windowing
 {
@@ -14,8 +16,27 @@ namespace UI.Windowing
 	{
 		[SerializeField]
 		private WindowTab tabTemplate = null!;
+
+		[SerializeField]
+		private Button newTabButton = null!;
 		
 		private readonly List<WindowTab> tabInstances = new List<WindowTab>();
+		private bool showNewTab = false;
+
+		public Action? NewTabCallback { get; set; }
+		
+		public bool ShowNewTab
+		{
+			get => showNewTab;
+			set
+			{
+				if (showNewTab == value)
+					return;
+
+				showNewTab = value;
+				this.UpdateTabs();
+			}
+		}
 		
 		/// <inheritdoc />
 		public ITabbedContent? TabbedContent { get; set;  }
@@ -25,6 +46,7 @@ namespace UI.Windowing
 		{
 			base.Awake();
 			this.AssertAllFieldsAreSerialized(typeof(WindowTabRenderer));
+			this.newTabButton.onClick.AddListener(OnNewTab);
 			
 			this.tabTemplate.gameObject.SetActive(false);
 		}
@@ -32,6 +54,8 @@ namespace UI.Windowing
 		/// <inheritdoc />
 		public void UpdateTabs()
 		{
+			this.newTabButton.gameObject.SetActive(this.showNewTab);
+			
 			int tabCount = 0;
 
 			if (TabbedContent != null && TabbedContent.Tabs != null)
@@ -54,6 +78,8 @@ namespace UI.Windowing
 				tab.gameObject.SetActive(true);
 
 				tab.Clicked = SwitchTab;
+				tab.Closed = CloseTab;
+				
 			}
 
 			if (TabbedContent == null)
@@ -70,12 +96,23 @@ namespace UI.Windowing
 				tab.Title = panel.Title;
 				tab.TabIndex = i;
 				tab.IsActiveTab = TabbedContent.ActiveContent == panel;
+				tab.CanBeClosed = panel.CanClose;
 			}
 		}
 
+		private void CloseTab(int index)
+		{
+			TabbedContent?.CloseTab(index);
+		}
+		
 		private void SwitchTab(int index)
 		{
 			TabbedContent?.SwitchTab(index);
+		}
+
+		private void OnNewTab()
+		{
+			NewTabCallback?.Invoke();
 		}
 	}
 }

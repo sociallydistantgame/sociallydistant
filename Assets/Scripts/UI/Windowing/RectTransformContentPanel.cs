@@ -17,11 +17,12 @@ namespace UI.Windowing
 		private RectTransform rectTransform;
 		private IContent? currentContent;
 		private VerticalLayoutGroup layoutGroup;
+		private IWindow parentWindow;
 
 		public RectTransform RectTransform => rectTransform;
 		
 		/// <inheritdoc />
-		public bool CanClose { get; }
+		public bool CanClose { get; set; }
 
 		/// <inheritdoc />
 		public void Close()
@@ -43,7 +44,7 @@ namespace UI.Windowing
 		}
 
 		/// <inheritdoc />
-		public IWindow Window { get; }
+		public IWindow Window => parentWindow;
 
 		/// <inheritdoc />
 		public string Title { get; set; } = "Window title";
@@ -67,6 +68,7 @@ namespace UI.Windowing
 					value.OnParentChanged(this);
 
 				this.currentContent = value;
+				this.ApplyHints();
 			}
 		}
 
@@ -77,9 +79,10 @@ namespace UI.Windowing
 		protected override void Awake()
 		{
 			base.Awake();
-
+			this.MustGetComponentInParent(out parentWindow);
+			
 			this.MustGetComponent(out rectTransform);
-
+			
 			if (!this.TryGetComponent(out layoutGroup))
 			{
 				this.layoutGroup = this.gameObject.AddComponent<VerticalLayoutGroup>();
@@ -89,6 +92,34 @@ namespace UI.Windowing
 				this.layoutGroup.childScaleWidth = true;
 				this.layoutGroup.childScaleHeight = true;
 			}
+		}
+
+		/// <inheritdoc />
+		protected override void Start()
+		{
+			base.Start();
+
+			// Depth fix
+			Vector3 anchoredPos = rectTransform.anchoredPosition3D;
+			anchoredPos.z = 0;
+			rectTransform.anchoredPosition3D = anchoredPos;
+			
+			ApplyHints();
+		}
+
+		private void ApplyHints()
+		{
+			if (this.currentContent == null)
+				return;
+
+			if (this.currentContent is not RectTransformContent rtContent)
+				return;
+
+			var hintProvider = rtContent.RectTransform.GetComponentInChildren<WindowHintProvider>(true);
+			if (hintProvider == null)
+				return;
+			
+			parentWindow.SetWindowHints(hintProvider.Hints);
 		}
 	}
 }

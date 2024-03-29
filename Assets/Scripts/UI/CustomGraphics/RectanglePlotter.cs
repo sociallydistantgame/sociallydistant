@@ -1,5 +1,6 @@
 ﻿#nullable enable
 
+using System.Collections.Concurrent;
 using System.Collections.Generic;
 using UnityEngine.UI;
 using UnityEngine;
@@ -13,7 +14,7 @@ namespace UI.CustomGraphics
 		[SerializeField]
 		private bool renderDefaultGraphic = false;
 		
-		private readonly List<RectangleElement> rectangles = new List<RectangleElement>();
+		private readonly ConcurrentBag<RectangleElement> rectangles = new ConcurrentBag<RectangleElement>();
 		
 		/// <inheritdoc />
 		protected override void OnPopulateMesh(VertexHelper vh)
@@ -26,8 +27,6 @@ namespace UI.CustomGraphics
 				return;
 			}
 			
-            Vector3 scale = rectTransform.lossyScale;
-            
             Rect pixelRect = GetPixelAdjustedRect();
 
             if (pixelRect.width * pixelRect.height < 0)
@@ -36,9 +35,11 @@ namespace UI.CustomGraphics
 	            return;
             }
 
-            for (var i = 0; i < rectangles.Count; i++)
+            RectangleElement[] elementArray = this.rectangles.ToArray();
+            Vector3 scale = rectTransform.lossyScale;
+            for (var i = 0; i < elementArray.Length; i++)
 			{
-				RectangleElement element = rectangles[i];
+				RectangleElement element = elementArray[i];
 
 				Color32 rectColor = element.Color;
 
@@ -47,6 +48,11 @@ namespace UI.CustomGraphics
 				
 				Rect rect = element.Rect;
 
+				rect.x *= scale.x;
+				rect.y *= scale.y;
+				rect.width *= scale.x;
+				rect.height *= scale.y;
+				
 				var max = new Vector2(rect.xMax, pixelRect.height - rect.yMax);
 				var min = new Vector2(rect.xMin, pixelRect.height - rect.yMin);
 
@@ -133,13 +139,6 @@ namespace UI.CustomGraphics
 
 		public void Plot(Rect rect, Color color)
 		{
-			Vector3 scale = rectTransform.lossyScale;
-
-			rect.x *= scale.x;
-			rect.y *= scale.y;
-			rect.width *= scale.x;
-			rect.height *= scale.y;
-			
 			if (color.a == 0)
 				return;
 

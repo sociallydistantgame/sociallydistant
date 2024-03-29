@@ -6,6 +6,8 @@ namespace Shell.Windowing
 		ITabbedContent, 
 		IWorkspaceDefinition
 	{
+		bool ShowNewTab { get; set; }
+		
 		void Hide();
 		void Show();
 	}

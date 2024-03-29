@@ -25,7 +25,8 @@ namespace UI.Terminal.SimpleTerminal
         private CSIEscape csiescseq = new CSIEscape();
         private readonly List<string> completions = new List<string>();
         private readonly ConcurrentQueue<ConsoleInputData> pendingKeys = new ConcurrentQueue<ConsoleInputData>();
-
+        private readonly RepeatableCancellationToken token;
+        
         private int prevLineCount;
         private StringBuilder line = new StringBuilder();
         private int cursor;
@@ -61,10 +62,11 @@ namespace UI.Terminal.SimpleTerminal
             return data;
         }
 
-        public SimpleTerminalSession(SimpleTerminal term, PseudoTerminal pty)
+        public SimpleTerminalSession(SimpleTerminal term, PseudoTerminal pty, RepeatableCancellationToken token)
         {
             this.term = term;
             this.pty = pty;
+            this.token = token;
         }
 
         private void HandleLeftArrow()
@@ -106,11 +108,20 @@ namespace UI.Terminal.SimpleTerminal
                 text = text.Replace("\r\n", "\n").Replace("\n", Environment.NewLine);
             }*/
 
+            token.ThrowIfCancellationRequested();
+            
             if (string.IsNullOrEmpty(text))
                 return;
 
             byte[] bytes = Encoding.UTF8.GetBytes(text);
             this.pty.Write(bytes, 0, bytes.Length);
+        }
+
+        /// <inheritdoc />
+        public string WindowTitle
+        {
+            get => this.term.WindowTitle;
+            set => this.term.WindowTitle = value;
         }
 
         /// <inheritdoc />
@@ -127,6 +138,8 @@ namespace UI.Terminal.SimpleTerminal
 
         private int PtyRead()
         {
+            token.ThrowIfCancellationRequested();
+            
             var ret = 0;
             var written = 0;
 

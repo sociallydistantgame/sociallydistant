@@ -1,12 +1,11 @@
 ﻿#nullable enable
-
 using System.Threading.Tasks;
 using OS.Devices;
 
 namespace Core.Scripting
 {
-	public interface IScriptCommand
+	public interface IScriptFunction
 	{
-		Task ExecuteAsync(IScriptExecutionContext context, ITextConsole console, string name, string[] args);
+		Task<int> ExecuteAsync(string name, string[] args, ITextConsole console, IScriptExecutionContext callSite);
 	}
 }

@@ -1,4 +1,5 @@
 ﻿#nullable enable
+using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 using Core.Scripting.Instructions;
@@ -10,7 +11,7 @@ namespace Core.Scripting.Parsing
 	{
 		private readonly IScriptExecutionContext underlyingContext;
 		private readonly Dictionary<string, string> localVariables = new Dictionary<string, string>();
-		private readonly Dictionary<string, ScriptFunction> functions = new Dictionary<string, ScriptFunction>();
+		private readonly Dictionary<string, IScriptFunction> functions = new Dictionary<string, IScriptFunction>();
 		private readonly Stack<FunctionFrame> functionFrames = new Stack<FunctionFrame>();
 		private readonly bool leakVariables;
 
@@ -21,6 +22,9 @@ namespace Core.Scripting.Parsing
 			this.underlyingContext = underlyingContext;
 			this.leakVariables = leakVariables;
 		}
+
+		/// <inheritdoc />
+		public string Title => this.underlyingContext.Title;
 
 		/// <inheritdoc />
 		public string GetVariableValue(string variableName)
@@ -52,7 +56,7 @@ namespace Core.Scripting.Parsing
 			callSite ??= this;
 			
 			// Always try functions first.
-			if (functions.TryGetValue(name, out ScriptFunction function))
+			if (functions.TryGetValue(name, out IScriptFunction function))
 			{
 				functionFrames.Push(new FunctionFrame());
 				
@@ -63,7 +67,7 @@ namespace Core.Scripting.Parsing
 				for (var i = 0; i < args.Length; i++)
 					CurrentFrame?.SetVariableValue(i.ToString(), args[i]);
 				
-				int result = await function.ExecuteAsync(name, args, console);
+				int result = await function.ExecuteAsync(name, args, console, callSite);
 
 				functionFrames.Pop();
 				
@@ -82,12 +86,16 @@ namespace Core.Scripting.Parsing
 		/// <inheritdoc />
 		public void HandleCommandNotFound(string name, ITextConsole console)
 		{
+			if (name == "start")
+				throw new InvalidOperationException("Could not find mission start function! Cannot start the mission.");
+			
 			underlyingContext.HandleCommandNotFound(name, console);
 		}
 
-		public void DeclareFunction(string functionName, ShellInstruction body)
+		/// <inheritdoc />
+		public void DeclareFunction(string name, IScriptFunction body)
 		{
-			functions[functionName] = new ScriptFunction(body);
+			this.functions[name] = body;
 		}
 	}
 

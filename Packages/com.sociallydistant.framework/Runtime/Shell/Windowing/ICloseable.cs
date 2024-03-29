@@ -2,7 +2,7 @@
 {
 	public interface ICloseable
 	{
-		bool CanClose { get; }
+		bool CanClose { get; set; }
 		
 		void Close();
 		void ForceClose();

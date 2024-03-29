@@ -8,12 +8,12 @@ namespace UI.Windowing
 {
 	public class OverlayWorkspace : IWorkspaceDefinition
 	{
-		private readonly GameObject go;
+		private readonly UguiOverlay go;
 		private readonly UguiWorkspaceDefinition workspace;
 
 		public event Action? Closed;
 		
-		public OverlayWorkspace(GameObject go, UguiWorkspaceDefinition workspace)
+		public OverlayWorkspace(UguiOverlay go, UguiWorkspaceDefinition workspace)
 		{
 			this.go = go;
 			this.workspace = workspace;
@@ -25,7 +25,7 @@ namespace UI.Windowing
 				WindowList[0].Close();
 
 			Closed?.Invoke();
-			UnityEngine.Object.Destroy(go);
+			go.Close();
 		}
 		
 		/// <inheritdoc />

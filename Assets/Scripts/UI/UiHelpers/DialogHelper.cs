@@ -95,10 +95,12 @@ namespace UI.UiHelpers
 					case MessageDialogResult.Yes:
 						callback?.Invoke(true);
 						break;
-					default:
 					case MessageDialogResult.No:
 						callback?.Invoke(false);
 						return;
+					default:
+						callback?.Invoke(null);
+						break;
 				}
 			}
 		}

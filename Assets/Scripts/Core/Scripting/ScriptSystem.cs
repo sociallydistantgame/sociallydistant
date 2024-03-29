@@ -2,7 +2,9 @@
 
 using System.Collections.Generic;
 using System.Threading.Tasks;
+using GamePlatform;
 using Modules;
+using OS.Devices;
 using UnityEngine;
 
 namespace Core.Scripting
@@ -17,7 +19,19 @@ namespace Core.Scripting
 		{
 			this.game = game;
 		}
-		
+
+		/// <inheritdoc />
+		public async Task RunCommandAsync(string name, string[] args, IScriptExecutionContext context, ITextConsole? console = null)
+		{
+			if (!globalCommands.TryGetValue(name, out IScriptCommand? command))
+				return;
+
+			if (command == null)
+				return;
+
+			await command.ExecuteAsync(context, console ?? new UnityTextConsole(), name, args);
+		}
+
 		/// <inheritdoc />
 		public async Task RunHookAsync(string hookName)
 		{

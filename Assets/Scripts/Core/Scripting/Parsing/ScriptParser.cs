@@ -116,8 +116,7 @@ namespace Core.Scripting.Parsing
 				switch (tokenView.Current.Text)
 				{
 					case "function":
-						await ParseFunction(tokenView);
-						return await ParseInstruction(tokenView);
+						return await ParseFunction(tokenView, true);
 					case "if":
 						return await ParseIfStatement(tokenView);
 					case "while":
@@ -130,10 +129,7 @@ namespace Core.Scripting.Parsing
 			
 			// Special case: You can have functions without the "function" keyword. Because of course you can.
 			if (tokenView.Current.TokenType == ShellTokenType.Text && tokenView.Next?.TokenType == ShellTokenType.OpenParen)
-			{
-				await ParseFunction(tokenView);
-				return await ParseInstruction(tokenView);
-			}
+				return await ParseFunction(tokenView, false);
 			
 			return await ParseLogicalAnd(tokenView);
 		}
@@ -316,15 +312,19 @@ namespace Core.Scripting.Parsing
 			return new SingleInstruction(commandData);
 		}
 		
-		private async Task ParseFunction(ArrayView<ShellToken> tokenView)
+		private async Task<ShellInstruction?> ParseFunction(ArrayView<ShellToken> tokenView, bool requireFunctionKeyword)
 		{
 			if (tokenView.Current.TokenType != ShellTokenType.Text)
-				return;
+				return null;
 
-			if (tokenView.Current.Text != "function")
-				return;
-
-			tokenView.Advance();
+			if (requireFunctionKeyword)
+			{
+				if (tokenView.Current.Text != "function")
+					return null;
+				
+				tokenView.Advance();
+			}
+			
 			SkipWhiteSpace(tokenView, false);
 
 			if (tokenView.EndOfArray || tokenView.Current.TokenType != ShellTokenType.Text)
@@ -339,7 +339,7 @@ namespace Core.Scripting.Parsing
 
 			ShellInstruction block = await ParseBlock(tokenView);
 
-			CurrentScope.DeclareFunction(functionName, block);
+			return new FunctionDeclaration(functionName, block);
 		}
 		
 		private async Task<ShellInstruction> ParseBlock(ArrayView<ShellToken> tokenView)

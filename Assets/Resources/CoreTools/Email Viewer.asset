@@ -14,8 +14,13 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   binaryName: mailbox
   windowTitle: Email
-  programGuiPrefab: {fileID: 536731253686827546, guid: cbfa175b53c5a7d44a0088de659735be, type: 3}
+  programGuiPrefab: {fileID: 9194160542938903524, guid: c8c3143fcf7f686419f7f4133a71d12a, type: 3}
   programIcon:
     textIcon: \ue0be
     spriteIcon: {fileID: 0}
-    iconColor: {r: 1, g: 1, b: 1, a: 1}
+    iconColor:
+      name: 0
+      r: 1
+      g: 1
+      b: 1
+      a: 1

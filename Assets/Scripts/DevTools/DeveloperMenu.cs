@@ -11,6 +11,8 @@ using UnityEngine;
 using UnityEngine.InputSystem;
 using UnityExtensions;
 using DevTools.Social;
+using GameplaySystems.Missions;
+using GameplaySystems.Social;
 
 namespace DevTools
 {
@@ -27,6 +29,12 @@ namespace DevTools
 		[SerializeField]
 		private WorldManagerHolder world = null!;
 
+		[SerializeField]
+		private SocialServiceHolder socialServiceHolder = null!;
+
+		[SerializeField]
+		private MissionManagerHolder missionManager = null!;
+		
 		[SerializeField]
 		private DeviceCoordinator deviceCoordinator = null!;
 		
@@ -51,12 +59,15 @@ namespace DevTools
 
 		private void Start()
 		{
-			menus.Insert(0, new GameManagerDebug(gameManager));
-			menus.Insert(1, new NetworldDebug(world.Value, networkSimulation.Value, playerInstance));
-			menus.Insert(2, new GodModeMenu(deviceCoordinator, playerInstance));
-			menus.Insert(3, new HackablesMenu(world));
-			menus.Insert(4, new SocialDebug(world));
-			menus.Insert(5, new GuiToolsMenu(playerInstance));
+			menus.Insert(0, new UriRunnerMenu(gameManager));
+			menus.Insert(1, new GameManagerDebug(gameManager));
+			menus.Insert(2, new NetworldDebug(world.Value, networkSimulation.Value, playerInstance));
+			menus.Insert(3, new GodModeMenu(deviceCoordinator, playerInstance));
+			menus.Insert(4, new HackablesMenu(world));
+			menus.Insert(5, new SocialDebug(world));
+			menus.Insert(6, new GuiToolsMenu(playerInstance));
+			menus.Insert(7, new EmailMenu(this.world, this.socialServiceHolder));
+			menus.Insert(8, new MissionDebug(this.world, this.missionManager, this.gameManager));
 			
 
 			overlay = new Texture2D(1, 1);

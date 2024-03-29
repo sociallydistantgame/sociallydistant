@@ -52,6 +52,7 @@ namespace UI.Applications.WebBrowser
 		private void Awake()
 		{
 			this.AssertAllFieldsAreSerialized(typeof(WebBrowserController));
+			NavigateTo(homepage, null, false);
 		}
 
 		private void Start()
@@ -61,8 +62,6 @@ namespace UI.Applications.WebBrowser
 			homeButton.onClick.AddListener(GoHome);
 			navigateButton.onClick.AddListener(Navigate);
 			addressBar.onSubmit.AddListener(NavigateTo);
-
-			NavigateTo(homepage, null, false);
 		}
 
 		private void OnDestroy()
@@ -131,12 +130,18 @@ namespace UI.Applications.WebBrowser
 			NavigateTo(addressBar.text);
 		}
 
+		public void Navigate(Uri uri)
+		{
+			addressBar.SetTextWithoutNotify(uri.ToString());
+			Navigate();
+		}
+		
 		private bool ParseUrl(string text, out Uri uri)
 		{
-			if (text.StartsWith("http://") || text.StartsWith("https://"))
+			if (text.StartsWith("web://"))
 				return Uri.TryCreate(text, UriKind.Absolute, out uri);
 			
-            return Uri.TryCreate("https://" + text, UriKind.Absolute, out uri);
+            return Uri.TryCreate("web://" + text, UriKind.Absolute, out uri);
 		}
 
 		private void NavigateTo(string urlOrSearchQuery)

@@ -4,11 +4,13 @@ using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
 using Architecture;
+using Core;
 using Core.Config;
 using Core.Config.SystemConfigCategories;
 using Core.Scripting;
 using Core.Scripting.GlobalCommands;
 using GamePlatform.ContentManagement;
+using GameplaySystems.Missions;
 using GameplaySystems.WebPages;
 using Modules;
 using Shell;
@@ -25,7 +27,8 @@ namespace Modding
 	public class SystemModule : GameModule
 	{
 		private static SystemModule? currentSystemModule;
-		
+
+		private readonly MissionScriptLocator missionScriptLocator = new();
 		private readonly WebSiteContentManager websites = new();
 		private readonly IHookListener debugWorldHook = new DebugWorldHook();
 		private GraphicsSettings? graphicsSettings;
@@ -67,6 +70,9 @@ namespace Modding
 			// Websites
 			Context.ContentManager.AddContentSource(websites);
 
+			// missions
+			Context.ContentManager.AddContentSource(missionScriptLocator);
+			
 			// Find Restitched save data. If we do, the player gets a little gift from the lead programmer of the game - who.......created this game as well? <3
 			// FindRestitchedDataAndRegisterRestitchedContent();
 			
@@ -77,11 +83,25 @@ namespace Modding
 		}
 
 		/// <inheritdoc />
+		public override void OnGameModeChanged(GameMode gameMode)
+		{
+			var uriBuilder = new UriBuilder
+			{
+				Scheme = "shell",
+				Host = "tool",
+				Path = "/mailbox"
+			};
+			
+			base.OnGameModeChanged(gameMode);
+		}
+
+		/// <inheritdoc />
 		protected override async Task OnShutdown()
 		{
 			UnregisterHooks();
 			UnregisterGlobalCommands();
-			
+
+			Context.ContentManager.RemoveContentSource(missionScriptLocator);
 			Context.ContentManager.RemoveContentSource(websites);
 			
 			if (graphicsSettings != null)

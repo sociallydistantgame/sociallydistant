@@ -28,6 +28,8 @@ namespace Modules
 		/// </summary>
 		string? CurrentSaveDataDirectory { get; }
 		
+		IUriManager UriManager { get; }
+		
 		/// <summary>
 		///		Gets a reference to the player kernel.
 		/// </summary>
@@ -67,5 +69,7 @@ namespace Modules
 		Task EndCurrentGame(bool save);
 		
 		bool IsDebugWorld { get; }
+
+		void SetPlayerHostname(string hostname);
 	}
 }

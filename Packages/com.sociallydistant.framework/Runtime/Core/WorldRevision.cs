@@ -17,7 +17,13 @@
 		LocalNetworkNarrativeIds = 12,
 		PublicIpsStoredInSave = 13,
 		PlayerIpStoredInSave = 14,
+		Email = 15,
+		NarrativeProfiles = 16,
+		ChangeLogs = 17,
+		MailTypes = 18,
+		CompletedMissions = 19,
 
+		
 		Latest
 	}
 }

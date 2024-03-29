@@ -13,6 +13,7 @@ GameObject:
   - component: {fileID: 7671064977219092891}
   - component: {fileID: 4568074890834569877}
   - component: {fileID: 158256451796275211}
+  - component: {fileID: 5625097932911950707}
   m_Layer: 5
   m_Name: Login Screen
   m_TagString: Untagged
@@ -132,6 +133,19 @@ MonoBehaviour:
   displayName: {fileID: 4331308014762340726}
   usernameText: {fileID: 6925319398073238039}
   userSettingsWindowPrefab: {fileID: 3513057853783407201, guid: 077ebc506712bcfb298c71a57e856373, type: 3}
+--- !u!114 &5625097932911950707
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 382556335856030820}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 7db550bd52394ced8f3952cfb1563d17, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  gameManagerHolder: {fileID: 11400000, guid: 872374c25807361459f4e174bb460b2c, type: 2}
 --- !u!1 &504644160905844590
 GameObject:
   m_ObjectHideFlags: 0
