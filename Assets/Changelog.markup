@@ -1,1 +1,57 @@
-﻿Changelog text goes here
+﻿<b>Welcome to Socially Distant 24.04-indev!</b>
+
+This is a development build of the game, for internal use only.
+
+This build brings many performance improvements, quality-of-life changes, and even some foundational gameplay work to the game.
+
+<u>Changelog:</u>
+
+ - Update version string
+ - Slightly optimize terminal resize detection
+ - Add support for thread-safe Terminal rendering
+ - Remove old/stale code from terminal emulator
+ - Move terminal emulation code to a separate thread
+ - Add support for cancelling Terminal programs with CTRL+C
+ - Add support for window hints
+ - Add support for terminal background blur
+ - Add settings listeners for reacting to settings changes in the UI
+ - Add accessibility toggle for disabling terminal background blur
+ - Use background blur for window overlays
+ - Render all UI to the main camera
+ - Fix layer ordering of UI top-levels
+ - Add support for bloom
+ - Add support for turning off bloom in Settings
+ - Add LeanTween
+ - Fix window dragging
+ - Fix terminal selection dragging
+ - Remove the lost souls of the damned
+ - Use file chooser driver's path combine implementation instead of .NET's
+ - Fix tab windows not closing when all of their tabs are closed
+ - Fix issue where closing the only opened Terminal tab prevents new terminals from being opened.
+ - Add support for opening multiple Terminal tabs
+ - Fix YesNoCancel dialog boxes reporting a result of No when clicking Cancel
+ - Add support for changing terminal titles
+ - Limit titles of window tabs to one line
+ - Use WindowTitle console API to show status of running nmap scans
+ - Add support for changing player hostname via /etc/hostname
+ - Add support for reading Unity log in-game via dmesg command
+ - Add email viewer
+ - Add support for game changelog emails
+ - Fix Delete Account confirmation appearing behind the User Info overlay and being uninteractible
+ - Add support for importing mission scripts
+ - Allow mission scripts to be loaded by the System Module
+ - Add support for starting missions via emails
+ - Add support for script function libraries
+ - Add support for text links in Acidic UI
+ - Add support for performing shell URI navigations via mission script
+ - Add support for opening web URIs in Web Browser
+ - Fix browser links not actually opening when opening browser for the first time
+ - Add support for starting/stopping missions with mission URIs
+ - Add support for visually styling links
+ - Fix handling of newlines in ShellScriptImporter
+ - Fix window tab list not updating when a tab gets closed
+ - Add support for visually closing window tabs
+ - Fix occasional corruption when outputting text to Terminal
+ - Fix selection word snapping corrupting text in Terminal
+ - Improve handling of double/triple-click in Terminal
+
