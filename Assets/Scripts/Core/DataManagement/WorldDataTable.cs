@@ -9,7 +9,7 @@ namespace Core.DataManagement
 		where TDataElement : struct, IWorldData, IDataWithId
 	{
 		/// <inheritdoc />
-		public WorldDataTable(UniqueIntGenerator instanceIdgenerator, DataEventDispatcher eventDispatcher) : base(instanceIdgenerator, eventDispatcher)
+		public WorldDataTable(UniqueIntGenerator instanceIdgenerator, DataEventDispatcher eventDispatcher, bool dispatchOnSerialize = true) : base(instanceIdgenerator, eventDispatcher, dispatchOnSerialize)
 		{ }
 	}
 }

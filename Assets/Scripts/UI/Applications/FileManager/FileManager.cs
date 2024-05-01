@@ -120,7 +120,7 @@ namespace UI.Applications.FileManager
 			this.filesGrid.SetFiles(allEntries);
 		}
 
-		private void OnFileClicked(string path)
+		private async void OnFileClicked(string path)
 		{
 			if (vfs.DirectoryExists(path))
 				GoTo(path);
@@ -130,11 +130,12 @@ namespace UI.Applications.FileManager
 			}
 			else if (vfs.FileExists(path))
 			{
-				ISystemProcess? fileProcess = fileAssociations.OpenFile(this.process, path);
+				ISystemProcess? fileProcess = await fileAssociations.OpenFile(this.process, path);
 				if (fileProcess != null)
 					return;
 
 				dialogHelper.ShowMessage(
+					MessageBoxType.Error,
 					"Cannot open file",
 					$"Cannot open the file '{path}' because you do not have any programs installed that can open it.",
 					this.window.Window,

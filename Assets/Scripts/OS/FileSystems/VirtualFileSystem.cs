@@ -6,6 +6,7 @@ using System.Linq;
 using Core;
 using OS.Devices;
 using Utility;
+using System.Threading.Tasks;
 
 namespace OS.FileSystems
 {
@@ -225,7 +226,7 @@ namespace OS.FileSystems
 			return file.CanExecute;
 		}
 		
-		public ISystemProcess Execute(ISystemProcess parentProcess, string path, ITextConsole console, string[] arguments)
+		public async Task<ISystemProcess> Execute(ISystemProcess parentProcess, string path, ITextConsole console, string[] arguments)
 		{
 			string[] parts = PathUtility.Split(path);
 			IFileEntry? file = FindFileEntry(parts, parentProcess.User);
@@ -233,7 +234,7 @@ namespace OS.FileSystems
 			if (file == null)
 				throw new FileNotFoundException();
 
-			ISystemProcess fork = parentProcess.Fork();
+			ISystemProcess fork = await parentProcess.Fork();
 			if (!file.TryExecute(fork, console, arguments))
 			{
 				fork.Kill();

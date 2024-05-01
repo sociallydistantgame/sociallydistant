@@ -8,18 +8,20 @@ using System.Threading.Tasks;
 using Architecture;
 using Core;
 using Core.Scripting;
+using Core.Scripting.Instructions;
 using GamePlatform;
 using OS.Devices;
 using UnityEngine;
 using Missions;
 using Social;
-using UnityEditor.Rendering;
+using UI.Shell;
 
 namespace GameplaySystems.Missions
 {
 	public class MissionScriptAsset : 
 		ScriptableObject,
-		IMission
+		IMission,
+		ICachedScript
 	{
 		[SerializeField]
 		private string missionName = string.Empty;
@@ -45,6 +47,12 @@ namespace GameplaySystems.Missions
 		[TextArea]
 		[SerializeField]
 		private string scriptText = string.Empty;
+
+		[NonSerialized]
+		private ShellInstruction? startTree;
+
+		[NonSerialized]
+		private ShellInstruction? emailTree;
 		
 		#if UNITY_EDITOR
 		public void SetScriptText(string text)
@@ -223,6 +231,9 @@ namespace GameplaySystems.Missions
 		/// <inheritdoc />
 		public async Task<string> GetBriefingText(IProfile playerProfile)
 		{
+			if (this.emailTree == null)
+				await this.RebuildScriptTree();
+			
 			var stringConsole = new StringConsole();
 
 			var scriptContext = new UserScriptExecutionContext();
@@ -231,13 +242,9 @@ namespace GameplaySystems.Missions
 			scriptContext.SetVariableValue("PLAYER_USERNAME", playerProfile.ChatUsername);
 			
 			var shell = new InteractiveShell(scriptContext);
-
-			var script = new StringBuilder();
-			script.AppendLine(this.scriptText);
-			script.AppendLine("email");
 			
 			shell.Setup(stringConsole);
-			await shell.RunScript(script.ToString());
+			await shell.RunParsedScript(emailTree);
 			
 			return stringConsole.GetText();
 		}
@@ -245,20 +252,49 @@ namespace GameplaySystems.Missions
 		/// <inheritdoc />
 		public async Task StartMission(IMissionController missionController, CancellationToken cancellationToken)
 		{
+			if (this.startTree == null)
+				await RebuildScriptTree();
+			
 			var scriptContext = new MissionScriptContext(missionController, this);
 			var console = new UnityTextConsole();
 			var shell = new InteractiveShell(scriptContext);
-
-			var scriptBuilder = new StringBuilder(this.scriptText);
-			scriptBuilder.AppendLine("start");
 			
 			// TODO: Allow the script to be cancelled via mission abandonment token
 			missionController.DisableAbandonment();
 			
 			shell.Setup(console);
-			await shell.RunScript(scriptBuilder.ToString());
+			await shell.RunParsedScript(startTree);
 			
 			missionController.EnableAbandonment();
+		}
+
+		/// <inheritdoc />
+		public async Task RebuildScriptTree()
+		{
+			var context = new UserScriptExecutionContext();
+			var console = new UnityTextConsole();
+			var shell = new InteractiveShell(context);
+			
+			shell.Setup(console);
+
+			ShellInstruction primaryTree = await shell.ParseScript(this.scriptText);
+
+			this.startTree = CreateStartTree(primaryTree, "start");
+			this.emailTree = CreateStartTree(primaryTree, "email");
+		}
+
+		private ShellInstruction CreateStartTree(ShellInstruction primaryTree, string entrypoint)
+		{
+			var instructionList = new List<ShellInstruction>();
+			instructionList.Add(primaryTree);
+
+			var nameEvaulator = new TextArgumentEvaluator(entrypoint);
+			var command = new CommandData(null, nameEvaulator, Enumerable.Empty<IArgumentEvaluator>(), FileRedirectionType.None, null);
+			var single = new SingleInstruction(command);
+			
+			instructionList.Add(single);
+
+			return new SequentialInstruction(instructionList);
 		}
 	}
 }

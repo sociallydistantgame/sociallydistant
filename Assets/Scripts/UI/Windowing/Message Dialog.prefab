@@ -12,7 +12,6 @@ GameObject:
   - component: {fileID: 968370839800509669}
   - component: {fileID: 83979407045804883}
   - component: {fileID: 3687316460796897603}
-  - component: {fileID: 1233174390305829261}
   m_Layer: 5
   m_Name: Message Dialog
   m_TagString: Untagged
@@ -80,7 +79,9 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   infoBoxController: {fileID: 3525700772477604915}
-  popupSound: {fileID: 11400000, guid: 99b8cc63f5ebd664882705820d900507, type: 2}
+  popupSound: {fileID: 11400000, guid: c964c5b860e1b1947be472f9cd691c8c, type: 2}
+  errorPopupSound: {fileID: 11400000, guid: e0e3cb501595b554dabe059fcf1e793a, type: 2}
+  warningSound: {fileID: 11400000, guid: 98f359ac96e9dd3419654063d2cd2765, type: 2}
 --- !u!114 &3687316460796897603
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -101,18 +102,6 @@ MonoBehaviour:
   m_FlexibleWidth: -1
   m_FlexibleHeight: -1
   m_LayoutPriority: 1
---- !u!114 &1233174390305829261
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 7625877657390983908}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 0fbc272f4694434a9f2819136c9cdd4c, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
 --- !u!1001 &7410815036643661214
 PrefabInstance:
   m_ObjectHideFlags: 0

@@ -704,7 +704,6 @@ GameObject:
   - component: {fileID: 919731115130871124}
   - component: {fileID: 2573100427027408976}
   - component: {fileID: 5480041515678909738}
-  - component: {fileID: 7747416177515738844}
   - component: {fileID: 3965583899647949417}
   m_Layer: 5
   m_Name: Footer
@@ -774,22 +773,6 @@ MonoBehaviour:
   m_FillOrigin: 0
   m_UseSpriteMesh: 0
   m_PixelsPerUnitMultiplier: 1
---- !u!114 &7747416177515738844
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 7085400489643275626}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 7b222ca6429fd3146a0f51ad94ee67f9, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  graphicColor: 4
-  useCustomColor: 0
-  customLightColor: {r: 0, g: 0, b: 0, a: 0}
-  customDarkColor: {r: 0, g: 0, b: 0, a: 0}
 --- !u!114 &3965583899647949417
 MonoBehaviour:
   m_ObjectHideFlags: 0

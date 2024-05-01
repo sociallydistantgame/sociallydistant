@@ -10,12 +10,14 @@ namespace UI.PlayerUI
 	public sealed class PostProcessSettingsListener : SettingsListener
 	{
 		private PostProcessVolume volume = null!;
+		private GlitchMaster glitchMaster; // 7
 		
 		/// <inheritdoc />
 		protected override void Awake()
 		{
 			base.Awake();
 			this.MustGetComponent(out volume);
+			this.MustGetComponent(out glitchMaster);
 		}
 
 		/// <inheritdoc />
@@ -23,6 +25,8 @@ namespace UI.PlayerUI
 		{
 			var graphicsSettings = new GraphicsSettings(settingsManager);
 
+			glitchMaster.AllowGlitchBands = graphicsSettings.EnableXorgGlitches;
+			
 			if (volume.profile.TryGetSettings(out Bloom bloom))
 			{
 				bloom.enabled.value = graphicsSettings.BloomEffect;

@@ -2,6 +2,7 @@
 using System.Linq;
 using System.Threading.Tasks;
 using Architecture;
+using Shell.Windowing;
 using UI.UiHelpers;
 using UnityEngine;
 using UnityEngine.UI;
@@ -61,6 +62,7 @@ namespace UI.CharacterCreator
 			var source = new TaskCompletionSource<bool>();
 
 			dialogHelper.AskQuestion(
+				MessageBoxType.Warning,
 				"Confirm Lifepath Choice",
 				"Are you sure you want to continue with this Lifepath? You will not be able to change it later during this playthrough.",
 				null,

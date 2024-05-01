@@ -4,6 +4,7 @@ using System.Collections.Generic;
 using Core;
 using Core.DataManagement;
 using Core.WorldData.Data;
+using GamePlatform;
 using GameplaySystems.NonPlayerComputers;
 using Player;
 using UnityEngine;
@@ -14,23 +15,24 @@ namespace GameplaySystems.Networld
 {
 	public class NetworkEventListener : MonoBehaviour
 	{
-		private readonly Dictionary<ObjectId, InternetServiceProvider> isps = new Dictionary<ObjectId, InternetServiceProvider>();
-		private readonly Dictionary<ObjectId, LocalAreaNetwork> lans = new Dictionary<ObjectId, LocalAreaNetwork>();
-		private readonly Dictionary<ObjectId, ForwardingTableEntry> portForwardEntries = new Dictionary<ObjectId, ForwardingTableEntry>();
-		private NonPlayerComputerEventListener npcComputers = null!;
-
 		[Header("Dependencies")]
 		[SerializeField]
 		private PlayerInstanceHolder playerInstance = null!;
 		
 		[SerializeField]
-		private WorldManagerHolder world = null!;
-
-		[SerializeField]
 		private NetworkSimulationHolder simulation = null!;
 
+		private readonly Dictionary<ObjectId, InternetServiceProvider> isps = new Dictionary<ObjectId, InternetServiceProvider>();
+		private readonly Dictionary<ObjectId, LocalAreaNetwork> lans = new Dictionary<ObjectId, LocalAreaNetwork>();
+		private readonly Dictionary<ObjectId, ForwardingTableEntry> portForwardEntries = new Dictionary<ObjectId, ForwardingTableEntry>();
+		private NonPlayerComputerEventListener npcComputers = null!;
+		private IWorldManager world = null!;
+
+		
 		private void Awake()
 		{
+			world = GameManager.Instance.WorldManager;
+			
 			this.AssertAllFieldsAreSerialized(typeof(NetworkEventListener));
 		}
 
@@ -48,23 +50,23 @@ namespace GameplaySystems.Networld
 
 		private void InstallEvents()
 		{
-			world.Value.Callbacks.AddCreateCallback<WorldInternetServiceProviderData>(OnCreateIsp);
-			world.Value.Callbacks.AddDeleteCallback<WorldInternetServiceProviderData>(OnDeleteIsp);
-			world.Value.Callbacks.AddModifyCallback<WorldInternetServiceProviderData>(OnModifyIsp);
+			world.Callbacks.AddCreateCallback<WorldInternetServiceProviderData>(OnCreateIsp);
+			world.Callbacks.AddDeleteCallback<WorldInternetServiceProviderData>(OnDeleteIsp);
+			world.Callbacks.AddModifyCallback<WorldInternetServiceProviderData>(OnModifyIsp);
 			
-			world.Value.Callbacks.AddCreateCallback<WorldLocalNetworkData>(OnCreateLAN);
-			world.Value.Callbacks.AddDeleteCallback<WorldLocalNetworkData>(OnDeleteLan);
-			world.Value.Callbacks.AddModifyCallback<WorldLocalNetworkData>(OnModifyLan);
+			world.Callbacks.AddCreateCallback<WorldLocalNetworkData>(OnCreateLAN);
+			world.Callbacks.AddDeleteCallback<WorldLocalNetworkData>(OnDeleteLan);
+			world.Callbacks.AddModifyCallback<WorldLocalNetworkData>(OnModifyLan);
 			
-			world.Value.Callbacks.AddCreateCallback<WorldNetworkConnection>(OnCreateConnection);
-			world.Value.Callbacks.AddDeleteCallback<WorldNetworkConnection>(OnDeleteConnection);
-			world.Value.Callbacks.AddModifyCallback<WorldNetworkConnection>(OnModifyConnection);
+			world.Callbacks.AddCreateCallback<WorldNetworkConnection>(OnCreateConnection);
+			world.Callbacks.AddDeleteCallback<WorldNetworkConnection>(OnDeleteConnection);
+			world.Callbacks.AddModifyCallback<WorldNetworkConnection>(OnModifyConnection);
 			
-			world.Value.Callbacks.AddModifyCallback<WorldPlayerData>(OnPlayerDataModified);
+			world.Callbacks.AddModifyCallback<WorldPlayerData>(OnPlayerDataModified);
 
-			world.Value.Callbacks.AddCreateCallback<WorldPortForwardingRule>(OnCreatePortForwardingRule);
-			world.Value.Callbacks.AddModifyCallback<WorldPortForwardingRule>(OnModifyPortForwardingRule);
-			world.Value.Callbacks.AddDeleteCallback<WorldPortForwardingRule>(OnDeletePortForwardingRule);
+			world.Callbacks.AddCreateCallback<WorldPortForwardingRule>(OnCreatePortForwardingRule);
+			world.Callbacks.AddModifyCallback<WorldPortForwardingRule>(OnModifyPortForwardingRule);
+			world.Callbacks.AddDeleteCallback<WorldPortForwardingRule>(OnDeletePortForwardingRule);
 		}
 
 		
@@ -86,23 +88,23 @@ namespace GameplaySystems.Networld
 
 		private void UninstallEvents()
 		{
-			world.Value.Callbacks.RemoveCreateCallback<WorldInternetServiceProviderData>(OnCreateIsp);
-			world.Value.Callbacks.RemoveDeleteCallback<WorldInternetServiceProviderData>(OnDeleteIsp);
-			world.Value.Callbacks.RemoveModifyCallback<WorldInternetServiceProviderData>(OnModifyIsp);
+			world.Callbacks.RemoveCreateCallback<WorldInternetServiceProviderData>(OnCreateIsp);
+			world.Callbacks.RemoveDeleteCallback<WorldInternetServiceProviderData>(OnDeleteIsp);
+			world.Callbacks.RemoveModifyCallback<WorldInternetServiceProviderData>(OnModifyIsp);
 			
-			world.Value.Callbacks.RemoveCreateCallback<WorldLocalNetworkData>(OnCreateLAN);
-			world.Value.Callbacks.RemoveDeleteCallback<WorldLocalNetworkData>(OnDeleteLan);
-			world.Value.Callbacks.RemoveModifyCallback<WorldLocalNetworkData>(OnModifyLan);
+			world.Callbacks.RemoveCreateCallback<WorldLocalNetworkData>(OnCreateLAN);
+			world.Callbacks.RemoveDeleteCallback<WorldLocalNetworkData>(OnDeleteLan);
+			world.Callbacks.RemoveModifyCallback<WorldLocalNetworkData>(OnModifyLan);
 			
-			world.Value.Callbacks.RemoveCreateCallback<WorldNetworkConnection>(OnCreateConnection);
-			world.Value.Callbacks.RemoveDeleteCallback<WorldNetworkConnection>(OnDeleteConnection);
-			world.Value.Callbacks.RemoveModifyCallback<WorldNetworkConnection>(OnModifyConnection);
+			world.Callbacks.RemoveCreateCallback<WorldNetworkConnection>(OnCreateConnection);
+			world.Callbacks.RemoveDeleteCallback<WorldNetworkConnection>(OnDeleteConnection);
+			world.Callbacks.RemoveModifyCallback<WorldNetworkConnection>(OnModifyConnection);
 			
-			world.Value.Callbacks.RemoveModifyCallback<WorldPlayerData>(OnPlayerDataModified);
+			world.Callbacks.RemoveModifyCallback<WorldPlayerData>(OnPlayerDataModified);
 			
-			world.Value.Callbacks.RemoveCreateCallback<WorldPortForwardingRule>(OnCreatePortForwardingRule);
-			world.Value.Callbacks.RemoveModifyCallback<WorldPortForwardingRule>(OnModifyPortForwardingRule);
-			world.Value.Callbacks.RemoveDeleteCallback<WorldPortForwardingRule>(OnDeletePortForwardingRule);
+			world.Callbacks.RemoveCreateCallback<WorldPortForwardingRule>(OnCreatePortForwardingRule);
+			world.Callbacks.RemoveModifyCallback<WorldPortForwardingRule>(OnModifyPortForwardingRule);
+			world.Callbacks.RemoveDeleteCallback<WorldPortForwardingRule>(OnDeletePortForwardingRule);
 		}
 
 		private void OnDeletePortForwardingRule(WorldPortForwardingRule subject)

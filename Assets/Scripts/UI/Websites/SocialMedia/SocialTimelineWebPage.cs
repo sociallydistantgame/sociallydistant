@@ -90,21 +90,10 @@ namespace UI.Websites.SocialMedia
 			// People who the player follows are prioritized.
 			if (socialService.Value != null)
 			{
-				ListWidget? list = null;
 				foreach (IProfile profile in socialService.Value.GetFollowing(socialService.Value.PlayerProfile))
 				{
-					if (list == null)
-					{
-						list = new ListWidget
-						{
-							AllowSelectNone = true
-						};
-						builder.AddWidget(list, people);
-					}
-					
 					builder.AddWidget(new ListItemWidget<IProfile>
 					{
-						List = list,
 						Data = profile,
 						Title = $"<b>{profile.ChatName}</b>{Environment.NewLine}@{profile.SocialHandle}",
 						Callback = (data) =>

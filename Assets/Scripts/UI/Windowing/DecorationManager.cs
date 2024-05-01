@@ -1,13 +1,21 @@
 ﻿#nullable enable
 using System;
+using Core;
+using Shell;
+using Shell.Windowing;
 using ThisOtherThing.UI.Shapes;
 using UnityEngine;
 using UnityExtensions;
 
 namespace UI.Windowing
 {
-	public sealed class DecorationManager : MonoBehaviour
+	public sealed class DecorationManager : 
+		MonoBehaviour,
+		IColorable
 	{
+		[SerializeField]
+		private CommonColor borderColor = CommonColor.Cyan;
+		
 		[SerializeField]
 		private Rectangle borderRectangle = null!;
 
@@ -33,8 +41,23 @@ namespace UI.Windowing
 
 		private void UpdateDecorations()
 		{
+			this.borderRectangle.ShapeProperties.OutlineColor = this.borderColor.GetColor();
 			this.borderRectangle.ShapeProperties.DrawFill = useClientBackground;
 			this.borderRectangle.ForceMeshUpdate();
+		}
+
+		/// <inheritdoc />
+		public CommonColor Color
+		{
+			get => borderColor;
+			set
+			{
+				if (borderColor == value)
+					return;
+
+				borderColor = value;
+				UpdateDecorations();
+			}
 		}
 	}
 }

@@ -9,7 +9,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 9014129351275461263}
-  - component: {fileID: 8046853758290563660}
+  - component: {fileID: 879510100094342042}
   - component: {fileID: 2677841106806984607}
   m_Layer: 0
   m_Name: Audio
@@ -25,15 +25,15 @@ Transform:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 2546052319872577144}
-  serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
   m_LocalPosition: {x: 0, y: 0, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
   m_Father: {fileID: 0}
+  m_RootOrder: 0
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
---- !u!114 &8046853758290563660
+--- !u!114 &879510100094342042
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -42,10 +42,20 @@ MonoBehaviour:
   m_GameObject: {fileID: 2546052319872577144}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: c58186ab9cfb6e74b9145cb9bbf2b5fe, type: 3}
+  m_Script: {fileID: 11500000, guid: d3c1bd68b45d4e618352cc355f27d213, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  configuration: {fileID: 11400000, guid: 853fe0ebe5e5e4848ba844a0f2e1ddae, type: 2}
+  maximumSoundsAtOnce: 20
+  primaryAudioMixer: {fileID: 24100000, guid: 6b9098331e3ddac4985e792350244d69, type: 2}
+  soundsGroup: {fileID: -7257021110167407072, guid: 6b9098331e3ddac4985e792350244d69, type: 2}
+  guiSoundsGroup: {fileID: -7257021110167407072, guid: 6b9098331e3ddac4985e792350244d69, type: 2}
+  dialogueGrroup: {fileID: 3267067581848305304, guid: 6b9098331e3ddac4985e792350244d69, type: 2}
+  musicGroup: {fileID: 4683937425421628523, guid: 6b9098331e3ddac4985e792350244d69, type: 2}
+  soundsVolumeParameter: GuiVolume
+  guiSoundsVolumeParameter: GuiVolume
+  dialogueVolumeParameter: GuiVolume
+  musicVolumeParameter: MusicVolume
+  guiSounds: {fileID: 0}
 --- !u!114 &2677841106806984607
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -58,4 +68,3 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 2000bcf9c08644c497b2a12a82dec859, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  gameManager: {fileID: 11400000, guid: 872374c25807361459f4e174bb460b2c, type: 2}

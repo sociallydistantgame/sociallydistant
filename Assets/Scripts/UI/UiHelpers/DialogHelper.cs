@@ -4,6 +4,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using GamePlatform;
 using Player;
 using Shell.Windowing;
 using UI.Widgets;
@@ -19,27 +20,27 @@ namespace UI.UiHelpers
 		IWindowCloseBlocker
 	{
 		private readonly List<IMessageDialog> openDialogs = new List<IMessageDialog>();
-
-		[SerializeField]
-		private PlayerInstanceHolder player = null!;
-
+		
+		private GameManager gameManager;
+        
 		public bool AreAnyDialogsOpen => openDialogs.Any();
 		
 		public IFileChooserDriver? FileChooserDriver { get; set; }
 		
 		private void Awake()
 		{
+			gameManager = GameManager.Instance;
 			this.AssertAllFieldsAreSerialized(typeof(DialogHelper));
 		}
 
 		public async Task<string> OpenFile(string title, string directory, string extensionFilter)
 		{
-			OverlayWorkspace overlay = this.player.Value.UiManager.WindowManager.CreateSystemOverlay();
+			OverlayWorkspace overlay = this.gameManager.PlayerInstance.UiManager.WindowManager.CreateSystemOverlay();
 			IWindow win = overlay.CreateFloatingGui(title);
 			if (win is not UguiWindow guiWin)
 				return string.Empty;
 
-			FileChooserWindow chooser = player.Value.UiManager.CreateFileChooser(guiWin);
+			FileChooserWindow chooser = gameManager.PlayerInstance.UiManager.CreateFileChooser(guiWin);
 			chooser.FileChooserType = FileChooserWindow.ChooserType.Open;
 			chooser.Directory = directory;
 			chooser.Filter = extensionFilter;
@@ -53,12 +54,12 @@ namespace UI.UiHelpers
 		
 		public async Task<string> SaveFile(string title, string directory, string extensionFilter)
 		{
-			OverlayWorkspace overlay = this.player.Value.UiManager.WindowManager.CreateSystemOverlay();
+			OverlayWorkspace overlay = this.gameManager.PlayerInstance.UiManager.WindowManager.CreateSystemOverlay();
 			IWindow win = overlay.CreateFloatingGui(title);
 			if (win is not UguiWindow guiWin)
 				return string.Empty;
 
-			FileChooserWindow chooser = player.Value.UiManager.CreateFileChooser(guiWin);
+			FileChooserWindow chooser = gameManager.PlayerInstance.UiManager.CreateFileChooser(guiWin);
 			chooser.FileChooserType = FileChooserWindow.ChooserType.Save;
 			chooser.Directory = directory;
 			chooser.Filter = extensionFilter;
@@ -70,11 +71,12 @@ namespace UI.UiHelpers
 			return result;
 		}
 		
-		public void AskYesNoCancel(string title, string message, IWindow? parentWindow, Action<bool?> callback)
+		public void AskYesNoCancel(MessageBoxType type, string title, string message, IWindow? parentWindow, Action<bool?> callback)
 		{
-			IMessageDialog messageDialog = player.Value.UiManager.WindowManager.CreateMessageDialog(title, parentWindow);
+			IMessageDialog messageDialog = gameManager.PlayerInstance.UiManager.WindowManager.CreateMessageDialog(title, parentWindow);
 			messageDialog.Title = title;
 			messageDialog.Message = message;
+			messageDialog.MessageType = type;
 
 			messageDialog.Buttons.Add("Yes");
 			messageDialog.Buttons.Add("No");
@@ -105,18 +107,19 @@ namespace UI.UiHelpers
 			}
 		}
 
-		public Task<bool> AskQuestionAsync(string title, string message, IWindow? parentWindow = null)
+		public Task<bool> AskQuestionAsync(MessageBoxType type, string title, string message, IWindow? parentWindow = null)
 		{
 			var completionSource = new TaskCompletionSource<bool>();
-			AskQuestion(title, message, parentWindow, completionSource.SetResult);
+			AskQuestion(type, title, message, parentWindow, completionSource.SetResult);
 			return completionSource.Task;
 		}
 		
-		public void AskQuestion(string title, string message, IWindow? parentWindow, Action<bool>? callback)
+		public void AskQuestion(MessageBoxType type, string title, string message, IWindow? parentWindow, Action<bool>? callback)
 		{
-			IMessageDialog messageDialog = player.Value.UiManager.WindowManager.CreateMessageDialog(title, parentWindow);
+			IMessageDialog messageDialog = gameManager.PlayerInstance.UiManager.WindowManager.CreateMessageDialog(title, parentWindow);
 			messageDialog.Title = title;
 			messageDialog.Message = message;
+			messageDialog.MessageType = type;
 
 			messageDialog.Buttons.Add(new MessageBoxButtonData
 			{
@@ -142,11 +145,12 @@ namespace UI.UiHelpers
 			openDialogs.Add(messageDialog);
 		}
 
-		public void ShowMessage(string title, string message, IWindow? parentWindow, Action callback)
+		public void ShowMessage(MessageBoxType type, string title, string message, IWindow? parentWindow, Action callback)
 		{
-			IMessageDialog messageDialog = player.Value.UiManager.WindowManager.CreateMessageDialog(title, parentWindow);
+			IMessageDialog messageDialog = gameManager.PlayerInstance.UiManager.WindowManager.CreateMessageDialog(title, parentWindow);
 			messageDialog.Title = title;
 			messageDialog.Message = message;
+			messageDialog.MessageType = type;
 
 			messageDialog.Buttons.Add("OK");
             

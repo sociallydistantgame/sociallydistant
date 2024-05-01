@@ -1,6 +1,7 @@
 ﻿#nullable enable
 using System;
 using TMPro;
+using UI.Widgets.Settings;
 using UnityEngine;
 using UnityExtensions;
 using UnityEngine.UI;
@@ -23,7 +24,7 @@ namespace UI.Applications.Chat
 		private RectTransform userIconArea = null!;
 
 		[SerializeField]
-		private RawImage userImage = null!;
+		private AvatarWidgetController userImage = null!;
 		
 		private void Awake()
 		{
@@ -39,15 +40,17 @@ namespace UI.Applications.Chat
 			this.channelDescriptionText.SetText(channelDescription);
 		}
 
-		public void DisplayDirectMessage(string displayName, string username, Texture2D userAvatar)
+		public void DisplayDirectMessage(string displayName, string username, Texture2D? userAvatar)
 		{
 			this.userIconArea.gameObject.SetActive(true);
 			this.guildIconArea.gameObject.SetActive(false);
 
-			this.userImage.texture = userAvatar;
+			this.userImage.DefaultAvatarColor = Color.yellow;
+			this.userImage.AvatarTexture = userAvatar;
+			this.userImage.UpdateUI();
 			
 			this.channelTitleText.SetText("Direct messages");
-			this.channelDescriptionText.SetText($"<b>{displayName}</b> @{username}");
+			this.channelDescriptionText.SetText($"<b>{displayName}</b> {username}");
 		}
 	}
 }

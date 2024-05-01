@@ -4,4 +4,9 @@
 	{
 		
 	}
+
+	public interface INarrativeObject
+	{
+		string? NarrativeId { get; set; }
+	}
 }

@@ -13,4 +13,11 @@ namespace Core
 	{
 		
 	}
+
+	public interface INarrativeObjectTable<TDataElement> :
+		IWorldTable<TDataElement>
+		where TDataElement : struct, IWorldData, IDataWithId, INarrativeObject
+	{
+		TDataElement GetNarrativeObject(string narrativeId);
+	}
 }

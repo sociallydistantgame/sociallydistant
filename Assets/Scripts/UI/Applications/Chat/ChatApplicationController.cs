@@ -6,10 +6,14 @@ using System.Linq;
 using AcidicGui.Widgets;
 using Core;
 using Core.WorldData.Data;
+using GamePlatform;
+using GameplaySystems.Chat;
 using GameplaySystems.Social;
 using Social;
 using TMPro;
+using UI.PlayerUI;
 using UI.Widgets;
+using UI.Widgets.Settings;
 using UnityEngine;
 using UnityEngine.UI;
 using UnityExtensions;
@@ -19,13 +23,6 @@ namespace UI.Applications.Chat
 {
 	public class ChatApplicationController : MonoBehaviour
 	{
-		[Header("Dependencies")]
-		[SerializeField]
-		private WorldManagerHolder worldManager = null!;
-		
-		[SerializeField]
-		private SocialServiceHolder socialService = null!;
-		
 		[Header("UI")]
 		[SerializeField]
 		private ChatHeader chatHeader = null!;
@@ -33,6 +30,9 @@ namespace UI.Applications.Chat
 		[SerializeField]
 		private ServerMembersController serverMembers = null!;
 
+		[SerializeField]
+		private TypingIndicator typingIndicator = null!;
+		
 		[SerializeField]
 		private ChatConversationController conversationController = null!;
 
@@ -47,30 +47,54 @@ namespace UI.Applications.Chat
 
 		[SerializeField]
 		private TMP_InputField messageInputField = null!;
+
+		[SerializeField]
+		private ConversationBranchList branchList = null!;
 		
 		private readonly List<ChatMessageModel> messages = new List<ChatMessageModel>();
 		private readonly List<IUserMessage> userMessages = new List<IUserMessage>();
+		private ConversationManager? conversationManager;
+		private IGuildList? playerGuilds;
+		private IGuild? currentGuild;
+		private IChatChannel? currentChannel = null;
+		private UiManager uiManager = null!;
 		private IDisposable? messageSendObserver;
 		private IDisposable? messageDeleteObserver;
 		private IDisposable? messageModifyObserver;
-		private IGuildList? playerGuilds;
 		private IDisposable? guildJoinObserver;
 		private IDisposable? guildLeaveObserver;
-		private IGuild? currentGuild;
-		private IChatChannel? currentChannel = null;
-		
+		private IDisposable? branchObserver;
+		private IDisposable? pendingChatBoxRequestsObserver;
+		private IDisposable? typingObserver;
+		private IWorldManager worldManager;
+		private ISocialService socialService;
 		
 		private void Awake()
 		{
+			worldManager = GameManager.Instance.WorldManager;
+			socialService = GameManager.Instance.SocialService;
+			conversationManager = ConversationManager.Instance;
+			
 			this.AssertAllFieldsAreSerialized(typeof(ChatApplicationController));
+			this.MustGetComponentInParent(out uiManager);
+		}
+
+		private void OnEnable()
+		{
+			if (conversationManager != null)
+			{
+				pendingChatBoxRequestsObserver = conversationManager.ObservePendingChatBoxRequests(OnChatBoxControlRequested);
+			}
+		}
+
+		private void OnDisable()
+		{
+			this.pendingChatBoxRequestsObserver?.Dispose();
 		}
 
 		private void Start()
 		{
-			if (socialService.Value == null)
-				return;
-			
-			playerGuilds = socialService.Value.GetGuilds().ThatHaveMember(socialService.Value.PlayerProfile);
+			playerGuilds = socialService.GetGuilds().ThatHaveMember(socialService.PlayerProfile);
 			guildJoinObserver = playerGuilds.ObserveGuildAdded().Subscribe(OnGuildJoin);
 			guildLeaveObserver = playerGuilds.ObserveGuildRemoved().Subscribe(OnGuildLeave);
 			
@@ -80,16 +104,46 @@ namespace UI.Applications.Chat
 			messageInputField.onSubmit.AddListener(OnMessageSubmit);
 
 			RefreshGuildList();
-			ShowDirectMessagesList();
+
+			IChatChannel? channel = socialService.GetDirectConversations(socialService.PlayerProfile).FirstOrDefault();
+			if (channel != null)
+				ShowChannel(channel);
+			else
+				ShowDirectMessagesList();
+		}
+
+		private async void OnChatBoxControlRequested(ChatBoxRequest request)
+		{
+			if (this.currentChannel == null)
+				return;
+
+			if (request.ChannelId != this.currentChannel.Id)
+				return;
+
+			uiManager.Autopilot = true;
+
+			await request.GiveControlAndWaitForRelease(this.messageInputField);
+			
+			uiManager.Autopilot = false;
 		}
 
 		private void OnDestroy()
 		{
-			playerGuilds?.Dispose();
+			messageSendObserver?.Dispose();
+			messageDeleteObserver?.Dispose();
+			messageModifyObserver?.Dispose();
+			guildJoinObserver?.Dispose();
+			guildLeaveObserver?.Dispose();
+			branchObserver?.Dispose();
+			pendingChatBoxRequestsObserver?.Dispose();
+			typingObserver?.Dispose();
 		}
 
 		private void ShowChannel(IChatChannel channel)
 		{
+			typingObserver?.Dispose();
+			branchObserver?.Dispose();
+			
 			if (currentChannel != null)
 			{
 				messageSendObserver?.Dispose();
@@ -114,10 +168,27 @@ namespace UI.Applications.Chat
 			this.messageSendObserver = currentChannel.SendObservable.Subscribe(OnMessageReceived);
 			this.messageDeleteObserver = currentChannel.EditObservable.Subscribe(OnMessageEdit);
 			this.messageDeleteObserver = currentChannel.DeleteObservable.Subscribe(OnMessageDelete);
-            
+
+			if (conversationManager != null)
+			{
+				branchObserver = conversationManager.ObserveBranchDefinitions(channel, OnNewBranchesAvailable);
+			}
+
+			typingObserver = channel.ObserveTypingUsers(OnTypingListChanged);
+
+			if (channel.ChannelType == MessageChannelType.DirectMessage)
+			{
+				ShowDirectMessagesList();
+			}
+			
 			UpdateMessageList();
 		}
 
+		private void OnTypingListChanged(IEnumerable<IProfile> typers)
+		{
+			this.typingIndicator.UpdateIndicator(typers);
+		}
+		
 		private void UpdateMessageList()
 		{
 			this.messages.Clear();
@@ -193,23 +264,10 @@ namespace UI.Applications.Chat
 			int memberCount = guild.Members.Count();
 			var channelCount = 0;
 
-			ListWidget? list = null;
-
 			foreach (IChatChannel channel in guild.Channels)
 			{
-				if (list == null)
-				{
-					list = new ListWidget
-					{
-						AllowSelectNone = false
-					};
-
-					builder.AddWidget(list, channelSection);
-				}
-
 				builder.AddWidget(new ListItemWidget<IChatChannel>
 				{
-					List = list,
 					Title = channel.Name,
 					Data = channel,
 					Callback = ShowChannel
@@ -237,47 +295,46 @@ namespace UI.Applications.Chat
 			return builder.Build();
 		}
 
+		private void OnNewBranchesAvailable(BranchDefinitionList list)
+		{
+			this.branchList.UpdateList(list);
+		}
+
 		private bool IsRecent(DateTime newDate, DateTime oldDate)
 		{
 			TimeSpan timespan = newDate - oldDate;
 
-			return timespan.TotalMinutes <= 5;
+			return timespan.TotalMinutes <= 30;
 		}
 		
-		private void ConvertToUiMessage(IUserMessage userMessage)
+		private void ConvertToUiMessage(IUserMessage userMessage, bool isNewMessage = false)
 		{
+			var newMessageShowsAvatar = true;
 			if (messages.Count > 0)
 			{
 				ChatMessageModel lastModel = messages[^1];
+				lastModel.IsNewMessage = false;
 				
-				// We can merge documents from the new message into the last message if
-				// the last message was sent by the same author and was sent within the last 5 minutes
-				// of the new message.
 				if (lastModel.AuthorId == userMessage.Author.ProfileId && IsRecent(userMessage.Date, lastModel.Date))
-				{
-					DocumentElement[] oldDocs = lastModel.DocumentData;
-					DocumentElement[] newDocs = userMessage.GetDocumentData();
-                    
-					Array.Resize(ref oldDocs, oldDocs.Length + newDocs.Length);
-					Array.Copy(newDocs, 0, oldDocs, oldDocs.Length - newDocs.Length, newDocs.Length);
-
-					lastModel.DocumentData = oldDocs;
-					
-					return;
-				}
+					newMessageShowsAvatar = false;
 			}
-			
-			messages.Add(new ChatMessageModel()
+
+			foreach (DocumentElement documentElement in userMessage.GetDocumentData())
 			{
-				Date = userMessage.Date,
-				AuthorId = userMessage.Author.ProfileId,
-				UseBubbleStyle = !(currentGuild != null && currentChannel != null && currentChannel.ChannelType == MessageChannelType.Guild),
-				IsFromPlayer = socialService.Value != null && userMessage.Author.ProfileId == socialService.Value.PlayerProfile.ProfileId,
-				FormattedDateTime = FormatDate(userMessage.Date),
-				Username = userMessage.Author.ChatUsername,
-				DisplayName = userMessage.Author.ChatName,
-				DocumentData = userMessage.GetDocumentData()
-			});
+				messages.Add(new ChatMessageModel()
+				{
+					Date = userMessage.Date,
+					AuthorId = userMessage.Author.ProfileId,
+					UseBubbleStyle = !(currentGuild != null && currentChannel != null && currentChannel.ChannelType == MessageChannelType.Guild),
+					IsFromPlayer = userMessage.Author.ProfileId == socialService.PlayerProfile.ProfileId,
+					FormattedDateTime = FormatDate(userMessage.Date),
+					Username = userMessage.Author.ChatUsername,
+					DisplayName = userMessage.Author.ChatName,
+					Document = documentElement,
+					ShowAvatar = newMessageShowsAvatar,
+					IsNewMessage = isNewMessage
+				});
+			}
 		}
 
 		private string FormatDate(DateTime date)
@@ -288,7 +345,9 @@ namespace UI.Applications.Chat
 		private void OnMessageReceived(IUserMessage message)
 		{
 			userMessages.Add(message);
-			UpdateMessageList();
+			
+			ConvertToUiMessage(message, true);
+			conversationController.SetMessageList(this.messages);
 		}
 
 		private void OnMessageEdit(IUserMessage message)
@@ -304,23 +363,23 @@ namespace UI.Applications.Chat
 		
 		private void OnMessageSubmit(string text)
 		{
+			if (this.branchList.PickSelectedIfAny())
+			{
+				this.messageInputField.SetTextWithoutNotify(string.Empty);
+				return;
+			}
+			
 			if (string.IsNullOrWhiteSpace(text))
 				return;
-
-			if (worldManager.Value == null)
-				return;
-
-			if (socialService.Value == null)
-				return;
-
+			
 			if (currentChannel == null)
 				return;
 
 			var message = new WorldMessageData
 			{
-				InstanceId = worldManager.Value.GetNextObjectId(),
+				InstanceId = worldManager.GetNextObjectId(),
 				ChannelId = currentChannel.Id,
-				Author = socialService.Value.PlayerProfile.ProfileId,
+				Author = socialService.PlayerProfile.ProfileId,
 				Date = DateTime.UtcNow,
 				DocumentElements = new List<DocumentElement>()
 				{
@@ -332,11 +391,25 @@ namespace UI.Applications.Chat
 				}
 			};
 			
-			worldManager.Value.World.Messages.Add(message);
+			worldManager.World.Messages.Add(message);
 			
 			this.messageInputField.SetTextWithoutNotify(string.Empty);
 
 			messageInputField.ActivateInputField();
+		}
+
+		private IWidget? BuildAvatarWidget(ChannelIconData data)
+		{
+			// TODO
+			if (data.UseUnicodeIcon)
+				return null;
+
+			return new AvatarWidget()
+			{
+				Size = AvatarSize.Small,
+				AvatarColor = data.AvatarColor,
+				AvatarTexture = data.UserAvatar
+			};
 		}
 
 		private IList<IWidget> BuilDDirectMessageList()
@@ -348,26 +421,16 @@ namespace UI.Applications.Chat
 			builder.AddSection("Conversations", out SectionWidget section);
 
 			var conversationCount = 0;
-			ListWidget? list = null;
 
-			foreach (IDirectConversation? channel in socialService.Value.GetDirectConversations(socialService.Value.PlayerProfile))
+			foreach (IDirectConversation? channel in socialService.GetDirectConversations(socialService.PlayerProfile))
 			{
-				if (list == null)
-				{
-					list = new ListWidget
-					{
-						AllowSelectNone = false
-					};
-
-					builder.AddWidget(list, section);
-				}
-
 				builder.AddWidget(new ListItemWidget<IChatChannel>
 				{
-					List = list,
+					Image = BuildAvatarWidget(channel.GetIcon()),
 					Title = $"<b>{channel.Name}</b>{Environment.NewLine}{channel.Description}",
 					Data = channel,
-					Callback = ShowChannel
+					Callback = ShowChannel,
+					Selected = this.currentChannel?.Id == channel.Id
 				}, section);
 				
 				conversationCount++;

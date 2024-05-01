@@ -22,6 +22,7 @@ namespace UI.Windowing
 		
 		private readonly List<WindowTab> tabInstances = new List<WindowTab>();
 		private bool showNewTab = false;
+		private bool tabUpdateNeeded = true;
 
 		public Action? NewTabCallback { get; set; }
 		
@@ -34,7 +35,7 @@ namespace UI.Windowing
 					return;
 
 				showNewTab = value;
-				this.UpdateTabs();
+				this.ScheduleUpdateTabs();
 			}
 		}
 		
@@ -51,8 +52,22 @@ namespace UI.Windowing
 			this.tabTemplate.gameObject.SetActive(false);
 		}
 
+		private void Update()
+		{
+			if (tabUpdateNeeded)
+			{
+				tabUpdateNeeded = false;
+				UpdateTabs();
+			}
+		}
+
 		/// <inheritdoc />
-		public void UpdateTabs()
+		public void ScheduleUpdateTabs()
+		{
+			tabUpdateNeeded = true;
+		}
+		
+		private void UpdateTabs()
 		{
 			this.newTabButton.gameObject.SetActive(this.showNewTab);
 			

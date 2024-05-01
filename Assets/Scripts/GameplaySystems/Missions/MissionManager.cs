@@ -23,31 +23,31 @@ namespace GameplaySystems.Missions
 	public sealed class MissionManager : MonoBehaviour
 	{
 		[SerializeField]
-		private GameManagerHolder gameManager = null!;
-
-		[SerializeField]
-		private WorldManagerHolder worldManager = null!;
-
-		[SerializeField]
 		private SocialServiceHolder socialService = null!;
 
+		private static readonly Singleton<MissionManager> singleton = new();
+		
+		private GameManager gameManager = null!;
 		private StartMissionCommand startMissionCommand;
 		private MissionMailerHook missionMailerHook;
 		private CancellationTokenSource? missionAnandonSource;
 		private IMission? currentMission;
 		private Task? currentMissionTask;
 		private IMissionController missionController;
+		private WorldManager worldManager = null!;
 
 		public IMission? CurrentMission => currentMission;
 
 		public bool CAnAbandonMissions => CurrentMission != null && missionController.CanAbandonMission;
-		public bool CanStartMissions => worldManager.Value != null
-		                                && gameManager.Value != null
-		                                && gameManager.Value.CurrentGameMode == GameMode.OnDesktop
+		public bool CanStartMissions => gameManager.CurrentGameMode == GameMode.OnDesktop
 		                                && (this.currentMission == null || missionController.CanAbandonMission);
 		
 		private void Awake()
 		{
+			singleton.SetInstance(this);
+			gameManager = GameManager.Instance;
+			worldManager = WorldManager.Instance;
+			
 			this.AssertAllFieldsAreSerialized(typeof(MissionManager));
 
 			this.startMissionCommand = new StartMissionCommand(this);
@@ -57,36 +57,25 @@ namespace GameplaySystems.Missions
 
 		private void OnEnable()
 		{
-			if (gameManager.Value != null)
-			{
-				gameManager.Value.UriManager.RegisterSchema("mission", new MissionUriSchemeHandler(this));
-			}
+			gameManager.UriManager.RegisterSchema("mission", new MissionUriSchemeHandler(this));
 		}
 
 		private void OnDisable()
 		{
-			if (gameManager.Value != null)
-			{
-				gameManager.Value.UriManager.UnregisterSchema("mission");
-			}
+			gameManager.UriManager.UnregisterSchema("mission");
 		}
 
 		private void Start()
 		{
-			if (gameManager.Value == null)
-				return;
-			
-			gameManager.Value.ScriptSystem.RegisterGlobalCommand("start_mission", startMissionCommand);
-			gameManager.Value.ScriptSystem.RegisterHookListener(CommonScriptHooks.AfterWorldStateUpdate, missionMailerHook);
+			gameManager.ScriptSystem.RegisterGlobalCommand("start_mission", startMissionCommand);
+			gameManager.ScriptSystem.RegisterHookListener(CommonScriptHooks.AfterWorldStateUpdate, missionMailerHook);
 		}
 
 		private void OnDestroy()
 		{
-			if (gameManager.Value == null)
-				return;
-
-			gameManager.Value.ScriptSystem.UnregisterHookListener(CommonScriptHooks.AfterWorldStateUpdate, missionMailerHook);
-			gameManager.Value.ScriptSystem.UnregisterGlobalCommand("start_mission");
+			gameManager.ScriptSystem.UnregisterHookListener(CommonScriptHooks.AfterWorldStateUpdate, missionMailerHook);
+			gameManager.ScriptSystem.UnregisterGlobalCommand("start_mission");
+			singleton.SetInstance(null);
 		}
 
 		private void Update()
@@ -110,26 +99,22 @@ namespace GameplaySystems.Missions
 			if (this.currentMission == null)
 				return;
 
-			if (worldManager.Value != null)
-			{
-				ProtectedWorldState protectedState = worldManager.Value.World.ProtectedWorldData.Value;
-				var missionList = new List<string>();
-				missionList.AddRange(protectedState.CompletedMissions);
-				missionList.Add(this.currentMission.Id);
+			ProtectedWorldState protectedState = worldManager.World.ProtectedWorldData.Value;
+			var missionList = new List<string>();
+			missionList.AddRange(protectedState.CompletedMissions);
+			missionList.Add(this.currentMission.Id);
 
-				protectedState.CompletedMissions = missionList;
+			protectedState.CompletedMissions = missionList;
 
-				worldManager.Value.World.ProtectedWorldData.Value = protectedState;
-			}
+			worldManager.World.ProtectedWorldData.Value = protectedState;
 
 			this.currentMission = null;
 			this.currentMissionTask = null;
 			this.missionAnandonSource = null;
 
-			if (this.gameManager.Value != null)
-				await gameManager.Value.SaveCurrentGame(false);
+			await gameManager.SaveCurrentGame(false);
 		}
-		
+
 		public void AbandonMission()
 		{
 			if (this.currentMission == null)
@@ -142,13 +127,10 @@ namespace GameplaySystems.Missions
 		
 		public bool StartMission(IMission mission)
 		{
-			if (worldManager.Value == null)
-				return false;
-
-			if (mission.IsCompleted(worldManager.Value.World))
+			if (mission.IsCompleted(worldManager.World))
 				return false;
 			
-			if (!mission.IsAvailable(worldManager.Value.World))
+			if (!mission.IsAvailable(worldManager.World))
 				return false;
 			
 			if (this.currentMission != null)
@@ -167,10 +149,7 @@ namespace GameplaySystems.Missions
 		
 		public IMission? GetMissionById(string missionId)
 		{
-			if (gameManager.Value == null)
-				return null;
-
-			return gameManager.Value.ContentManager.GetContentOfType<IMission>()
+			return gameManager.ContentManager.GetContentOfType<IMission>()
 				.FirstOrDefault(x => x.Id == missionId);
 		}
 
@@ -178,30 +157,13 @@ namespace GameplaySystems.Missions
 		{
 			if (socialService.Value == null)
 				throw new InvalidOperationException("SocialService is null");
-			
-			if (worldManager.Value == null)
-				throw new InvalidOperationException("WorldManager is null");
 
-			WorldProfileData profileData = worldManager.Value.World.Profiles.FirstOrDefault(x => x.NarrativeId == giverId);
-			if (profileData.NarrativeId != giverId)
-			{
-				profileData.InstanceId = worldManager.Value.GetNextObjectId();
-				profileData.NarrativeId = giverId;
-				profileData.ChatUsername = giverId;
-				profileData.ChatName = giverId;
-				profileData.Gender = Gender.Unknown;
-				worldManager.Value.World.Profiles.Add(profileData);
-			}
-
-			return socialService.Value.GetProfileById(profileData.InstanceId);
+			return socialService.Value.GetNarrativeProfile(giverId);
 		}
 		
 		private async Task MailMission(IMission mission)
 		{
 			if (socialService.Value == null)
-				return;
-
-			if (worldManager.Value == null)
 				return;
 			
 			IProfile giver = ResolveGiver(mission.GiverId);
@@ -215,19 +177,12 @@ namespace GameplaySystems.Missions
 					// If we find it, then we'll update it with the mission's new briefing info. If we don't find
 					// a matching mail object then we'll send a new one to the player.
 					var isNewMail = false;
-					WorldMailData mail = worldManager.Value.World.Emails.FirstOrDefault(x => x.NarrativeId == mission.Id
-					                                                                         && x.TypeFlags.HasFlag(MailTypeFlags.Briefing));
+					WorldMailData mail = worldManager.World.Emails.GetNarrativeObject(mission.Id);
 
-					if (mail.NarrativeId != mission.Id)
-					{
-						mail.InstanceId = worldManager.Value.GetNextObjectId();
-						mail.ThreadId = worldManager.Value.GetNextObjectId();
-						mail.NarrativeId = mission.Id;
-						mail.TypeFlags = MailTypeFlags.Briefing;
-						isNewMail = true;
-					}
+					mail.ThreadId = worldManager.GetNextObjectId();
+					mail.TypeFlags = MailTypeFlags.Briefing;
 
-					if (mission.IsCompleted(worldManager.Value.World))
+					if (mission.IsCompleted(worldManager.World))
 					{
 						mail.TypeFlags |= MailTypeFlags.CompletedMission;
 					}
@@ -235,7 +190,7 @@ namespace GameplaySystems.Missions
 					{
 						mail.TypeFlags &= ~MailTypeFlags.CompletedMission;
 					}
-					
+
 					mail.From = giver.ProfileId;
 					mail.To = player.ProfileId;
 					mail.Subject = mission.Name;
@@ -248,28 +203,18 @@ namespace GameplaySystems.Missions
 							ElementType = DocumentElementType.Text,
 							Data = x
 						}).ToList();
-					
-					if (isNewMail)
-						worldManager.Value.World.Emails.Add(mail);
-					else
-						worldManager.Value.World.Emails.Modify(mail);
-					
+
+					worldManager.World.Emails.Modify(mail);
 					break;
-				}
+			}
 			}
 		}
 		
 		private async Task MailMissions()
 		{
-			if (gameManager.Value == null)
-				return;
-
-			if (worldManager.Value == null)
-				return;
-			
-			foreach (IMission mission in gameManager.Value.ContentManager.GetContentOfType<IMission>())
+			foreach (IMission mission in gameManager.ContentManager.GetContentOfType<IMission>())
 			{
-				if (!mission.IsAvailable(worldManager.Value.World))
+				if (!mission.IsAvailable(worldManager.World))
 					continue;
 
 
@@ -361,5 +306,7 @@ namespace GameplaySystems.Missions
 				}
 			}
 		}
+
+		public static MissionManager? Instance => singleton.Instance;
 	}
 }

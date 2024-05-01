@@ -15,6 +15,8 @@ namespace UI.Applications.Chat
 		public string DisplayName = string.Empty;
 		public string Username = string.Empty;
 		public string FormattedDateTime = string.Empty;
-		public DocumentElement[] DocumentData = Array.Empty<DocumentElement>();
+		public DocumentElement Document;
+		public bool ShowAvatar;
+		public bool IsNewMessage;
 	}
 }

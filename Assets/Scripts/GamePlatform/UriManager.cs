@@ -5,6 +5,8 @@ using Modules;
 
 namespace GamePlatform
 {
+	
+	
 	public sealed class UriManager : IUriManager
 	{
 		private readonly GameManager gameManager;

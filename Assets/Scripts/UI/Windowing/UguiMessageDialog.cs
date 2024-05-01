@@ -6,6 +6,7 @@ using Shell;
 using Shell.Common;
 using Shell.Windowing;
 using TrixelCreative.TrixelAudio;
+using TrixelCreative.TrixelAudio.Core;
 using TrixelCreative.TrixelAudio.Data;
 using UI.Controllers;
 using UnityEngine;
@@ -22,11 +23,17 @@ namespace UI.Windowing
 
 		[SerializeField]
 		private SoundEffectAsset popupSound = null!;
+
+		[SerializeField]
+		private SoundEffectAsset errorPopupSound = null!;
+
+		[SerializeField]
+		private SoundEffectAsset warningSound = null!;
 		
+		private MessageBoxType messageType;
 		private IFloatingGui parentWindow;
 		private ObservableList<MessageBoxButtonData> buttonsList = new ObservableList<MessageBoxButtonData>();
-		private TrixelAudioSource trixelAudio = null!;
-
+		
 		/// <inheritdoc />
 		public bool CanClose { get; set; } = true;
 
@@ -121,6 +128,13 @@ namespace UI.Windowing
 		}
 
 		/// <inheritdoc />
+		public MessageBoxType MessageType
+		{
+			get => messageType;
+			set => messageType = value;
+		}
+
+		/// <inheritdoc />
 		public IList<MessageBoxButtonData> Buttons => buttonsList;
 
 		/// <inheritdoc />
@@ -130,21 +144,40 @@ namespace UI.Windowing
 		{
 			this.AssertAllFieldsAreSerialized(typeof(UguiMessageDialog));
 			this.MustGetComponentInParent(out this.parentWindow);
-			this.MustGetComponent(out trixelAudio);
 			
 			this.buttonsList.ItemAdded += HandleItemAdded;
 			this.buttonsList.ItemRemoved += HandleItemRemoved;
 			
-			parentWindow.EnableMaximizeButton = false;
-			parentWindow.EnableMinimizeButton = false;
 			parentWindow.EnableCloseButton = false;
 			
 			parentWindow.MinimumSize = Vector2.zero;
 		}
 
+		private SoundEffectAsset GetMessageSound()
+		{
+			return this.messageType switch
+			{
+				MessageBoxType.Error => errorPopupSound,
+				MessageBoxType.Warning => warningSound,
+				_ => this.popupSound
+			};
+		}
+		
 		private void Start()
 		{
-			trixelAudio.Play(this.popupSound);
+			AudioManager.PlaySound(GetMessageSound());
+
+			this.infoBoxController.Color = this.MessageType switch
+			{
+				MessageBoxType.Warning => CommonColor.Yellow,
+				MessageBoxType.Error => CommonColor.Red,
+				_ => CommonColor.Cyan
+			};
+
+			if (this.parentWindow is IColorable colorable)
+			{
+				colorable.Color = infoBoxController.Color;
+			}
 		}
 
 		private void HandleItemRemoved(MessageBoxButtonData obj)

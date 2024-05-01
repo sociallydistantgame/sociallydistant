@@ -5,7 +5,8 @@ namespace AcidicGui.Widgets
 {
 	public class ListItemWidget<TData> : IWidget
 	{
-		public ListWidget List { get; set; }
+		public IWidget? Image { get; set; }
+		
 		public string? Title { get; set; }
 		public string? Description { get; set; }
 		public TData Data { get; set; }
@@ -15,16 +16,14 @@ namespace AcidicGui.Widgets
 		/// <inheritdoc />
 		public WidgetController Build(IWidgetAssembler assembler, RectTransform destination)
 		{
-			if (this.List == null)
-				throw new InvalidOperationException("Cannot build this ListItemWidget, because it is not assigned to a ListWidget.");
-            
 			ListItemWidgetController controller = assembler.GetListItem(destination);
 
 			controller.Title = this.Title;
 			controller.Description = Description;
-			controller.List = this.List;
 			controller.Callback = OnSelect;
 			controller.Selected = Selected;
+
+			controller.ImageWidget = this.Image?.Build(assembler, controller.ImageSlot);
 			
 			return controller;
 		}

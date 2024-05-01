@@ -99,11 +99,30 @@ namespace Core.Scripting.Parsing
 		{
 			scopeStack.Pop();
 		}
+
+		private void SkipAllWhitespace(ArrayView<ShellToken> tokenView)
+		{
+			while (!tokenView.EndOfArray)
+			{
+				if (tokenView.Current.TokenType == ShellTokenType.Newline)
+				{
+					tokenView.Advance();
+					continue;
+				}
+				
+				if (tokenView.Current.TokenType == ShellTokenType.Whitespace)
+				{
+					tokenView.Advance();
+					continue;
+				}
+
+				break;
+			}
+		}
 		
 		private async Task<ShellInstruction?> ParseInstruction(ArrayView<ShellToken> tokenView)
 		{
-			while (!tokenView.EndOfArray && tokenView.Current.TokenType == ShellTokenType.Newline)
-				tokenView.Advance();
+			SkipAllWhitespace(tokenView);
 			
 			if (tokenView.EndOfArray)
 				return null;
@@ -119,6 +138,8 @@ namespace Core.Scripting.Parsing
 						return await ParseFunction(tokenView, true);
 					case "if":
 						return await ParseIfStatement(tokenView);
+					case "case":
+						return await ParseCaseStatement(tokenView);
 					case "while":
 						return await ParseWhileLoop(tokenView);
 				}
@@ -134,6 +155,74 @@ namespace Core.Scripting.Parsing
 			return await ParseLogicalAnd(tokenView);
 		}
 
+		private async Task<ShellPattern?> ParsePattern(ArrayView<ShellToken> tokenView)
+		{
+			SkipWhiteSpace(tokenView);
+			
+			if (tokenView.EndOfArray)
+				return null;
+			
+			if (tokenView.Current.Text == "esac")
+				return null;
+			
+			IArgumentEvaluator? pattern = await ParseArgument(tokenView);
+			if (pattern == null)
+				return null;
+			
+			Require(tokenView, ShellTokenType.CloseParen, ") expected");
+
+			var instructions = new List<ShellInstruction>();
+
+			while (!tokenView.EndOfArray)
+			{
+				SkipWhiteSpace(tokenView);
+
+				if (tokenView.EndOfArray)
+					break;
+
+				if (tokenView.Current.TokenType == ShellTokenType.SequentialExecute && tokenView.Next?.TokenType == ShellTokenType.SequentialExecute)
+				{
+					tokenView.Advance();
+					tokenView.Advance();
+					break;
+				}
+
+				ShellInstruction? instruction = await ParseInstruction(tokenView);
+				if (instruction == null)
+					break;
+				
+				instructions.Add(instruction);
+			}
+
+			return new ShellPattern(pattern, new SequentialInstruction(instructions));
+		}
+		
+		private async Task<ShellInstruction?> ParseCaseStatement(ArrayView<ShellToken> tokenView)
+		{
+			RequireKeyword(tokenView, "case");
+
+			IArgumentEvaluator? expression = await ParseArgument(tokenView);
+			if (expression == null)
+				return null;
+
+			RequireKeyword(tokenView, "in");
+			
+			var patterns = new List<ShellPattern>();
+
+			while (!tokenView.EndOfArray)
+			{
+				ShellPattern? pattern = await ParsePattern(tokenView);
+				if (pattern == null)
+					break;
+				
+				patterns.Add(pattern);
+			}
+			
+			RequireKeyword(tokenView, "esac");
+
+			return new ShellCaseStatement(expression, patterns);
+		}
+		
 		private async Task<ShellInstruction> ParseWhileLoop(ArrayView<ShellToken> tokenView)
 		{
 			RequireKeyword(tokenView, "while");
@@ -361,7 +450,9 @@ namespace Core.Scripting.Parsing
 					continue;
 				}
 
-				ShellInstruction instruction = await ParseInstruction(tokenView);
+				ShellInstruction? instruction = await ParseInstruction(tokenView);
+				if (instruction == null)
+					break;
 				
 				instructionList.Add(instruction);
 			}
@@ -436,10 +527,12 @@ namespace Core.Scripting.Parsing
 			return new LogicalOrInstruction(left, right);
 		}
 		
-		private async Task<ShellInstruction> ParseParallelInstruction(ArrayView<ShellToken> tokenView)
+		private async Task<ShellInstruction?> ParseParallelInstruction(ArrayView<ShellToken> tokenView)
 		{
 			// Parse sequential command list
-			ShellInstruction leftSide = await ParseCommandList(tokenView);
+			ShellInstruction? leftSide = await ParseCommandList(tokenView);
+			if (leftSide == null)
+				return null;
 
 			if (tokenView.EndOfArray)
 				return leftSide;
@@ -456,12 +549,15 @@ namespace Core.Scripting.Parsing
 			return new ParallelInstruction(leftSide, rightSide);
 		}
 		
-		private async Task<ShellInstruction> ParseCommandList(ArrayView<ShellToken> tokenView)
+		private async Task<ShellInstruction?> ParseCommandList(ArrayView<ShellToken> tokenView)
 		{
 			var instructionList = new List<ShellInstruction>();
 			
 			// Parse a pipe sequence
-			ShellInstruction pipeSequence = await ParsePipeSequence(tokenView);
+			ShellInstruction? pipeSequence = await ParsePipeSequence(tokenView);
+			if (pipeSequence == null)
+				return null;
+			
 			instructionList.Add(pipeSequence);
 			
 			while (!tokenView.EndOfArray)
@@ -643,7 +739,7 @@ namespace Core.Scripting.Parsing
 			if (tokenView.EndOfArray)
 				return null;
 
-			if (CheckReserved(tokenView))
+			if (CheckReserved(tokenView, false))
 				return null;
 			
 			IArgumentEvaluator? result = tokenView.Current.TokenType switch
@@ -786,7 +882,7 @@ namespace Core.Scripting.Parsing
 			return (redirectionType, filePath);
 		}
 		
-		private bool CheckReserved(ArrayView<ShellToken> tokenView)
+		private bool CheckReserved(ArrayView<ShellToken> tokenView, bool crash = true)
 		{
 			if (tokenView.EndOfArray)
 				return false;
@@ -837,10 +933,10 @@ namespace Core.Scripting.Parsing
 				}
 			}
 			
-			if (willThrow)
+			if (willThrow && crash)
 				throw new InvalidOperationException($"syntax error near unexpected token '{tokenView.Current.Text}'");
 
-			return false;
+			return willThrow;
 		}
 		
 		private enum LanguageContext

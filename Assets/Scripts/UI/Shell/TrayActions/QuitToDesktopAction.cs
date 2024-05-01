@@ -2,6 +2,7 @@
 
 using System;
 using GamePlatform;
+using Shell.Windowing;
 using UI.Popovers;
 using UI.UiHelpers;
 using UnityEngine;
@@ -15,15 +16,13 @@ namespace UI.Shell.TrayActions
 	[RequireComponent(typeof(DialogHelper))]
 	public class QuitToDesktopAction : MonoBehaviour
 	{
-		[Header("Dependencies")]
-		[SerializeField]
-		private GameManagerHolder gameManager = null!;
-		
+		private GameManager gameManager = null!;
 		private Button button = null!;
 		private DialogHelper dialogHelper = null!;
 
 		private void Awake()
 		{
+			gameManager = GameManager.Instance;
 			this.AssertAllFieldsAreSerialized(typeof(QuitToDesktopAction));
 			this.MustGetComponent(out button);
 			this.MustGetComponent(out dialogHelper);
@@ -40,6 +39,7 @@ namespace UI.Shell.TrayActions
 				return;
 
 			dialogHelper.AskQuestion(
+				MessageBoxType.Warning,
 				"Quit Socially Distant?",
 				"Do you want to quit Socially Distant and return to your host desktop? Your progress will be saved, but any unsaved changes to files will be lost.",
 				null,
@@ -47,18 +47,12 @@ namespace UI.Shell.TrayActions
 			);
 		}
 
-		private void OnDialogDismissed(bool yes)
+		private async void OnDialogDismissed(bool yes)
 		{
 			if (!yes)
 				return;
 
-			if (this.gameManager.Value == null)
-			{
-				PlatformHelper.QuitToDesktop();
-				return;
-			}
-
-			gameManager.Value.QuitVM();
+			await gameManager.QuitVM();
 		}
 	}
 }

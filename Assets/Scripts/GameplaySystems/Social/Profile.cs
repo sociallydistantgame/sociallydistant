@@ -1,7 +1,9 @@
 ﻿#nullable enable
+using System.Linq;
 using Core;
 using Core.WorldData.Data;
 using Social;
+using UnityEngine;
 using UnityEngine.Analytics;
 
 namespace GameplaySystems.Social
@@ -41,5 +43,26 @@ namespace GameplaySystems.Social
 
 		/// <inheritdoc />
 		public string ChatUsername => data.ChatUsername;
+
+		/// <inheritdoc />
+		public Texture2D? Picture => null;
+
+		/// <inheritdoc />
+		public bool IsFriendsWith(IProfile friend)
+		{
+			if (friend == this)
+				return true;
+
+			return socialService.GetFriends(this).Contains(friend);
+		}
+
+		/// <inheritdoc />
+		public bool IsBlockedBy(IProfile user)
+		{
+			if (user == this)
+				return false;
+
+			return socialService.GetBlockedProfiles(user).Contains(this);
+		}
 	}
 }

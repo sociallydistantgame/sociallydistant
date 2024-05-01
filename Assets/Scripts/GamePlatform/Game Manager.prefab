@@ -49,3 +49,4 @@ MonoBehaviour:
   worldManager: {fileID: 11400000, guid: 6ddfb5183f8225440a5d156e7fb16747, type: 2}
   infoPanelService: {fileID: 11400000, guid: e04c289c2acd7e44fbdc339b481d4594, type: 2}
   socialHolder: {fileID: 11400000, guid: 14dff3910d71124449959fd5c6db14e7, type: 2}
+  terminal: {fileID: 11400000, guid: 5614c328da0b7c440b51b285393a38fb, type: 2}

@@ -3,6 +3,7 @@
 	public enum DocumentElementType
 	{
 		Text,
-		Image
+		Image,
+		Mission
 	}
 }

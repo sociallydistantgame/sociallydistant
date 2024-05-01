@@ -8,14 +8,65 @@ using System.Runtime.InteropServices;
 using System.Text;
 using ContentManagement;
 using Modules;
-using UnityEngine;
 using UnityEngine.Analytics;
 
 namespace Core
 {
 	public static class SociallyDistantUtility
 	{
+		private static readonly List<ulong> levelSteps = new()
+		{
+			200,
+			400,
+			800,
+			1600,
+			3200,
+			6400,
+			12800,
+			25600,
+			51200,
+			102400,
+			204800,
+			409600,
+			819200,
+			1638400,
+			3276800,
+			6553600,
+			13107200,
+			26214400,
+			52428800,
+			104857600
+		};
+		
 		public static readonly string PlayerHomeId = "player";
+
+		public static PlayerLevelInfo GetPlayerLevelFromExperience(ulong experience)
+		{
+			var level = 0;
+			var nextLevelStep = 0ul;
+			
+			for (level = 0; level < levelSteps.Count; level++)
+			{
+				ulong step = levelSteps[level];
+				if (experience < step)
+				{
+					nextLevelStep = step;
+					break;
+				}
+			}
+
+			if (level == levelSteps.Count)
+			{
+				nextLevelStep = levelSteps[^1];
+				return new PlayerLevelInfo(experience, level, nextLevelStep, 1);
+			}
+
+			ulong previousLevelStep = level == 0 ? 0 : levelSteps[level - 1];
+
+			float progress = (float) (experience - previousLevelStep) / (float) (nextLevelStep - previousLevelStep);
+
+			return new PlayerLevelInfo(experience, level, nextLevelStep, progress);
+		}
 		
 		public static bool IsPosixName(string? text)
 		{
@@ -283,5 +334,5 @@ namespace Core
 			.ToArray();
 	}
 	#endif
-	
+}
 }

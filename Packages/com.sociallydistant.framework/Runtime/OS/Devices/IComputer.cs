@@ -3,6 +3,7 @@
 using OS.FileSystems;
 using OS.Network;
 using Unity.IO.LowLevel.Unsafe;
+using System.Threading.Tasks;
 
 namespace OS.Devices
 {
@@ -23,7 +24,7 @@ namespace OS.Devices
 		/// <param name="programName">The name of the program to run</param>
 		/// <param name="arguments">Command-line arguments to pass to the program to run</param>
 		/// <returns>The forked child process for the program, or null if the program doesn't exist.</returns>
-		ISystemProcess? ExecuteProgram(ISystemProcess parentProcess, ITextConsole console, string programName, string[] arguments);
+		Task<ISystemProcess?> ExecuteProgram(ISystemProcess parentProcess, ITextConsole console, string programName, string[] arguments);
 
 		/// <summary>
 		///		Gets an instance of the <see cref="VirtualFileSystem" /> class that
@@ -36,6 +37,6 @@ namespace OS.Devices
 		
 		INetworkConnection? Network { get; }
 
-		ISystemProcess? CreateDaemonProcess(string name);
+		Task<ISystemProcess?> CreateDaemonProcess(string name);
 	}
 }

@@ -109,7 +109,7 @@ namespace UI.Windowing
 			ShowNetworkViewer = !ShowNetworkViewer;
 		}
 
-		public void OpenApplications()
+		public async void OpenApplications()
 		{
 			if (this.appLauncherProcess != null)
 			{
@@ -118,7 +118,7 @@ namespace UI.Windowing
 				return;
 			}
 			
-			appLauncherProcess = desktop.OpenProgram(this.applicationLauncherProgram, Array.Empty<string>(), null, null);
+			appLauncherProcess = await desktop.OpenProgram(this.applicationLauncherProgram, Array.Empty<string>(), null, null);
 			appLauncherProcess.Killed += OnAppLauncherKilled;
 			this.UpdateDock();
 		}

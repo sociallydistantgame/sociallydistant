@@ -1,6 +1,7 @@
 ﻿#nullable enable
 
 using System;
+using AcidicGui.Widgets;
 using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
@@ -11,6 +12,9 @@ namespace AcidicGui.Components
 	public class ListItemWithHeader : MonoBehaviour
 	{
 		[Header("UI")]
+		[SerializeField]
+		private RectTransform headerRect = null!;
+		
 		[SerializeField]
 		private Button activator = null!;
 
@@ -26,6 +30,9 @@ namespace AcidicGui.Components
 		[SerializeField]
 		private string value = string.Empty;
 
+		[SerializeField]
+		private AnimatedHighlight animatedHighlight = null!;
+		
 		public string Value
 		{
 			get => value;
@@ -41,6 +48,18 @@ namespace AcidicGui.Components
 				
 				itemText.SetText(value);
 			}
+		}
+
+		public bool IsActive
+		{
+			get => animatedHighlight.IsActive;
+			set => animatedHighlight.IsActive = value;
+		}
+
+		public bool ShowTitle
+		{
+			get => headerText.gameObject.activeSelf;
+			set => headerRect.gameObject.SetActive(value);
 		}
 		
 		public string? Title

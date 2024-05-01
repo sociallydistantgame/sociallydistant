@@ -5,6 +5,7 @@ namespace Core.WorldData.Data
 {
 	public struct WorldMailData :
 		IWorldData,
+		INarrativeObject,
 		IDataWithId
 	{
 		private ObjectId id;
@@ -59,7 +60,7 @@ namespace Core.WorldData.Data
 			set => this.typeFlags = (byte) value;
 		}
 
-		public string NarrativeId
+		public string? NarrativeId
 		{
 			get => narrativeId;
 			set => narrativeId = value;

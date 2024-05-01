@@ -192,8 +192,6 @@ namespace UI.Windowing
 			
 			// Prevents user resizing and hiding
 			window.EnableCloseButton = false;
-			window.EnableMaximizeButton = false;
-			window.EnableMinimizeButton = false;
 			
 			// Cursed shit to get the tab manager for the underlying window.
 			// You shouldn't do this unless your name is Ritchie and you're the lead programmer of the game.

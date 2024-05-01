@@ -4,6 +4,7 @@ using System.Collections.Generic;
 using Architecture;
 using Core;
 using Core.WorldData.Data;
+using GamePlatform;
 using GameplaySystems.Networld;
 using OS.Devices;
 using OS.FileSystems;
@@ -11,6 +12,7 @@ using OS.Network;
 using UnityEngine;
 using UnityExtensions;
 using Utility;
+using System.Threading.Tasks;
 
 namespace GameplaySystems.NonPlayerComputers
 {
@@ -18,19 +20,6 @@ namespace GameplaySystems.NonPlayerComputers
 		MonoBehaviour,
 		IComputer
 	{
-		private WorldComputerData worldData;
-		private ISystemProcess initProcess = null!;
-		private LocalAreaNetwork? currentLan;
-		private NetworkConnection? networkConnection;
-		private SuperUser su;
-		private NonPlayerFileSystem fs;
-		private NpcFileOverrider fileOverrider;
-		private ISystemProcess systemd;
-
-		[Header("Dependencies")]
-		[SerializeField]
-		private WorldManagerHolder world = null!;
-
 		[SerializeField]
 		private DeviceCoordinator deviceCoordinator = null!;
 
@@ -44,18 +33,30 @@ namespace GameplaySystems.NonPlayerComputers
 		[SerializeField]
 		private FileSystemTableAsset fileSystemTable = null!;
 		
+		private WorldComputerData worldData;
+		private ISystemProcess initProcess = null!;
+		private LocalAreaNetwork? currentLan;
+		private NetworkConnection? networkConnection;
+		private SuperUser su;
+		private NonPlayerFileSystem fs;
+		private NpcFileOverrider fileOverrider;
+		private ISystemProcess systemd;
+		private IWorldManager world = null!;
+		
 		/// <inheritdoc />
 		public string Name => worldData.HostName;
 
-		private void Awake()
+		private async void Awake()
 		{
+			world = GameManager.Instance.WorldManager;
+			
 			this.AssertAllFieldsAreSerialized(typeof(NonPlayerComputer));
 
 			this.su = new SuperUser(this);
 			RebuildVfs();
 			
 			this.initProcess = this.deviceCoordinator.SetUpComputer(this, null);
-			this.systemd = this.initProcess.Fork();
+			this.systemd = await this.initProcess.Fork();
 			this.systemd.Name = "systemd";
 			
 			// Apply environment variables to the system
@@ -94,10 +95,10 @@ namespace GameplaySystems.NonPlayerComputers
 		public IUser SuperUser => su;
 
 		/// <inheritdoc />
-		public ISystemProcess? ExecuteProgram(ISystemProcess parentProcess, ITextConsole console, string programName, string[] arguments)
+		public async Task<ISystemProcess?> ExecuteProgram(ISystemProcess parentProcess, ITextConsole console, string programName, string[] arguments)
 		{
 			// Perhaps we should remove this in favour of calling the VFS method directly?
-			return GetFileSystem(parentProcess.User)
+			return await GetFileSystem(parentProcess.User)
 				.Execute(parentProcess, programName, console, arguments);
 		}
 
@@ -111,9 +112,9 @@ namespace GameplaySystems.NonPlayerComputers
 		public INetworkConnection? Network => networkConnection;
 
 		/// <inheritdoc />
-		public ISystemProcess? CreateDaemonProcess(string name)
+		public async Task<ISystemProcess?> CreateDaemonProcess(string name)
 		{
-			ISystemProcess? result = systemd?.Fork();
+			ISystemProcess? result = await systemd?.Fork();
 			if (result != null)
 				result.Name = name;
 			return result;
@@ -151,7 +152,7 @@ namespace GameplaySystems.NonPlayerComputers
 			if (!this.gameObject.activeSelf)
 				return;
 
-			this.fs = new NonPlayerFileSystem(this, worldData.InstanceId, this.world.Value);
+			this.fs = new NonPlayerFileSystem(this, worldData.InstanceId, this.world);
 			
 			// Mount file systems from Unity
 			FileSystemTable.MountFileSystemsToComputer(this, this.fileSystemTable);

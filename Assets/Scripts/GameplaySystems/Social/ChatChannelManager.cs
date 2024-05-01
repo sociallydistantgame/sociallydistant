@@ -10,12 +10,14 @@ namespace GameplaySystems.Social
 {
 	public class ChatChannelManager : IDisposable
 	{
+		private readonly ISocialService socialService;
 		private readonly MessageManager messageManager;
-		private readonly WorldManager world;
+		private readonly IWorldManager world;
 		private readonly Dictionary<ObjectId, ChatChannel> channels = new Dictionary<ObjectId, ChatChannel>();
 
-		public ChatChannelManager(WorldManager worldManager, MessageManager messageManager)
+		public ChatChannelManager(ISocialService socialService, IWorldManager worldManager, MessageManager messageManager)
 		{
+			this.socialService = socialService;
 			this.messageManager = messageManager;
 			this.world = worldManager;
 			
@@ -28,8 +30,6 @@ namespace GameplaySystems.Social
 		/// <inheritdoc />
 		public void Dispose()
 		{
-			// TODO release managed resources here
-			
 			this.world.Callbacks.RemoveCreateCallback<WorldChannelData>(OnCreateChannel);
 			this.world.Callbacks.RemoveDeleteCallback<WorldChannelData>(OnDeleteChannel);
 			this.world.Callbacks.RemoveModifyCallback<WorldChannelData>(OnModifyChannel);
@@ -61,7 +61,7 @@ namespace GameplaySystems.Social
 		{
 			if (!channels.TryGetValue(subject.InstanceId, out ChatChannel channel))
 			{
-				channel = new ChatChannel(messageManager);
+				channel = new ChatChannel(messageManager, this.socialService);
 				this.channels.Add(subject.InstanceId, channel);
 			}
 			
@@ -82,6 +82,27 @@ namespace GameplaySystems.Social
 				return null;
 
 			return channel;
+		}
+
+		public IChatChannel GetNarrativeChannel(ObjectId guildId, string channelId)
+		{
+			foreach (IChatChannel channel in GetGuildChannels(guildId))
+			{
+				if (channel.NarrativeId == channelId)
+					return channel;
+			}
+
+			var newChannel = new WorldChannelData
+			{
+				InstanceId = world.GetNextObjectId(),
+				GuildId = guildId,
+				NarrativeId = channelId,
+				Name = channelId
+			};
+			
+			world.World.Channels.Add(newChannel);
+
+			return channels[newChannel.InstanceId];
 		}
 	}
 }

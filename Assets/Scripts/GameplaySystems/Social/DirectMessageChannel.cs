@@ -4,7 +4,10 @@ using System.Collections.Generic;
 using System.Linq;
 using Core;
 using Core.WorldData.Data;
+using Cysharp.Threading.Tasks;
+using Shell;
 using Social;
+using UnityEngine;
 
 namespace GameplaySystems.Social
 {
@@ -16,6 +19,9 @@ namespace GameplaySystems.Social
 
 		/// <inheritdoc />
 		public IEnumerable<IChatMember> Members => memberManager.GetMembersInGroup(Id, MemberGroupType.GroupDirectMessage);
+
+		/// <inheritdoc />
+		public string? NarrativeId => dmChannel.NarrativeId;
 
 		/// <inheritdoc />
 		public ObjectId Id => dmChannel.Id;
@@ -47,6 +53,9 @@ namespace GameplaySystems.Social
 		}
 
 		/// <inheritdoc />
+		public IEnumerable<IProfile> TypingUsers => dmChannel.TypingUsers;
+
+		/// <inheritdoc />
 		public IObservable<IUserMessage> SendObservable => dmChannel.SendObservable;
 
 		/// <inheritdoc />
@@ -63,6 +72,34 @@ namespace GameplaySystems.Social
 
 		/// <inheritdoc />
 		public IEnumerable<IUserMessage> Messages => dmChannel.Messages;
+
+		/// <inheritdoc />
+		public IDisposable ObserveTypingUsers(Action<IEnumerable<IProfile>> callback)
+		{
+			return dmChannel.ObserveTypingUsers(callback);
+		}
+
+		/// <inheritdoc />
+		public ChannelIconData GetIcon()
+		{
+			IEnumerable<IChatMember> otherMembers = this.Members.Where(x => x.Profile.ProfileId != viewingUser.ProfileId).ToArray();
+
+			if (otherMembers.Count() != 1)
+			{
+				return new ChannelIconData
+				{
+					UseUnicodeIcon = true,
+					UnicodeIcon = MaterialIcons.Group
+				};
+			}
+
+			return new ChannelIconData
+			{
+				UseUnicodeIcon = false,
+				UserAvatar = otherMembers.First().Profile.Picture,
+				AvatarColor = Color.yellow
+			};
+		}
 
 		public DirectMessageChannel(ChatMemberManager memberManager, IChatChannel dmChannel, IProfile viewingUser)
 		{

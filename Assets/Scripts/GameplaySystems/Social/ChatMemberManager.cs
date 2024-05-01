@@ -10,10 +10,10 @@ namespace GameplaySystems.Social
 	public class ChatMemberManager
 	{
 		private readonly SocialService socialService;
-		private readonly WorldManager world;
+		private readonly IWorldManager world;
 		private readonly Dictionary<ObjectId, ChatMember> members = new Dictionary<ObjectId, ChatMember>();
 
-		public ChatMemberManager(SocialService service, WorldManager world)
+		public ChatMemberManager(SocialService service, IWorldManager world)
 		{
 			this.socialService = service;
 			this.world = world;
@@ -45,6 +45,11 @@ namespace GameplaySystems.Social
 		public IEnumerable<IChatMember> GetMembersInGroup(ObjectId groupId, MemberGroupType groupType)
 		{
 			return members.Values.Where(x => x.GroupType == groupType && x.GroupId == groupId);
+		}
+
+		public bool IsProfileInGroup(ObjectId groupId, ObjectId userId, MemberGroupType type)
+		{
+			return GetMembersInGroup(groupId, type).Any(x => x.Profile.ProfileId == userId);
 		}
 	}
 }

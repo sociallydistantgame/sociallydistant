@@ -81,7 +81,7 @@ namespace UI.Login
 			if (!Directory.Exists(user.LocalFilePath))
 				return;
 			
-			var shouldDelete = await dialogHelper.AskQuestionAsync("Delete Account", $"Are you sure you want to delete {user.PlayerInfo.Name}? This action cannot be undone.", this.parentWindow);
+			var shouldDelete = await dialogHelper.AskQuestionAsync(MessageBoxType.Warning, "Delete Account", $"Are you sure you want to delete {user.PlayerInfo.Name}? This action cannot be undone.", this.parentWindow);
 
 			if (!shouldDelete)
 				return;

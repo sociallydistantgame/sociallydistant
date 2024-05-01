@@ -14,10 +14,6 @@ namespace UI.Styling.Colorizers
 	[ExecuteInEditMode]
 	public class StatusBarColorizer : UIBehaviour
 	{
-		[Header("Dependencies")]
-		[SerializeField]
-		private GameManagerHolder gameManagerHolder = null!;
-
 		[Header("Colors")]
 		[SerializeField]
 		private Color normalBright;
@@ -44,6 +40,7 @@ namespace UI.Styling.Colorizers
 		[SerializeField]
 		private float safetyPulseDecay = 0.5f;
 
+		private GameManager gameManagerHolder = null!;
 		private IDisposable? gameModeObserver;
 		private IDisposable? panicObserver;
 		private GameMode gameMode;
@@ -57,6 +54,7 @@ namespace UI.Styling.Colorizers
 		/// <inheritdoc />
 		protected override void Awake()
 		{
+			gameManagerHolder = GameManager.Instance;
 			this.AssertAllFieldsAreSerialized(typeof(StatusBarColorizer));
 			
 			this.MustGetComponent(out graphic);
@@ -68,12 +66,9 @@ namespace UI.Styling.Colorizers
 		protected override void Start()
 		{
 			base.Start();
-
-			if (gameManagerHolder.Value == null)
-				return;
-
-			panicObserver = gameManagerHolder.Value.PanicObservable.Subscribe(OnPanicChanged);
-			gameModeObserver = gameManagerHolder.Value.GameModeObservable.Subscribe(OnGameModeChanged);
+			
+			panicObserver = gameManagerHolder.PanicObservable.Subscribe(OnPanicChanged);
+			gameModeObserver = gameManagerHolder.GameModeObservable.Subscribe(OnGameModeChanged);
 		}
 		
 		private void Update()

@@ -7,7 +7,7 @@ namespace DevTools
 {
 	public sealed class UriRunnerMenu : IDevMenu
 	{
-		private readonly GameManagerHolder gameManager = null!;
+		private readonly GameManager gameManager = null!;
 		
 		private Exception? exception;
 		private string rawUri = string.Empty;
@@ -15,7 +15,7 @@ namespace DevTools
 		/// <inheritdoc />
 		public string Name => "Run Shell URI";
 
-		public UriRunnerMenu(GameManagerHolder game)
+		public UriRunnerMenu(GameManager game)
 		{
 			this.gameManager = game;
 		}
@@ -23,12 +23,6 @@ namespace DevTools
 		/// <inheritdoc />
 		public void OnMenuGUI(DeveloperMenu devMenu)
 		{
-			if (gameManager.Value == null)
-			{
-				GUILayout.Label("Game Manager is unavailable");
-				return;
-			}
-
 			if (exception != null)
 			{
 				GUILayout.Label("URI Handler Error");
@@ -50,7 +44,7 @@ namespace DevTools
 					if (!Uri.TryCreate(rawUri, UriKind.Absolute, out Uri uri))
 						throw new FormatException("Cannot parse URI");
 
-					gameManager.Value.UriManager.ExecuteNavigationUri(uri);
+					gameManager.UriManager.ExecuteNavigationUri(uri);
 				}
 				catch (Exception e)
 				{

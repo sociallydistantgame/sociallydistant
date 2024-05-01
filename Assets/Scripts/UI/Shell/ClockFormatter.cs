@@ -1,7 +1,9 @@
 ﻿#nullable enable
 
 using System;
+using System.Text;
 using Core;
+using GamePlatform;
 using TMPro;
 using UnityEngine;
 using UnityExtensions;
@@ -11,12 +13,6 @@ namespace UI.Shell
 {
 	public class ClockFormatter : MonoBehaviour
 	{
-		private TextMeshProUGUI text= null!;
-
-		[Header("Dependencies")]
-		[SerializeField]
-		private WorldManagerHolder worldHolder = null!;
-
 		[Header("Configuration")]
 		[SerializeField]
 		[Multiline]
@@ -24,16 +20,21 @@ namespace UI.Shell
 
 		[SerializeField]
 		private bool abbreviateDayOfWeek;
-		
+
+		private TextMeshProUGUI text= null!;
+		private IWorldManager worldHolder = null!;
+
 		private void Awake()
 		{
+			worldHolder = GameManager.Instance.WorldManager;
+			
 			this.AssertAllFieldsAreSerialized(typeof(ClockFormatter));
 			this.MustGetComponent(out text);
 		}
 
 		private void Update()
 		{
-			DateTime now = worldHolder.Value.World.GlobalWorldState.Value.Now;
+			DateTime now = worldHolder.World.GlobalWorldState.Value.Now;
 
 			string dayName = GetDayOfWeekText(now.DayOfWeek);
 			string time = now.ToShortTimeString();
@@ -43,7 +44,12 @@ namespace UI.Shell
 
 		private void SetClockText(string dayName, string time)
 		{
-			text.SetText(textFormat.Replace("DAYNAME", dayName).Replace("TIME", time));
+			string newText = textFormat.Replace("DAYNAME", dayName).Replace("TIME", time);
+
+			if (this.text.text == newText)
+				return;
+
+			this.text.SetText(newText);
 		}
 
 		private string GetDayOfWeekText(DayOfWeek dayOfWeek)

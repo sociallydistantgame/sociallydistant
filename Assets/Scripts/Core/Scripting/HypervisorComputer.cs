@@ -3,6 +3,7 @@ using System;
 using OS.Devices;
 using OS.FileSystems;
 using OS.Network;
+using System.Threading.Tasks;
 
 namespace Core.Scripting
 {
@@ -40,9 +41,9 @@ namespace Core.Scripting
 		public IUser SuperUser => user;
 
 		/// <inheritdoc />
-		public ISystemProcess? ExecuteProgram(ISystemProcess parentProcess, ITextConsole console, string programName, string[] arguments)
+		public Task<ISystemProcess?> ExecuteProgram(ISystemProcess parentProcess, ITextConsole console, string programName, string[] arguments)
 		{
-			return null;
+			return Task.FromResult<ISystemProcess?>(null);
 		}
 
 		/// <inheritdoc />
@@ -55,9 +56,9 @@ namespace Core.Scripting
 		public INetworkConnection? Network => null;
 
 		/// <inheritdoc />
-		public ISystemProcess? CreateDaemonProcess(string name)
+		public Task<ISystemProcess?> CreateDaemonProcess(string name)
 		{
-			return null;
+			return Task.FromResult<ISystemProcess?>(null);
 		}
 
 		internal HypervisorComputer(IUser user)

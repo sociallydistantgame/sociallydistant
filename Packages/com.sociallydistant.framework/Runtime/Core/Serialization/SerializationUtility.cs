@@ -1039,6 +1039,12 @@ namespace Core.Serialization
 				}
 			}
 		}
+
+		private static void EnsureNotNull<T>(ref IReadOnlyList<T>? collection)
+		{
+			if (collection == null)
+				collection = new List<T>();
+		}
 		
 		public static void SerializeCollectionAtRevision<TRevision>(ref IReadOnlyList<string> collection, IRevisionedSerializer<TRevision> serializer, TRevision revision)
 			where TRevision : Enum
@@ -1061,6 +1067,8 @@ namespace Core.Serialization
 			
 			if (serializer.IsWriting)
 			{
+				EnsureNotNull(ref collection);
+                
 				int elementCount = collection.Count;
 				SerializeAtRevision(ref elementCount, serializer, revision, elementCount);
 				

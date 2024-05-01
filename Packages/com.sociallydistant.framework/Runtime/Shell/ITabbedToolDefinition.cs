@@ -1,6 +1,8 @@
-﻿namespace Shell
+﻿using ContentManagement;
+
+namespace Shell
 {
-	public interface ITabbedToolDefinition
+	public interface ITabbedToolDefinition : IGameContent
 	{
 		IProgram Program { get; }
 		bool AllowUserTabs { get; }

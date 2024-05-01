@@ -61,3 +61,20 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   settings:
   - {fileID: -8764192180421664816}
+  - {fileID: 5953024632517534653}
+--- !u!114 &5953024632517534653
+MonoBehaviour:
+  m_ObjectHideFlags: 3
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: e19a306896b548d9955000636bbdfb17, type: 3}
+  m_Name: XorgGlitchEffectSettings
+  m_EditorClassIdentifier: 
+  active: 1
+  enabled:
+    overrideState: 1
+    value: 1

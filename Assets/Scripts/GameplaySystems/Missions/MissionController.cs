@@ -15,14 +15,14 @@ namespace GameplaySystems.Missions
 		private readonly List<IObjective> objectives = new();
 		private readonly Subject<IReadOnlyList<IObjective>> objectiveUpdateSubject = new();
 		private readonly MissionManager missionManager;
-		private readonly WorldManagerHolder worldManager;
-		private readonly GameManagerHolder gameManagerHolder;
+		private readonly IWorldManager worldManager;
+		private readonly GameManager gameManagerHolder;
 
 		/// <inheritdoc />
-		public IGameContext Game => gameManagerHolder.Value!;
-        
+		public IGameContext Game => gameManagerHolder!;
+
 		/// <inheritdoc />
-		public IWorldManager WorldManager => worldManager.Value!; // if this is null, we've already had a catastrophe anyway.
+		public IWorldManager WorldManager => worldManager;
 
 		/// <inheritdoc />
 		public bool CanAbandonMission { get; private set; } = true;
@@ -30,7 +30,7 @@ namespace GameplaySystems.Missions
 		/// <inheritdoc />
 		public IReadOnlyList<IObjective> CurrentObjectives => objectives;
 
-		public MissionController(MissionManager missionManager, WorldManagerHolder worldManager, GameManagerHolder gameManagerHolder)
+		public MissionController(MissionManager missionManager, IWorldManager worldManager, GameManager gameManagerHolder)
 		{
 			this.missionManager = missionManager;
 			this.worldManager = worldManager;

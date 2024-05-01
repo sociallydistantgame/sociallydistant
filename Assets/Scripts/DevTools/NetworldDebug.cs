@@ -15,7 +15,7 @@ namespace DevTools
 		
 		public string Name => "Networld Debugger";
 
-		public NetworldDebug(WorldManager world, NetworkSimulationController simulation, PlayerInstanceHolder playerInstance)
+		public NetworldDebug(NetworkSimulationController simulation, PlayerInstanceHolder playerInstance)
 		{
 			this.world = world;
 			this.simulation = simulation;

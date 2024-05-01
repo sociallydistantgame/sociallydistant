@@ -1,12 +1,15 @@
 ﻿#nullable enable
 
 using System;
+using System.Collections;
+using System.Collections.Generic;
 using System.IO;
+using System.Linq;
 using System.Text;
 using System.Threading;
-using Core;
 using Core.Scripting;
-using GameplaySystems.Missions;
+using GameplaySystems.Chat;
+using GameplaySystems.Social;
 using UnityEditor;
 using UnityEditor.AssetImporters;
 using UnityEngine;
@@ -14,98 +17,49 @@ using File = UnityEngine.Windows.File;
 
 namespace Editor.CustomImporters
 {
-	[ScriptedImporter(1, ".markup")]
-	public class MarkupImporter : ScriptedImporter
-	{
-		/// <inheritdoc />
-		public override void OnImportAsset(AssetImportContext ctx)
-		{
-			string path = ctx.assetPath;
-
-			var sb = new StringBuilder();
-			using (Stream stream = System.IO.File.OpenRead(path))
-			{
-				using var streamReader = new StreamReader(stream);
-
-				while (!streamReader.EndOfStream)
-				{
-					sb.Append(streamReader.ReadToEnd());
-				}
-			}
-
-			var asset = ScriptableObject.CreateInstance<MarkupAsset>();
-			asset.SetMarkup(sb.ToString());
-
-			asset.name = Path.GetFileName(ctx.assetPath);
-			
-			ctx.AddObjectToAsset(asset.name, asset);
-			ctx.SetMainObject(asset);
-		}
-	}
-
-	[ScriptedImporter(1, ".mission")]
-	public sealed class MissionScriptImporter : ScriptedImporter
-	{
-		/// <inheritdoc />
-		public override void OnImportAsset(AssetImportContext ctx)
-		{
-			var sb = new StringBuilder();
-			var uniqueId = string.Empty;
-			
-			using (var stream = System.IO.File.OpenRead(ctx.assetPath))
-			{
-				using (var reader = new StreamReader(stream))
-				{
-					var isFirstLine = true;
-					
-					while (!reader.EndOfStream)
-					{
-						string? nextLine = reader.ReadLine();
-						if (string.IsNullOrWhiteSpace(nextLine))
-							continue;
-
-						if (isFirstLine)
-						{
-							if (!nextLine.StartsWith("#!"))
-								throw new InvalidOperationException("The first line of a mission script must be a shebang specifying the unique ID of the mission.");
-
-							uniqueId = nextLine.Substring(2).Trim();
-							if (string.IsNullOrWhiteSpace(uniqueId))
-								throw new InvalidOperationException("The first line of a mission script must be a shebang specifying the unique ID of the mission.");
-
-							isFirstLine = false;
-							continue;
-						}
-						
-						sb.Append(nextLine);
-						sb.Append("\n");
-					}
-				}
-			}
-
-			var mission = ScriptableObject.CreateInstance<MissionScriptAsset>();
-			mission.name = uniqueId;
-
-			mission.SetScriptText(sb.ToString());
-			mission.ImportMetadata();
-			
-			ctx.AddObjectToAsset(uniqueId, mission);
-			ctx.SetMainObject(mission);
-		}
-	}
-	
 	[ScriptedImporter(1, ".sh")]
 	public class ShellScriptImporter : ScriptedImporter 
 	{
+		private UnityEngine.Object NpcImporter(string shebang, StringBuilder scriptText)
+		{
+			var asset = ScriptableObject.CreateInstance<NpcGeneratorScript>();
+			asset.SetScriptText(scriptText.ToString());
+			return asset;
+		}
+		
+		private UnityEngine.Object ChatImporter(string shebang, StringBuilder scriptText)
+		{
+			var chat = ScriptableObject.CreateInstance<ChatConversationAsset>();
+			chat.Id = shebang;
+
+			chat.SetScriptText(scriptText.ToString());
+			
+			return chat;
+		}
+		
 		/// <inheritdoc />
 		public override void OnImportAsset(AssetImportContext ctx)
 		{
 			string path = ctx.assetPath;
 
+			var importers = new Dictionary<string, Func<string, StringBuilder, UnityEngine.Object>>()
+			{
+				{
+					"chat",
+					ChatImporter
+				},
+				{
+					"npcs",
+					NpcImporter
+				}
+			};
 			var sb = new StringBuilder();
 
 			ScriptExecutionContext? executionContext = null;
+			Func<string, StringBuilder, UnityEngine.Object>? importerDelegate = null;
 
+			string? shebang = null;
+			
 			var useOSContext = false;
 			using (Stream stream = System.IO.File.OpenRead(path))
 			{
@@ -119,10 +73,20 @@ namespace Editor.CustomImporters
 
 					if (line.StartsWith("#!") && sb.Length == 0)
 					{
-						if (line.Substring(2).Trim() == "/bin/sh")
+						string[] splitted = line.Substring(2).Split(' ', StringSplitOptions.RemoveEmptyEntries);
+						if (splitted.Length == 0)
+							throw new InvalidOperationException("Malformed shebang line.");
+
+						string interpreterName = splitted[0];
+						string args = string.Join(" ", splitted.Skip(1).ToArray());
+
+						if (interpreterName == "/bin/sh")
 							useOSContext = true;
-						else 
-							executionContext = FindScriptExecutionContext(line.Substring(2));
+						else if (importers.TryGetValue(interpreterName, out importerDelegate))
+							shebang = args;
+						else
+							executionContext = FindScriptExecutionContext(interpreterName);
+						
 						continue;
 					}
 
@@ -131,6 +95,14 @@ namespace Editor.CustomImporters
 				}
 			}
 
+			if (importerDelegate != null)
+			{
+				UnityEngine.Object imported = importerDelegate(shebang ?? string.Empty, sb);
+				ctx.AddObjectToAsset(imported.name, imported);
+				ctx.SetMainObject(imported);
+				return;
+			}
+			
 			if (executionContext == null && !useOSContext)
 				return;
 

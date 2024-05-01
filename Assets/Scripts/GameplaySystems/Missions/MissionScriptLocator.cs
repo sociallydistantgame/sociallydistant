@@ -1,6 +1,8 @@
 ﻿#nullable enable
+using System;
 using System.Threading.Tasks;
 using ContentManagement;
+using Core;
 using UnityEngine;
 
 namespace GameplaySystems.Missions
@@ -8,14 +10,21 @@ namespace GameplaySystems.Missions
 	public sealed class MissionScriptLocator : IGameContentSource
 	{
 		/// <inheritdoc />
-		public async Task LoadAllContent(ContentCollectionBuilder builder)
+		public async Task LoadAllContent(ContentCollectionBuilder builder, IContentFinder finder)
 		{
-			MissionScriptAsset[]? assets = Resources.LoadAll<MissionScriptAsset>("Missions");
-
-			foreach (MissionScriptAsset script in assets)
+			foreach (MissionScriptAsset script in await finder.FindContentOfType<MissionScriptAsset>())
 			{
-				await Task.Yield();
-				builder.AddContent(script);
+				try
+				{
+					if (script is ICachedScript cachedScript)
+						await cachedScript.RebuildScriptTree();
+					
+					builder.AddContent(script);
+				}
+				catch (Exception ex)
+				{
+					Debug.LogException(ex);
+				}
 			}
 		}
 	}

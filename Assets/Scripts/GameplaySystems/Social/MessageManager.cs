@@ -13,7 +13,7 @@ namespace GameplaySystems.Social
 	public class MessageManager : IDisposable
 	{
 		private readonly Dictionary<ObjectId, UserMessage> messages = new Dictionary<ObjectId, UserMessage>();
-		private readonly WorldManager worldManager;
+		private readonly IWorldManager worldManager;
 		private readonly SocialService socialService;
 		private readonly Subject<IUserMessage> messageCreateSubject = new Subject<IUserMessage>();
 		private readonly Subject<IUserMessage> messageModifySubject = new Subject<IUserMessage>();
@@ -23,7 +23,7 @@ namespace GameplaySystems.Social
 		public IObservable<IUserMessage> MessageDeleteObservable => messageDeleteSubject;
 		public IObservable<IUserMessage> MessageModifyObservable => messageModifySubject;
 
-		internal MessageManager(WorldManager worldManager, SocialService socialService)
+		internal MessageManager(IWorldManager worldManager, SocialService socialService)
 		{
 			this.worldManager = worldManager;
 			this.socialService = socialService;

@@ -12,7 +12,13 @@ namespace Core
 		void AddDeleteCallback<TDataElement>(DeleteCallback<TDataElement> callback)
 			where TDataElement : struct;
 		
+		void RemoveCreateCallback<TDataElement>(CreateCallback<TDataElement> callback)
+			where TDataElement : struct;
+		
 		void RemoveModifyCallback<TDataElement>(ModifyCallback<TDataElement> callback)
+			where TDataElement : struct;
+		
+		void RemoveDeleteCallback<TDataElement>(DeleteCallback<TDataElement> callback)
 			where TDataElement : struct;
 	}
 	

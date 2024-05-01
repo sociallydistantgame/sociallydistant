@@ -5,11 +5,13 @@ namespace UI.Terminal.SimpleTerminal
 {
 	public class SimpleTerminalInputHelper
 	{
+		private readonly ITerminalSounds sounds;
 		private readonly SimpleTerminal term;
 		private readonly Action<string> Write;
 
-		public SimpleTerminalInputHelper(SimpleTerminal term, Action<string> writeMethod)
+		public SimpleTerminalInputHelper(ITerminalSounds sounds, SimpleTerminal term, Action<string> writeMethod)
 		{
+			this.sounds = sounds;
 			this.term = term;
 			this.Write = writeMethod;
 		}
@@ -41,7 +43,7 @@ namespace UI.Terminal.SimpleTerminal
 		
 		public void Backspace()
 		{
-			this.Write("\b");
+			Char('\b');
 		}
 
 		public void Enter()
@@ -53,6 +55,9 @@ namespace UI.Terminal.SimpleTerminal
 
 		public void Char(char ch)
 		{
+			if (ch != '\r' && ch != '\n')
+				sounds.PlayTypingSound();
+			
 			this.Write(ch.ToString());
 		}
 
@@ -115,10 +120,10 @@ namespace UI.Terminal.SimpleTerminal
 
 			var rawKeyCode = (int) keyCode;
 			this.Write(rawKeyCode.ToString());
-			this.Char(';');
+			this.Write(";");
 			this.Write(modifierMask.ToString());
 			
-			this.Char('~');
+			this.Write("~");
 		}
 	}
 

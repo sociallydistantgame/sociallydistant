@@ -6,7 +6,13 @@ namespace Core.DataManagement
 	public class ModifyEvent
 	{
 		private Dictionary<Type, List<object>> invocationLists = new Dictionary<Type, List<object>>();
+		private readonly ThreadInvoker threadInvoker;
 
+		public ModifyEvent(ThreadInvoker threadInvoker)
+		{
+			this.threadInvoker = threadInvoker;
+		}
+		
 		public void AddCallback<TDataElement>(ModifyCallback<TDataElement> callback)
 			where TDataElement : struct
 		{
@@ -46,7 +52,12 @@ namespace Core.DataManagement
 			foreach (object invocation in invocationList)
 			{
 				if (invocation is ModifyCallback<TDataElement> callback)
-					callback(subjectPrevious, subjectNew);
+				{
+					threadInvoker.Do(() =>
+					{
+						callback(subjectPrevious, subjectNew);
+					});
+				}
 			}
 		}
 	}

@@ -4,6 +4,6 @@
 	{
 		ITabbedContent? TabbedContent { get; set; }
 		
-		void UpdateTabs();
+		void ScheduleUpdateTabs();
 	}
 }

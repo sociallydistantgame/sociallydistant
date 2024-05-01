@@ -142,19 +142,11 @@ namespace UI.Websites.SocialMedia
 
 			var followerCount = 0;
 			var followingCount = 0;
-
-			ListWidget? list = null;
+			
 			foreach (IProfile follower in socialService.Value.GetFollowers(profile))
 			{
-				if (list == null)
-				{
-					list = new ListWidget { AllowSelectNone = true };
-					builder.AddWidget(list, followers);
-				}
-				
 				builder.AddWidget(new ListItemWidget<IProfile>()
 				{
-					List = list,
 					Data = follower,
 					Title = $"{follower.ChatName}{Environment.NewLine}@{follower.SocialHandle}",
 					Callback = ShowProfileWithHistory,
@@ -163,19 +155,11 @@ namespace UI.Websites.SocialMedia
 
 				followerCount++;
 			}
-
-			list = null;
+			
 			foreach (IProfile follower in socialService.Value.GetFollowing(profile))
 			{
-				if (list == null)
-				{
-					list = new ListWidget { AllowSelectNone = true };
-					builder.AddWidget(list, following);
-				}
-				
 				builder.AddWidget(new ListItemWidget<IProfile>()
 				{
-					List = list,
 					Data = follower,
 					Title = $"{follower.ChatName}{Environment.NewLine}@{follower.SocialHandle}",
 					Callback = ShowProfileWithHistory,

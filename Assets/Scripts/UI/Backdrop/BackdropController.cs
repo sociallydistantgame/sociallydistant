@@ -67,7 +67,7 @@ namespace UI.Backdrop
 				
 				// Start fading out the old one.
 				float alpha = temporaryBackdropImage.color.a;
-				float timeInSeconds = 0.5f;
+				float timeInSeconds = 1f;
 				float timer = 0;
 
 				while (timer < timeInSeconds)

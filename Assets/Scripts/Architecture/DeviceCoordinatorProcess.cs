@@ -8,6 +8,7 @@ using OS.Devices;
 using OS.Tasks;
 using UnityEngine;
 using UnityEngine.Assertions;
+using System.Threading.Tasks;
 
 namespace Architecture
 {
@@ -66,13 +67,13 @@ namespace Architecture
 		}
 		
 		/// <inheritdoc />
-		public ISystemProcess Fork()
+		public async Task<ISystemProcess> Fork()
 		{
-			return ForkAsUser(this.User);
+			return await ForkAsUser(this.User);
 		}
 		
 		/// <inheritdoc />
-		public ISystemProcess ForkAsUser(IUser user)
+		public async Task<ISystemProcess> ForkAsUser(IUser user)
 		{
 			// Prevent users not from the same computer from
 			// executing processes on it.
@@ -80,11 +81,13 @@ namespace Architecture
 				throw new InvalidOperationException("An invalid attempt was made to execute a process on one computer by the user of another computer.");
 
 
-			return CreateLoginProcess(user).Fork();
+			ISystemProcess loginProcess = await CreateLoginProcess(user);
+
+			return await loginProcess.Fork();
 		}
 
 		/// <inheritdoc />
-		public ISystemProcess CreateLoginProcess(IUser user)
+		public async Task<ISystemProcess> CreateLoginProcess(IUser user)
 		{
 			if (!userProcesses.TryGetValue(user, out ISystemProcess userProcess))
 			{
@@ -96,9 +99,7 @@ namespace Architecture
 				}
 				else
 				{
-					loginScript.Run(userProcess, Array.Empty<string>(), new UnityTextConsole())
-						.GetAwaiter()
-						.GetResult();
+					await loginScript.Run(userProcess, Array.Empty<string>(), new UnityTextConsole());
 				}
 
 				this.userProcesses.Add(user, userProcess);			

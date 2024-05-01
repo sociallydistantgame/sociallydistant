@@ -97,7 +97,7 @@ namespace GameplaySystems.Networld
 
 				if (stopwatch.Elapsed.TotalSeconds > 1)
 				{
-					Debug.LogError($"Simulation update took more than 1 second (total time: {stopwatch.Elapsed}). Consider sending less packets.");
+					Debug.LogWarning($"Simulation update took more than 1 second (total time: {stopwatch.Elapsed}). Consider sending less packets.");
 				}
 
 				stopwatch.Reset();

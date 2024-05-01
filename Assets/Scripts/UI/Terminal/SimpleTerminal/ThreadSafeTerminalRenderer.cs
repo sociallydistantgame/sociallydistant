@@ -44,7 +44,8 @@ namespace UI.Terminal.SimpleTerminal
 		private float blinkTimer;
 		private float blinkInterval = 0.25f;
 		private float cursorBlinkInterval = 0.5f;
-		
+
+		private volatile bool hasBlinkingElements = false;
 		private volatile bool needsLayoutUpdate = true;
 		private volatile bool textPresentNeeded = true;
 		private volatile bool backgroundPresentNeeded = true;
@@ -203,6 +204,23 @@ namespace UI.Terminal.SimpleTerminal
 					cell.Blinking = blink;
 
 					cell.Character = glyph.character;
+				}
+			}
+
+			CheckForBlinks();
+		}
+
+		private void CheckForBlinks()
+		{
+			this.hasBlinkingElements = false;
+			
+			for (var i = 0; i < colorCells.Length; i++)
+			{
+				ref ColorCell cell = ref colorCells[i];
+				if (cell.Blinking)
+				{
+					hasBlinkingElements = true;
+					break;
 				}
 			}
 		}
@@ -465,7 +483,7 @@ namespace UI.Terminal.SimpleTerminal
 			if (this.blinkTimer >= this.blinkInterval)
 			{
 				this.blinkTimer = 0;
-				this.textIsDirty = true;
+				this.textIsDirty |= this.hasBlinkingElements;
 				this.hideBlinking = !this.hideBlinking;
 			}
 

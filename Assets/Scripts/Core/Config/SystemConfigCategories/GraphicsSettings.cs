@@ -32,6 +32,12 @@ namespace Core.Config.SystemConfigCategories
 			get => GetValue(nameof(BloomEffect), true);
 			set => SetValue(nameof(BloomEffect), value);
 		}
+
+		public bool EnableXorgGlitches
+		{
+			get => GetValue(nameof(EnableXorgGlitches), true);
+			set => SetValue(nameof(EnableXorgGlitches), value);
+		}
 		
 		/// <inheritdoc />
 		public GraphicsSettings(ISettingsManager settingsManager) : base(settingsManager)
@@ -94,7 +100,14 @@ namespace Core.Config.SystemConfigCategories
 					"Adds subtle glow to brighter UI elements and text",
 					BloomEffect,
 					x => BloomEffect = x,
-					effects);
+					effects)
+				.WithToggle(
+					"Glitch bands",
+					"Enable or disable the flashing bands of color that appear during malware infections and high system load.",
+					EnableXorgGlitches,
+					x => EnableXorgGlitches = x,
+					effects
+				);
 		}
 		
 		#if UNITY_EDITOR

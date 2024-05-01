@@ -11,6 +11,12 @@ namespace UI.Applications.Chat
 		[SerializeField]
 		private ChatMessageListView listView = null!;
 
+		private float scrollDelay = 0.25f;
+		private float counter = 0;
+		private int messageCount = 0;
+		private bool scrollToEnd;
+		private bool scrolling;
+		
 		private void Awake()
 		{
 			this.AssertAllFieldsAreSerialized(typeof(ChatConversationController));
@@ -19,8 +25,12 @@ namespace UI.Applications.Chat
 		public void SetMessageList(IList<ChatMessageModel> messageList)
 		{
 			this.listView.SetItems(messageList);
-			if (messageList.Count > 0)
-				this.listView.ScrollTo(messageList.Count - 1, 0);
+			messageCount = messageList.Count;
+			if (messageCount != 0)
+				listView.ScrollTo(messageCount-1, 0f);
+			
+			scrollToEnd = true;
+			counter = 0;
 		}
 	}
 }

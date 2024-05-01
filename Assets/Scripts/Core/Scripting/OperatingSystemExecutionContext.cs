@@ -55,7 +55,7 @@ namespace Core.Scripting
 				return await HandleCustomCommand(customCommand, name, args, console);
 				
 			
-			ISystemProcess? commandProcess = FindProgram(this.process, console, name, args);
+			ISystemProcess? commandProcess = await FindProgram(this.process, console, name, args);
 			if (commandProcess == null)
 				return null;
 			
@@ -146,7 +146,7 @@ namespace Core.Scripting
 				return null;
 
 			var consoleWrapper = new ConsoleWrapper(console);
-			ISystemProcess commandProcess = process.Fork();
+			ISystemProcess commandProcess = await process.Fork();
 
 			if (command.AdminRequired && commandProcess.User.PrivilegeLevel != PrivilegeLevel.Root)
 			{
@@ -269,18 +269,18 @@ namespace Core.Scripting
 			};
 		}
 
-		private ISystemProcess? FindProgram(ISystemProcess shellProcess, ITextConsole console, string name, string[] args)
+		private async Task<ISystemProcess?> FindProgram(ISystemProcess shellProcess, ITextConsole console, string name, string[] args)
 		{
 			// if the program name starts with a /, use the absolute path.
 			if (name.StartsWith("/"))
-				return shellProcess.User.Computer.ExecuteProgram(shellProcess, console, name, args);
+				return await shellProcess.User.Computer.ExecuteProgram(shellProcess, console, name, args);
 
 			// if the name starts with "./", try the current directory instead
 			if (name.StartsWith("./"))
 			{
 				string filename = name.Substring(2);
 				string fullPath = PathUtility.Combine(shellProcess.WorkingDirectory, filename);
-				return shellProcess.User.Computer.ExecuteProgram(shellProcess, console, fullPath, args);
+				return await shellProcess.User.Computer.ExecuteProgram(shellProcess, console, fullPath, args);
 			}
 
 			// Read the PATH environment variable to find well-known program paths.
@@ -293,7 +293,7 @@ namespace Core.Scripting
 			{
 				string fullPath = PathUtility.Combine(path, name);
 				if (fs.FileExists(fullPath))
-					return shellProcess.User.Computer.ExecuteProgram(shellProcess, console, fullPath, args);
+					return await shellProcess.User.Computer.ExecuteProgram(shellProcess, console, fullPath, args);
 			}
 
 			// Found nothing... :(

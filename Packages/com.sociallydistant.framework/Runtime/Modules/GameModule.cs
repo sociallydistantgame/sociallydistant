@@ -72,5 +72,10 @@ namespace Modules
 		/// </summary>
 		/// <param name="gameMode">The new game mode</param>
 		public virtual void OnGameModeChanged(GameMode gameMode) { }
+
+		/// <summary>
+		///		Called every time the game's Content Manager reloads.
+		/// </summary>
+		public virtual void AfterContentLoad() {}
 	}
 }

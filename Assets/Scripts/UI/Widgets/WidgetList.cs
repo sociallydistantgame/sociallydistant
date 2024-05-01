@@ -68,6 +68,7 @@ namespace UI.Widgets
             newOrRecycled.Widget = widget;
 
             newOrRecycled.WidgetController.UpdateUI();
+            newOrRecycled.WidgetController.gameObject.SetActive(true);
             
 			ScheduleComputeVisibilityTwinPass();
 		}

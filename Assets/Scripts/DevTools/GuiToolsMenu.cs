@@ -49,12 +49,10 @@ namespace DevTools
 
 	public sealed class EmailMenu : IDevMenu
 	{
-		private readonly WorldManagerHolder world;
 		private readonly SocialServiceHolder social = null!;
 
-		public EmailMenu(WorldManagerHolder world, SocialServiceHolder social)
+		public EmailMenu(SocialServiceHolder social)
 		{
-			this.world = world;
 			this.social = social;
 		}
 
@@ -64,20 +62,12 @@ namespace DevTools
 		/// <inheritdoc />
 		public void OnMenuGUI(DeveloperMenu devMenu)
 		{
-			if (world.Value == null)
-			{
-				GUILayout.Label("WorldManager not ready!");
-				return;
-			}
-
-			if (social.Value == null)
-			{
-				GUILayout.Label("SocialService not ready!");
-				return;
-			}
-
+			ISocialService social = GameManager.Instance.SocialService;
+			
+			var world = WorldManager.Instance;
+			
 			if (GUILayout.Button("Send Message To Player"))
-				devMenu.PushMenu(new SendMessageToProfile(world.Value, social.Value.PlayerProfile));
+				devMenu.PushMenu(new SendMessageToProfile(world, social.PlayerProfile));
 		}
 	}
 
@@ -151,67 +141,54 @@ namespace DevTools
 
 	public sealed class MissionDebug : IDevMenu
 	{
-		private readonly WorldManagerHolder world;
-		private readonly GameManagerHolder game;
-		private readonly MissionManagerHolder missions;
+		private readonly GameManager game;
 		
 		/// <inheritdoc />
 		public string Name => "Mission Manager";
 
-		public MissionDebug(WorldManagerHolder world, MissionManagerHolder missions, GameManagerHolder game)
+		public MissionDebug(GameManager game)
 		{
-			this.world = world;
-			this.missions = missions;
 			this.game = game;
 		}
 		
 		/// <inheritdoc />
 		public void OnMenuGUI(DeveloperMenu devMenu)
 		{
-			if (game.Value == null)
-			{
-				GUILayout.Label("Game Manager is unavailable.");
-				return;
-			}
+			var world = WorldManager.Instance;
+			var missions = MissionManager.Instance;
 
-			if (world.Value == null)
-			{
-				GUILayout.Label("WorldManager is unavailable.");
-				return;
-			}
-
-			if (missions.Value == null)
+			if (missions == null)
 			{
 				GUILayout.Label("Mission Manager is unavailable.");
 				return;
 			}
 
-			if (game.Value.CurrentGameMode != GameMode.OnDesktop)
+			if (game.CurrentGameMode != GameMode.OnDesktop)
 			{
 				GUILayout.Label("Missions can not be debugged in the current game mode.");
 				return;
 			}
 			
 			GUILayout.Label("Current Mission Status");
-			if (missions.Value.CurrentMission == null)
+			if (missions.CurrentMission == null)
 			{
 				GUILayout.Label("Free Roam (No mission active)");
 			}
 			else
 			{
-				GUILayout.Label($"{missions.Value.CurrentMission.Id} ({missions.Value.CurrentMission.Name})");
+				GUILayout.Label($"{missions.CurrentMission.Id} ({missions.CurrentMission.Name})");
 
-				GUILayout.Label($"Abandonable through UI: {missions.Value.CAnAbandonMissions}");
+				GUILayout.Label($"Abandonable through UI: {missions.CAnAbandonMissions}");
 				
 				if (GUILayout.Button("Return to Free Roam (abandon mission forcibly)"))
 				{
-					missions.Value.AbandonMission();
+					missions.AbandonMission();
 				}
 			}
 
 			if (GUILayout.Button("Start Mission"))
 			{
-				devMenu.PushMenu(new StartMissionDebug(missions.Value, game.Value.ContentManager));
+				devMenu.PushMenu(new StartMissionDebug(missions, game.ContentManager));
 				return;
 			}
 		}

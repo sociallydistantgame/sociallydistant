@@ -16,6 +16,7 @@ using Player;
 using UnityEngine;
 using UnityEngine.Assertions;
 using UniRx;
+using System.Threading.Tasks;
 
 namespace OS.Devices
 {
@@ -119,10 +120,10 @@ namespace OS.Devices
 		public IUser SuperUser => su;
 
 		/// <inheritdoc />
-		public ISystemProcess? ExecuteProgram(ISystemProcess parentProcess, ITextConsole console, string programName, string[] arguments)
+		public async Task<ISystemProcess?> ExecuteProgram(ISystemProcess parentProcess, ITextConsole console, string programName, string[] arguments)
 		{
 			// Perhaps we should remove this in favour of calling the VFS method directly?
-			return GetFileSystem(parentProcess.User)
+			return await GetFileSystem(parentProcess.User)
 				.Execute(parentProcess, programName, console, arguments);
 		}
 
@@ -139,9 +140,9 @@ namespace OS.Devices
 		public INetworkConnection Network { get; private set; }
 
 		/// <inheritdoc />
-		public ISystemProcess? CreateDaemonProcess(string name)
+		public async Task<ISystemProcess?> CreateDaemonProcess(string name)
 		{
-			ISystemProcess? result = systemd?.Fork();
+			ISystemProcess? result = await systemd?.Fork();
 			if (result != null)
 				result.Name = name;
 
@@ -158,13 +159,13 @@ namespace OS.Devices
 			this.usernameMap.Add(user.UserName, user.Id);
 		}
 
-		internal void SetInitProcess(ISystemProcess? initProcess)
+		internal async Task SetInitProcess(ISystemProcess? initProcess)
 		{
 			if (this.initProcess != null)
 				throw new InvalidOperationException("You already fucking did this, ya dummy");
 
 			this.initProcess = initProcess;
-			this.systemd = this.initProcess.Fork();
+			this.systemd = await this.initProcess.Fork();
 			systemd.Name = "systemd";
 
 		}

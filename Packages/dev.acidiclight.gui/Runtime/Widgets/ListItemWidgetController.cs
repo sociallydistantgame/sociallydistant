@@ -8,25 +8,35 @@ namespace AcidicGui.Widgets
 	public class ListItemWidgetController : WidgetController
 	{
 		[SerializeField]
+		private RectTransform slot = null!;
+		
+		[SerializeField]
 		private Toggle toggle;
 
 		[SerializeField]
 		private TextMeshProUGUI label = null!;
 
 		[SerializeField]
+		private AnimatedHighlight animatedHighlight = null!;
+		
+		[SerializeField]
 		private TextMeshProUGUI description = null!;
 
 		private bool ignoreCallback;
+
+		public RectTransform ImageSlot => slot;
 		
 		public bool Selected { get; set; }
-		public ListWidget List { get; set; }
 		public Action? Callback { get; set; }
 		public string? Title { get; set; }
 		public string? Description { get; set; }
+		public WidgetController? ImageWidget { get; set; }
 		
 		/// <inheritdoc />
 		public override void UpdateUI()
 		{
+			animatedHighlight.IsActive = Selected;
+			
 			if (string.IsNullOrWhiteSpace(Description))
 			{
 				label.SetText(string.Empty);
@@ -37,24 +47,17 @@ namespace AcidicGui.Widgets
 				label.SetText(Title);
 				description.SetText(Description);
 			}
-
-			toggle.group = List?.ToggleGroup;
+			
 			toggle.SetIsOnWithoutNotify(Selected);
 			toggle.onValueChanged.AddListener(OnValueChanged);
+			
+			if (this.ImageWidget != null)
+			{
+				this.ImageWidget.UpdateUI();
+				this.ImageWidget.gameObject.SetActive(true);
+			}
 		}
-
-		private void Update()
-		{
-			// We do this here because we can't guarantee the toggle group will be instantiated by the time we
-			// get built/removed from recycling.
-			//
-			// Cases where that's an issue:
-			// - The user's using OSA (like in Socially Distant)
-			// - The list is in a different widget section
-			// - The list is further in the widget list than this list item
-			this.toggle.group = List?.ToggleGroup;
-		}
-
+		
 		private void OnValueChanged(bool newValue)
 		{
 			if (!newValue)
@@ -66,6 +69,14 @@ namespace AcidicGui.Widgets
 		/// <inheritdoc />
 		public override void OnRecycle()
 		{
+			if (ImageWidget != null)
+			{
+				ImageWidget.gameObject.SetActive(false);
+				ImageWidget.OnRecycle();
+			}
+			
+			animatedHighlight.IsActive = false;
+			
 			if (ignoreCallback)
 				return;
 			
@@ -76,7 +87,6 @@ namespace AcidicGui.Widgets
 			toggle.group = null;
 			toggle.group = null;
 			Callback = null;
-			this.List = null;
 			
 			ignoreCallback = false;
 		}

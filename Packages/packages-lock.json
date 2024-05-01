@@ -30,11 +30,10 @@
       }
     },
     "com.trixelcreative.audio": {
-      "version": "https://github.com/Trixel-Creative/TrixelAudio.git",
+      "version": "file:com.trixelcreative.audio",
       "depth": 0,
-      "source": "git",
-      "dependencies": {},
-      "hash": "139bfa17008465a80211a801e9679a93ec2f2f96"
+      "source": "embedded",
+      "dependencies": {}
     },
     "com.unity.2d.sprite": {
       "version": "1.0.0",
@@ -220,6 +219,12 @@
         "com.unity.modules.ui": "1.0.0",
         "com.unity.modules.imgui": "1.0.0"
       }
+    },
+    "dev.acidiclight.fuzzyunited": {
+      "version": "file:dev.acidiclight.fuzzyunited",
+      "depth": 0,
+      "source": "embedded",
+      "dependencies": {}
     },
     "dev.acidiclight.gui": {
       "version": "file:dev.acidiclight.gui",

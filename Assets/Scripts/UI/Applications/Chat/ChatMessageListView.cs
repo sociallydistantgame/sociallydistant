@@ -41,7 +41,7 @@ namespace UI.Applications.Chat
 
 			newOrRecycled.UpdateView(model);
 			
-			ScheduleComputeVisibilityTwinPass();
+			ScheduleComputeVisibilityTwinPass(true);
 		}
 	}
 }

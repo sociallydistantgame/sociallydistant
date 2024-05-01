@@ -4,6 +4,7 @@ using System.Collections.Generic;
 using System.Linq;
 using Core.Systems;
 using OS.Devices;
+using System.Threading.Tasks;
 
 namespace Architecture
 {
@@ -56,21 +57,21 @@ namespace Architecture
 		}
 		
 		/// <inheritdoc />
-		public ISystemProcess Fork()
+		public Task<ISystemProcess> Fork()
 		{
-			return new SystemProcess(
+			return Task.FromResult<ISystemProcess>(new SystemProcess(
 				pidGenerator,
 				coordinator,
 				this,
 				User
-			);
+			));
 		}
 		
 		/// <inheritdoc />
-		public ISystemProcess ForkAsUser(IUser user)
+		public async Task<ISystemProcess> ForkAsUser(IUser user)
 		{
 			if (user == User)
-				return Fork();
+				return await Fork();
 			
 			// Prevent users not from the same computer from
 			// executing processes on it.
@@ -79,7 +80,7 @@ namespace Architecture
 
 			IUser previousUser = this.User;
 			this.User = user;
-			ISystemProcess forked = Fork();
+			ISystemProcess forked = await Fork();
 
 			this.User = previousUser;
 

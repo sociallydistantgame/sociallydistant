@@ -54,7 +54,7 @@ namespace UI.Applications.Terminal
 			
 			// Fork a child process for the shell or specified command-line
 			// application to use.
-			this.shellProcess = this.process.Fork();
+			this.shellProcess = await this.process.Fork();
 			
 			// Create a shell execution context for the in-game OS.
 			this.context = new OperatingSystemExecutionContext(shellProcess);
@@ -88,6 +88,7 @@ namespace UI.Applications.Terminal
 			{
 				shellTask = this.StartShell();
 				hasStartedShell = true;
+				return;
 			}
 
 			if (shellTask.IsCompleted)
@@ -119,6 +120,7 @@ namespace UI.Applications.Terminal
 				if (!dialogHelper.AreAnyDialogsOpen)
 				{
 					dialogHelper.AskQuestion(
+						MessageBoxType.Warning,
 						"Force-quit running tasks?",
 						"There are tasks currently running inside this Terminal. Are you sure you want to quit the Terminal and force-quit all currently-running tasks? Any unsaved data will be lost.",
 						this.window.Window,

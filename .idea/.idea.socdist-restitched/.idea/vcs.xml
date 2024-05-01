@@ -3,5 +3,7 @@
   <component name="VcsDirectoryMappings">
     <mapping directory="" vcs="Git" />
     <mapping directory="$PROJECT_DIR$/Packages/com.sociallydistant.framework" vcs="Git" />
+    <mapping directory="$PROJECT_DIR$/Packages/com.trixelcreative.audio" vcs="Git" />
+    <mapping directory="$PROJECT_DIR$/Packages/dev.acidiclight.fuzzyunited" vcs="Git" />
   </component>
 </project>

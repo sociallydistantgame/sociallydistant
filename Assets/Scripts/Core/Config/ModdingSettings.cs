@@ -10,6 +10,12 @@
 			set => SetValue(nameof(AcceptLegalWaiver), value);
 		}
 
+		public bool ModDebugMode
+		{
+			get => GetValue(nameof(ModDebugMode), false);
+			set => SetValue(nameof(ModDebugMode), value);
+		}
+		
 		/// <inheritdoc />
 		public ModdingSettings(ISettingsManager settingsManager) : base(settingsManager)
 		{ }
@@ -27,6 +33,15 @@
 				)
 				.AddSection(CommonSettingsSections.Legal, out int legal)
 				.WithLabel("By enabling script mods, you accept the risk associated with the execution of un-trusted code. You agree that Socially Distant's development team is neither responsible nor liable for damage caused to your device as a result of executing script mods.", legal);
+
+			uiBuilder.AddSection("Development", out int development)
+				.WithToggle(
+					"Mod debug mode",
+					"Enable or disable Mod Debug Mode. Mod Debug mode sets up a safe, temporary environment for testing in-development mods with, and doesn't allow you to play regular save files. Changing this setting requires restarting the game.",
+					ModDebugMode,
+					x => ModDebugMode = x,
+					development
+				);
 		}
 	}
 }

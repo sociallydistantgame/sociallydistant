@@ -11,6 +11,9 @@ namespace Core.Scripting
 		private readonly Dictionary<string, string> variables = new(0);
 		private readonly Dictionary<string, IScriptCommand> builtIns = new(0);
 		private readonly ScriptFunctionManager functions = new();
+		private readonly ScriptModuleManager moduleManager;
+
+		public ScriptModuleManager ModuleManager => moduleManager;
 		
 
 		public event Action<string, ITextConsole>? OnCommandNotFound;
@@ -18,6 +21,11 @@ namespace Core.Scripting
 		/// <inheritdoc />
 		public string Title { get; set; } = "User script";
 
+		public UserScriptExecutionContext()
+		{
+			moduleManager = new ScriptModuleManager();
+		}
+		
 		/// <inheritdoc />
 		public string GetVariableValue(string variableName)
 		{
@@ -39,6 +47,10 @@ namespace Core.Scripting
 			int? functionResult = await functions.CallFunction(name, args, console, callSite ?? this);
 			if (functionResult != null)
 				return functionResult;
+
+			int? moduleResult = await ModuleManager.TryExecuteFunction(name, args, console, callSite ?? this);
+			if (moduleResult != null)
+				return moduleResult;
 			
 			if (name == "export")
 			{

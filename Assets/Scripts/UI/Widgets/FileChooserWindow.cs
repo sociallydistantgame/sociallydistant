@@ -243,13 +243,7 @@ namespace UI.Widgets
 			var builder = new WidgetBuilder();
 			builder.Begin();
 
-			var list = new ListWidget
-			{
-				AllowSelectNone = false
-			};
-
-			builder.AddSection("Places", out SectionWidget places)
-				.AddWidget(list, places);
+			builder.AddSection("Places", out SectionWidget places);
 
 			foreach (string place in GetPlaces())
 			{
@@ -257,7 +251,6 @@ namespace UI.Widgets
 				{
 					Title = Path.GetFileName(place),
 					Callback = Navigate,
-					List = list,
 					Data = place,
 					Selected = Directory == place
 				}, places);
@@ -278,7 +271,6 @@ namespace UI.Widgets
 					Title = drive.VolumeLabel,
 					Description = $"{SociallyDistantUtility.GetFriendlyFileSize(drive.FreeSpace)} / {SociallyDistantUtility.GetFriendlyFileSize(drive.TotalSpace)}",
 					Callback = Navigate,
-					List = list,
 					Data = drive.Path,
 					Selected = Directory == drive.Path
 				}, devices);

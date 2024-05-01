@@ -5,10 +5,14 @@ using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+using AcidicGui.Widgets;
 using GamePlatform;
 using Player;
 using Shell.Windowing;
+using Social;
 using TMPro;
+using UI.Widgets;
+using UI.Widgets.Settings;
 using UI.Windowing;
 using UnityEngine;
 using UnityEngine.Assertions;
@@ -20,10 +24,6 @@ namespace UI.Login
 {
 	public class LoginManager : MonoBehaviour
 	{
-		[Header("Dependencies")]
-		[SerializeField]
-		private GameManagerHolder gameManager = null!;
-
 		[SerializeField]
 		private PlayerInstanceHolder playerHolder = null!;
 		
@@ -38,7 +38,7 @@ namespace UI.Login
 		private TextMeshProUGUI gameVersion = null!;
 		
 		[SerializeField]
-		private UserListController userListController = null!;
+		private WidgetList userListController = null!;
 
 		[SerializeField]
 		private Button backButton = null!;
@@ -53,7 +53,7 @@ namespace UI.Login
 		private Button createUserButton = null!;
 		
 		[SerializeField]
-		private Image avatarImage = null!;
+		private AvatarWidgetController avatarImage = null!;
 
 		[SerializeField]
 		private TextMeshProUGUI displayName = null!;
@@ -67,27 +67,29 @@ namespace UI.Login
 		
 		private IGameData? gameToLoad;
 		private TextMeshProUGUI buttonText;
+		private GameManager gameManager = null!;
 		
 		private void Awake()
 		{
+			gameManager = GameManager.Instance;
+			
 			this.AssertAllFieldsAreSerialized(typeof(LoginManager));
 			this.startGameButton.MustGetComponentInChildren(out buttonText);
 
 			SetupVersion();
 		}
 
-		private IEnumerator Start()
+		private async void Start()
 		{
 			startGameButton.onClick.AddListener(OnLogin);
 			this.createUserButton.onClick.AddListener(OnCreateNewUser);
 			this.manageUserButton.onClick.AddListener(ManageUser);
 			this.backButton.onClick.AddListener(GoBack);
-
-			this.userListController.GameDataSelected += OnGameDataSelected;
 			
-			yield return null;
 			RefreshUserList();
 			RefreshMainArea();
+			
+			
 		}
 
 		private void SetupVersion()
@@ -102,33 +104,44 @@ namespace UI.Login
 			
 			gameVersion.SetText(sb);
 		}
-		
+
 		private async void RefreshUserList()
 		{
 			var models = new List<UserListItemModel>();
-			
-			if (gameManager.Value != null)
-			{
-				IOrderedEnumerable<IGameData> gameData = gameManager.Value.ContentManager
-					.GetContentOfType<IGameData>()
-					.OrderByDescending(x => x.PlayerInfo.LastPlayed);
-				
-				models.AddRange(gameData.Select(x => new UserListItemModel
-				{
-					GameData = x,
-					Name = x.PlayerInfo.Name,
-					Comments = MakeComment(x)
-				}));
-			}
 
-			if (models.Count == 0)
+			IOrderedEnumerable<IGameData> gameData = gameManager.ContentManager
+				.GetContentOfType<IGameData>()
+				.OrderByDescending(x => x.PlayerInfo.LastPlayed);
+
+			var builder = new WidgetBuilder();
+			builder.Begin();
+
+			var useNewGameFlow = true;
+			
+			foreach (IGameData model in gameData)
 			{
-				if (gameManager.Value!=null)
-					await gameManager.Value.StartCharacterCreator();
+				useNewGameFlow = false;
+				builder.AddWidget(new ListItemWidget<IGameData>
+				{
+					Data = model,
+					Callback = OnGameDataSelected,
+					Title = model.PlayerInfo.Name,
+					Description = MakeComment(model),
+					Image = new AvatarWidget
+					{
+						Size = AvatarSize.Small,
+						AvatarColor = Color.cyan
+					}
+				});
+			}
+			
+			if (useNewGameFlow)
+			{
+				await gameManager.StartCharacterCreator();
 				return;
 			}
-			
-			this.userListController.SetItems(models);
+
+			this.userListController.SetItems(builder.Build());
 		}
 
 		private string MakeComment(IGameData data)
@@ -173,27 +186,21 @@ namespace UI.Login
 
 		private void OnLogin()
 		{
-			if (gameManager.Value == null)
-				return;
-            
 			startGameButton.enabled = false;
 			
 			if (gameToLoad != null)
 			{
-				this.gameManager.Value.StartGame(gameToLoad);
+				this.gameManager.StartGame(gameToLoad);
 			}
 			else
 			{
-				this.gameManager.Value.StartCharacterCreator();
+				this.gameManager.StartCharacterCreator();
 			}
 		}
 
 		private async void OnCreateNewUser()
 		{
-			if (gameManager.Value == null)
-				return;
-
-			await gameManager.Value.StartCharacterCreator();
+			await gameManager.StartCharacterCreator();
 		}
 
 		private void ManageUser()
@@ -225,8 +232,7 @@ namespace UI.Login
 		
 		private async void OnUserSettingsClosed(IWindow obj)
 		{
-			if (gameManager.Value != null)
-				await gameManager.Value.ContentManager.RefreshContentDatabaseAsync();
+			await gameManager.ContentManager.RefreshContentDatabaseAsync();
 			
 			this.GoBack();
 			this.RefreshUserList();

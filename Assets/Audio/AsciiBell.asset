@@ -14,5 +14,5 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   soundEffectName: os.asciiBell
   audioClip: {fileID: 8300000, guid: 77931442d29cee34a86ac2a1699a4ba8, type: 3}
-  volume: 1
-  pitch: 1
+  volume: 0.36
+  pitch: 2

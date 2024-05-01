@@ -12,7 +12,7 @@ namespace GameplaySystems.Social
 	public class SocialPostManager : IDisposable
 	{
 		private readonly SocialService socialService;
-		private readonly WorldManager worldManager;
+		private readonly IWorldManager worldManager;
 		private readonly Dictionary<ObjectId, SocialPost> posts = new Dictionary<ObjectId, SocialPost>();
 		private readonly Subject<IUserMessage> createSubject = new Subject<IUserMessage>();
 		private readonly Subject<IUserMessage> modifySubject = new Subject<IUserMessage>();
@@ -21,7 +21,7 @@ namespace GameplaySystems.Social
 
 		public IEnumerable<IUserMessage> Posts => posts.Values.OrderByDescending(x => x.Date);
 		
-		public SocialPostManager(SocialService socialService, WorldManager worldManager)
+		public SocialPostManager(SocialService socialService, IWorldManager worldManager)
 		{
 			this.socialService = socialService;
 			this.worldManager = worldManager;

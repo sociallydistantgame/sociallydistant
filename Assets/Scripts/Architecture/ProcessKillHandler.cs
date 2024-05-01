@@ -25,13 +25,13 @@ namespace Architecture
 
 		private void HandleProcessKilled(ISystemProcess obj)
 		{
+			obj.Killed -= HandleProcessKilled;
+			
 			if (!killedFirst)
 			{
 				killedFirst = true;
 				window.ForceClose();
 			}
-
-			process.Killed -= HandleProcessKilled;
 		}
 
 		private void HandleWindowClosed(IWindow obj)

@@ -23,9 +23,6 @@ namespace Player
 		private NetworkSimulationHolder networkSimulation = null!;
 		
 		[SerializeField]
-		private GameManagerHolder gameManager = null!;
-		
-		[SerializeField]
 		private DeviceCoordinator deviceCoordinator = null!;
 
 		[Header("File System Table")]
@@ -47,22 +44,24 @@ namespace Player
 		[SerializeField]
 		private Texture2D defaultBackdrop = null!;
 		
+		private GameManager gameManager = null!;
+		
 		private void Awake()
 		{
+			this.gameManager = GameManager.Instance;
 			this.AssertAllFieldsAreSerialized(typeof(PlayerInstantiator));
 		}
 
 		private async void Start()
 		{
-			if (gameManager.Value != null)
-				await gameManager.Value.WaitForModulesToLoad();
+			//await gameManager.WaitForModulesToLoad();
 			
 			// Create a ghost LAN for the player
 			LocalAreaNetwork playerLan = networkSimulation.Value.CreateLocalAreaNetwork();
 
 
 			var fileOverrider = new PlayerFileOverrider();
-			var playerComputer = new PlayerComputer(gameManager.Value, playerLan, fileOverrider, this.loginScript, fstab);
+			var playerComputer = new PlayerComputer(gameManager, playerLan, fileOverrider, this.loginScript, fstab);
 			var player = new PlayerInstance();
 
 			player.FileOverrider = fileOverrider;

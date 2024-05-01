@@ -1,4 +1,5 @@
 ﻿using System;
+using System.IO;
 using System.Linq;
 using System.Text;
 using Core.DataManagement;
@@ -7,13 +8,19 @@ using Core.Serialization.Binary;
 using Core.Systems;
 using Core.WorldData;
 using Core.WorldData.Data;
+using GamePlatform;
 using OS.Network;
 using UnityEngine;
+using System.Threading.Tasks;
 
 namespace Core
 {
-    public class WorldManager : IWorldManager
+    public class WorldManager : 
+        IWorldManager, 
+        IDisposable
     {
+        private static readonly Singleton<WorldManager> singleton = new();
+        
         private World world;
         private UniqueIntGenerator instanceIdGenerator;
         private DataEventDispatcher eventDispatcher;
@@ -28,15 +35,22 @@ namespace Core
         /// <inheritdoc />
         IWorld IWorldManager.World => this.world;
         
-        public WorldManager()
+        public WorldManager(GameManager gameManager)
         {
-            eventDispatcher = new DataEventDispatcher();
+            singleton.SetInstance(this);
+            
+            eventDispatcher = new DataEventDispatcher(gameManager);
             instanceIdGenerator = new UniqueIntGenerator();
             dataCallbacks = new DataCallbacks(eventDispatcher);
             
             world = new World(instanceIdGenerator, eventDispatcher);
         }
 
+        public void Dispose()
+        {
+            singleton.SetInstance(null);
+        }
+        
         public ObjectId GetNextObjectId()
         {
             return instanceIdGenerator.GetNextValue();
@@ -45,7 +59,12 @@ namespace Core
         public void SaveWorld(IDataWriter saveDestination)
         {
             var serializer = new WorldSerializer(saveDestination);
-            world.Serialize(serializer);
+            SaveWorldInternal(world, serializer);
+        }
+
+        private void SaveWorldInternal(IWorld worldToSave, WorldSerializer worldSerializer)
+        {
+            worldToSave.Serialize(worldSerializer);
         }
 
         public void LoadWorld(IDataReader reader)
@@ -136,5 +155,43 @@ namespace Core
             worldData.Now = now.AddSeconds(clockDelta);
             World.GlobalWorldState.Value = worldData;
         }
+
+        public async Task RestoreWorld(IWorld worldToRestore)
+        {
+            if (worldToRestore == this.world)
+            {
+                Debug.LogWarning("Attempting to restore the current world as a snapshot. Don't.");
+                return;
+            }
+
+            this.WipeWorld();
+            
+            // first we serialize the snapshot into RAM
+            using var memory = new MemoryStream();
+
+            await Task.Run(() =>
+            {
+                using var binaryWriter = new BinaryWriter(memory, Encoding.UTF8, true);
+                using var dataWriter = new BinaryDataWriter(binaryWriter);
+
+                var serializer = new WorldSerializer(dataWriter);
+                SaveWorldInternal(worldToRestore, serializer);
+            });
+
+            memory.Seek(0, SeekOrigin.Begin);
+            
+            // Now we can load it from RAM as a copy!
+            await Task.Run(() =>
+            {
+                using var binaryReader = new BinaryReader(memory, Encoding.UTF8, true);
+                using var dataReader = new BinaryDataReader(binaryReader);
+
+                var serializer = new WorldSerializer(dataReader);
+
+                this.world.Serialize(serializer);
+            });
+        }
+        
+        public static WorldManager Instance => singleton.MustGetInstance();
     }
 }

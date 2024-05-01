@@ -4,6 +4,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using Architecture;
+using GamePlatform;
 using OS.Devices;
 using Player;
 using Shell.Windowing;
@@ -27,13 +28,15 @@ namespace UI.Applications.AppLauncher
 
 		private readonly List<UguiProgram> programs = new List<UguiProgram>();
 		private readonly Dictionary<string, int> programMap = new Dictionary<string, int>();
-		private IWindow window;
+		private ISystemProcess? process;
+		private GameManager game = null!;
 
 		/// <inheritdoc />
 		protected override void Awake()
 		{
+			game = GameManager.Instance;
+			
 			this.AssertAllFieldsAreSerialized(typeof(AppLauncherController));
-			this.MustGetComponentInParent(out window);
 			base.Awake();
 		}
 
@@ -43,8 +46,9 @@ namespace UI.Applications.AppLauncher
 			base.Start();
 
 			this.programs.Clear();
-			this.programs.AddRange(Resources.LoadAll<UguiProgram>("Applications"));
 
+			this.programs.AddRange(game.ContentManager.GetContentOfType<UguiProgram>());
+			
 			var i = 0;
 			foreach (UguiProgram program in programs)
 			{
@@ -65,9 +69,10 @@ namespace UI.Applications.AppLauncher
 		/// <inheritdoc />
 		public void OnProgramOpen(ISystemProcess process, IContentPanel window, ITextConsole console, string[] args)
 		{
+			this.process = process;
 		}
 		
-		private void OnFileDoubleClicked(string file)
+		private async void OnFileDoubleClicked(string file)
 		{
 			if (!programMap.TryGetValue(file, out int index))
 				return;
@@ -77,9 +82,9 @@ namespace UI.Applications.AppLauncher
 			if (playerInstance.Value.UiManager.Desktop == null)
 				return;
 			
-			playerInstance.Value.UiManager.Desktop.OpenProgram(program, Array.Empty<string>(), null, null);
+			await playerInstance.Value.UiManager.Desktop.OpenProgram(program, Array.Empty<string>(), null, null);
 
-			window.ForceClose();
+			process?.Kill();
 		}
 	}
 }
