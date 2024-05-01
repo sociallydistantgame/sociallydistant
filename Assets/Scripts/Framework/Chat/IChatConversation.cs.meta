@@ -1,3 +1,4 @@
+<<<<<<<< HEAD:Assets/Scripts/Framework/Chat/IChatConversation.cs.meta
 fileFormatVersion: 2
 guid: 147d9518455bc4b0aa10762eb5e647f4
 MonoImporter:
@@ -9,3 +10,16 @@ MonoImporter:
   userData: 
   assetBundleName: 
   assetBundleVariant: 
+========
+fileFormatVersion: 2
+guid: 997264cf859cee34582da3c617113a4c
+MonoImporter:
+  externalObjects: {}
+  serializedVersion: 2
+  defaultReferences: []
+  executionOrder: 0
+  icon: {instanceID: 0}
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
+>>>>>>>> 96e20b81 (NPCs, Chat, UI polish, and Spring Cleaning):Packages/dev.acidiclight.fuzzyunited/Editor/Tests/FuzzyTests/RegressionTests.cs.meta

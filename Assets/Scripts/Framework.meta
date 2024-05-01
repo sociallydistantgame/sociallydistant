@@ -1,3 +1,4 @@
+<<<<<<<< HEAD:Assets/Scripts/Framework.meta
 fileFormatVersion: 2
 guid: e45a234f29fe1ca5483bb7df1ada706f
 folderAsset: yes
@@ -6,3 +7,13 @@ DefaultImporter:
   userData: 
   assetBundleName: 
   assetBundleVariant: 
+========
+fileFormatVersion: 2
+guid: a17c3599738126748adbc7e4d703a8c2
+folderAsset: yes
+DefaultImporter:
+  externalObjects: {}
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
+>>>>>>>> 96e20b81 (NPCs, Chat, UI polish, and Spring Cleaning):Assets/Assets/Core.meta

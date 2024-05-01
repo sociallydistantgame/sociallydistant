@@ -1,3 +1,4 @@
+<<<<<<<< HEAD:Assets/Assets/Core/Sfx.meta
 fileFormatVersion: 2
 guid: 0c1b3061b2babea43aa446ca76101582
 folderAsset: yes
@@ -6,3 +7,13 @@ DefaultImporter:
   userData: 
   assetBundleName: 
   assetBundleVariant: 
+========
+fileFormatVersion: 2
+guid: f42ffa70219e980408193471c3db5003
+folderAsset: yes
+DefaultImporter:
+  externalObjects: {}
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
+>>>>>>>> 96e20b81 (NPCs, Chat, UI polish, and Spring Cleaning):Assets/Audio.meta

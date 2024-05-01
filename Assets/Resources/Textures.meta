@@ -1,5 +1,9 @@
 fileFormatVersion: 2
+<<<<<<<< HEAD:Assets/Resources/Textures.meta
 guid: c278a1bc0ecf311a0ad37882dfc4df15
+========
+guid: 0c1b3061b2babea43aa446ca76101582
+>>>>>>>> 96e20b81 (NPCs, Chat, UI polish, and Spring Cleaning):Assets/Assets/Core/Sfx.meta
 folderAsset: yes
 DefaultImporter:
   externalObjects: {}
