@@ -4,6 +4,7 @@ using System.Text;
 using System.Threading.Tasks;
 using Core;
 using Core.Serialization.Binary;
+using Core.WorldData;
 using UnityEngine;
 
 namespace GamePlatform
@@ -78,7 +79,7 @@ namespace GamePlatform
 			await writer.WriteAsync(xml);
 		}
 
-		private async Task<bool> LoadPlayerData()
+		private bool LoadPlayerData()
 		{
 			string playerInfoPath = Path.Combine(directory, PlayerInfoFileName);
 			string worldPath = Path.Combine(directory, WorldFileName);
@@ -89,10 +90,10 @@ namespace GamePlatform
 			if (!File.Exists(worldPath))
 				return false;
 
-			await using FileStream fileStream = File.OpenRead(playerInfoPath);
+			using FileStream fileStream = File.OpenRead(playerInfoPath);
 			using var reader = new StreamReader(fileStream);
 
-			string xml = await reader.ReadToEndAsync();
+			string xml = reader.ReadToEnd();
 
 			if (!PlayerInfo.TryGetFromXML(xml, out PlayerInfo info))
 				return false;
@@ -101,20 +102,21 @@ namespace GamePlatform
 			return true;
 		}
 		
-		public static async Task<LocalGameData?> TryLoadFromDirectory(string directory)
+		public static LocalGameData TryLoadFromDirectory(string directory)
 		{
 			if (!Directory.Exists(directory))
 				return null;
 
 			var data = new LocalGameData(directory);
 
-			if (!await data.LoadPlayerData())
+			if (!data.LoadPlayerData())
 				return null;
 
 			return data;
 		}
 
-		public async Task SaveWorld(WorldManager worldManager)
+		/// <inheritdoc />
+		public async Task SaveWorld(IWorldManager worldManager)
 		{
 			// Serialize the world to RAM first, because that'll be faster than writing to disk.
 			// Serializing the world is a blocking operation.
@@ -122,7 +124,12 @@ namespace GamePlatform
 			await using (var binaryWriter = new BinaryWriter(memory, Encoding.UTF8, true))
 			{
 				var binarySerializer = new BinaryDataWriter(binaryWriter);
-                worldManager.SaveWorld(binarySerializer);
+				
+				// we can do this on another thread because saving the world should not modify it.
+				await Task.Run(() =>
+				{
+					worldManager.SaveWorld(binarySerializer);
+				});
 			}
 
 			memory.Seek(0, SeekOrigin.Begin);
@@ -136,7 +143,7 @@ namespace GamePlatform
 			await memory.CopyToAsync(fileStream);
 		}
 		
-		public static async Task<LocalGameData> CreateNewGame(PlayerInfo playerInfo, WorldManager worldManager)
+		public static async Task<LocalGameData> CreateNewGame(PlayerInfo playerInfo, World world)
 		{
 			var gameIndex = 0;
 
@@ -158,7 +165,8 @@ namespace GamePlatform
 
 			await gameData.UpdatePlayerInfo(playerInfo);
 
-			await gameData.SaveWorld(worldManager);
+			await WorldManager.Instance.RestoreWorld(world);
+			await gameData.SaveWorld(WorldManager.Instance);
 
 			return gameData;
 		}

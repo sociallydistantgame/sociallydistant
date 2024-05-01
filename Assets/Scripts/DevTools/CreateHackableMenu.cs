@@ -11,7 +11,7 @@ namespace DevTools
 {
 	public class CreateHackableMenu : IDevMenu
 	{
-		private WorldManager world; 
+		private IWorldManager world; 
 		private ushort port;
 		private ObjectId computerId;
 		private ServerType serverType;
@@ -21,7 +21,7 @@ namespace DevTools
 		private string[] serverTypeNames;
 		private WorldComputerData[] computers;
 
-		public CreateHackableMenu(WorldManager world)
+		public CreateHackableMenu(IWorldManager world)
 		{
 			this.world = world;
 			serverTypeNames = Enum.GetNames(typeof(ServerType));

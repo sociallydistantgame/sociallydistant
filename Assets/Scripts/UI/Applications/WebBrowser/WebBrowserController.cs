@@ -15,10 +15,6 @@ namespace UI.Applications.WebBrowser
 {
 	public class WebBrowserController : MonoBehaviour
 	{
-		[Header("Dependencies")]
-		[SerializeField]
-		private GameManagerHolder gameManager = null!;
-		
 		[Header("UI")]
 		[SerializeField]
 		private Button backButton = null!;
@@ -44,6 +40,7 @@ namespace UI.Applications.WebBrowser
 
 		public string CurrentUrl => addressBar.text;
 
+		private GameManager gameManager = null!;
 		private IDisposable? websitePathObserver;
 		private readonly Stack<string> future = new Stack<string>();
 		private readonly Stack<string> history = new Stack<string>();
@@ -51,6 +48,7 @@ namespace UI.Applications.WebBrowser
 		
 		private void Awake()
 		{
+			gameManager = GameManager.Instance;
 			this.AssertAllFieldsAreSerialized(typeof(WebBrowserController));
 			NavigateTo(homepage, null, false);
 		}
@@ -159,12 +157,9 @@ namespace UI.Applications.WebBrowser
 
 			// Find a website with a matching hostname
 			WebPageAsset? asset = null;
-			if (gameManager.Value != null)
-			{
-				asset = gameManager.Value.ContentManager.GetContentOfType<WebPageAsset>()
-					.FirstOrDefault(x => x.HostName == uri.Host);
-			}
-
+			asset = gameManager.ContentManager.GetContentOfType<WebPageAsset>()
+				.FirstOrDefault(x => x.HostName == uri.Host);
+			
 			// TODO: 404: Code Not Found.
 			if (asset == null)
 				return;

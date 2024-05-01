@@ -313,7 +313,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: c799d7e33bafc8345b9e1d39a52c825d, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  gameManager: {fileID: 11400000, guid: 872374c25807361459f4e174bb460b2c, type: 2}
   categoriesList: {fileID: 2679908452515679640}
   viewController: {fileID: 6107435873652454708}
 --- !u!114 &4374797453016973442
@@ -355,9 +354,9 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   m_IgnoreLayout: 0
-  m_MinWidth: 1280
+  m_MinWidth: 857
   m_MinHeight: 720
-  m_PreferredWidth: 1280
+  m_PreferredWidth: 857
   m_PreferredHeight: 720
   m_FlexibleWidth: -1
   m_FlexibleHeight: -1

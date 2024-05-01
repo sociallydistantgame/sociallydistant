@@ -39,6 +39,10 @@ namespace UI.Terminal.SimpleTerminal
 		private readonly float maxLatency;
 		private readonly float minLatency;
 		private readonly SimpleTerminalInputHelper inputHelper;
+		private readonly int startingRows;
+		private readonly int startingColumns;
+
+		private bool isFirstUpdate = true;
 		
 		private IPseudoTerminal? tty;
 		private Data.Line[] altline = null;
@@ -130,6 +134,7 @@ namespace UI.Terminal.SimpleTerminal
 		public SimpleTerminal(
 			IClipboard clipboard,
 			IDrawableScreen screen,
+			ITerminalSounds sounds,
 			float minLatency,
 			float maxLatency,
 			int columns,
@@ -139,9 +144,10 @@ namespace UI.Terminal.SimpleTerminal
 			this.screen = screen;
 			this.minLatency = minLatency;
 			this.maxLatency = maxLatency;
-			this.inputHelper = new SimpleTerminalInputHelper(this, MasterWrite);
+			this.inputHelper = new SimpleTerminalInputHelper(sounds, this, MasterWrite);
 
-			TerminalNew(columns, rows);
+			startingColumns = columns;
+			startingRows = rows;
 		}
 
 		public void SetTty(IPseudoTerminal tty)
@@ -286,6 +292,12 @@ namespace UI.Terminal.SimpleTerminal
 		/// </summary>
 		public void Update(float deltaTime)
 		{
+			if (isFirstUpdate)
+			{
+				isFirstUpdate = false;
+				TerminalNew(startingColumns, startingRows);
+			}
+			
 			// Tick, tock, update the clock.
 			this.now += deltaTime;
 			
@@ -1312,6 +1324,17 @@ namespace UI.Terminal.SimpleTerminal
 									break;
 								case 20: /* LNM -- Linefeed/new line */
 									SetTerminalMode(ref this.term.mode, set, TermMode.MODE_CRLF);
+									break;
+								case 1049: /* swap screen & set/restore cursor as xterm */
+								case 47: /* swap screen */
+								case 1047: /* swap screen, clearing alternate screen */
+									if (!this.allowAltScreen)
+										break;
+
+									if (set != 0)
+										this.LoadAltScreen(*ptr == 1049, *ptr == 1049);
+									else
+										this.LoadDefScreen(*ptr == 1047, *ptr == 1049);
 									break;
 								default:
 									Debug.LogError($"erresc: unknown set/reset mode {*ptr}\n");

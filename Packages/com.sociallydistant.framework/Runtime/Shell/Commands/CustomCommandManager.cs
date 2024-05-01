@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using ContentManagement;
@@ -7,7 +8,7 @@ using System.Reflection;
 
 namespace Shell.Commands
 {
-	public class CustomCommandManager : IGameContentSource
+	public class CustomCommandManager : IContentGenerator
 	{
 		private readonly IModuleManager moduleManager;
 
@@ -16,7 +17,7 @@ namespace Shell.Commands
 			this.moduleManager = moduleManager;
 		}
 
-		private void GetCommandsInAssembly(Assembly assembly, ContentCollectionBuilder builder)
+		private IEnumerable<IGameContent> GetCommandsInAssembly(Assembly assembly)
 		{
 			foreach (Type type in assembly.GetTypes())
 			{
@@ -35,23 +36,23 @@ namespace Shell.Commands
 				if (type.GetConstructor(Type.EmptyTypes) == null)
 					continue;
 
-				var commandAsset = new CustomCommandAsset(type, attribute);
-				builder.AddContent(commandAsset);
+				yield return new CustomCommandAsset(type, attribute);
 			}
 		}
-
+		
 		/// <inheritdoc />
-		public Task LoadAllContent(ContentCollectionBuilder builder)
+		public IEnumerable<IGameContent> CreateContent()
 		{
-			GetCommandsInAssembly(this.GetType().Assembly, builder);
+			foreach (IGameContent command in GetCommandsInAssembly(this.GetType().Assembly))
+			{
+				yield return command;
+			}
 			
 			foreach (GameModule module in moduleManager.Modules)
 			{
-				GetCommandsInAssembly(module.GetType().Assembly, builder);
+				foreach (IGameContent command in GetCommandsInAssembly(module.GetType().Assembly))
+					yield return command;
 			}
-
-			return Task.CompletedTask;
 		}
-
 	}
 }

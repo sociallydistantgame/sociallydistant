@@ -1,11 +1,19 @@
 ﻿#nullable enable
 
+using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Threading.Tasks;
 using Core;
+using Core.Scripting;
+using Core.WorldData;
 using Core.WorldData.Data;
+using DevTools;
+using GamePlatform;
+using Modules;
 using Player;
 using Social;
+using UniRx;
 using UnityEngine;
 using UnityEngine.Analytics;
 using UnityExtensions;
@@ -16,13 +24,11 @@ namespace GameplaySystems.Social
 		MonoBehaviour,
 		ISocialService
 	{
-		[Header("Dependencies")]
-		[SerializeField]
-		private WorldManagerHolder worldManager = null!;
-        
 		[SerializeField]
 		private PlayerInstanceHolder playerInstance = null!;
 
+		private readonly CharacterUpdateHook characterUpdateHook = new();
+		
 		private Dictionary<ObjectId, Profile> profiles = new Dictionary<ObjectId, Profile>();
 		private ObjectId playerProfileId;
 		private EmptyProfile unloadedPlayerProfile = new EmptyProfile();
@@ -31,6 +37,8 @@ namespace GameplaySystems.Social
 		private ChatChannelManager channelManager;
 		private MessageManager messageManager;
 		private SocialPostManager socialPostManager;
+		private IWorldManager worldManager = null!;
+		private IGameContext game;
 
 		/// <inheritdoc />
 		public IProfile PlayerProfile
@@ -46,29 +54,32 @@ namespace GameplaySystems.Social
 
 		private void Awake()
 		{
+			game = GameManager.Instance;
+			worldManager = GameManager.Instance.WorldManager;
+			
 			this.AssertAllFieldsAreSerialized(typeof(SocialService));
 		}
 
 		private void Start()
 		{
-			if (worldManager.Value == null)
-				return;
-
-			messageManager = new MessageManager(worldManager.Value, this);
-			channelManager = new ChatChannelManager(this.worldManager.Value, messageManager);
-			memberManager = new ChatMemberManager(this, worldManager.Value);
-			masterGuildList = new GuildList(channelManager, memberManager, worldManager.Value);
-			socialPostManager = new SocialPostManager(this, worldManager.Value);
+			game.ScriptSystem.RegisterHookListener(CommonScriptHooks.AfterWorldStateUpdate, characterUpdateHook);
+			messageManager = new MessageManager(worldManager, this);
+			channelManager = new ChatChannelManager(this, this.worldManager, messageManager);
+			memberManager = new ChatMemberManager(this, worldManager);
+			masterGuildList = new GuildList(channelManager, memberManager, worldManager);
+			socialPostManager = new SocialPostManager(this, worldManager);
 			
-			worldManager.Value.Callbacks.AddModifyCallback<WorldPlayerData>(OnPlayerDataUpdated);
+			worldManager.Callbacks.AddModifyCallback<WorldPlayerData>(OnPlayerDataUpdated);
 			
-			worldManager.Value.Callbacks.AddCreateCallback<WorldProfileData>(OnProfileCreated);
-			worldManager.Value.Callbacks.AddModifyCallback<WorldProfileData>(OnProfileModified);
-			worldManager.Value.Callbacks.AddDeleteCallback<WorldProfileData>(OnProfileDeleted);
+			worldManager.Callbacks.AddCreateCallback<WorldProfileData>(OnProfileCreated);
+			worldManager.Callbacks.AddModifyCallback<WorldProfileData>(OnProfileModified);
+			worldManager.Callbacks.AddDeleteCallback<WorldProfileData>(OnProfileDeleted);
+			
 		}
 
 		private void OnDestroy()
 		{
+			game.ScriptSystem.UnregisterHookListener(CommonScriptHooks.AfterWorldStateUpdate, characterUpdateHook);
 			socialPostManager.Dispose();
 			masterGuildList.Dispose();
 			masterGuildList = null;
@@ -111,10 +122,7 @@ namespace GameplaySystems.Social
 		/// <inheritdoc />
 		public IEnumerable<IProfile> GetFriends(IProfile user)
 		{
-			if (worldManager.Value == null)
-				yield break;
-
-			foreach (WorldRelationshipData relationship in worldManager.Value.World.Relationships)
+			foreach (WorldRelationshipData relationship in worldManager.World.Relationships)
 			{
 				if (relationship.Type != RelationshipType.Friend)
 					continue;
@@ -134,10 +142,7 @@ namespace GameplaySystems.Social
 		/// <inheritdoc />
 		public IEnumerable<IProfile> GetFollowers(IProfile user)
 		{
-			if (worldManager.Value == null)
-				yield break;
-
-			foreach (WorldRelationshipData relationship in worldManager.Value.World.Relationships)
+			foreach (WorldRelationshipData relationship in worldManager.World.Relationships)
 			{
 				if (relationship.Target != user.ProfileId)
 					continue;
@@ -155,10 +160,7 @@ namespace GameplaySystems.Social
 		/// <inheritdoc />
 		public IEnumerable<IProfile> GetFollowing(IProfile user)
 		{
-			if (worldManager.Value == null)
-				yield break;
-
-			foreach (WorldRelationshipData relationship in worldManager.Value.World.Relationships)
+			foreach (WorldRelationshipData relationship in worldManager.World.Relationships)
 			{
 				if (relationship.Source != user.ProfileId)
 					continue;
@@ -176,10 +178,7 @@ namespace GameplaySystems.Social
 		/// <inheritdoc />
 		public IEnumerable<IProfile> GetBlockedProfiles(IProfile user)
 		{
-			if (worldManager.Value == null)
-				yield break;
-
-			foreach (WorldRelationshipData relationship in worldManager.Value.World.Relationships)
+			foreach (WorldRelationshipData relationship in worldManager.World.Relationships)
 			{
 				if (relationship.Source != user.ProfileId)
 					continue;
@@ -203,9 +202,6 @@ namespace GameplaySystems.Social
 		/// <inheritdoc />
 		public IEnumerable<IDirectConversation> GetDirectConversations(IProfile user)
 		{
-			if (worldManager.Value == null)
-				yield break;
-			
 			// Find all of the user's friends.
 			foreach (IProfile? friend in GetFriends(user))
 			{
@@ -219,7 +215,7 @@ namespace GameplaySystems.Social
 				IEnumerable<IChatChannel> channels = channelManager.GetDirectMessageChannels();
 				foreach (IChatChannel channel in channels)
 				{
-					WorldMemberData[] members = worldManager.Value.World.Members.Where(x => x.GroupId == channel.Id && x.GroupType == MemberGroupType.GroupDirectMessage).ToArray();
+					WorldMemberData[] members = worldManager.World.Members.Where(x => x.GroupId == channel.Id && x.GroupType == MemberGroupType.GroupDirectMessage).ToArray();
 					if (members.Length != 2)
 						continue;
 
@@ -233,25 +229,25 @@ namespace GameplaySystems.Social
 				{
 					var newChannel = new WorldChannelData
 					{
-						InstanceId = worldManager.Value.GetNextObjectId(),
+						InstanceId = worldManager.GetNextObjectId(),
 						ChannelType = MessageChannelType.DirectMessage,
 						Name = $"__DMChannel__",
 						Description = "This is a DM channel"
 					};
 					
-					worldManager.Value.World.Channels.Add(newChannel);
+					worldManager.World.Channels.Add(newChannel);
 
-					worldManager.Value.World.Members.Add(new WorldMemberData()
+					worldManager.World.Members.Add(new WorldMemberData()
 					{
-						InstanceId = worldManager.Value.GetNextObjectId(),
+						InstanceId = worldManager.GetNextObjectId(),
 						GroupId = newChannel.InstanceId,
 						GroupType = MemberGroupType.GroupDirectMessage,
 						ProfileId = user.ProfileId
 					});
 					
-					worldManager.Value.World.Members.Add(new WorldMemberData()
+					worldManager.World.Members.Add(new WorldMemberData()
 					{
-						InstanceId = worldManager.Value.GetNextObjectId(),
+						InstanceId = worldManager.GetNextObjectId(),
 						GroupId = newChannel.InstanceId,
 						GroupType = MemberGroupType.GroupDirectMessage,
 						ProfileId = friend.ProfileId
@@ -260,7 +256,7 @@ namespace GameplaySystems.Social
 			}
 			
 			// Now, find all world member data for DM channels where the member is the user we're searching for.
-			foreach (WorldMemberData memberData in worldManager.Value.World.Members)
+			foreach (WorldMemberData memberData in worldManager.World.Members)
 			{
 				if (memberData.GroupType != MemberGroupType.GroupDirectMessage)
 					continue;
@@ -306,26 +302,164 @@ namespace GameplaySystems.Social
 		/// <inheritdoc />
 		public IProfile GetProfileById(ObjectId id)
 		{
+			if (id.IsInvalid)
+				return new EmptyProfile();
+			
 			return profiles[id];
 		}
 
 		/// <inheritdoc />
 		public IProfile GetNarrativeProfile(string narrativeIdentifier)
 		{
-			WorldProfileData profileDAta = worldManager.Value!.World.Profiles.FirstOrDefault(x => x.NarrativeId == narrativeIdentifier);
+			if (narrativeIdentifier == "player")
+				return PlayerProfile;
 
-			if (profileDAta.NarrativeId != narrativeIdentifier)
+			WorldProfileData profileDAta = worldManager!.World.Profiles.GetNarrativeObject(narrativeIdentifier);
+
+			var modify = false;
+			if (string.IsNullOrWhiteSpace(profileDAta.ChatUsername))
 			{
-				profileDAta.InstanceId = worldManager.Value.GetNextObjectId();
-				profileDAta.NarrativeId = narrativeIdentifier;
-				profileDAta.ChatName = narrativeIdentifier;
+				modify = true;
 				profileDAta.ChatUsername = narrativeIdentifier;
-				profileDAta.Gender = Gender.Unknown;
-				
-				worldManager.Value.World.Profiles.Add(profileDAta);
 			}
 
+			if (string.IsNullOrWhiteSpace(profileDAta.ChatName))
+			{
+				modify = true;
+				profileDAta.ChatName = narrativeIdentifier;
+			}
+			
+			if (modify)
+				worldManager.World.Profiles.Modify(profileDAta);
+			
 			return profiles[profileDAta.InstanceId];
+		}
+
+		/// <inheritdoc />
+		public INarrativeThread? GetNarrativeThread(NarrativeThread threadType, string guildId, string channelId, bool create, params string[] nonPlayerActors)
+		{
+			if (nonPlayerActors.Length < 1)
+			{
+				if (create)
+					throw new InvalidOperationException("A narrative thread must have at least one non-player actor. Do not pass an empty array to this function!");
+				else return null;
+			}
+
+			IWorld world = worldManager.World;
+
+			IProfile[] nonPlayerProfiles = nonPlayerActors.Select(GetNarrativeProfile).ToArray();
+			IProfile playerProfile = this.PlayerProfile;
+
+			var profileIds = new ObjectId[nonPlayerProfiles.Length + 1];
+
+			profileIds[0] = playerProfile.ProfileId;
+
+			for (var i = 0; i < nonPlayerProfiles.Length; i++)
+			{
+				profileIds[i + 1] = nonPlayerProfiles[i].ProfileId;
+			}
+			
+			switch (threadType)
+			{
+				case NarrativeThread.DirectMessage:
+				{
+					if (nonPlayerActors.Length > 1)
+					{
+						if (create)
+							throw new InvalidOperationException("Direct message threads may only have one non-player actor.");
+						else return null;
+					}
+
+					WorldChannelData threadData = world.Channels.FirstOrDefault(x => x.ChannelType == MessageChannelType.DirectMessage &&
+					                                                                 world.Members.Where(m => m.GroupId == x.InstanceId).All(m => profileIds.Contains(m.ProfileId)));
+
+					if (threadData.InstanceId.IsInvalid)
+					{
+						threadData.InstanceId = worldManager.GetNextObjectId();
+						threadData.ChannelType = MessageChannelType.DirectMessage;
+						
+						world.Channels.Add(threadData);
+
+						foreach (ObjectId profileId in profileIds)
+						{
+							world.Members.Add(new WorldMemberData
+							{
+								InstanceId = worldManager.GetNextObjectId(),
+								GroupId = threadData.InstanceId,
+								ProfileId = profileId,
+								GroupType = MemberGroupType.GroupDirectMessage
+							});
+						}
+					}
+
+					return new NarrativeThreadController(worldManager, this.PlayerProfile, threadData.InstanceId);
+				}
+				case NarrativeThread.Channel:
+				{
+					if (string.IsNullOrWhiteSpace(guildId) || string.IsNullOrWhiteSpace(channelId))
+					{
+						if (create)
+							throw new InvalidOperationException("When requesting a Guild-type narrative thread, you must specify a Narrative ID for the guild and channel");
+						return null;
+					}
+
+					// Find the guild by narrative ID, it'll be created if non already exists.
+					IGuild guild = this.masterGuildList.GetNarrativeGuild(guildId);
+
+					// Invite the player into the guild if they're not in it already
+					if (!guild.HasMember(playerProfile))
+					{
+						// We do not invite players to guilds unless a script is starting.
+						if (!create)
+							return null;
+						
+						world.Members.Add(new WorldMemberData()
+						{
+							InstanceId = worldManager.GetNextObjectId(),
+							GroupId = guild.Id,
+							ProfileId = playerProfile.ProfileId,
+							GroupType = MemberGroupType.Guild
+						});
+					}
+
+					// And do the same for the NPCs
+					foreach (IProfile npcProfile in nonPlayerProfiles)
+					{
+						if (!guild.HasMember(npcProfile))
+							world.Members.Add(new WorldMemberData()
+							{
+								InstanceId = worldManager.GetNextObjectId(),
+								GroupId = guild.Id,
+								ProfileId = npcProfile.ProfileId,
+								GroupType = MemberGroupType.Guild
+							});
+					}
+					
+					// Now we can grab a channel to create the thread in
+					// It'll also be created if it doesn't exist.
+					IChatChannel channel = guild.GetNarrativeChannel(channelId);
+					
+					return new NarrativeThreadController(worldManager, this.PlayerProfile, channel.Id);
+				}
+				default:
+				{
+					if (create)
+						throw new NotImplementedException();
+					else return null;
+				}
+			}
+		}
+	}
+
+	public sealed class CharacterUpdateHook : IHookListener
+	{
+		/// <inheritdoc />
+		public async Task ReceiveHookAsync(IGameContext game)
+		{
+			foreach (ICharacterGenerator generator in game.ContentManager.GetContentOfType<ICharacterGenerator>())
+			{
+				await generator.GenerateNpcs(game.WorldManager);
+			}
 		}
 	}
 }

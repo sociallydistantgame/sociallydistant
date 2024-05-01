@@ -37,7 +37,7 @@ Administrator. It usually boils down to these three things:
 				return;
 			}
 
-			ISystemProcess fork = Process.ForkAsUser(Process.User.Computer.SuperUser);
+			ISystemProcess fork = await Process.ForkAsUser(Process.User.Computer.SuperUser);
 
 			var context = new OperatingSystemExecutionContext(fork);
 			var shell = new InteractiveShell(context);

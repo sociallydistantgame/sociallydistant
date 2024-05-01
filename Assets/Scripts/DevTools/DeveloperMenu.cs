@@ -11,6 +11,7 @@ using UnityEngine;
 using UnityEngine.InputSystem;
 using UnityExtensions;
 using DevTools.Social;
+using GameplaySystems.Chat;
 using GameplaySystems.Missions;
 using GameplaySystems.Social;
 
@@ -27,20 +28,11 @@ namespace DevTools
 
 		[Header("Dependencies")]
 		[SerializeField]
-		private WorldManagerHolder world = null!;
-
-		[SerializeField]
 		private SocialServiceHolder socialServiceHolder = null!;
-
-		[SerializeField]
-		private MissionManagerHolder missionManager = null!;
 		
 		[SerializeField]
 		private DeviceCoordinator deviceCoordinator = null!;
 		
-		[SerializeField]
-		private GameManagerHolder gameManager = null!;
-
 		[SerializeField]
 		private PlayerInstanceHolder playerInstance = null!;
 
@@ -50,8 +42,12 @@ namespace DevTools
 		[SerializeField]
 		private GamePlatformHolder platform = null!;
 		
+		private GameManager gameManager = null!;
+		
 		private void Awake()
 		{
+			gameManager = GameManager.Instance;
+			
 			this.AssertAllFieldsAreSerialized(typeof(DeveloperMenu));
 		}
 
@@ -61,13 +57,14 @@ namespace DevTools
 		{
 			menus.Insert(0, new UriRunnerMenu(gameManager));
 			menus.Insert(1, new GameManagerDebug(gameManager));
-			menus.Insert(2, new NetworldDebug(world.Value, networkSimulation.Value, playerInstance));
+			menus.Insert(2, new NetworldDebug(networkSimulation.Value, playerInstance));
 			menus.Insert(3, new GodModeMenu(deviceCoordinator, playerInstance));
-			menus.Insert(4, new HackablesMenu(world));
-			menus.Insert(5, new SocialDebug(world));
+			menus.Insert(4, new HackablesMenu());
+			menus.Insert(5, new SocialDebug());
 			menus.Insert(6, new GuiToolsMenu(playerInstance));
-			menus.Insert(7, new EmailMenu(this.world, this.socialServiceHolder));
-			menus.Insert(8, new MissionDebug(this.world, this.missionManager, this.gameManager));
+			menus.Insert(7, new EmailMenu(this.socialServiceHolder));
+			menus.Insert(8, new MissionDebug(this.gameManager));
+			menus.Insert(9, new ConversationScriptDebugger());
 			
 
 			overlay = new Texture2D(1, 1);

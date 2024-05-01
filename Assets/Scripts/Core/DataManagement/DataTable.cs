@@ -4,8 +4,6 @@ using System.Collections.Generic;
 using System.Linq;
 using Core.Serialization;
 using Core.Systems;
-using PlasticPipe.PlasticProtocol.Messages;
-using UnityEngine.AI;
 using UnityEngine.Assertions;
 
 namespace Core.DataManagement
@@ -16,6 +14,7 @@ namespace Core.DataManagement
 		where TDataElement : struct, ISerializable<TRevision, TSerializer>, IDataWithId
 		where TRevision : Enum
 	{
+		private readonly bool dispatchOnSerialize;
 		private UniqueIntGenerator instanceIdGenerator;
 		private List<TDataElement> dataElements = new List<TDataElement>();
 		private Dictionary<ObjectId, int> dataIndexMap = new Dictionary<ObjectId, int>();
@@ -32,13 +31,19 @@ namespace Core.DataManagement
 			}
 		}
 
-		protected DataTable(UniqueIntGenerator instanceIdgenerator, DataEventDispatcher eventDispatcher)
+		protected DataTable(UniqueIntGenerator instanceIdgenerator, DataEventDispatcher eventDispatcher, bool dispatchOnSerialize)
 		{
 			this.instanceIdGenerator = instanceIdgenerator;
 			this.eventDispatcher = eventDispatcher;
+			this.dispatchOnSerialize = dispatchOnSerialize;
 		}
 
 		public void Add(TDataElement data)
+		{
+			AddInternal(data, true);
+		}
+
+		private void AddInternal(TDataElement data, bool dispatch)
 		{
 			if (data.InstanceId.IsInvalid)
 				throw new InvalidOperationException("Cannot add data with an invalid instance ID to a data table.");
@@ -49,7 +54,8 @@ namespace Core.DataManagement
 			dataIndexMap.Add(data.InstanceId, dataElements.Count);
 			dataElements.Add(data);
 			
-			eventDispatcher.Create.Invoke(data);
+			if (dispatch)
+				eventDispatcher.Create.Invoke(data);
 		}
 
 		public void Remove(TDataElement data)
@@ -134,7 +140,7 @@ namespace Core.DataManagement
 
 				instanceIdGenerator.ClaimUsedValue(element.InstanceId.Id);
 
-				Add(element);
+				AddInternal(element, dispatchOnSerialize);
 			}
 		}
 

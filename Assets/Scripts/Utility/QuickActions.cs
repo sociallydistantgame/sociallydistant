@@ -2,6 +2,7 @@
 
 using Core.Config;
 using GamePlatform;
+using GamePlatform.ContentManagement;
 using UnityEditor;
 using UnityEngine.Device;
 
@@ -11,6 +12,12 @@ namespace Utility
 	{
 		private const string MenuName = "Quick Actions";
 
+		[MenuItem(itemName: MenuName + "/Rebuild System Asset Bundles")]
+		public static void BuildSystemAssetBundles()
+		{
+			ContentManager.BuildSystemAssetBundles();
+		}
+		
 		[MenuItem(itemName: MenuName + "/Open Game Data")]
 		private static void OpenGameData()
 		{

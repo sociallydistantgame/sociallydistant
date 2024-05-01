@@ -2,8 +2,11 @@
 
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using Architecture;
+using ContentManagement;
 using Core;
+using GamePlatform;
 using OS.FileSystems;
 using UnityEngine;
 
@@ -19,16 +22,21 @@ namespace VfsMapping
 		/// <inheritdoc />
 		public sealed override IFileSystem GetFileSystem()
 		{
-			var assetList = new List<TAssetType>();
-			foreach (string searchDirectory in searchDirectories)
-			{
-				TAssetType[] assets = Resources.LoadAll<TAssetType>(searchDirectory);
-				foreach (TAssetType asset in assets)
-					if (!assetList.Contains(asset))
-						assetList.Add(asset);
-			}
+			IContentManager contentManager = GameManager.Instance.ContentManager;
+
+			TAssetType[] assetList = FindAssets(contentManager).Where(Filter).ToArray();
 
 			return new AssetFileSystem<TAssetType, TFileEntryType>(assetList.ToArray());
+		}
+
+		protected virtual IEnumerable<TAssetType> FindAssets(IContentManager contentManager)
+		{
+			return contentManager.GetContentOfType<TAssetType>();
+		}
+
+		protected virtual bool Filter(TAssetType asset)
+		{
+			return true;
 		}
 	}
 }

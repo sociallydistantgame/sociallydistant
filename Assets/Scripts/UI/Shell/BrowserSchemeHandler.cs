@@ -14,10 +14,10 @@ namespace UI.Shell
 		}
 		
 		/// <inheritdoc />
-		public void HandleUri(Uri uri)
+		public async void HandleUri(Uri uri)
 		{
 			// switch to (or open) the web browser in the Main Tile
-			shell.OpenWebBrowser(uri);
+			await shell.OpenWebBrowser(uri);
 		}
 	}
 }

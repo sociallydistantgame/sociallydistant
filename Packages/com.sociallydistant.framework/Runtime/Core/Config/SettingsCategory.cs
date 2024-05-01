@@ -8,6 +8,8 @@ namespace Core.Config
 		private readonly ISettingsManager settingsManager;
 		private SettingsCategoryAttribute reflectionAttribute;
 
+		protected ISettingsManager Context => settingsManager;
+		
 		public string CategoryKey => reflectionAttribute.Key;
 		public string Name => reflectionAttribute.DisplayName;
 		public string SectionName => reflectionAttribute.SectionName;

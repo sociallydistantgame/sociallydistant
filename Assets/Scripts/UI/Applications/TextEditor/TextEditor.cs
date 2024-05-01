@@ -187,6 +187,7 @@ namespace UI.Applications.TextEditor
 			var source = new TaskCompletionSource<bool?>();
 
 			dialogHelper.AskYesNoCancel(
+				MessageBoxType.Question,
 				"Unsaved changes",
 				"The current document has unsaved changes. Would you like to save before continuing?",
 				this.win.Window,

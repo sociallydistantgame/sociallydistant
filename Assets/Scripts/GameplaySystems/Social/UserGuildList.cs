@@ -18,10 +18,10 @@ namespace GameplaySystems.Social
 		private readonly Subject<IGuild> leaveSubject = new Subject<IGuild>();
 		private readonly IDisposable createObserver;
 		private readonly IDisposable deleteObserver;
-		private readonly WorldManager world;
+		private readonly IWorldManager world;
 		
 
-		public UserGuildList(WorldManager world, IGuildList parent, params IProfile[] profiles)
+		public UserGuildList(IWorldManager world, IGuildList parent, params IProfile[] profiles)
 		{
 			this.world = world;
 			

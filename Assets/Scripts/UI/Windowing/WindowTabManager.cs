@@ -112,7 +112,7 @@ namespace UI.Windowing
 						if (closeOnEmpty)
 							this.window?.ForceClose();
 						
-						tabRenderer.UpdateTabs();
+						tabRenderer.ScheduleUpdateTabs();
 						return true;
 					}
 
@@ -126,7 +126,7 @@ namespace UI.Windowing
 				tabIndex--;
 			}
 
-			tabRenderer.UpdateTabs();
+			tabRenderer.ScheduleUpdateTabs();
 			
 			return true;
 		}
@@ -204,12 +204,12 @@ namespace UI.Windowing
 
 			EnableCurrentTab();
 
-			tabRenderer.UpdateTabs();
+			tabRenderer.ScheduleUpdateTabs();
 		}
 
 		private void OnTitleChanged(string title)
 		{
-			tabRenderer.UpdateTabs();
+			tabRenderer.ScheduleUpdateTabs();
 		}
 	}
 }

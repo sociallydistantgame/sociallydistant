@@ -8,30 +8,24 @@ namespace DevTools
 {
 	public class GameManagerDebug : IDevMenu
 	{
-		private GameManagerHolder gameManager;
+		private GameManager gameManager;
 		
 		public string Name => "Game Manager Debug";
 
-		public GameManagerDebug(GameManagerHolder gameManager)
+		public GameManagerDebug(GameManager gameManager)
 		{
 			this.gameManager = gameManager;
 		}
 		
 		public void OnMenuGUI(DeveloperMenu devMenu)
 		{
-			if (gameManager.Value == null)
-			{
-				GUILayout.Label("Sorry, GameManager isn't available!");
-				return;
-			}
-			
-			if (gameManager.Value.IsGameActive)
+			if (gameManager.IsGameActive)
 			{
 				if (GUILayout.Button("Save Current Game"))
-					gameManager.Value.SaveCurrentGame(false);
+					gameManager.SaveCurrentGame(false);
 
 				if (GUILayout.Button("End Current Game"))
-					gameManager.Value.EndCurrentGame(true);
+					gameManager.EndCurrentGame(true);
 			}
 			else
 			{

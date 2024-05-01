@@ -2,8 +2,10 @@
 
 using System;
 using Core;
+using Core.Config;
 using GamePlatform;
 using Player;
+using Shell.Windowing;
 using TMPro;
 using UI.UiHelpers;
 using UnityEngine;
@@ -16,10 +18,6 @@ namespace UI.Controllers
 {
 	public class StatusBarController : UIBehaviour
 	{
-		[Header("Dependencies")]
-		[SerializeField]
-		private GameManagerHolder gameManagerHolder = null!;
-
 		[SerializeField]
 		private PlayerInstanceHolder player = null!;
 		
@@ -39,6 +37,7 @@ namespace UI.Controllers
 		private GameMode gameMode;
 		private IDisposable? gameModeObserver;
 		private DialogHelper dialogHelper = null!;
+		private GameManager gameManagerHolder = null!;
 		
 		public string UserInfo
 		{
@@ -49,6 +48,8 @@ namespace UI.Controllers
 		/// <inheritdoc />
 		protected override void Awake()
 		{
+			gameManagerHolder = GameManager.Instance;
+			
 			this.AssertAllFieldsAreSerialized(typeof(StatusBarController));
 			base.Awake();
 
@@ -62,11 +63,8 @@ namespace UI.Controllers
 			
 			this.systemSettingsButton.onClick.AddListener(OpenSettings);
 			this.logoutButton.onClick.AddListener(OnLogoutClicked);
-
-			if (this.gameManagerHolder.Value == null)
-				return;
-
-			gameModeObserver = gameManagerHolder.Value.GameModeObservable.Subscribe(OnGameModeChanged);
+			
+			gameModeObserver = gameManagerHolder.GameModeObservable.Subscribe(OnGameModeChanged);
 		}
 
 		/// <inheritdoc />
@@ -87,23 +85,23 @@ namespace UI.Controllers
 		private async void OnLogoutClicked()
 		{
 			bool shouldLogout = await dialogHelper.AskQuestionAsync(
+				MessageBoxType.Warning,
 				"End session",
 				"Are you sure you want to log out and end the current session? All open programs will be closed and any unsaved progress will be lost."
 			);
 
 			if (!shouldLogout)
 				return;
-
-			if (gameManagerHolder.Value == null)
-				return;
-
-			await gameManagerHolder.Value.EndCurrentGame(true);
-			await gameManagerHolder.Value.GoToLoginScreen();
+			
+			await gameManagerHolder.EndCurrentGame(true);
+			await gameManagerHolder.GoToLoginScreen();
 		}
 
 		private void UpdateUI()
 		{
-			this.logoutButton.gameObject.SetActive(gameMode == GameMode.OnDesktop);
+			var modSettings = new ModdingSettings(GameManager.Instance.SettingsManager);
+			
+			this.logoutButton.gameObject.SetActive(gameMode == GameMode.OnDesktop && !modSettings.ModDebugMode);
 		}
 		
 		private void OnGameModeChanged(GameMode newGameMode)

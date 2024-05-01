@@ -8,9 +8,9 @@ namespace GameplaySystems.Networld
 {
 	public sealed class WorldHostResolver : IHostNameResolver
 	{
-		private readonly WorldManagerHolder worldHolder;
+		private readonly IWorldManager worldHolder;
 
-		public WorldHostResolver(WorldManagerHolder holder)
+		public WorldHostResolver(IWorldManager holder)
 		{
 			this.worldHolder = holder;
 		}
@@ -18,12 +18,7 @@ namespace GameplaySystems.Networld
 		/// <inheritdoc />
 		public bool IsValidSubnet(uint address)
 		{
-			// No Internet!
-			if (worldHolder.Value == null)
-				return false;
-
-
-			foreach (WorldInternetServiceProviderData isp in worldHolder.Value.World.InternetProviders)
+			foreach (WorldInternetServiceProviderData isp in worldHolder.World.InternetProviders)
 			{
 				if (!NetUtility.TryParseCidrNotation(isp.CidrNetwork, out Subnet ispSubnet))
 					continue;
@@ -32,15 +27,15 @@ namespace GameplaySystems.Networld
 				if ((address & ispSubnet.mask) != ispSubnet.networkAddress)
 					continue;
 
-				if (worldHolder.Value.World.PlayerData.Value.PlayerInternetProvider == isp.InstanceId)
+				if (worldHolder.World.PlayerData.Value.PlayerInternetProvider == isp.InstanceId)
 				{
 					// check the player's LAN to see if it matches
-					uint lanAddress = (ispSubnet.networkAddress & ispSubnet.mask) | (worldHolder.Value.World.PlayerData.Value.PublicNetworkAddress & ~ispSubnet.mask);
+					uint lanAddress = (ispSubnet.networkAddress & ispSubnet.mask) | (worldHolder.World.PlayerData.Value.PublicNetworkAddress & ~ispSubnet.mask);
 					if (lanAddress == address)
 						return true;
 				}
 				
-				foreach (WorldLocalNetworkData lan in worldHolder.Value.World.LocalAreaNetworks)
+				foreach (WorldLocalNetworkData lan in worldHolder.World.LocalAreaNetworks)
 				{
 					// Address of a LAN!
 					uint lanAddress = (ispSubnet.networkAddress & ispSubnet.mask) | (lan.PublicNetworkAddress & ~ispSubnet.mask);
@@ -55,7 +50,7 @@ namespace GameplaySystems.Networld
 		/// <inheritdoc />
 		public string? ReverseHostLookup(uint networkAddress)
 		{
-			WorldDomainNameData? firstRecord = worldHolder.Value?
+			WorldDomainNameData? firstRecord = worldHolder?
 				.World
 				.Domains
 				.FirstOrDefault(x => x.Address == networkAddress);
@@ -73,7 +68,7 @@ namespace GameplaySystems.Networld
 			if (NetUtility.TryParseNetworkAddress(hostname, out uint parsedAddress))
 				return parsedAddress;
 
-			WorldDomainNameData? firstRecord = worldHolder.Value?
+			WorldDomainNameData? firstRecord = worldHolder?
 				.World
 				.Domains
 				.FirstOrDefault(x => x.RecordName == hostname);

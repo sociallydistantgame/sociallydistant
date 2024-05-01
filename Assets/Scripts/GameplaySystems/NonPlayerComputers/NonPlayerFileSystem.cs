@@ -10,7 +10,7 @@ namespace GameplaySystems.NonPlayerComputers
 	{
 		private MountManager mountManager;
 		
-		public NonPlayerFileSystem(NonPlayerComputer computer, ObjectId computerId, WorldManager world)
+		public NonPlayerFileSystem(NonPlayerComputer computer, ObjectId computerId, IWorldManager world)
 		{
 			mountManager = new MountManager(this);
 			

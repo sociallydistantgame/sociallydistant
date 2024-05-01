@@ -12,6 +12,7 @@ GameObject:
   - component: {fileID: 4256799467300792743}
   - component: {fileID: 6685415254541536282}
   - component: {fileID: 8576601988660935162}
+  - component: {fileID: 7824254492731194187}
   m_Layer: 5
   m_Name: UI Root
   m_TagString: Untagged
@@ -91,11 +92,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 0423c1d1693449748a0503911040900f, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  acidicGuiSettings: {fileID: 11400000, guid: 736af5b49d1afe548b65ab894401a75f, type: 2}
-  defaultTheme: {fileID: -4257553632059914568, guid: c6a6aa124c467bd41b83937fe3f2941a, type: 3}
-  gameManager: {fileID: 11400000, guid: 872374c25807361459f4e174bb460b2c, type: 2}
-  themeService: {fileID: 11400000, guid: 0261859824a581e40a24f72973b52394, type: 2}
-  themeEditorPrefab: {fileID: 4585425317818486975, guid: 6b1e7230dd426c1408692df1e41264f8, type: 3}
+  bootScreenPrefab: {fileID: 2783074047896612289, guid: f40e4e2458395f1758ef2b5ac8738dee, type: 3}
   characterCreatorPrefab: {fileID: 2089658602290510733, guid: a5aceb7c7bd7f044ea19c9dfb04f2556, type: 3}
   desktopPrefab: {fileID: 94841126449236779, guid: 2d3bebba157bed94fa6fe837f5cbd2b8, type: 3}
   backdropPrefab: {fileID: 1876961014414637132, guid: 437971ffa9ad15844ab503f02119cf2b, type: 3}
@@ -107,3 +104,15 @@ MonoBehaviour:
   sansSerifFont: {fileID: 11400000, guid: f509d26bf7ce06243bf3324babe5918e, type: 2}
   serifFont: {fileID: 11400000, guid: f509d26bf7ce06243bf3324babe5918e, type: 2}
   monospaceFont: {fileID: 11400000, guid: 87de73e7c24d6134d8dd62f6b304d98d, type: 2}
+--- !u!225 &7824254492731194187
+CanvasGroup:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 6404087894138473668}
+  m_Enabled: 1
+  m_Alpha: 1
+  m_Interactable: 1
+  m_BlocksRaycasts: 1
+  m_IgnoreParentGroups: 0

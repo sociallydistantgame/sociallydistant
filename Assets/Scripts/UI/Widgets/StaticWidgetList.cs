@@ -60,6 +60,7 @@ namespace UI.Widgets
 				holder.WidgetController = widgets[i].Build(widgetAssembler, holder.ViewRoot);
 
 				holder.WidgetController.UpdateUI();
+				holder.WidgetController.gameObject.SetActive(true);
 			}
 		}
 

@@ -7,7 +7,7 @@ using System.Linq;
 using Core;
 using Core.WorldData;
 using Core.WorldData.Data;
-using GameplaySystems.Networld;
+using System.Threading.Tasks;
 using OS.Network;
 using UnityEngine;
 using InvalidOperationException = System.InvalidOperationException;
@@ -15,7 +15,9 @@ using Random = System.Random;
 
 namespace GameplaySystems.Hacking.Assets
 {
-	public class NetworkAsset : ScriptableObject
+	public class NetworkAsset : 
+		ScriptableObject,
+		INetworkAsset
 	{
 		[SerializeField]
 		private string narrativeId = string.Empty;
@@ -54,9 +56,10 @@ namespace GameplaySystems.Hacking.Assets
 
 		public string NetworkName => networkName;
 
-		internal void Build(WorldManager worldManager)
+		public async Task Build(IWorldManager worldManager)
 		{
-			World world = worldManager.World;
+			await Task.Yield();
+			IWorld world = worldManager.World;
 
 			WorldInternetServiceProviderData isp = world.InternetProviders.FirstOrDefault(x => x.NarrativeId == ispId);
 			if (isp.NarrativeId != ispId)

@@ -7,20 +7,13 @@ namespace DevTools.Social
 {
 	public class SocialDebug : IDevMenu
 	{
-		private WorldManagerHolder worldHolder;
-
 		/// <inheritdoc />
 		public string Name => "Social + Chat Tools";
-
-		public SocialDebug(WorldManagerHolder world)
-		{
-			this.worldHolder = world;
-		}
 		
 		/// <inheritdoc />
 		public void OnMenuGUI(DeveloperMenu devMenu)
 		{
-			WorldManager? world = worldHolder.Value;
+			var world = WorldManager.Instance; 
 
 			if (world == null)
 			{

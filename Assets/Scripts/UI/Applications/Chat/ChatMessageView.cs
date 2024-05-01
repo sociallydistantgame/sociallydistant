@@ -3,7 +3,12 @@ using System;
 using System.Collections.Generic;
 using AcidicGui.Widgets;
 using Core.WorldData.Data;
+using Social;
+using TrixelCreative.TrixelAudio;
+using TrixelCreative.TrixelAudio.Core;
+using TrixelCreative.TrixelAudio.Data;
 using UI.Widgets;
+using UI.Widgets.Settings;
 using UnityEngine;
 using UnityEngine.UI;
 using UnityExtensions;
@@ -17,7 +22,10 @@ namespace UI.Applications.Chat
 		private StaticWidgetList documentArea = null!;
 
 		[SerializeField]
-		private RawImage avatar = null!;
+		private CanvasGroup canvasGroup = null!;
+		
+		[SerializeField]
+		private AvatarWidgetController avatar = null!;
 
 		[SerializeField]
 		private RectTransform bubbleSpacer = null!;
@@ -28,9 +36,24 @@ namespace UI.Applications.Chat
 		[SerializeField]
 		private HorizontalLayoutGroup messageLayout = null!;
 
+		[Header("Sound")]
+		[SerializeField]
+		private SoundEffectAsset playerMessageSound = null!;
+
+		[SerializeField]
+		private SoundEffectAsset npcMessageSound = null!;
+		
+		private IList<IWidget>? builtWidgets;
+		
 		private void Awake()
 		{
 			this.AssertAllFieldsAreSerialized(typeof(ChatMessageView));
+		}
+
+		private void OnEnable()
+		{
+			if (builtWidgets != null)
+				this.documentArea.UpdateWidgetList(builtWidgets);
 		}
 
 		public void UpdateMessage(ChatMessageModel model)
@@ -41,17 +64,55 @@ namespace UI.Applications.Chat
 			// Use reverse layout if we're a bubble message from the player.
 			messageLayout.reverseArrangement = model.UseBubbleStyle && model.IsFromPlayer;
 			
+			// Update our pivot point for the "New message" animation
+			var rect = (RectTransform) this.transform;
+			rect.pivot = messageLayout.reverseArrangement
+				? new Vector2(1, 1)
+				: new Vector2(0, 1);
+			
 			// Adjust document element alignment based on the above.
 			documentLayout.childAlignment = messageLayout.reverseArrangement ? TextAnchor.UpperRight : TextAnchor.UpperLeft;
 			
 			// Set avatar!
-			avatar.texture = model.Avatar;
+			avatar.enabled = model.ShowAvatar;
+			avatar.AvatarTexture = model.Avatar;
+			
+
+			if (model.IsFromPlayer)
+			{
+				avatar.DefaultAvatarColor = Color.cyan;
+			}
+			else
+			{
+				avatar.DefaultAvatarColor = Color.gray;
+			}
+
+			avatar.AvatarSize = AvatarSize.Small;
+			avatar.UpdateUI();
 			
 			// Rebuild document
-			RebuildDocument(model.DisplayName, model.Username, model.FormattedDateTime, model.UseBubbleStyle, model.IsFromPlayer, model.DocumentData);
+			RebuildDocument(model.DisplayName, model.Username, model.FormattedDateTime, model.UseBubbleStyle, model.IsFromPlayer, model.Document);
+			this.documentArea.UpdateWidgetList(builtWidgets);
+			
+			if (model.IsNewMessage)
+			{
+				DoMessageAnimation(model.IsFromPlayer);
+			}
 		}
 
-		private void RebuildDocument(string displayName, string username, string formattedDate, bool bubble, bool isPlayer, IEnumerable<DocumentElement> elements)
+		private void DoMessageAnimation(bool isFromPlayer)
+		{
+			AudioManager.PlaySound(isFromPlayer ? playerMessageSound : npcMessageSound);
+			
+			RectTransform t = (RectTransform) this.transform;
+			t.localScale = Vector3.zero;
+			
+			canvasGroup.alpha = 0;
+			LeanTween.alphaCanvas(canvasGroup, 1, 0.26f);
+			LeanTween.scale(t, Vector3.one, 0.26f);
+		}
+		
+		private void RebuildDocument(string displayName, string username, string formattedDate, bool bubble, bool isPlayer, DocumentElement element)
 		{
 			var builder = new WidgetBuilder();
 
@@ -66,12 +127,9 @@ namespace UI.Applications.Chat
 				});
 			}
 
-			foreach (DocumentElement element in elements)
-			{
-				BuildElement(builder, element, bubble, isPlayer);
-			}
-			
-			this.documentArea.UpdateWidgetList(builder.Build());
+			BuildElement(builder, element, bubble, isPlayer);
+
+			builtWidgets = builder.Build();
 		}
 
 		private void BuildElement(WidgetBuilder builder, DocumentElement element, bool bubble, bool isPlayer)

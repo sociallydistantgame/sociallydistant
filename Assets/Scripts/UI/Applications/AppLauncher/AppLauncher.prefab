@@ -80,6 +80,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 975c1bf908554ed694c8285f07999292, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  game: {fileID: 11400000, guid: 872374c25807361459f4e174bb460b2c, type: 2}
   playerInstance: {fileID: 11400000, guid: b143bb84d08c6044bb9b1a69e33c8460, type: 2}
   grid: {fileID: 8540579842890989113}
 --- !u!1001 &9032072323984693154

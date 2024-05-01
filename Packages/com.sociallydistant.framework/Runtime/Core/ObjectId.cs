@@ -23,13 +23,27 @@ namespace Core
 			return Id;
 		}
 
-		public int Id;
+		private bool wasUserConstructorCalled;
+		private int id;
 
-		public bool IsInvalid => Id == -1;
-
+		public int Id
+		{
+			get => id;
+			set
+			{
+				id = value;
+				
+				if (id != -1)
+					wasUserConstructorCalled = true;
+			}
+		}
+		
+		public bool IsInvalid => Id == -1 || !wasUserConstructorCalled;
+		
 		public ObjectId(int id)
 		{
-			this.Id = id;
+			this.wasUserConstructorCalled = true;
+			this.id = id;
 		}
 		
 		/// <inheritdoc />

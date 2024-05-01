@@ -12,7 +12,7 @@ namespace GameplaySystems.Social
 {
 	public class GuildList : IGuildList
 	{
-		private readonly WorldManager world;
+		private readonly IWorldManager world;
 		private readonly Subject<IGuild> createObservable = new Subject<IGuild>();
 		private readonly Subject<IGuild> deleteObservable = new Subject<IGuild>();
 		private readonly Dictionary<ObjectId, Guild> guilds = new Dictionary<ObjectId, Guild>();
@@ -20,7 +20,7 @@ namespace GameplaySystems.Social
 		private readonly ChatChannelManager channelManager;
 		
 
-		public GuildList(ChatChannelManager channelManager, ChatMemberManager memberManager, WorldManager world)
+		public GuildList(ChatChannelManager channelManager, ChatMemberManager memberManager, IWorldManager world)
 		{
 			this.world = world;
 			this.memberManager = memberManager;
@@ -119,6 +119,12 @@ namespace GameplaySystems.Social
 
 			if (notify)
 				createObservable.OnNext(guild);
+		}
+
+		public IGuild GetNarrativeGuild(string narrativeId)
+		{
+			WorldGuildData data = world.World.Guilds.GetNarrativeObject(narrativeId);
+			return this.guilds[data.InstanceId];
 		}
 	}
 }

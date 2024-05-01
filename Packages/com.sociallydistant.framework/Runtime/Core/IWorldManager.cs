@@ -1,5 +1,6 @@
 ﻿#nullable enable
 
+using Core.Serialization;
 using OS.Network;
 
 namespace Core
@@ -13,5 +14,6 @@ namespace Core
 		ObjectId GetNextObjectId();
 		string GetNextIspRange();
 		uint GetNextPublicAddress(ObjectId ispId);
+		void SaveWorld(IDataWriter writer);
 	}
 }

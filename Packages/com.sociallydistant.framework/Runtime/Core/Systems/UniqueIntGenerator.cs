@@ -13,7 +13,7 @@ namespace Core.Systems
 		public void DeclareUnused(int value)
 		{
 			if (!usedValues.Contains(value))
-				throw new InvalidOperationException($"Value {value} isn't claimed.");
+				return;
 
 			usedValues.Remove(value);
 			nextValue = value;
@@ -22,7 +22,7 @@ namespace Core.Systems
 		public void ClaimUsedValue(int value)
 		{
 			if (usedValues.Contains(value))
-				throw new InvalidOperationException($"Value {value} already claimed.");
+				return;
 
 			usedValues.Add(value);
 

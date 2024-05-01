@@ -6,11 +6,13 @@ using System.IO;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using Architecture;
 using ContentManagement;
 using Core;
 using Core.Config;
 using Core.Scripting;
 using Core.Serialization.Binary;
+using Core.WorldData;
 using Core.WorldData.Data;
 using Cysharp.Threading.Tasks;
 using GamePlatform.ContentManagement;
@@ -22,6 +24,7 @@ using Player;
 using Shell;
 using Shell.InfoPanel;
 using Social;
+using UI.PlayerUI;
 using UI.Shell.InfoPanel;
 using UniRx;
 using UnityEngine;
@@ -45,25 +48,27 @@ namespace GamePlatform
 		private PlayerInstanceHolder playerInstance = null!;
 		
 		[SerializeField]
-		private WorldManagerHolder worldManager = null!;
-		
-		[SerializeField]
 		private InfoPanelService infoPanelService = null!;
 
 		[SerializeField]
 		private SocialServiceHolder socialHolder = null!;
 
+		[SerializeField]
+		private MainToolGroup terminal = null!;
+
+		private static readonly Singleton<GameManager> singleton = new();
 		private static readonly ConcurrentQueue<Action> staticActionQueue = new ConcurrentQueue<Action>();
 		
 		private readonly UnityTextConsole unityConsole = new UnityTextConsole();
 		private bool areModulesLoaded = false;
+		private WorldManager worldManager;
 		private IScriptSystem scriptSystem;
 		private TabbedToolCollection availableTools;
 		private GameMode currentGameMode;
 		private SettingsManager settingsManager;
 		private ModuleManager moduleManager;
 		private Subject<GameMode> gameMode = new Subject<GameMode>();
-		private ContentManager contentManager = new ContentManager();
+		private ContentManager contentManager = null!;
 		private IGameData? currentGameData;
 		private PlayerInfo loadedPlayerInfo;
 		private Subject<bool> panicSubject = new Subject<bool>();
@@ -71,6 +76,7 @@ namespace GamePlatform
 		private IUriManager uriManager;
 		private Subject<PlayerInfo> playerInfoSubject = new Subject<PlayerInfo>();
 
+		public PlayerInstance PlayerInstance => this.playerInstance.Value;
 		public IObservable<PlayerInfo> PlayerInfoObservable => playerInfoSubject;
 		public IObservable<GameMode> GameModeObservable { get; private set; }
 		public IObservable<bool> PanicObservable { get; private set; }
@@ -96,9 +102,9 @@ namespace GamePlatform
         
 		/// <inheritdoc />
 		public GameMode CurrentGameMode => this.currentGameMode;
-		
+
 		/// <inheritdoc />
-		public IWorldManager WorldManager => this.worldManager.Value!;
+		public IWorldManager WorldManager => worldManager;
 
 		/// <inheritdoc />
 		public ISettingsManager SettingsManager => settingsManager;
@@ -114,6 +120,11 @@ namespace GamePlatform
 		
 		private void Awake()
 		{
+			worldManager = new WorldManager(this);
+			
+			singleton.SetInstance(this);
+			
+			contentManager = new ContentManager(this);
 			scriptSystem = new ScriptSystem(this);
 			availableTools = new TabbedToolCollection(this);
 			uriManager = new UriManager(this);
@@ -140,65 +151,23 @@ namespace GamePlatform
 			this.moduleManager = new ModuleManager(this);
             
 			// Register mandatory content sources with ContentManager
-			contentManager.AddContentSource<LocalGameDataSource>(); // User profiles
+			contentManager.AddContentGenerator(new LocalGameDataSource()); // User profiles
 		}
-
+		
 		private void OnDestroy()
 		{
 			settingsManager.Dispose();
+			singleton.SetInstance(null);
 		}
 
-		private async UniTaskVoid Start()
+		private async void Start()
 		{
+			scriptSystem.RegisterHookListener(CommonScriptHooks.AfterContentReload, new UpdateAvailableToolsHook(contentManager, availableTools, terminal));
+			
 			infoPanelService.ClearAllWidgets();
-			
-			SetGameMode(GameMode.Loading);
-			
-			// Load mods.
-			await moduleManager.LocateAllGameModules();
-			
-			// Initial ContentManager database rebuild.
-			await ContentManager.RefreshContentDatabaseAsync();
-			ModulesLoaded?.Invoke();
-			
-			// Settings refresh, in case anything relies on content manager
-			settingsManager.ForceChangeNotify();
-			
-			// Determine initialization flow.
-			InitializationFlow flow = GetInitializationFlow();
 
-			switch (flow)
-			{
-				case InitializationFlow.MostRecentSave:
-				{
-					// Find the most recent save file, if any.
-					IGameData? saveFile = contentManager.GetContentOfType<IGameData>()
-						.OrderByDescending(x => x.PlayerInfo.LastPlayed)
-						.FirstOrDefault();
-					
-					// No save data, go to login screen instead
-					if (saveFile == null)
-					{
-						goto case InitializationFlow.LoginScreen;
-						break;
-					}
-
-					await StartGame(saveFile);
-					break;
-				}
-				case InitializationFlow.LoginScreen:
-				{
-					await GoToLoginScreen();
-					break;
-				}
-				case InitializationFlow.DebugWorld:
-				{
-					this.infoPanelService.CreateStickyInfoWidget(MaterialIcons.BugReport, "Debug world", "The Hypervisor is in debug mode. This OS will be destroyed when you log out. Use the Backtick key (`) to activate the debug UI.");
-					
-					await StartGame(new DebugGameData());
-					break;
-				}
-			}
+			this.SettingsManager.Load();
+			SetGameMode(GameMode.Booting);
 		}
 		
 		public async Task GoToLoginScreen()
@@ -228,52 +197,55 @@ namespace GamePlatform
 
 				await gameToLoad.UpdatePlayerInfo(this.loadedPlayerInfo);
 
-				// Load world data
-				if (worldManager.Value != null)
+				using var memory = new MemoryStream();
+				bool result = await gameToLoad.ExtractWorldData(memory);
+				if (!result)
 				{
-					using var memory = new MemoryStream();
-					bool result = await gameToLoad.ExtractWorldData(memory);
-					if (!result)
-					{
-						// Couldn't extract a world, fail and bail.
-						await GoToLoginScreen();
-						return;
-					}
+					// Couldn't extract a world, fail and bail.
+					await GoToLoginScreen();
+					return;
+				}
 
-					memory.Seek(0, SeekOrigin.Begin);
+				memory.Seek(0, SeekOrigin.Begin);
 
-					this.worldManager.Value.WipeWorld();
+				var world = Core.WorldManager.Instance;
+
+				await Task.Run(() =>
+				{
+					world.WipeWorld();
 
 					if (memory.Length > 0)
 					{
 						using var binaryReader = new BinaryReader(memory, Encoding.UTF8);
 						using var worldReader = new BinaryDataReader(binaryReader);
 
-						this.worldManager.Value.LoadWorld(worldReader);
+						world.LoadWorld(worldReader);
 					}
+				});
 
-					// Create player profile data if it's missing
-					WorldPlayerData playerData = this.worldManager.Value.World.PlayerData.Value;
+				while (staticActionQueue.Count > 0)
+					await Task.Yield();
+				
+				// Create player profile data if it's missing
+				WorldPlayerData playerData = world.World.PlayerData.Value;
 
-					WorldProfileData profile = default;
-					if (!worldManager.Value.World.Profiles.ContainsId(playerData.PlayerProfile))
-					{
-						profile.InstanceId = worldManager.Value.GetNextObjectId();
-						playerData.PlayerProfile = profile.InstanceId;
+				WorldProfileData profile = default;
+				if (!world.World.Profiles.ContainsId(playerData.PlayerProfile))
+				{
+					profile.InstanceId = world.GetNextObjectId();
+					playerData.PlayerProfile = profile.InstanceId;
 
-						// Sync the profile data with the save's metadata
-						// We only sync the gender and full names.
-						profile.Gender = this.loadedPlayerInfo.PlayerGender;
-						profile.ChatName = this.loadedPlayerInfo.Name;
-						
-						worldManager.Value.World.Profiles.Add(profile);
-						worldManager.Value.World.PlayerData.Value = playerData;
-					}
+					// Sync the profile data with the save's metadata
+					// We only sync the gender and full names.
+					profile.Gender = this.loadedPlayerInfo.PlayerGender;
+					profile.ChatName = this.loadedPlayerInfo.Name;
+
+					world.World.Profiles.Add(profile);
+					world.World.PlayerData.Value = playerData;
 				}
-
+				
 				this.currentGameData = gameToLoad;
-
-
+				
 				await gameInitializationScript.ExecuteAsync(unityConsole);
 			}
 			catch (Exception ex)
@@ -291,8 +263,10 @@ namespace GamePlatform
 
 		private void Update()
 		{
-			while (staticActionQueue.TryDequeue(out Action action))
+			if (staticActionQueue.TryDequeue(out Action action))
 				action();
+
+			worldManager.UpdateWorldClock();
 		}
 
 		public async Task QuitVM()
@@ -311,13 +285,9 @@ namespace GamePlatform
 		{
 			if (currentGameData == null)
 				return;
-
-			if (worldManager.Value == null)
-				return;
 			
 			await currentGameData.UpdatePlayerInfo(loadedPlayerInfo);
-			await currentGameData.SaveWorld(worldManager.Value);
-			await contentManager.RefreshContentDatabaseAsync();
+			await currentGameData.SaveWorld(WorldManager);
 			
 			if (silent)
 				return;
@@ -338,7 +308,7 @@ namespace GamePlatform
 			this.loadedPlayerInfo = default;
 			this.playerInfoSubject.OnNext(this.loadedPlayerInfo);
 
-			this.worldManager.Value?.WipeWorld();
+			Core.WorldManager.Instance.WipeWorld();
 		}
 
 		/// <inheritdoc />
@@ -359,14 +329,41 @@ namespace GamePlatform
 			this.gameMode.OnNext(currentGameMode);
 		}
 
-		private InitializationFlow GetInitializationFlow()
+		public async Task DoUserInitialization()
 		{
-#if UNITY_EDITOR
-			int initializationFlowId =  EditorPrefs.GetInt(InitializationFlowEditorPreference, (int) InitializationFlow.MostRecentSave);
-			return (InitializationFlow) initializationFlowId;
-#else
-			return InitializationFlow.MostRecentSave;
-#endif
+			InitializationFlow flow = GetInitializationFlow();
+
+			IGameData? saveToLoad = null;
+
+			if (flow == InitializationFlow.DebugWorld)
+			{
+				saveToLoad = new DebugGameData();
+			}
+			else if (flow == InitializationFlow.MostRecentSave)
+			{
+				saveToLoad = ContentManager.GetContentOfType<IGameData>()
+					.OrderByDescending(x => x.PlayerInfo.LastPlayed)
+					.FirstOrDefault();
+			}
+
+			if (saveToLoad != null)
+			{
+				await StartGame(saveToLoad);
+				return;
+			}
+
+			await GoToLoginScreen();
+		}
+		
+		public InitializationFlow GetInitializationFlow()
+		{
+			var modSettings = new ModdingSettings(settingsManager);
+			var uiSettings = new UiSettings(settingsManager);
+
+			if (modSettings.ModDebugMode)
+				return InitializationFlow.DebugWorld;
+
+			return uiSettings.PreferredInitializationFlow;
 		}
 
 		#if UNITY_EDITOR
@@ -380,27 +377,51 @@ namespace GamePlatform
 			DebugWorld
 		}
 
-		public Task WaitForModulesToLoad()
+		public async Task WaitForModulesToLoad(bool doReload = false)
 		{
-			if (areModulesLoaded)
-				return Task.CompletedTask;
+			if (areModulesLoaded && !doReload)
+				return;
 
-			var completionSource =  new TaskCompletionSource<bool>();
+			areModulesLoaded = false;
 
-			ModulesLoaded += HandleModulesLoaded;
-			
-			return completionSource.Task;
+			await moduleManager.LocateAllGameModules();
 
-			void HandleModulesLoaded()
-			{
-				completionSource.SetResult(true);
-				ModulesLoaded -= HandleModulesLoaded;
-			}
+			areModulesLoaded = true;
 		}
 
 		public static void ScheduleAction(Action action)
 		{
 			staticActionQueue.Enqueue(action);
 		}
+
+		internal sealed class UpdateAvailableToolsHook : IHookListener
+		{
+			private readonly IContentManager contentManager;
+			private readonly TabbedToolCollection collection;
+			private readonly MainToolGroup terminal;
+
+			public UpdateAvailableToolsHook(IContentManager contentManager, TabbedToolCollection collection, MainToolGroup terminal)
+			{
+				this.contentManager = contentManager;
+				this.collection = collection;
+				this.terminal = terminal;
+			}
+			
+			/// <inheritdoc />
+			public async Task ReceiveHookAsync(IGameContext game)
+			{
+				collection.Clear();
+				collection.Add(terminal);
+
+				foreach (ITabbedToolDefinition group in contentManager.GetContentOfType<ITabbedToolDefinition>())
+				{
+					collection.Add(group);
+				}
+				
+				await game.ScriptSystem.RunHookAsync(CommonScriptHooks.BeforeUpdateShellTools);
+			}
+		}
+
+		public static GameManager Instance => singleton.MustGetInstance();
 	}
 }

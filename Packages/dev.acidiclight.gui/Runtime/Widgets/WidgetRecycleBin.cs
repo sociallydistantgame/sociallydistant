@@ -34,21 +34,20 @@ namespace AcidicGui.Widgets
 			
 			desiredWidget.transform.SetParent(destination, false);
 			desiredWidget.transform.localScale = scale;
-			desiredWidget.gameObject.SetActive(true);
 			return desiredWidget;
 		}
 		
 		public void Recycle(WidgetController widget)
 		{
-			widget.OnRecycle();
-
 			if (recycleBinRoot == null)
 			{
+				widget.OnRecycle();
 				UnityEngine.Object.Destroy(widget.gameObject);
 				return;
 			}
 
 			widget.gameObject.SetActive(false);
+			widget.OnRecycle();
 
 			Type type = widget.GetType();
 

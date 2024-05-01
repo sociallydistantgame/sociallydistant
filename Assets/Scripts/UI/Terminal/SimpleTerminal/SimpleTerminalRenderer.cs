@@ -15,20 +15,23 @@ using TrixelCreative.TrixelAudio.Data;
 using OS.Network.MessageTransport;
 using UI.CustomGraphics;
 using UI.PlayerUI;
-using Debug = UnityEngine.Debug;
+using System.Threading.Tasks;
+using TrixelCreative.TrixelAudio.Core;
 
 namespace UI.Terminal.SimpleTerminal
 {
 	public class SimpleTerminalRenderer :
 		MonoBehaviour,
+		ITerminalSounds,
 		IUpdateSelectedHandler,
 		IPointerDownHandler,
 		IPointerUpHandler,
-		IPointerMoveHandler,
 		ISelectHandler,
 		IDeselectHandler,
 		IScrollHandler,
-		IClipboard
+		IClipboard,
+		IEndDragHandler,
+		IDragHandler
 	{
 		[Header("Color Plotters")]
 		[SerializeField]
@@ -46,8 +49,17 @@ namespace UI.Terminal.SimpleTerminal
 
 		[Header("Sound Effects")]
 		[SerializeField]
+		private bool enableTypingSounds = true;
+
+		[SerializeField]
+		private bool audibleBell = true;
+		
+		[SerializeField]
 		private SoundEffectAsset asciiBeep = null!;
 
+		[SerializeField]
+		private SoundEffectAsset typingSound = null!;
+		
 		[Header("Appearance")]
 		[SerializeField]
 		private int minimumColumnCount = 132;
@@ -92,7 +104,6 @@ namespace UI.Terminal.SimpleTerminal
 		private int clickCount;
 		private int mainThreadId;
 		private ThreadSafeTerminalRenderer terminalRenderer;
-		private TrixelAudioSource trixelAudio;
 		private float characterWidth;
 		private float lineHeight;
 		private int rowCount;
@@ -112,6 +123,7 @@ namespace UI.Terminal.SimpleTerminal
 		private volatile bool emulatorEnabled = false;
 		private float clickTime = 0;
 		private float clickDoubleTime = 0;
+		private Task? resizeTask;
 		
 		public RectTransform TextAreaTransform => textAreaGroup.transform as RectTransform;
 		public int DefaultRowCount => this.rowCount;
@@ -122,17 +134,31 @@ namespace UI.Terminal.SimpleTerminal
 		public float CharacterWidth => characterWidth;
 		public float UnscaledLineHeight { get; private set; }
 		public float UnscaledCharacterWidth { get; private set; }
+		public int Columns => this.simpleTerminal.Columns;
+		public int Rows => this.simpleTerminal.Rows;
 
+		public bool EnableAudibleBell
+		{
+			get => audibleBell;
+			set => audibleBell = value;
+		}
+		
+		public bool EnableTypingSounds
+		{
+			get => enableTypingSounds;
+			set => enableTypingSounds = value;
+		}
+		
 		public string WindowTitle => this.simpleTerminal.WindowTitle;
 		
 
 		private void Awake()
 		{
+			workQueue.MaximumWorkPerUpdate = 1;
 			mainThreadId = Thread.CurrentThread.ManagedThreadId;
 			
 			this.MustGetComponent(out rectTransform);
 			this.MustGetComponent(out layoutElement);
-			this.MustGetComponent(out trixelAudio);
 			this.MustGetComponent(out layoutElement);
 
 			this.terminalRenderer = new ThreadSafeTerminalRenderer(
@@ -150,7 +176,7 @@ namespace UI.Terminal.SimpleTerminal
 			
 			this.transform.parent.MustGetComponent(out parentRectTransform);
 			
-			this.simpleTerminal = new SimpleTerminal(this, terminalRenderer, minLatency, maxLatency, this.minimumColumnCount, this.minimumRowCount);
+			this.simpleTerminal = new SimpleTerminal(this, terminalRenderer, this, minLatency, maxLatency, this.minimumColumnCount, this.minimumRowCount);
 			this.simpleTerminal.BlinkTimeout = blinkTimeout;
 			this.simpleTerminal.DoubleClickTime = doubleClickTime;
 			this.simpleTerminal.TripleClickTime = trippleClickTime;
@@ -188,6 +214,14 @@ namespace UI.Terminal.SimpleTerminal
 
 		private void Update()
 		{
+			if (resizeTask != null)
+			{
+				if (resizeTask.IsCanceled)
+					resizeTask = null;
+				
+				return;
+			}
+			
 			if (this.master is null)
 				return;
 
@@ -217,7 +251,7 @@ namespace UI.Terminal.SimpleTerminal
 				if (r != simpleTerminal.Rows || c != simpleTerminal.Columns)
 				{
 					// Must be executed on the emulator thread since the emulator itself is not threadsafe
-					emulatorWorkQueue.EnqueueAsync(() => { simpleTerminal.Resize(c, r); }).Wait();
+					resizeTask = emulatorWorkQueue.EnqueueAsync(() => { simpleTerminal.Resize(c, r); });
 				}
 			}
 		}
@@ -256,8 +290,8 @@ namespace UI.Terminal.SimpleTerminal
 
 		public void Bell()
 		{
-			if (this.asciiBeep != null)
-				this.trixelAudio.Play(this.asciiBeep);
+			if (this.asciiBeep != null && audibleBell)
+				AudioManager.PlaySound(this.asciiBeep);
 		}
 		
 		private void TtyInit()
@@ -284,22 +318,6 @@ namespace UI.Terminal.SimpleTerminal
 
 		#region Unity UI Event Handlers
 
-		public void OnPointerMove(PointerEventData eventData)
-		{
-			RectTransformUtility.ScreenPointToLocalPointInRectangle(rectTransform, eventData.position, UiManager.UiCamera, out Vector2 localPosition);
-
-			if (localPosition.x < 0 || localPosition.y < 0)
-				return;
-
-			float x = Math.Abs(localPosition.x);
-			float y = Math.Abs(localPosition.y);
-
-			this.emulatorWorkQueue.Enqueue(() =>
-			{
-				simpleTerminal.MouseMove(x, y);
-			});
-		}
-
 		public void OnScroll(PointerEventData eventData)
 		{
 			float delta = eventData.scrollDelta.y;
@@ -310,6 +328,17 @@ namespace UI.Terminal.SimpleTerminal
 			});
 		}
 
+		public void PlayTypingSound()
+		{
+			if (!enableTypingSounds)
+				return;
+
+			if (this.typingSound == null)
+				return;
+			
+			AudioManager.PlaySound(typingSound);
+		}
+		
 		public void OnUpdateSelected(BaseEventData eventData)
 		{
 			if (!simpleTerminal.IsFocused)
@@ -417,8 +446,6 @@ namespace UI.Terminal.SimpleTerminal
 					clickTime = Time.time;
 					clickMode = ClickMode.Single;
 				}
-				
-				Debug.LogError(clickMode);
 			}
 			else
 			{
@@ -526,6 +553,29 @@ namespace UI.Terminal.SimpleTerminal
 			this.lineHeight = height / scale.y;
 			UnscaledLineHeight = height;
 			UnscaledCharacterWidth = width;
+		}
+		
+		/// <inheritdoc />
+		public void OnEndDrag(PointerEventData eventData)
+		{
+			OnPointerUp(eventData);
+		}
+
+		/// <inheritdoc />
+		public void OnDrag(PointerEventData eventData)
+		{
+			RectTransformUtility.ScreenPointToLocalPointInRectangle(rectTransform, eventData.position, UiManager.UiCamera, out Vector2 localPosition);
+
+			if (localPosition.x < 0 || localPosition.y < 0)
+				return;
+
+			float x = Math.Abs(localPosition.x);
+			float y = Math.Abs(localPosition.y);
+
+			this.emulatorWorkQueue.Enqueue(() =>
+			{
+				simpleTerminal.MouseMove(x, y);
+			});
 		}
 	}
 }

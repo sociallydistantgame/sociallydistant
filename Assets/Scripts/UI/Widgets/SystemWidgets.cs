@@ -19,10 +19,22 @@ namespace UI.Widgets
 
 		[SerializeField]
 		private ButtonWidgetController buttonPrefab = null!;
-        
+
+		[SerializeField]
+		private AvatarWidgetController avatarPrefab = null!;
+		
+		[SerializeField]
+		private DropdownController dropdownPrefab = null!;
+		
+		[SerializeField]
+		private InputFieldWidgetController inputFieldPrefab = null!;
+		
 		[SerializeField]
 		private LabelWidgetController labelPrefab = null!;
 
+		[SerializeField]
+		private SwitchWidgetController switchPrefab = null!;
+		
 		[SerializeField]
 		private ImageWidgetController imagePrefab = null!;
 
@@ -30,34 +42,25 @@ namespace UI.Widgets
 		private RawImageWidgetController rawImagePrefab = null!;
 
 		[SerializeField]
+		private SliderWidgetController sliderPrefab = null!;
+
+		
+		[SerializeField]
 		private ListWidgetController listPrefab = null!;
 
 		[SerializeField]
 		private ListItemWidgetController listItemPrefab = null!;
-		
+
 		[Header("Settings widgets")]
 		[SerializeField]
-		private SettingsSliderWidgetController sliderPrefab = null!;
-
-		[SerializeField]
-		private SettingsToggleWidgetController settingsTogglePrefab = null!;
-
-		[SerializeField]
-		private SettingsInputFieldController settingsInputFieldPrefab = null!;
-
-		[SerializeField]
-		private SettingsDropdownWidgetController settingsDropdownPrefab = null!;
-
+		private SettingsFieldController settingsField = null!;
+		
 		[Header("Chat")]
 		[SerializeField]
 		private ChatBubbleWidgetController chatBubblePrefab = null!;
 
 		[SerializeField]
 		private GuildHeaderWidgetController guildHeaderPrefab = null!;
-
-		[Header("Steam Workshop Editors")]
-		[SerializeField]
-		private GraphicPickerWidgetController graphicPickerPrefab = null!;
 
 		[Header("Rich Embeds")]
 		[SerializeField]
@@ -81,10 +84,30 @@ namespace UI.Widgets
 			return RecycleOrInstantiate(this.sectionPrefab, destination);
 		}
 		
+		public AvatarWidgetController GetAvatar(RectTransform destination)
+		{
+			return RecycleOrInstantiate(this.avatarPrefab, destination);
+		}
+		
+		public InputFieldWidgetController GetInputField(RectTransform destination)
+		{
+			return RecycleOrInstantiate(this.inputFieldPrefab, destination);
+		}
+		
 		/// <inheritdoc />
 		public LabelWidgetController GetLabel(RectTransform destination)
 		{
 			return RecycleOrInstantiate(this.labelPrefab, destination);
+		}
+		
+		public SwitchWidgetController GetSwitch(RectTransform destination)
+		{
+			return RecycleOrInstantiate(this.switchPrefab, destination);
+		}
+		
+		public DropdownController GetDropdown(RectTransform destination)
+		{
+			return RecycleOrInstantiate(this.dropdownPrefab, destination);
 		}
 
 		/// <inheritdoc />
@@ -114,27 +137,33 @@ namespace UI.Widgets
 		/// <inheritdoc />
 		public ListItemWidgetController GetListItem(RectTransform destination)
 		{
-			return RecycleOrInstantiate(listItemPrefab, destination);
+			ListItemWidgetController controller = RecycleOrInstantiate(listItemPrefab, destination);
+			
+			if (controller.ImageWidget != null)
+			{
+				RecycleBin.Recycle(controller.ImageWidget);
+				controller.ImageWidget = null;
+			}
+			
+			return controller;
+		}
+		
+		public SettingsFieldController GetSettingsField(RectTransform destination)
+		{
+			SettingsFieldController controller = RecycleOrInstantiate(settingsField, destination);
+
+			if (controller.SlotWidget != null)
+			{
+				RecycleBin.Recycle(controller.SlotWidget);
+				controller.SlotWidget = null;
+			}
+			
+			return controller;
 		}
 
-		public SettingsSliderWidgetController GetSettingsSlider(RectTransform destination)
+		public SliderWidgetController GetSlider(RectTransform destination)
 		{
 			return RecycleOrInstantiate(this.sliderPrefab, destination);
-		}
-		
-		public SettingsToggleWidgetController GetSettingsToggle(RectTransform destination)
-		{
-			return RecycleOrInstantiate(this.settingsTogglePrefab, destination);
-		}
-
-		public SettingsInputFieldController GetSettingsInputField(RectTransform destination)
-		{
-			return RecycleOrInstantiate(this.settingsInputFieldPrefab, destination);
-		}
-		
-		public SettingsDropdownWidgetController GetSettingsDropdown(RectTransform destination)
-		{
-			return RecycleOrInstantiate(this.settingsDropdownPrefab, destination);
 		}
 		
 		public ChatBubbleWidgetController GetChatBubble(RectTransform destination)
@@ -145,11 +174,6 @@ namespace UI.Widgets
 		public GuildHeaderWidgetController GetGuildHeader(RectTransform destination)
 		{
 			return RecycleOrInstantiate(this.guildHeaderPrefab, destination);
-		}
-		
-		public GraphicPickerWidgetController GetGraphicPicker(RectTransform destination)
-		{
-			return RecycleOrInstantiate(this.graphicPickerPrefab, destination);
 		}
 		
 		public RichEmbedWidgetController GetRichEmbed(RectTransform destination)

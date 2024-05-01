@@ -6,6 +6,7 @@ using Core.Scripting;
 using Core.WorldData.Data;
 using GameplaySystems.Hacking.Assets;
 using Modules;
+using OS.Network;
 using UnityEngine;
 using UnityEngine.UI;
 
@@ -13,9 +14,9 @@ namespace GameplaySystems.Networld
 {
 	internal sealed class NetworkUpdateHook : IHookListener
 	{
-		private readonly WorldManagerHolder worldHolder;
+		private readonly IWorldManager worldHolder;
 
-		public NetworkUpdateHook(WorldManagerHolder worldHolder)
+		public NetworkUpdateHook(IWorldManager worldHolder)
 		{
 			this.worldHolder = worldHolder;
 		}
@@ -23,18 +24,15 @@ namespace GameplaySystems.Networld
 		/// <inheritdoc />
 		public async Task ReceiveHookAsync(IGameContext game)
 		{
-			if (worldHolder.Value == null)
-				return;
-			
 			// assign the player's public IP
-			IWorldDataObject<WorldPlayerData> playerData = worldHolder.Value.World.PlayerData;
+			IWorldDataObject<WorldPlayerData> playerData = worldHolder.World.PlayerData;
 			ObjectId playerIsp = playerData.Value.PlayerInternetProvider;
-			if (worldHolder.Value.World.InternetProviders.Any(x => x.InstanceId == playerIsp))
+			if (worldHolder.World.InternetProviders.Any(x => x.InstanceId == playerIsp))
 			{
 				if (playerData.Value.PublicNetworkAddress == 0)
 				{
 					WorldPlayerData playerValue = playerData.Value;
-					playerValue.PublicNetworkAddress = worldHolder.Value.GetNextPublicAddress(playerIsp);
+					playerValue.PublicNetworkAddress = worldHolder.GetNextPublicAddress(playerIsp);
 					playerData.Value = playerValue;
 				}
 			}
@@ -48,13 +46,9 @@ namespace GameplaySystems.Networld
 				}
 			}
 			
-			NetworkAsset[]? assets = Resources.LoadAll<NetworkAsset>("Networks");
-
-			foreach (NetworkAsset asset in assets)
+			foreach (INetworkAsset asset in game.ContentManager.GetContentOfType<INetworkAsset>())
 			{
-				await Task.Yield();
-
-				asset.Build(worldHolder.Value);
+				await asset.Build(worldHolder);
 			}
 		}
 	}

@@ -5,8 +5,14 @@ namespace Core.DataManagement
 {
 	public class DeleteEvent
 	{
+		private readonly ThreadInvoker threadInvoker;
 		private Dictionary<Type, List<object>> invocationLists = new Dictionary<Type, List<object>>();
 
+		public DeleteEvent(ThreadInvoker invoker)
+		{
+			this.threadInvoker = invoker;
+		}
+		
 		public void AddCallback<TDataElement>(DeleteCallback<TDataElement> callback)
 			where TDataElement : struct
 		{
@@ -46,7 +52,12 @@ namespace Core.DataManagement
 			foreach (object invocation in invocationList)
 			{
 				if (invocation is DeleteCallback<TDataElement> callback)
-					callback(data);
+				{
+					threadInvoker.Do(() =>
+					{
+						callback(data);
+					});
+				}
 			}
 		}
 	}

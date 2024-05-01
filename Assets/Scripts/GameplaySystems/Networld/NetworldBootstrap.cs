@@ -13,22 +13,19 @@ namespace GameplaySystems.Networld
 {
 	public class NetworldBootstrap : MonoBehaviour
 	{
-		private CoreRouter? coreRouter;
-		private NetworkUpdateHook networkUpdateHook;
-
-		[SerializeField]
-		private GameManagerHolder gameManager = null!;
-		
-		[SerializeField]
-		private WorldManagerHolder worldHolder = null!;
-		
 		[SerializeField]
 		private NetworkSimulationHolder holder = null!;
-
+		
+		private IWorldManager worldHolder = null!;
+		private CoreRouter? coreRouter;
+		private NetworkUpdateHook networkUpdateHook;
+		private GameManager gameManager = null!;
 		private IDisposable? gameModeObserver;
 		
 		private void Awake()
 		{
+			gameManager = GameManager.Instance;
+			worldHolder = gameManager.WorldManager;
 			this.AssertAllFieldsAreSerialized(typeof(NetworldBootstrap));
 
 			var worldHostResolver = new WorldHostResolver(worldHolder);
@@ -41,8 +38,8 @@ namespace GameplaySystems.Networld
 
 		private void Start()
 		{
-			gameManager.Value!.ScriptSystem.RegisterHookListener("AfterWorldStateUpdate", networkUpdateHook);
-			gameModeObserver = gameManager.Value!.GameModeObservable.Subscribe(OnGameModeChanged);
+			gameManager!.ScriptSystem.RegisterHookListener("AfterWorldStateUpdate", networkUpdateHook);
+			gameModeObserver = gameManager.GameModeObservable.Subscribe(OnGameModeChanged);
 		}
 
 		private void OnDestroy()
@@ -50,7 +47,8 @@ namespace GameplaySystems.Networld
 			this.holder.Value?.DisableSimulation();
 			
 			gameModeObserver?.Dispose();
-			gameManager.Value!.ScriptSystem.UnregisterHookListener("AfterWorldStateUpdate", networkUpdateHook);
+			
+			gameManager.ScriptSystem.UnregisterHookListener("AfterWorldStateUpdate", networkUpdateHook);
 		}
 		
 		private void OnGameModeChanged(GameMode newGameMode)

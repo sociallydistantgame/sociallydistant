@@ -22,6 +22,10 @@
 		ChangeLogs = 17,
 		MailTypes = 18,
 		CompletedMissions = 19,
+		CompletedInteractions = 20,
+		MissionFailures = 21,
+		NarrativeGuilds = 22,
+		NarrativeChannels = 23,
 
 		
 		Latest

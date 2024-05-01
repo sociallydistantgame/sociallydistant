@@ -23,7 +23,6 @@ namespace UI.CustomGraphics
 			
 			if (this.rectangles.Count == 0)
 			{
-				RenderDefaultGraphic(vh);
 				return;
 			}
 			

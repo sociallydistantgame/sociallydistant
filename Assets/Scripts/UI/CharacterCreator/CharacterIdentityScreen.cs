@@ -4,7 +4,6 @@ using System.Linq;
 using AcidicGui.Widgets;
 using Core;
 using UI.Social;
-using UI.SystemSettings;
 using UI.Widgets;
 using UI.Widgets.Settings;
 using UnityEngine;
@@ -67,24 +66,30 @@ namespace UI.CharacterCreator
 			builder.Begin();
 
 			builder.AddSection("Personal Identity", out SectionWidget section)
-				.AddWidget(new SettingsInputFieldWidget
+				.AddWidget(new SettingsFieldWidget
 				{
 					Title = "Character Name",
-					CurrentValue = state.PlayerName,
-					Callback = value =>
+					Slot = new InputFieldWidget
 					{
-						state.PlayerName = value;
-						RefreshProfile();
+						Value = state.PlayerName,
+						Callback = value =>
+						{
+							state.PlayerName = value;
+							RefreshProfile();
+						}
 					}
-				}).AddWidget(new SettingsDropdownWidget
+				}).AddWidget(new SettingsFieldWidget
 				{
 					Title = "Gender Identity",
-					Choices = Enum.GetValues(typeof(Gender)).Cast<Gender>().Select(x => SociallyDistantUtility.GetGenderDisplayString(x)).ToArray(),
-					CurrentIndex = (int) state.ChosenGender,
-					Callback = value =>
+					Slot = new DropdownWidget
 					{
-						state.ChosenGender = (Gender) value;
-						RefreshProfile();
+						Choices = Enum.GetValues(typeof(Gender)).Cast<Gender>().Select(x => SociallyDistantUtility.GetGenderDisplayString(x)).ToArray(),
+						CurrentIndex = (int) state.ChosenGender,
+						Callback = value =>
+						{
+							state.ChosenGender = (Gender) value;
+							RefreshProfile();
+						}
 					}
 				});
 			

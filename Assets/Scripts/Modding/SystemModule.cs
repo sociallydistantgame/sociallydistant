@@ -10,6 +10,7 @@ using Core.Config.SystemConfigCategories;
 using Core.Scripting;
 using Core.Scripting.GlobalCommands;
 using GamePlatform.ContentManagement;
+using GameplaySystems.Chat;
 using GameplaySystems.Missions;
 using GameplaySystems.WebPages;
 using Modules;
@@ -28,7 +29,9 @@ namespace Modding
 	{
 		private static SystemModule? currentSystemModule;
 
+		private readonly ToolGroupsSource toolGroupsSource = new();
 		private readonly MissionScriptLocator missionScriptLocator = new();
+		private readonly ConversationLocator conversations = new();
 		private readonly WebSiteContentManager websites = new();
 		private readonly IHookListener debugWorldHook = new DebugWorldHook();
 		private GraphicsSettings? graphicsSettings;
@@ -64,22 +67,33 @@ namespace Modding
 			a11ySettings = Context.SettingsManager.RegisterSettingsCategory<AccessibilitySettings>();
 			uiSettings = Context.SettingsManager.RegisterSettingsCategory<UiSettings>();
 			
+			// Core shit
+			Context.ContentManager.AddContentSource<NetworkLocator>();
+			Context.ContentManager.AddContentSource<CommandSource>();
+			Context.ContentManager.AddContentSource<ProgramSource>();
+			Context.ContentManager.AddContentSource<ExploitSource>();
+			Context.ContentManager.AddContentSource<PayloadSource>();
+			Context.ContentManager.AddContentSource<NpcSource>();
+			
+			
+			
 			// Watch system settings
 			settingsObservable = Context.SettingsManager.ObserveChanges(OnSettingsUpdated);
 			
 			// Websites
 			Context.ContentManager.AddContentSource(websites);
 
+			// chats
+			Context.ContentManager.AddContentSource(conversations);
+			
 			// missions
 			Context.ContentManager.AddContentSource(missionScriptLocator);
 			
+			// Tool groups for the Dock.
+			Context.ContentManager.AddContentSource(toolGroupsSource);
+			
 			// Find Restitched save data. If we do, the player gets a little gift from the lead programmer of the game - who.......created this game as well? <3
 			// FindRestitchedDataAndRegisterRestitchedContent();
-			
-			// Load tabbed tools from resources
-			MainToolGroup[]? tabbedTools = Resources.LoadAll<MainToolGroup>("TabbedTools");
-			foreach (MainToolGroup tool in tabbedTools)
-				this.Context.AvailableTools.Add(tool);
 		}
 
 		/// <inheritdoc />
@@ -101,7 +115,9 @@ namespace Modding
 			UnregisterHooks();
 			UnregisterGlobalCommands();
 
+			Context.ContentManager.RemoveContentSource(toolGroupsSource);
 			Context.ContentManager.RemoveContentSource(missionScriptLocator);
+			Context.ContentManager.RemoveContentSource(conversations);
 			Context.ContentManager.RemoveContentSource(websites);
 			
 			if (graphicsSettings != null)
@@ -218,9 +234,6 @@ namespace Modding
 				// Display a message to the user in their info panel when they've logged in.
 				Context.InfoPanelService.CreateCloseableInfoWidget(MaterialIcons.Brush, "New content unlocked!", "The Hypervisor has detected saved game data on your host computer from Restitched. Some Restitched-themed content has been added to your OS. Go to System Settings -> Customization to see what's new.");
 			}
-
-            // Register Restitched content with ContentManager.
-            Context.ContentManager.AddContentSource<RestitchedContentSource>();
 		}
 
 		public static SystemModule GetSystemModule()

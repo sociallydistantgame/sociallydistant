@@ -18,14 +18,13 @@ namespace UI.Applications.Email
 	{
 		[SerializeField]
 		private StaticWidgetList widgetList = null!;
-
-		[SerializeField]
-		private MissionManagerHolder missionManager = null!;
-
+		
+		private MissionManager? missionManager = null!;
 		private IMailMessage? message = null;
 		
 		private void Awake()
 		{
+			missionManager = MissionManager.Instance;
 			this.AssertAllFieldsAreSerialized(typeof(ConversationItemView));
 		}
 
@@ -44,9 +43,9 @@ namespace UI.Applications.Email
 				BuildElement(widgetBuilder, element);
 			}
 
-			if (message.MessageType.HasFlag(MailTypeFlags.Briefing) && missionManager.Value != null)
+			if (message.MessageType.HasFlag(MailTypeFlags.Briefing) && missionManager != null)
 			{
-				IMission? mission = missionManager.Value.GetMissionById(message.NarrativeId);
+				IMission? mission = missionManager.GetMissionById(message.NarrativeId);
 				if (mission != null)
 				{
 					AddMissionEmbed(widgetBuilder, mission, message.MessageType.HasFlag(MailTypeFlags.CompletedMission));
@@ -58,7 +57,7 @@ namespace UI.Applications.Email
 
 		private void AddMissionEmbed(WidgetBuilder builder, IMission mission, bool completed)
 		{
-			if (missionManager.Value == null)
+			if (missionManager == null)
 				return;
 
 			EmbedBuilder embedBuilder = new EmbedBuilder()
@@ -74,13 +73,13 @@ namespace UI.Applications.Email
 			{
 				embedBuilder = embedBuilder.WithColor(CommonColor.Yellow);
 
-				if (this.missionManager.Value.CurrentMission == mission)
+				if (this.missionManager.CurrentMission == mission)
 					embedBuilder = embedBuilder.WithTitle("Mission - In Progress");
 
-				if (this.missionManager.Value.CanStartMissions && this.missionManager.Value.CurrentMission != mission)
+				if (this.missionManager.CanStartMissions && this.missionManager.CurrentMission != mission)
 					embedBuilder = embedBuilder.WithAction("Start", () => StartMission(mission));
 
-				if (this.missionManager.Value.CurrentMission == mission && this.missionManager.Value.CAnAbandonMissions)
+				if (this.missionManager.CurrentMission == mission && this.missionManager.CAnAbandonMissions)
 					embedBuilder = embedBuilder.WithAction("Abandon mission", AbandonMission);
 			}
 			
@@ -95,13 +94,13 @@ namespace UI.Applications.Email
 			if (this.message == null)
 				return;
 			
-			if (this.missionManager.Value == null)
+			if (this.missionManager == null)
 				return;
 
-			if (!this.missionManager.Value.CAnAbandonMissions)
+			if (!this.missionManager.CAnAbandonMissions)
 				return;
 
-			this.missionManager.Value.AbandonMission();
+			this.missionManager.AbandonMission();
 			this.UpdateView(this.message);
 		}
 		
@@ -110,10 +109,10 @@ namespace UI.Applications.Email
 			if (this.message == null)
 				return;
 			
-			if (missionManager.Value == null)
+			if (missionManager == null)
 				return;
 
-			if (!missionManager.Value.StartMission(mission))
+			if (!missionManager.StartMission(mission))
 				return;
 
 			this.UpdateView(this.message);

@@ -1,0 +1,17 @@
+﻿#!mis_tutorial_example
+
+metadata() {
+    name "Example Mission"
+    giver chr_example
+    type main
+    start_type email
+}
+
+email() {
+    echo "Hello, $PLAYER_NAME"
+    echo "Could you please hack into <link=\"web://flock.social/friendusername\">my friend\'s social profile</link>? They went private and it\'s like they dropped off the face of the Earth. I want to make sure they\'re okay."
+}
+
+start() {
+    shellexec shell://tool/terminal
+}

@@ -2,6 +2,7 @@
 using System;
 using System.Collections.Generic;
 using Player;
+using Shell;
 using Shell.Common;
 using Shell.Windowing;
 using UI.Widgets;
@@ -18,7 +19,8 @@ namespace UI.Windowing
 		ISelectHandler,
 		IDeselectHandler,
 		IPointerDownHandler,
-		IFloatingGui
+		IFloatingGui,
+		IColorable
 	{
 		[FormerlySerializedAs("dragService")]
 		[Header("Dependencies")]
@@ -40,13 +42,7 @@ namespace UI.Windowing
 
 		[SerializeField]
 		private Button closeButton = null!;
-
-		[SerializeField]
-		private Button maximizeButton = null!;
-
-		[SerializeField]
-		private Button minimizeButton = null!;
-
+		
 		[SerializeField]
 		private WindowTabManager tabManager = null!;
 		
@@ -120,21 +116,7 @@ namespace UI.Windowing
 			get => closeButton.gameObject.activeSelf;
 			set => closeButton.gameObject.SetActive(value);
 		}
-
-		/// <inheritdoc />
-		public bool EnableMaximizeButton
-		{
-			get => maximizeButton.gameObject.activeSelf;
-			set => maximizeButton.gameObject.SetActive(value);
-		}
-
-		/// <inheritdoc />
-		public bool EnableMinimizeButton
-		{
-			get => minimizeButton.gameObject.activeSelf;
-			set => minimizeButton.gameObject.SetActive(value);
-		}
-
+		
 		/// <inheritdoc />
 		public bool IsActive
 			=> gameObject.activeSelf && transform.IsLastSibling();
@@ -187,8 +169,6 @@ namespace UI.Windowing
 			this.MustGetComponent(out contentSizeFitter);
 			this.clientArea.MustGetComponent(out layoutElement);
 			
-			this.maximizeButton.onClick.AddListener(ToggleMaximize);
-			this.minimizeButton.onClick.AddListener(Minimize);
 			this.closeButton.onClick.AddListener(Close);
 
 			this.SetWindowHints(defaultWindowHints);
@@ -266,32 +246,6 @@ namespace UI.Windowing
 		{
 			WindowClosed?.Invoke(this);
 			Destroy(this.gameObject);
-		}
-		
-		public void Minimize()
-		{
-			if (!allowMinimizing)
-				return;
-			
-			WindowState = WindowState.Minimized;
-		}
-
-		public void Restore()
-		{
-			if (this.WindowState == WindowState.Maximized)
-				this.ToggleMaximize();
-			else if (this.WindowState == WindowState.Normal)
-				this.Minimize();
-			else
-				this.WindowState = WindowState.Normal;
-		}
-		
-		public void ToggleMaximize()
-		{
-			if (this.WindowState == WindowState.Maximized)
-				this.WindowState = WindowState.Normal;
-			else
-				this.WindowState = WindowState.Maximized;
 		}
 		
 		private void RefreshCloseBlockers()
@@ -381,5 +335,11 @@ namespace UI.Windowing
 			this.transform.SetAsLastSibling();
 		}
 
+		/// <inheritdoc />
+		public CommonColor Color
+		{
+			get => decorationManager.Color;
+			set => decorationManager.Color = value;
+		}
 	}
 }

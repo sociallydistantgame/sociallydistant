@@ -1,10 +1,15 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Linq;
+using System.Threading.Tasks;
 using Core;
 using Core.DataManagement;
+using Core.Scripting;
 using Core.WorldData.Data;
+using GamePlatform;
 using GameplaySystems.Networld;
 using GameplaySystems.NonPlayerComputers;
+using Modules;
 using OS.Devices;
 using OS.FileSystems;
 using OS.Network;
@@ -18,19 +23,9 @@ namespace GameplaySystems.Hacking
 {
 	public class HackingSystem : MonoBehaviour
 	{
-		private readonly Dictionary<ObjectId, IListener> hackables = new Dictionary<ObjectId, IListener>();
-		private readonly Dictionary<ObjectId, CraftedExploitFile> craftedExploits = new Dictionary<ObjectId, CraftedExploitFile>();
-
-		private ExploitAsset[] exploits;
-		private PayloadAsset[] payloads;
-		private NonPlayerComputerEventListener npcComputers;
-
 		[Header("Dependencies")]
 		[SerializeField]
 		private PlayerInstanceHolder playerInstance = null!;
-
-		[SerializeField]
-		private WorldManagerHolder world = null!;
 		
 		[Header("Settings")]
 		[SerializeField]
@@ -38,27 +33,49 @@ namespace GameplaySystems.Hacking
 
 		[SerializeField]
 		private string payloadsResourcePath = "Payloads";
+		
+		private readonly Dictionary<ObjectId, IListener> hackables = new Dictionary<ObjectId, IListener>();
+		private readonly Dictionary<ObjectId, CraftedExploitFile> craftedExploits = new Dictionary<ObjectId, CraftedExploitFile>();
+		private GameManager gameManager;
+		private ExploitAsset[] exploits;
+		private PayloadAsset[] payloads;
+		private NonPlayerComputerEventListener npcComputers;
+		private IWorldManager world = null!;
+		private ReloadHackingStuffHook reloadHackingStuffHook;
 
 		public IEnumerable<ExploitAsset> Exploits => exploits;
 		public IEnumerable<PayloadAsset> Payloads => payloads;
-
+		
 		private void Awake()
 		{
+			reloadHackingStuffHook = new ReloadHackingStuffHook(this);
+			
+			gameManager = GameManager.Instance;
+			world = GameManager.Instance.WorldManager;
+			
 			this.AssertAllFieldsAreSerialized(typeof(HackingSystem));
 			
 			UnityHelpers.MustFindObjectOfType(out npcComputers);
 		}
 
+		private void OnEnable()
+		{
+			gameManager.ScriptSystem.RegisterHookListener(CommonScriptHooks.AfterContentReload, reloadHackingStuffHook);
+			ReloadHackingStuff();
+		}
+
+		private void OnDisable()
+		{
+			gameManager.ScriptSystem.UnregisterHookListener(CommonScriptHooks.AfterContentReload, reloadHackingStuffHook);
+		}
+
 		private void Start()
 		{
-			exploits = Resources.LoadAll<ExploitAsset>(exploitsResourcePath);
-			payloads = Resources.LoadAll<PayloadAsset>(payloadsResourcePath);
-
-			world.Value.Callbacks.AddCreateCallback<WorldCraftedExploitData>(OnCraftedExploitCreated);
-			world.Value.Callbacks.AddModifyCallback<WorldCraftedExploitData>(OnCraftedExploitModified);
-			world.Value.Callbacks.AddDeleteCallback<WorldCraftedExploitData>(OnCraftedExploitDeleted);
+			world.Callbacks.AddCreateCallback<WorldCraftedExploitData>(OnCraftedExploitCreated);
+			world.Callbacks.AddModifyCallback<WorldCraftedExploitData>(OnCraftedExploitModified);
+			world.Callbacks.AddDeleteCallback<WorldCraftedExploitData>(OnCraftedExploitDeleted);
 			
-			world.Value.Callbacks.AddCreateCallback<WorldHackableData>(OnHackableCreated);
+			world.Callbacks.AddCreateCallback<WorldHackableData>(OnHackableCreated);
 		}
 
 		private void OnHackableCreated(WorldHackableData subject)
@@ -101,7 +118,7 @@ namespace GameplaySystems.Hacking
 
 			if (!craftedExploits.TryGetValue(subject.InstanceId, out CraftedExploitFile file))
 			{
-				file = new CraftedExploitFile(world.Value, subject.InstanceId);
+				file = new CraftedExploitFile(world, subject.InstanceId);
 				craftedExploits.Add(subject.InstanceId, file);
 			}
 
@@ -135,6 +152,29 @@ namespace GameplaySystems.Hacking
 				return playerInstance.Value.FileOverrider;
 			else
 				return npcComputers.GetNpcFileOverrider(computer);
+		}
+
+		private void ReloadHackingStuff()
+		{
+			this.exploits = gameManager.ContentManager.GetContentOfType<ExploitAsset>().ToArray();
+			this.payloads = gameManager.ContentManager.GetContentOfType<PayloadAsset>().ToArray();
+		}
+		
+		private sealed class ReloadHackingStuffHook : IHookListener
+		{
+			private readonly HackingSystem hackingSystem;
+
+			public ReloadHackingStuffHook(HackingSystem hackingSystem)
+			{
+				this.hackingSystem = hackingSystem;
+			}
+			
+			/// <inheritdoc />
+			public Task ReceiveHookAsync(IGameContext game)
+			{
+				hackingSystem.ReloadHackingStuff();
+				return Task.CompletedTask;
+			}
 		}
 	}
 }

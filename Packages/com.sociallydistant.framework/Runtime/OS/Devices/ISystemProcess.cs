@@ -1,6 +1,7 @@
 ﻿#nullable enable
 using System;
 using System.Collections.Generic;
+using System.Threading.Tasks;
 
 namespace OS.Devices
 {
@@ -18,8 +19,8 @@ namespace OS.Devices
 		
 		event Action<ISystemProcess>? Killed;
 
-		ISystemProcess Fork();
-		ISystemProcess ForkAsUser(IUser user);
+		Task<ISystemProcess> Fork();
+		Task<ISystemProcess> ForkAsUser(IUser user);
 
 		
 		void Kill(int exitCode = 0);

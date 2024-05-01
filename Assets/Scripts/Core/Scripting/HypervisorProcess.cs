@@ -5,6 +5,7 @@ using System.Diagnostics;
 using Architecture;
 using Core.Systems;
 using OS.Devices;
+using System.Threading.Tasks;
 
 namespace Core.Scripting
 {
@@ -63,13 +64,13 @@ namespace Core.Scripting
 		}
 		
 		/// <inheritdoc />
-		public ISystemProcess Fork()
+		public async Task<ISystemProcess> Fork()
 		{
-			return ForkAsUser(user);
+			return await ForkAsUser(user);
 		}
 
 		/// <inheritdoc />
-		public ISystemProcess ForkAsUser(IUser user)
+		public Task<ISystemProcess> ForkAsUser(IUser user)
 		{
 			var proc = new HypervisorProcess(idGenerator, user, this);
 
@@ -77,7 +78,7 @@ namespace Core.Scripting
 
 			proc.Killed += HandleKilled;
 
-			return proc;
+			return Task.FromResult<ISystemProcess>(proc);
 			
 			void HandleKilled(ISystemProcess killed)
 			{

@@ -11,7 +11,7 @@ namespace AcidicGui.Widgets
 		SectionWidgetController GetSectionWidget(RectTransform destination);
 
 		LabelWidgetController GetLabel(RectTransform destination);
-
+		
 		ButtonWidgetController GetButtonWidget(RectTransform destination);
 		
 		ImageWidgetController GetImage(RectTransform destination);

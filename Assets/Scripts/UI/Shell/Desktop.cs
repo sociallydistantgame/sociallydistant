@@ -16,6 +16,7 @@ using UnityEngine;
 using UnityEngine.UI;
 using UnityExtensions;
 using Utility;
+using System.Threading.Tasks;
 
 namespace UI.Shell
 {
@@ -24,10 +25,6 @@ namespace UI.Shell
 		IProgramOpener,
 		IDesktop
 	{
-		[Header("Dependencies")]
-		[SerializeField]
-		private GameManagerHolder gameManager = null!;
-		
 		[SerializeField]
 		private PlayerInstanceHolder playerHolder = null!;
 
@@ -45,49 +42,56 @@ namespace UI.Shell
 		private ISystemProcess loginProcess = null!;
 		private IUser loginUser = null!;
 		private UiManager uiManager = null!;
-
+		private CanvasGroup canvasGroup = null!;
+		private LTDescr? fadeIn;
+		private LTDescr? fadeOut;
+		private GameManager gameManager = null!;
+		
 		internal ISystemProcess LoginProcess => loginProcess;
 		
 		public IWorkspaceDefinition CurrentWorkspace => currentWorkspace;
 		
 		private void Awake()
 		{
+			gameManager = GameManager.Instance;
 			this.AssertAllFieldsAreSerialized(typeof(Desktop));
 			this.MustGetComponentInParent(out uiManager);
+			this.MustGetComponent(out canvasGroup);
+
+			canvasGroup.alpha = 0;
 		}
 
-		private void OnEnable()
+		private async void OnEnable()
 		{
-			if (gameManager.Value != null)
-			{
-				gameManager.Value.UriManager.RegisterSchema("web", new BrowserSchemeHandler(this));
-				gameManager.Value.UriManager.RegisterSchema("shell", new ShellUriSchemeHandler(this));
-			}
+			this.loginUser = this.playerHolder.Value.Computer.PlayerUser;
+			this.loginProcess = await this.playerHolder.Value.OsInitProcess.CreateLoginProcess(this.loginUser);
+			
+			gameManager.UriManager.RegisterSchema("web", new BrowserSchemeHandler(this));
+			gameManager.UriManager.RegisterSchema("shell", new ShellUriSchemeHandler(this));
+		
+			this.UpdateUserDisplay();
+			await this.toolManager.StartFirstTool();
+			Show();
 		}
 
 		private void OnDisable()
 		{
-			if (gameManager.Value != null)
-			{
-				gameManager.Value.UriManager.UnregisterSchema("web");
-				gameManager.Value.UriManager.UnregisterSchema("shell");
-			}
+			gameManager.UriManager.UnregisterSchema("web");
+			gameManager.UriManager.UnregisterSchema("shell");
+
+			Hide();
 		}
 
 		private void Start()
 		{
-			this.loginUser = this.playerHolder.Value.Computer.PlayerUser;
-			this.loginProcess = this.playerHolder.Value.OsInitProcess.CreateLoginProcess(this.loginUser);
 			this.currentWorkspace = playerHolder.Value.UiManager.WindowManager.DefineWorkspace(this.workspaceArea);
-
-			this.UpdateUserDisplay();
 		}
 
 		/// <inheritdoc />
-		public ISystemProcess OpenProgram(IProgram program, string[] arguments, ISystemProcess? parentProcess, ITextConsole? console)
+		public async Task<ISystemProcess> OpenProgram(IProgram program, string[] arguments, ISystemProcess? parentProcess, ITextConsole? console)
 		{
 			// Create a process for the window, if we weren't supplied with one.
-			ISystemProcess windowProcess = parentProcess ?? this.loginProcess.Fork();
+			ISystemProcess windowProcess = parentProcess ?? await this.loginProcess.Fork();
 			
 			// Create a new window for the program, on the current workspace.
 			IFloatingGui? win = CurrentWorkspace.CreateFloatingGui("Window");
@@ -99,9 +103,9 @@ namespace UI.Shell
 			return windowProcess;
 		}
 
-		public void OpenWebBrowser(Uri uri)
+		public async Task OpenWebBrowser(Uri uri)
 		{
-			this.toolManager.OpenWebBrowser(uri);
+			await this.toolManager.OpenWebBrowser(uri);
 		}
 
 		private void UpdateUserDisplay()
@@ -110,6 +114,44 @@ namespace UI.Shell
 			string hostname = this.loginUser.Computer.Name;
 			
 			statusBarController.UserInfo = $"{username}@{hostname}";
+		}
+
+		private void Show()
+		{
+			if (fadeOut != null)
+			{
+				LeanTween.cancel(fadeOut.id);
+				fadeOut = null;
+			}
+			
+			if (fadeIn != null)
+				return;
+			
+			fadeIn = LeanTween.alphaCanvas(canvasGroup, 1, 0.5f).setOnComplete(AfterHide);
+		}
+
+		private void Hide()
+		{
+			if (fadeIn != null)
+			{
+				LeanTween.cancel(fadeIn.id);
+				fadeIn = null;
+			}
+
+			if (fadeOut != null)
+				return;
+
+			fadeOut = LeanTween.alphaCanvas(canvasGroup, 0, 0.5f).setOnComplete(AfterHide);
+		}
+
+		private void AfterShow()
+		{
+			fadeIn = null;
+		}
+
+		private void AfterHide()
+		{
+			fadeOut = null;
 		}
 
 		private sealed class ShellUriSchemeHandler : IUriSchemeHandler

@@ -1,8 +1,9 @@
 ﻿#nullable enable
+using System.Threading.Tasks;
 namespace OS.Devices
 {
 	public interface IInitProcess : ISystemProcess
 	{
-		ISystemProcess CreateLoginProcess(IUser user);
+		Task<ISystemProcess> CreateLoginProcess(IUser user);
 	}
 }

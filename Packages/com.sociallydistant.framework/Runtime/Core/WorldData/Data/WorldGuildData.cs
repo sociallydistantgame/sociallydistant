@@ -4,10 +4,12 @@ namespace Core.WorldData.Data
 {
 	public struct WorldGuildData :
 		IWorldData,
-		IDataWithId
+		IDataWithId,
+		INarrativeObject
 	{
 		private ObjectId id;
 		private string name;
+		private string? narrativeId;
 		
 		
 		/// <inheritdoc />
@@ -15,6 +17,7 @@ namespace Core.WorldData.Data
 		{
 			SerializationUtility.SerializeAtRevision(ref id, serializer, WorldRevision.ChatAndSocialMedia, default);
 			SerializationUtility.SerializeAtRevision(ref name, serializer, WorldRevision.ChatAndSocialMedia, default);
+			SerializationUtility.SerializeAtRevision(ref narrativeId, serializer, WorldRevision.NarrativeGuilds, default);
 		}
 
 		/// <inheritdoc />
@@ -28,6 +31,13 @@ namespace Core.WorldData.Data
 		{
 			get => name;
 			set => name = value;
+		}
+
+		/// <inheritdoc />
+		public string NarrativeId
+		{
+			get => narrativeId;
+			set => narrativeId = value;
 		}
 	}
 }

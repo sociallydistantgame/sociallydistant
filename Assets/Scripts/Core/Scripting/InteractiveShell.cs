@@ -15,6 +15,7 @@ using UI.Shell;
 using Utility;
 using Core.Scripting.Instructions;
 using Core.Scripting.Parsing;
+using GamePlatform;
 using Debug = UnityEngine.Debug;
 
 namespace Core.Scripting
@@ -186,6 +187,18 @@ namespace Core.Scripting
 			return lineBuilder.ToString();
 		}
 
+		public async Task<int> RunParsedScript(ShellInstruction scriptTree)
+		{
+			try
+			{
+				return await scriptTree.RunAsync(this.consoleDevice ?? new UnityTextConsole(), this);
+			}
+			catch (ScriptEndException endException)
+			{
+				return endException.ExitCode;
+			}
+		}
+		
 		private async Task RunScriptInternal(string scriptText, bool isInteractive)
 		{
 			if (consoleDevice == null)
@@ -227,7 +240,6 @@ namespace Core.Scripting
 			catch (ScriptEndException)
 			{
 				stopwatch.Stop();
-				PrintTimeDiagnostics(stopwatch.Elapsed, isInteractive);
 				throw;
 			}
 			catch (Exception ex)
@@ -235,7 +247,6 @@ namespace Core.Scripting
 				if (!HandleExceptionsGracefully)
 				{
 					stopwatch.Stop();
-					PrintTimeDiagnostics(stopwatch.Elapsed, isInteractive);
 					throw;
 				}
 
@@ -247,36 +258,6 @@ namespace Core.Scripting
 			}
 			
 			stopwatch.Stop();
-			PrintTimeDiagnostics(stopwatch.Elapsed, isInteractive);
-		}
-
-		private void PrintTimeDiagnostics(TimeSpan time, bool isInteractive)
-		{
-			var sb = new StringBuilder();
-			sb.Append("Script execution took ");
-			sb.AppendLine(time.ToString());
-
-			if (isInteractive)
-				this.consoleDevice?.WriteText(sb.ToString());
-
-			switch (time)
-			{
-				case { } when time.TotalSeconds > 5:
-				{
-					Debug.LogError(sb.ToString());
-					break;
-				}
-				case { } when time.TotalSeconds > 1:
-				{
-					Debug.LogWarning(sb.ToString());
-					break;
-				}
-				default:
-				{
-					Debug.Log(sb.ToString());
-					break;
-				}
-			}
 		}
 		
 		public async Task RunScript(string scriptText)
@@ -378,6 +359,29 @@ namespace Core.Scripting
 			var parser = new ScriptParser(this, useLocalExecutionContext);
 			
 			pendingInstructions.Enqueue(await parser.ParseScript(view));
+		}
+
+		public async Task<ShellInstruction> ParseScript(string scriptText)
+		{
+			StripComments(ref scriptText);
+			if (string.IsNullOrWhiteSpace(scriptText))
+				return new EmptyShellInstruction();
+			
+			// The first tokenization pass we do, before executing this function,
+			// only deals with quotes and escape sequences. It also ignores comments,
+			// but it has no concept of the actual syntax of the shell language.
+			//
+			// As such, we must do a more advanced tokenization of the raw input.
+			
+			// So let's do it.
+			IEnumerable<ShellToken>? typedTokens = ShellUtility.IdentifyTokens(scriptText);
+			
+			// Create a view over this array that we can advance during parsing
+			var view = new ArrayView<ShellToken>(typedTokens.ToArray());
+
+			var parser = new ScriptParser(this, false);
+
+			return await parser.ParseScript(view);
 		}
 
 		public bool ProcessBuiltIn(ISystemProcess process, ITextConsole console, string name, string[] arguments)

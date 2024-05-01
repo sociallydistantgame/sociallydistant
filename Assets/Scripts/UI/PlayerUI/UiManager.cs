@@ -9,6 +9,7 @@ using Shell;
 using Shell.Windowing;
 using TMPro;
 using UI.Backdrop;
+using UI.Boot;
 using UI.CharacterCreator;
 using UI.Login;
 using UI.Popovers;
@@ -26,11 +27,10 @@ namespace UI.PlayerUI
 		MonoBehaviour,
 		IShellContext
 	{
-		[Header("Dependencies")]
-		[SerializeField]
-		private GameManagerHolder gameManager = null!;
-		
 		[Header("Prefabs")]
+		[SerializeField]
+		private BootScreen bootScreenPrefab = null!;
+		
 		[SerializeField]
 		private GameObject characterCreatorPrefab = null!;
 		
@@ -67,8 +67,9 @@ namespace UI.PlayerUI
 		private TMP_FontAsset monospaceFont = null!;
 
 		private static Camera mainCamera = null!;
-		
+		private GameManager gameManager = null!;
 		private string? lastThemeName;
+		private CanvasGroup topGroup;
 		private IFloatingGui? settingsWindow;
 		private OverlayWorkspace? overlayWorkspace;
 		private WindowManager windowManager = null!;
@@ -77,6 +78,7 @@ namespace UI.PlayerUI
 		private GameMode gameMode;
 		private IDisposable? gameModeObserver;
 		private IDisposable? settingsObserver;
+		private GameObject? bootScreen;
 
 		public BackdropController Backdrop => backdrop;
 		public PopoverLayer PopoverLayer => popoverLayer;
@@ -86,25 +88,44 @@ namespace UI.PlayerUI
 		public Desktop? Desktop { get; private set; }
 		public LoginManager? LoginManager { get; private set; }
 		public CharacterCreatorController? CharacterCreator => characterCreator;
+
+		/// <summary>
+		///		Gets or sets whether the UI is in auto-pilot mode. If it is, then all user inputs will be blocked
+		///		and the UI can only be interacted with via script.
+		/// </summary>
+		public bool Autopilot
+		{
+			get => !topGroup.interactable;
+			set
+			{
+				topGroup.interactable = !value;
+				topGroup.blocksRaycasts = !value;
+			}
+		}
 		
 		private void Awake()
 		{
+			gameManager = GameManager.Instance;
+			
 			this.AssertAllFieldsAreSerialized(typeof(UiManager));
+			this.MustGetComponent(out topGroup);
 
 			mainCamera = Camera.main;
 			
 			Instantiate(backdropPrefab, this.transform).MustGetComponent(out backdrop);
 			Instantiate(this.popoverLayerPrefab, this.transform).MustGetComponent(out popoverLayer);
 			Instantiate(windowManagerPrefab, this.transform).MustGetComponent(out windowManager);
+
+			topGroup.alpha = 1;
+			topGroup.interactable = true;
+			topGroup.blocksRaycasts = true;
+			topGroup.ignoreParentGroups = true;
 		}
 
 		private void OnEnable()
 		{
-			if (gameManager.Value == null)
-				return;
-			
-			gameModeObserver = gameManager.Value.GameModeObservable.Subscribe(OnGameModeChanged);
-			settingsObserver = gameManager.Value.SettingsManager.ObserveChanges(OnSettingsUpdated);
+			gameModeObserver = gameManager.GameModeObservable.Subscribe(OnGameModeChanged);
+			settingsObserver = gameManager.SettingsManager.ObserveChanges(OnSettingsUpdated);
 		}
 
 		private void OnDisable()
@@ -213,11 +234,36 @@ namespace UI.PlayerUI
 		{
 			return Instantiate(this.fileChooser, win.ClientArea);
 		}
+
+		private void CreateBootScreen()
+		{
+			if (bootScreen != null)
+				return;
+
+			bootScreen = Instantiate(bootScreenPrefab, this.transform).gameObject;
+		}
+
+		private void DestroyBootScreen()
+		{
+			if (bootScreen != null)
+				Destroy(bootScreen);
+
+			bootScreen = null;
+		}
 		
 		private void OnGameModeChanged(GameMode newGameMode)
 		{
 			this.gameMode = newGameMode;
 
+			if (this.gameMode == GameMode.Booting)
+			{
+				CreateBootScreen();
+			}
+			else
+			{
+				DestroyBootScreen();
+			}
+			
 			if (this.gameMode == GameMode.AtLoginScreen)
 			{
 				ShowLoginScreen();
@@ -266,6 +312,7 @@ namespace UI.PlayerUI
 			
 			IMessageDialog dialog = windowManager.CreateMessageDialog("Failed to load game");
 
+			dialog.MessageType = MessageBoxType.Error;
 			dialog.Title = "System error";
 			dialog.Message = sb.ToString();
 			

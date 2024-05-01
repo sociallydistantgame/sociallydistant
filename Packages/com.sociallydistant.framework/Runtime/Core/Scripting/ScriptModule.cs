@@ -5,9 +5,7 @@ using System.Threading.Tasks;
 using OS.Devices;
 using System;
 using System.Linq;
-using System.Net;
 using System.Reflection;
-using Codice.CM.SEIDInfo;
 
 namespace Core.Scripting
 {

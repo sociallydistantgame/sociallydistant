@@ -92,23 +92,29 @@ namespace UI.CharacterCreator
 
 			builder.Begin();
 
-			builder.AddWidget(new SettingsInputFieldWidget
+			builder.AddWidget(new SettingsFieldWidget
 			{
 				Title = "Your Username",
-				CurrentValue = state.UserName,
-				Callback = value =>
+				Slot = new InputFieldWidget
 				{
-					state.UserName = value;
-					RefreshTerminal();
+					Value = state.UserName,
+					Callback = value =>
+					{
+						state.UserName = value;
+						RefreshTerminal();
+					}
 				}
-			}).AddWidget(new SettingsInputFieldWidget
+			}).AddWidget(new SettingsFieldWidget
 			{
 				Title = "System Hostname",
-				CurrentValue = state.HostName,
-				Callback = value =>
+				Slot = new InputFieldWidget
 				{
-					state.HostName = value;
-					RefreshTerminal();
+					Value = state.HostName,
+					Callback = value =>
+					{
+						state.HostName = value;
+						RefreshTerminal();
+					}
 				}
 			});
 			

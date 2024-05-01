@@ -13,6 +13,7 @@ namespace Core.WorldData
 {
 	public class World : IWorld
 	{
+		private readonly DataEventDispatcher eventDispatcher;
 		private readonly WorldFlagCollection worldFlags = new WorldFlagCollection();
 		private readonly WorldDataObject<ProtectedWorldState> protectedWorldState;
 		private readonly WorldDataObject<GlobalWorldData> globalWorldState;
@@ -24,29 +25,53 @@ namespace Core.WorldData
 		private readonly WorldDataTable<WorldPortForwardingRule> portForwardingRules;
 		private readonly WorldDataTable<WorldCraftedExploitData> craftedExploits;
 		private readonly WorldDataTable<WorldHackableData> hackables;
-		private readonly WorldDataTable<WorldProfileData> profiles;
+		private readonly NarrativeObjectTable<WorldProfileData> profiles;
 		private readonly WorldDataTable<WorldPostData> posts;
 		private readonly WorldDataTable<WorldMessageData> messages;
-		private readonly WorldDataTable<WorldChannelData> channels;
-		private readonly WorldDataTable<WorldGuildData> guilds;
+		private readonly NarrativeObjectTable<WorldChannelData> channels;
+		private readonly NarrativeObjectTable<WorldGuildData> guilds;
 		private readonly WorldDataTable<WorldMemberData> members;
 		private readonly WorldDataTable<WorldRelationshipData> relationships;
 		private readonly WorldDataTable<WorldDomainNameData> domains;
-		private readonly WorldDataTable<WorldMailData> emails;
-
+		private readonly NarrativeObjectTable<WorldMailData> emails;
+		private readonly WorldDataTable<WorldWitnessedObjectData> witnessedObjects;
 
 		internal IWorldDataObject<ProtectedWorldState> ProtectedWorldData => this.protectedWorldState;
-		
-        /// <inheritdoc />
+
+		/// <inheritdoc />
+		public string GameVersion => ProtectedWorldData.Value.GameVersion;
+
+		/// <inheritdoc />
         public IWorldDataObject<GlobalWorldData> GlobalWorldState => globalWorldState;
 
         /// <inheritdoc />
         public IWorldFlagCollection WorldFlags => worldFlags;
 
         /// <inheritdoc />
+        public ulong PlayerExperience => this.ProtectedWorldData.Value.Experience;
+
+        /// <inheritdoc />
+        public string CurrentMissionId => this.ProtectedWorldData.Value.CurrentMissionId;
+
+        /// <inheritdoc />
+        public string NarrativeLifePath => this.ProtectedWorldData.Value.LifepathId;
+
+        /// <inheritdoc />
         public bool IsMissionCompleted(string missionId)
         {
-	        return this.ProtectedWorldData.Value.CompletedMissions.Contains(missionId);
+	        return this.ProtectedWorldData.Value.CompletedMissions?.Contains(missionId) == true;
+        }
+
+        /// <inheritdoc />
+        public bool IsInteractionCompleted(string interactionId)
+        {
+	        return this.protectedWorldState.Value.CompletedInteractions.Contains(interactionId);
+        }
+
+        /// <inheritdoc />
+        public bool WasMissionFailed(string missionId)
+        {
+	        return this.ProtectedWorldData.Value.FailedMissions.Contains(missionId);
         }
 
         /// <inheritdoc />
@@ -74,19 +99,22 @@ namespace Core.WorldData
         public IWorldTable<WorldHackableData> Hackables => hackables;
 
         /// <inheritdoc />
-        public IWorldTable<WorldProfileData> Profiles => profiles;
+        public INarrativeObjectTable<WorldProfileData> Profiles => profiles;
 
         /// <inheritdoc />
         public IWorldTable<WorldPostData> Posts => posts;
 
         /// <inheritdoc />
+        public IWorldTable<WorldWitnessedObjectData> WitnessedObjects => witnessedObjects;
+
+        /// <inheritdoc />
         public IWorldTable<WorldMessageData> Messages => messages;
 
         /// <inheritdoc />
-        public IWorldTable<WorldChannelData> Channels => channels;
+        public INarrativeObjectTable<WorldChannelData> Channels => channels;
 
         /// <inheritdoc />
-        public IWorldTable<WorldGuildData> Guilds => guilds;
+        public INarrativeObjectTable<WorldGuildData> Guilds => guilds;
 
         /// <inheritdoc />
         public IWorldTable<WorldMemberData> Members => members;
@@ -96,10 +124,11 @@ namespace Core.WorldData
 
         /// <inheritdoc />
         public IWorldTable<WorldRelationshipData> Relationships => relationships;
-        public IWorldTable<WorldMailData> Emails => emails;
+        public INarrativeObjectTable<WorldMailData> Emails => emails;
         
         public World(UniqueIntGenerator instanceIdGenerator, DataEventDispatcher eventDispatcher)
-		{
+        {
+	        this.eventDispatcher = eventDispatcher;
 			protectedWorldState = new WorldDataObject<ProtectedWorldState>(eventDispatcher);
 			globalWorldState = new WorldDataObject<GlobalWorldData>(eventDispatcher);
 			playerData = new WorldDataObject<WorldPlayerData>(eventDispatcher);
@@ -110,19 +139,22 @@ namespace Core.WorldData
 			portForwardingRules = new WorldDataTable<WorldPortForwardingRule>(instanceIdGenerator, eventDispatcher);
 			craftedExploits = new WorldDataTable<WorldCraftedExploitData>(instanceIdGenerator, eventDispatcher);
 			hackables = new WorldDataTable<WorldHackableData>(instanceIdGenerator, eventDispatcher);
-        	profiles = new WorldDataTable<WorldProfileData>(instanceIdGenerator, eventDispatcher);
+        	profiles = new NarrativeObjectTable<WorldProfileData>(instanceIdGenerator, eventDispatcher);
         	posts = new WorldDataTable<WorldPostData>(instanceIdGenerator, eventDispatcher);
         	messages = new WorldDataTable<WorldMessageData>(instanceIdGenerator, eventDispatcher);
-        	channels = new WorldDataTable<WorldChannelData>(instanceIdGenerator, eventDispatcher);
-        	guilds = new WorldDataTable<WorldGuildData>(instanceIdGenerator, eventDispatcher);
+        	channels = new NarrativeObjectTable<WorldChannelData>(instanceIdGenerator, eventDispatcher);
+        	guilds = new NarrativeObjectTable<WorldGuildData>(instanceIdGenerator, eventDispatcher);
 			members = new WorldDataTable<WorldMemberData>(instanceIdGenerator, eventDispatcher);
 			relationships = new WorldDataTable<WorldRelationshipData>(instanceIdGenerator, eventDispatcher);
 			domains = new WorldDataTable<WorldDomainNameData>(instanceIdGenerator, eventDispatcher);
-			emails = new WorldDataTable<WorldMailData>(instanceIdGenerator, eventDispatcher);
+			emails = new NarrativeObjectTable<WorldMailData>(instanceIdGenerator, eventDispatcher);
+			witnessedObjects = new WorldDataTable<WorldWitnessedObjectData>(instanceIdGenerator, eventDispatcher);
 		}
 
 		public void Serialize(IWorldSerializer serializer)
 		{
+			eventDispatcher.PauseEvents = true;
+			
 			worldFlags.Serialize(serializer);
 			protectedWorldState.Serialize(serializer);
 			globalWorldState.Serialize(serializer);
@@ -148,13 +180,16 @@ namespace Core.WorldData
 			relationships.Serialize(serializer, WorldRevision.ChatAndSocialMedia);
 			domains.Serialize(serializer, WorldRevision.DomainNames);
 			emails.Serialize(serializer, WorldRevision.Email);
+			witnessedObjects.Serialize(serializer, WorldRevision.MissionFailures);
 			
+			eventDispatcher.PauseEvents = false;
 		}
 
 		public void Wipe()
 		{
 			// You must wipe the world in reverse order of how you would create or serialize it.
 			// This ensures proper handling of deleting objects that depend on other objects.
+			witnessedObjects.Clear();
 			emails.Clear();
 			domains.Clear();
 			relationships.Clear();

@@ -8,13 +8,12 @@ namespace UI.Widgets.Settings
 {
 	public abstract class SettingsListener : MonoBehaviour
 	{
-		[SerializeField]
-		private GameManagerHolder gameManagerHolder = null!;
-		
+		private GameManager gameManagerHolder = null!;
 		private IDisposable? settingsObserver;
 		
 		protected virtual void Awake()
 		{
+			gameManagerHolder = GameManager.Instance;
 			this.AssertAllFieldsAreSerialized(typeof(SettingsListener));
 		}
 
@@ -42,10 +41,7 @@ namespace UI.Widgets.Settings
 
 		private void BindToSettingsUpdates()
 		{
-			if (gameManagerHolder.Value == null)
-				return;
-			
-			settingsObserver = gameManagerHolder.Value.SettingsManager.ObserveChanges(OnSettingsChanged);
+			settingsObserver = gameManagerHolder.SettingsManager.ObserveChanges(OnSettingsChanged);
 		}
 	}
 }

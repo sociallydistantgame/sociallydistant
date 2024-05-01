@@ -23,29 +23,31 @@ namespace GameplaySystems.Mail
 		IHookListener
 	{
 		[SerializeField]
-		private GameManagerHolder gameManager = null!;
-		
-		[SerializeField]
-		private WorldManagerHolder worldManager = null!;
-
-		[SerializeField]
 		private SocialServiceHolder socialServiceHolder = null!;
 
 		[SerializeField]
 		private MarkupAsset changelogMarkupAsset = null!;
+
+		private static readonly Singleton<MailManager> singleton = new();
 		
 		private readonly Dictionary<ObjectId, MailThread> threads = new Dictionary<ObjectId, MailThread>();
 		private readonly Dictionary<ObjectId, MailMessage> messages = new Dictionary<ObjectId, MailMessage>();
 		
+		private GameManager gameManager = null!;
+		private WorldManager worldManager = null!;
+		
 		private void Awake()
 		{
+			gameManager = GameManager.Instance;
+			worldManager = WorldManager.Instance;
+			singleton.SetInstance(this);
+			
 			this.AssertAllFieldsAreSerialized(typeof(MailManager));
 		}
 
 		private void Start()
 		{
-			if (gameManager.Value != null)
-				gameManager.Value.ScriptSystem.RegisterHookListener(CommonScriptHooks.AfterWorldStateUpdate, this);
+			gameManager.ScriptSystem.RegisterHookListener(CommonScriptHooks.AfterWorldStateUpdate, this);
 			
 			InstallEvents();
 		}
@@ -54,29 +56,22 @@ namespace GameplaySystems.Mail
 		{
 			UninstallEvents();
 			
-			if (gameManager.Value != null)
-				gameManager.Value.ScriptSystem.UnregisterHookListener(CommonScriptHooks.AfterWorldStateUpdate, this);
+			gameManager.ScriptSystem.UnregisterHookListener(CommonScriptHooks.AfterWorldStateUpdate, this);
+			singleton.SetInstance(null);
 		}
 
 		private void InstallEvents()
 		{
-			if (worldManager.Value != null)
-			{
-				worldManager.Value.Callbacks.AddCreateCallback<WorldMailData>(OnCreateMail);
-				worldManager.Value.Callbacks.AddModifyCallback<WorldMailData>(OnModifyMail);
-				worldManager.Value.Callbacks.AddDeleteCallback<WorldMailData>(OnDeleteMail);
-				
-			}
+			worldManager.Callbacks.AddCreateCallback<WorldMailData>(OnCreateMail);
+			worldManager.Callbacks.AddModifyCallback<WorldMailData>(OnModifyMail);
+			worldManager.Callbacks.AddDeleteCallback<WorldMailData>(OnDeleteMail);
 		}
 
 		private void UninstallEvents()
 		{
-			if (worldManager.Value != null)
-			{
-				worldManager.Value.Callbacks.RemoveCreateCallback<WorldMailData>(OnCreateMail);
-				worldManager.Value.Callbacks.RemoveModifyCallback<WorldMailData>(OnModifyMail);
-				worldManager.Value.Callbacks.RemoveDeleteCallback<WorldMailData>(OnDeleteMail);
-			}
+			worldManager.Callbacks.RemoveCreateCallback<WorldMailData>(OnCreateMail);
+			worldManager.Callbacks.RemoveModifyCallback<WorldMailData>(OnModifyMail);
+			worldManager.Callbacks.RemoveDeleteCallback<WorldMailData>(OnDeleteMail);
 		}
 
 		public IEnumerable<IMailMessage> GetMessagesForUser(IProfile profile)
@@ -235,7 +230,7 @@ namespace GameplaySystems.Mail
 				}
 
 				this.Subject = mailData.Subject;
-				this.Body = mailData.Document.ToArray();
+				this.Body = mailData.Document?.ToArray() ?? Array.Empty<DocumentElement>();
 			}
 		}
 
@@ -244,44 +239,41 @@ namespace GameplaySystems.Mail
 		{
 			if (this.socialServiceHolder.Value == null)
 				return Task.CompletedTask;
-
-			if (this.worldManager.Value == null)
-				return Task.CompletedTask;
 			
 			string gameVersion = Application.version;
-			string saveGameVersion = this.worldManager.Value.World.ProtectedWorldData.Value.GameVersion;
+			string saveGameVersion = this.worldManager.World.GameVersion;
 			var mustSendChangelog = false;
 			
 			if (String.CompareOrdinal(gameVersion, saveGameVersion) != 0)
 			{
-				ProtectedWorldState state = worldManager.Value.World.ProtectedWorldData.Value;
+				ProtectedWorldState state = worldManager.World.ProtectedWorldData.Value;
 				state.GameVersion = gameVersion;
-				worldManager.Value.World.ProtectedWorldData.Value = state;
+				worldManager.World.ProtectedWorldData.Value = state;
 				mustSendChangelog = true;
 			}
 
 			if (mustSendChangelog)
 			{
-				WorldProfileData metaProfile = worldManager.Value.World.Profiles.FirstOrDefault(x => x.NarrativeId == "meta");
+				WorldProfileData metaProfile = worldManager.World.Profiles.FirstOrDefault(x => x.NarrativeId == "meta");
 
 				if (metaProfile.NarrativeId != "meta")
 				{
-					metaProfile.InstanceId = worldManager.Value.GetNextObjectId();
+					metaProfile.InstanceId = worldManager.GetNextObjectId();
 					metaProfile.NarrativeId = "meta";
 					metaProfile.Gender = Gender.Unknown;
 					metaProfile.IsSocialPrivate = true;
 					metaProfile.ChatName = "sociallydistant";
 					metaProfile.ChatName = "Socially Distant";
-					worldManager.Value.World.Profiles.Add(metaProfile);
+					worldManager.World.Profiles.Add(metaProfile);
 				}
 
 				var message = new WorldMailData()
 				{
-					InstanceId = worldManager.Value.GetNextObjectId(),
+					InstanceId = worldManager.GetNextObjectId(),
 					From = metaProfile.InstanceId,
 					To = socialServiceHolder.Value.PlayerProfile.ProfileId,
 					Subject = "Socially Distant Update",
-					ThreadId = worldManager.Value.GetNextObjectId(),
+					ThreadId = worldManager.GetNextObjectId(),
 					Document = new[]
 					{
 						new DocumentElement
@@ -302,10 +294,12 @@ namespace GameplaySystems.Mail
 					}
 				};
 				
-				worldManager.Value.World.Emails.Add(message);
+				worldManager.World.Emails.Add(message);
 			}
 			
 			return Task.CompletedTask;
 		}
+
+		public static MailManager? Instance => singleton.Instance;
 	}
 }

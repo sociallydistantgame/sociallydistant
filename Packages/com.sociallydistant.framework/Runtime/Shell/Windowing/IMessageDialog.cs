@@ -9,7 +9,8 @@ namespace Shell.Windowing
 	{
 		string Message { get; set; }
 		CommonColor Color { get; set; }
-
+		MessageBoxType MessageType { get; set; }
+		
 		IList<MessageBoxButtonData> Buttons { get; }
 
 		Action<MessageDialogResult>? DismissCallback { get; set; }

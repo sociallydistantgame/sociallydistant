@@ -10,5 +10,8 @@ namespace Social
 		string Name { get; }
 		
 		IEnumerable<IChatChannel> Channels { get; }
+
+		bool HasMember(IProfile profile);
+		IChatChannel GetNarrativeChannel(string channelId);
 	}
 }

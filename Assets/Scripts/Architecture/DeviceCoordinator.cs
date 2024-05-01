@@ -8,6 +8,7 @@ using OS.Devices;
 using OS.Tasks;
 using UnityEngine;
 using UnityEngine.Assertions;
+using System.Threading.Tasks;
 
 namespace Architecture
 {
@@ -81,14 +82,14 @@ namespace Architecture
 			return this.computers.Values;
 		}
 
-		internal void CopyEnvironment(IUser user, ISystemProcess process)
+		internal async Task CopyEnvironment(IUser user, ISystemProcess process)
 		{
 			Assert.IsTrue(user.Computer==process.User.Computer);
 
 			if (!this.computers.TryGetValue(user.Computer, out IInitProcess initProcess) || initProcess is not DeviceCoordinatorProcess deviceCoordinatorProcess)
 				throw new InvalidOperationException("Computer is being used but was not set up with DeviceCoordinator.");
 
-			ISystemProcess loginProcess = deviceCoordinatorProcess.CreateLoginProcess(user);
+			ISystemProcess loginProcess = await deviceCoordinatorProcess.CreateLoginProcess(user);
 
 			foreach (string key in loginProcess.Environment.Keys)
 				process.Environment[key] = loginProcess.Environment[key];

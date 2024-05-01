@@ -30,8 +30,8 @@ namespace GameplaySystems.Networld
 				this.deviceNode.UnhandledPacketReceived += OnPacketReceived;
 
 			ISystemProcess? serverProc = null;
-			if (serverType != ServerType.Netcat)
-				serverProc = node.Computer.CreateDaemonProcess(serverType.ToString());
+			//if (serverType != ServerType.Netcat)
+			//	serverProc = await node.Computer.CreateDaemonProcess(serverType.ToString());
 			
 			this.serverInfo = new ServerInfo(node.Computer, serverType, secLevel, serverProc);
 		}

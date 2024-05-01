@@ -3,6 +3,7 @@
 using System;
 using System.Runtime.Remoting.Contexts;
 using System.Text;
+using System.Threading.Tasks;
 using Core.Scripting;
 using Editor.ExecutionContexts;
 using GamePlatform;
@@ -32,7 +33,10 @@ namespace Editor.CustomImporters
 			
 			try
 			{
-				scriptRunner.RunScript(scriptText).Wait();
+				Task.Run(async () =>
+				{
+					await scriptRunner.RunScript(scriptText);
+				}).Wait();
 			}
 			catch (Exception ex)
 			{

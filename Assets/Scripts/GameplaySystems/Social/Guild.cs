@@ -23,6 +23,18 @@ namespace GameplaySystems.Social
 		/// <inheritdoc />
 		public IEnumerable<IChatChannel> Channels => channelManager.GetGuildChannels(this.Id);
 
+		/// <inheritdoc />
+		public bool HasMember(IProfile profile)
+		{
+			return memberManager.IsProfileInGroup(this.Id, profile.ProfileId, MemberGroupType.Guild);
+		}
+
+		/// <inheritdoc />
+		public IChatChannel GetNarrativeChannel(string channelId)
+		{
+			return channelManager.GetNarrativeChannel(this.Id, channelId);
+		}
+
 		internal Guild(ChatMemberManager memberManager, ChatChannelManager channelManager)
 		{
 			this.memberManager = memberManager;

@@ -23,6 +23,6 @@ namespace GamePlatform
 		Task<bool> ExtractWorldData(Stream destinationStream);
 
 		Task UpdatePlayerInfo(PlayerInfo newPlayerInfo);
-		Task SaveWorld(WorldManager world);
+		Task SaveWorld(IWorldManager world);
 	}
 }

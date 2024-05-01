@@ -159,7 +159,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 39961ae815474783b8487405c0169780, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  gameManagerHolder: {fileID: 11400000, guid: 872374c25807361459f4e174bb460b2c, type: 2}
+  terminalEmulator: {fileID: 2744779468550916393}
 --- !u!1001 &803966372462267498
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -169,11 +169,11 @@ PrefabInstance:
     m_Modifications:
     - target: {fileID: 1406728974547555833, guid: f4ae5abea6c56c648837eb9bc2b8b923, type: 3}
       propertyPath: m_AnchorMax.y
-      value: 0
+      value: 1
       objectReference: {fileID: 0}
     - target: {fileID: 1406728974547555833, guid: f4ae5abea6c56c648837eb9bc2b8b923, type: 3}
       propertyPath: m_AnchorMin.y
-      value: 0
+      value: 1
       objectReference: {fileID: 0}
     - target: {fileID: 2884742563595589282, guid: f4ae5abea6c56c648837eb9bc2b8b923, type: 3}
       propertyPath: m_Pivot.x
@@ -270,3 +270,14 @@ RectTransform:
   m_CorrespondingSourceObject: {fileID: 2884742563595589282, guid: f4ae5abea6c56c648837eb9bc2b8b923, type: 3}
   m_PrefabInstance: {fileID: 803966372462267498}
   m_PrefabAsset: {fileID: 0}
+--- !u!114 &2744779468550916393 stripped
+MonoBehaviour:
+  m_CorrespondingSourceObject: {fileID: 3260370034257184067, guid: f4ae5abea6c56c648837eb9bc2b8b923, type: 3}
+  m_PrefabInstance: {fileID: 803966372462267498}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 58b95f9e1b7e426c985f615f9018da2b, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 

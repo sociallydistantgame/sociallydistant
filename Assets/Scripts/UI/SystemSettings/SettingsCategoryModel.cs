@@ -9,5 +9,6 @@ namespace UI.SystemSettings
 		public string? MetaTitle { get; set; }
 		public bool ShowTitleArea { get; set; }
 		public SettingsCategory? Category { get; set; }
+		public bool IsActive { get; set; }
 	}
 }

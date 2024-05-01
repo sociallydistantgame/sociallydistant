@@ -3,6 +3,7 @@ namespace Core
 {
 	public enum GameMode
 	{
+		Booting,
 		Loading,
 		AtLoginScreen,
 		OnDesktop,

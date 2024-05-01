@@ -27,7 +27,9 @@ namespace UI.SystemSettings
 		{
 			this.model = model;
 			view.Value = model.Title;
+			this.view.IsActive = model.IsActive;
 			view.Title = model.MetaTitle;
+			view.ShowTitle = model.ShowTitleArea;
 		}
 
 		private void OnListItemClick()

@@ -1,57 +1,88 @@
-﻿<b>Welcome to Socially Distant 24.04-indev!</b>
+﻿<b>Welcome to Socially Distant 24.05-indev!</b>
 
 This is a development build of the game, for internal use only.
 
-This build brings many performance improvements, quality-of-life changes, and even some foundational gameplay work to the game.
+This is the first build containing the game's NPC dialogue system in a mostly-complete state. It also brings some much-needed UI and performance updates.
 
 <u>Changelog:</u>
 
- - Update version string
- - Slightly optimize terminal resize detection
- - Add support for thread-safe Terminal rendering
- - Remove old/stale code from terminal emulator
- - Move terminal emulation code to a separate thread
- - Add support for cancelling Terminal programs with CTRL+C
- - Add support for window hints
- - Add support for terminal background blur
- - Add settings listeners for reacting to settings changes in the UI
- - Add accessibility toggle for disabling terminal background blur
- - Use background blur for window overlays
- - Render all UI to the main camera
- - Fix layer ordering of UI top-levels
- - Add support for bloom
- - Add support for turning off bloom in Settings
- - Add LeanTween
- - Fix window dragging
- - Fix terminal selection dragging
- - Remove the lost souls of the damned
- - Use file chooser driver's path combine implementation instead of .NET's
- - Fix tab windows not closing when all of their tabs are closed
- - Fix issue where closing the only opened Terminal tab prevents new terminals from being opened.
- - Add support for opening multiple Terminal tabs
- - Fix YesNoCancel dialog boxes reporting a result of No when clicking Cancel
- - Add support for changing terminal titles
- - Limit titles of window tabs to one line
- - Use WindowTitle console API to show status of running nmap scans
- - Add support for changing player hostname via /etc/hostname
- - Add support for reading Unity log in-game via dmesg command
- - Add email viewer
- - Add support for game changelog emails
- - Fix Delete Account confirmation appearing behind the User Info overlay and being uninteractible
- - Add support for importing mission scripts
- - Allow mission scripts to be loaded by the System Module
- - Add support for starting missions via emails
- - Add support for script function libraries
- - Add support for text links in Acidic UI
- - Add support for performing shell URI navigations via mission script
- - Add support for opening web URIs in Web Browser
- - Fix browser links not actually opening when opening browser for the first time
- - Add support for starting/stopping missions with mission URIs
- - Add support for visually styling links
- - Fix handling of newlines in ShellScriptImporter
- - Fix window tab list not updating when a tab gets closed
- - Add support for visually closing window tabs
- - Fix occasional corruption when outputting text to Terminal
- - Fix selection word snapping corrupting text in Terminal
- - Improve handling of double/triple-click in Terminal
-
+ - Fix issue where whitespace doesn't get skipped at the start of parsing the next shell instruction in script parser
+ - Add support for importing chat scripts into Unity
+ - Add dev tools for chat scripts
+ - Add support for shrugging in a chat script
+ - Allow NPCs to send messages through chat scripts
+ - Add support for observing chat branch updates in the UI
+ - Add support for clicking chat branch choices
+ - Hide chat branch list when the message input isn't in focus
+ - Visually polish the Interact menu
+ - Add player typing animation in chat
+ - Fix NPC typing delays
+ - Add support for starting NPC interactions without dev tools
+ - Add support for chat script conditions
+ - Add support for tracking completed NPC interactions
+ - Add support for MissionComplete, InteractionComplete, WorldFlag, and Lifepath interaction conditions
+ - Add support for relationship-based encounter conditions
+ - Add support for witness conditions and skill level conditions
+ - Add support for generating mention links
+ - Add Typer data to channels in World
+ - Add support for typing indicators
+ - Add support for interaction condition policies
+ - Remove script execution time logging
+ - Add better support for world tables with Narrative IDs
+ - Fix handling of drag selection in the Terminal
+ - Optimize desktop layout
+ - Add support for loading content from Asset Bundles.
+ - Move websites and missions to asset bundles
+ - Use AssetBundles to store and load GUI programs
+ - Convert GameManager into a singleton
+ - Convert MailManager into a singleton
+ - Convert MissionManager into a singleton
+ - Cobvert WorldManager to a singleton
+ - Fix ContentManager erroneously unloading asset bundles
+ - Move exploits and payloads to Asset Bundles
+ - Move all Command assets to Asset Bundles
+ - Optimize various UI issues with Terminal
+ - Fix chat auto-scroll not reaching the bottom
+ - Add support for typing-based choices in chat
+ - Add support for new message animations in chat
+ - Cache interaction script syntax trees during game load
+ - Cache mission script ASTs on game load
+ - Fix chat not unsubscribing from backend observables
+ - Add support for loading and saving the world from another thread
+ - Fix major performance issues with desktop login
+ - Polish style of chat UI
+ - Revert support for StaticWidgetList pooling
+ - Fix issue where Unity hangs if importing too complex of a chat script
+ - Add support for generating NPCs via script
+ - Finish NPC generation scripts
+ - Use toggle switches in settings instead of checkboxes
+ - Retexture the Input Field
+ - Add minor tweaks to SectionWidget and window icons
+ - Add various audio effect toggles for later use
+ - Add various UI sounds
+ - Replace typing sound
+ - Add support for loading network assets from Asset Bundles
+ - Add input field border animation
+ - Finish animating Input Fields
+ - Properly theme dropdowns
+ - Add animations to dropdown interactions
+ - Switch from Trixel-Creative/TrixelAudio to our own fork
+ - Port audio code to acidic-audio
+ - Remove all obsolete TrixwelAudioSource objects
+ - Remove all references to TrixelAudioSource in code
+ - Remove all missing script references
+ - Remove old Settings Widgets and Graphic Picker
+ - Change how the game boots
+ - Add support for changing the game's initialization flow via UI
+ - Add various settings for controlling game boot
+ - Add support for case/esac statements in sdsh
+ - Merge ChatImporter with ShellScriptImporter
+ - Allow player to disable the glitch bands effect
+ - Properly theme buttons
+ - Fix glitch bands not applying their settings at game start
+ - Replace missing close button texture with shitty programmer art
+ - Add support for generated default avatars
+ - Improve anti-aliasing of the person in the default avatar
+ - Add support for MSAA
+ - Use new AvatarWidget in all Chat UI
+ - Use new Avatar Widget in main menu

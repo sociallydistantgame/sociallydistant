@@ -1,5 +1,6 @@
 ﻿#nullable enable
 using System;
+using System.Collections.Generic;
 using System.IO;
 using System.Threading.Tasks;
 using ContentManagement;
@@ -7,21 +8,21 @@ using GamePlatform.ContentManagement;
 
 namespace GamePlatform
 {
-	public class LocalGameDataSource : IGameContentSource
+	public class LocalGameDataSource : IContentGenerator
 	{
-		/// <inheritdoc />
-		public async Task LoadAllContent(ContentCollectionBuilder builder)
-		{
-			string baseDirectory = LocalGameData.BaseDirectory;
+		private readonly string baseDirectory = LocalGameData.BaseDirectory;
 
+		/// <inheritdoc />
+		public IEnumerable<IGameContent> CreateContent()
+		{
 			if (!Directory.Exists(baseDirectory))
 				Directory.CreateDirectory(baseDirectory);
 
 			foreach (string userDirectory in Directory.GetDirectories(baseDirectory))
 			{
-				LocalGameData? localData = await LocalGameData.TryLoadFromDirectory(userDirectory);
+				LocalGameData? localData = LocalGameData.TryLoadFromDirectory(userDirectory);
 				if (localData != null)
-					builder.AddContent(localData);
+					yield return localData;
 			}
 		}
 	}

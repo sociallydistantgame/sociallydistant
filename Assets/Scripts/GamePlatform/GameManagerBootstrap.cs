@@ -9,25 +9,28 @@ namespace GamePlatform
 	public class GameManagerBootstrap : MonoBehaviour
 	{
 		[SerializeField]
-		private GameManagerHolder holder = null!;
-
+		private GameObject mandatoryScriptsPrefab = null!;
+        
 		[SerializeField]
 		private GameManager prefab = null!;
 
+		private GameManager gameManager = null!;
+		private GameObject mandatoryScripts;
+		
 		private void Awake()
 		{
+			Debug.Log("Starting initial game boot...");
+			DontDestroyOnLoad(this.gameObject);
+			
 			this.AssertAllFieldsAreSerialized(typeof(GameManagerBootstrap));
 
-			this.holder.Value = Instantiate(this.prefab);
+			gameManager = Instantiate(this.prefab);
+			Debug.Log("Brought the game manager up. Now booting the rest of the game.");
 		}
 
-		private void OnDestroy()
+		private void Start()
 		{
-			if (this.holder.Value != null)
-			{
-				Destroy(this.holder.Value.gameObject);
-				this.holder.Value = null;
-			}
+			mandatoryScripts = Instantiate(mandatoryScriptsPrefab);
 		}
 	}
 }

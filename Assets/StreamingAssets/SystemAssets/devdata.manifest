@@ -1,0 +1,28 @@
+ManifestFileVersion: 0
+CRC: 2372354983
+Hashes:
+  AssetFileHash:
+    serializedVersion: 2
+    Hash: 0e44366af442d28fa5d33b7da7f69740
+  TypeTreeHash:
+    serializedVersion: 2
+    Hash: 60602c28078f16d7f0357ade02984702
+HashAppended: 0
+ClassTypes:
+- Class: 114
+  Script: {fileID: 11500000, guid: 568506bd63934dbe800f5e74214319a7, type: 3}
+- Class: 114
+  Script: {fileID: 11500000, guid: 937fd0b5353d4a40a350efa3208a6867, type: 3}
+- Class: 115
+  Script: {instanceID: 0}
+SerializeReferenceClassIdentifiers:
+- AssemblyName: Scripts
+  ClassName: Architecture.SerializableDictionary`2[System.String,System.String]
+Assets:
+- Assets/Assets/Developer/Missions/chat_test.mission
+- Assets/Assets/Developer/Missions/mis_tutorial.mission
+- Assets/Assets/Developer/Chats/chat_test_casestatements.chat.sh
+- Assets/Assets/Developer/Chats/chat_truth_machine.chat.sh
+- Assets/Assets/Developer/Chats/chat_guilds_test.chat.sh
+- Assets/Assets/Developer/Missions/example.mission
+Dependencies: []

@@ -4,23 +4,25 @@ using UnityEngine;
 
 namespace UI.Widgets.Settings
 {
-	public class SettingsSliderWidget : SettingsWidget
+	public class SliderWidget : IWidget
 	{
 		public float MinimumValue { get; set; }
 		public float MaximumValue { get; set; }
 		public float Value { get; set; }
 		public Action<float>? Callback { get; set; }
-		public string Label { get; set; } = string.Empty;
-		public string? Description { get; set; } = string.Empty;
-		
-		/// <inheritdoc />
-		public override WidgetController BuildSettingsWidget(SystemWidgets assembler, RectTransform destination)
-		{
-			var slider = assembler.GetSettingsSlider(destination);
 
-			slider.Setup(this);
+
+		/// <inheritdoc />
+		public WidgetController Build(IWidgetAssembler assembler, RectTransform destination)
+		{
+			SliderWidgetController controller = ((SystemWidgets) assembler).GetSlider(destination);
+
+			controller.Value = this.Value;
+			controller.MinValue = this.MinimumValue;
+			controller.MaxValue = this.MaximumValue;
+			controller.Callback = this.Callback;
 			
-			return slider;
+			return controller;
 		}
 	}
 }

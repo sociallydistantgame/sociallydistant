@@ -5,7 +5,8 @@ namespace Core.WorldData.Data
 {
 	public struct WorldProfileData :
 		IWorldData,
-		IDataWithId
+		IDataWithId,
+		INarrativeObject
 	{
 		private ObjectId id;
 		private string narrativeId;

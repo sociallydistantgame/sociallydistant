@@ -8,6 +8,7 @@ using OS.Devices;
 using OS.FileSystems;
 using Player;
 using UnityEngine;
+using System.Threading.Tasks;
 
 namespace UI.Applications.FileManager
 {
@@ -20,7 +21,7 @@ namespace UI.Applications.FileManager
 		[SerializeField]
 		private MimeTypeProgramMap mimeTypeAssociations = new MimeTypeProgramMap();
 		
-		public ISystemProcess? OpenFile(ISystemProcess parentProcess, string filePath)
+		public async Task<ISystemProcess?> OpenFile(ISystemProcess parentProcess, string filePath)
 		{
 			IVirtualFileSystem vfs = parentProcess.User.Computer.GetFileSystem(parentProcess.User);
 
@@ -52,7 +53,7 @@ namespace UI.Applications.FileManager
 			if (player.Value.UiManager.Desktop == null)
 				return null;
 			
-			return player.Value.UiManager.Desktop.OpenProgram(program, new[] { filePath }, null, null);
+			return await player.Value.UiManager.Desktop.OpenProgram(program, new[] { filePath }, null, null);
 		}
 	}
 }

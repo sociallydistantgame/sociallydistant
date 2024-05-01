@@ -13,13 +13,13 @@ namespace UI.ScriptableCommands
 	[CreateAssetMenu(menuName = "ScriptableObject/Scriptable Commands/System/Registry Control Command")]
 	public class RegistryControlCommand : ScriptableCommand
 	{
-		[SerializeField]
-		private GameManagerHolder gameManagerHolder = null!;
+		private GameManager gameManagerHolder = null!;
 		
 		/// <inheritdoc />
 		protected override Task OnExecute()
 		{
-			if (gameManagerHolder.Value == null)
+			gameManagerHolder = GameManager.Instance;
+			if (gameManagerHolder == null)
 			{
 				Console.WriteLine("Could not connect to the System Settings service.");
 				EndProcess();
@@ -32,7 +32,7 @@ namespace UI.ScriptableCommands
 				return Task.CompletedTask;
 			}
 
-			ISettingsManager settings = gameManagerHolder.Value.SettingsManager;
+			ISettingsManager settings = gameManagerHolder.SettingsManager;
             
 			switch (Arguments[0])
 			{

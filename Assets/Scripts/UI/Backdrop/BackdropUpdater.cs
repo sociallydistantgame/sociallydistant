@@ -10,13 +10,6 @@ namespace UI.Backdrop
 {
 	public class BackdropUpdater : MonoBehaviour
 	{
-		[Header("UI")]
-		[SerializeField]
-		private GameManagerHolder gameManager = null!;
-		
-		[SerializeField]
-		private WorldManagerHolder worldManager = null!;
-
 		[Header("Backdrops")]
 		[SerializeField]
 		private Texture2D dayTime = null!;
@@ -30,6 +23,8 @@ namespace UI.Backdrop
 		[SerializeField]
 		private Texture2D nightTimePanic = null!;
 		
+		private IWorldManager worldManager = null!;
+		private GameManager gameManager = null!;
 		private GameMode gameMode;
 		private bool isPanicking = false;
 		private bool isNightTime = false;
@@ -38,15 +33,15 @@ namespace UI.Backdrop
 		
 		private void Awake()
 		{
+			gameManager = GameManager.Instance;
+			worldManager = gameManager.WorldManager;
+			
 			this.MustGetComponent(out backdrop);
 		}
 		
 		private void Start()
 		{
-			if (gameManager.Value == null)
-				return;
-
-			gameModeObserver = gameManager.Value.GameModeObservable.Subscribe(OnGameModeChanged);
+			gameModeObserver = gameManager.GameModeObservable.Subscribe(OnGameModeChanged);
 		}
 		
 		private void OnDestroy()
@@ -56,8 +51,7 @@ namespace UI.Backdrop
 
 		private void Update()
 		{
-			if (worldManager.Value == null ||
-			    (gameMode != GameMode.OnDesktop && gameMode != GameMode.InMission))
+			if (gameMode != GameMode.OnDesktop && gameMode != GameMode.InMission)
 			{
 				if (isNightTime && !isPanicking)
 					return;
@@ -68,7 +62,7 @@ namespace UI.Backdrop
 				return;
 			}
 
-			DateTime timeOfDay = worldManager.Value.World.GlobalWorldState.Value.Now;
+			DateTime timeOfDay = worldManager.World.GlobalWorldState.Value.Now;
 
 			bool day = timeOfDay.Hour >= 7 && timeOfDay.Hour < 19;
 			bool night = !day;

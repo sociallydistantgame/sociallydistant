@@ -8,6 +8,7 @@ using OS.FileSystems;
 using OS.FileSystems.Host;
 using UI.Shell;
 using System.Threading.Tasks;
+using UnityEngine.Assertions;
 
 namespace Core.Scripting.Instructions
 {
@@ -28,6 +29,8 @@ namespace Core.Scripting.Instructions
 		
 		public async Task<int> ExecuteAsync(ITextConsole console, IScriptExecutionContext context)
 		{
+			await Task.Yield();
+			
 			string evaluatedFilePath = string.Empty;
 			string realName = await Name.GetArgumentText(context, console);
 

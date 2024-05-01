@@ -41,7 +41,7 @@ namespace GamePlatform
 		}
 
 		/// <inheritdoc />
-		public Task SaveWorld(WorldManager world)
+		public Task SaveWorld(IWorldManager world)
 		{
 			Debug.Log("If you were in an actual game, we'd be saving the world to disk right now. But this is the debug world, so we're not.");
 			return Task.CompletedTask;

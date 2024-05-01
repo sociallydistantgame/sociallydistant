@@ -1,0 +1,82 @@
+﻿#!NetworkAsset
+# "id" is the narrative ID for the network and must not be changed once set. This allows
+# you to update a network script and have the changes reflect in existing saves when loaded.
+#
+# "name" is the friendly name of the network, shown on the City Map and Network Map.
+id blackwall
+name "The Blackwall"
+isp district_fairview_isp
+
+# Create and point public domain names at the network
+domain blackwall.net
+domain cdn.blackwall.net
+domain forum.blackwall.net
+domain auth.blackwall.net
+
+
+# Defines the subnet mask and IP address range for the LAN
+subnet 10.0.0.0/24
+
+# create devices, first parameter is the narrative ID and the second is the hostname shown in-game. 
+# First parameter can never changfe or it will break a save.
+# First parameter is also how we address the device within the network script.
+host frodomar "Wiki server"
+host ketchum "Socially Distant Forum"
+host ash "Authentication Service"
+host vault "Storage Vault"
+host db_prod "Production Database Cluster"
+
+# Listeners. First parameter is the device and port (device addressed by narrative ID).
+# Second parameter is the protocol type and determines how the game handles traffic on that port.
+listen frodomar:22 Shell
+listen frodomar:80 Web
+listen frodomar:443 WebSecured
+
+listen ketchum:22 Shell
+listen ketchum:443 WebSecured
+listen ketchum:6697 Chat
+
+listen ash:22 Shell
+listen ash:443 WebSecured
+
+
+listen vault:21 FileTransfer
+listen vault:80 Web
+listen vault:443 WebSecured
+
+# forward ssh to the forum server
+forward 22:ketchum:22
+
+# Forward HTTP traffic to frodomar server
+forward 80:frodomar:80;
+forward 443:frodomar:443;
+
+# turns frodomar into a reverse proxy and forwards web traffic based on domain name to the right server
+# you must listen on ports 80 and 443 on the server you specify in the "proxy" command or the game won't
+# create a proxy server here.
+#
+# Make sure to port-forward those same ports so they're accessible on the public net, like we did above.
+proxy frodomar;
+proxypass blackwall.dev frodomar
+proxypass cdn.blackwall.net vault
+proxypass forum.blackwall.net ketchum
+proxypass auth.blackwall.net ash
+
+
+# Add users to devices for shell logins.
+# First parameter is the device to add the user to
+# Second is the user's name
+# Third is the user type: either "admin" or "limited". Meanings are the same as on Microsoft Windows.
+# Fourth is the authentication level and determines how hard the user is to crack. Can be either:
+#  - password - a random password is generated for the user that can be password-cracked
+#  - password_or_key - generates a much longer random password, but the hacker can also get in faster if they can find a private key
+#  - keyonly - hacker must obtain the correct private key for the user, can't be cracked
+#  - system - no login, user must already have access via another account.
+#
+# Note: You do not need to create root users, the game does this automatically and sets them up as system users.
+user ketchum sysop_management admin password
+user vault files limited password
+user db_prod db_access limited system
+
+
+

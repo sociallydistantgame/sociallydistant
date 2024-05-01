@@ -9,6 +9,7 @@ using UnityEngine;
 using UnityExtensions;
 using System.Collections.Generic;
 using System.Linq;
+using GamePlatform;
 using GameplaySystems.Social;
 using Social;
 using TMPro;
@@ -19,12 +20,6 @@ namespace UI.Applications.Email
 		MonoBehaviour,
 		IProgramOpenHandler
 	{
-		[SerializeField]
-		private MailManagerHolder mailManager = null!;
-
-		[SerializeField]
-		private SocialServiceHolder socialService = null!;
-		
 		[SerializeField]
 		private InboxMode inboxMode;
 
@@ -49,9 +44,14 @@ namespace UI.Applications.Email
 		private IMailMessage? currentMessage = null;
 		private IWindow window = null!;
 		private ISystemProcess process = null!;
+		private MailManager? mailManager = null!;
+		private ISocialService socialService;
 		
 		private void Awake()
 		{
+			socialService = GameManager.Instance.SocialService;
+			mailManager = MailManager.Instance;
+			
 			this.AssertAllFieldsAreSerialized(typeof(EmailApplication));
 			this.MustGetComponentInParent(out window);
 		}
@@ -65,18 +65,15 @@ namespace UI.Applications.Email
 
 		private void UpdateScreen()
 		{
-			if (mailManager.Value == null)
+			if (mailManager == null)
 				return;
 			
-			if (socialService.Value == null)
-				return;
-			
-			IProfile user = socialService.Value.PlayerProfile;
+			IProfile user = socialService.PlayerProfile;
 
 			IEnumerable<IMailMessage> messagesToList = this.inboxMode switch
 			{
-				InboxMode.Inbox => this.mailManager.Value.GetMessagesForUser(user),
-				InboxMode.Outbox => mailManager.Value.GetMessagesFromUser(user),
+				InboxMode.Inbox => this.mailManager.GetMessagesForUser(user),
+				InboxMode.Outbox => mailManager.GetMessagesFromUser(user),
 				InboxMode.CompletedMissions => Enumerable.Empty<IMailMessage>()
 			};
 			

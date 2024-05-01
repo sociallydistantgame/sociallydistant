@@ -5,6 +5,7 @@ using Architecture;
 using Core;
 using Core.DataManagement;
 using Core.WorldData.Data;
+using GamePlatform;
 using OS.FileSystems;
 using UnityEngine;
 using UnityExtensions;
@@ -14,20 +15,19 @@ namespace GameplaySystems.NonPlayerComputers
 {
 	public class NonPlayerComputerEventListener : MonoBehaviour
 	{
-		private readonly Dictionary<ObjectId, NonPlayerComputer> instances = new Dictionary<ObjectId, NonPlayerComputer>();
-		private readonly Dictionary<ObjectId, NpcFileOverrider> overriders = new Dictionary<ObjectId, NpcFileOverrider>();
-
-		[Header("Dependencies")]
-		[SerializeField]
-		private WorldManagerHolder world = null!;
-
 		[Header("Prefabs")]
 		[SerializeField]
 		private NonPlayerComputer computerPrefab = null!;
 		
+		private readonly Dictionary<ObjectId, NonPlayerComputer> instances = new Dictionary<ObjectId, NonPlayerComputer>();
+		private readonly Dictionary<ObjectId, NpcFileOverrider> overriders = new Dictionary<ObjectId, NpcFileOverrider>();
+		
+		private IWorldManager world = null!;
 		
 		private void Awake()
 		{
+			world = GameManager.Instance.WorldManager;
+			
 			this.AssertAllFieldsAreSerialized(typeof(NonPlayerComputerEventListener));
 		}
 
@@ -48,16 +48,16 @@ namespace GameplaySystems.NonPlayerComputers
 		
 		private void InstallEvents()
 		{
-			this.world.Value.Callbacks.AddCreateCallback<WorldComputerData>(OnCreateComputer);
-			this.world.Value.Callbacks.AddModifyCallback<WorldComputerData>(OnModifyComputer);
-			this.world.Value.Callbacks.AddDeleteCallback<WorldComputerData>(OnDeleteComputer);
+			this.world.Callbacks.AddCreateCallback<WorldComputerData>(OnCreateComputer);
+			this.world.Callbacks.AddModifyCallback<WorldComputerData>(OnModifyComputer);
+			this.world.Callbacks.AddDeleteCallback<WorldComputerData>(OnDeleteComputer);
 		}
 
 		private void UninstallEvents()
 		{
-			this.world.Value.Callbacks.RemoveCreateCallback<WorldComputerData>(OnCreateComputer);
-			this.world.Value.Callbacks.RemoveModifyCallback<WorldComputerData>(OnModifyComputer);
-			this.world.Value.Callbacks.RemoveDeleteCallback<WorldComputerData>(OnDeleteComputer);
+			this.world.Callbacks.RemoveCreateCallback<WorldComputerData>(OnCreateComputer);
+			this.world.Callbacks.RemoveModifyCallback<WorldComputerData>(OnModifyComputer);
+			this.world.Callbacks.RemoveDeleteCallback<WorldComputerData>(OnDeleteComputer);
 		}
 		
 		private void OnDeleteComputer(WorldComputerData subject)

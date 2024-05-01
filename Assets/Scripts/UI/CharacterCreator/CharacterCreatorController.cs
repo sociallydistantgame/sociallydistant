@@ -9,6 +9,9 @@ using UnityExtensions;
 using System.Threading.Tasks;
 using Architecture;
 using Core;
+using Core.DataManagement;
+using Core.Systems;
+using Core.WorldData;
 using GamePlatform;
 using TMPro;
 using UnityEngine.UI;
@@ -18,13 +21,6 @@ namespace UI.CharacterCreator
 {
 	public class CharacterCreatorController : Controller<CharacterCreatorView>
 	{
-		[Header("Dependencies")]
-		[SerializeField]
-		private GameManagerHolder gameManager = null!;
-
-		[SerializeField]
-		private WorldManagerHolder worldManager = null!;
-		
 		[Header("UI")]
 		[SerializeField]
 		private TextMeshProUGUI titleText = null!;
@@ -47,10 +43,18 @@ namespace UI.CharacterCreator
 		
 		private readonly CharacterCreatorState state = new();
 		private int screenIndex = -1;
+		private GameManager gameManager = null!;
 		private CanvasGroup canvasGroup;
+		private WorldManager worldManager = null!;
 
 		private void Awake()
 		{
+			gameManager = GameManager.Instance;
+			
+			// We need to be able to modify protected world state, which cannot be done
+			// via IWorldManager.
+			worldManager = WorldManager.Instance;
+			
 			this.AssertAllFieldsAreSerialized(typeof(CharacterCreatorController));
 			this.MustGetComponent(out canvasGroup);
 		}
@@ -143,13 +147,7 @@ namespace UI.CharacterCreator
 			
 			// Make us non-interactible
 			canvasGroup.interactable = false;
-
-			if (gameManager.Value == null)
-				return;
-
-			if (worldManager.Value == null)
-				return;
-
+			
 			// Create PlayerInfo structure needed by LocalGameData
 			var playerInfo = new PlayerInfo
 			{
@@ -160,16 +158,17 @@ namespace UI.CharacterCreator
 			};
 			
 			// Other info is stored in the world. Create an empty WorldManager to save the data to.
-			var world = new WorldManager();
+			var world = new World(new UniqueIntGenerator(), new DataEventDispatcher(GameManager.Instance));
 		
 			// Set the lifepath
-			world.World.ChangePlayerLifepath(state.Lifepath!);
+			world.ChangePlayerLifepath(state.Lifepath!);
 			
 			// Save the world and player data.
 			var gameData = await LocalGameData.CreateNewGame(playerInfo, world);
 			
 			// Start the game!
-			await gameManager.Value.StartGame(gameData);
+			await gameManager.ContentManager.RefreshContentDatabaseAsync();
+			await gameManager.StartGame(gameData);
 		}
 	}
 }

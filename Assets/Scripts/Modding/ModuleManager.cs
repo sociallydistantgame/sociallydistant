@@ -15,6 +15,7 @@ using Modules;
 using Shell.Commands;
 using UnityEngine;
 using UniRx;
+using Utility;
 
 namespace Modding
 {
@@ -28,6 +29,9 @@ namespace Modding
 		private readonly IDisposable gameModeObserver;
 		private readonly CustomCommandManager customCommandManager;
 
+		private IDisposable? settingsObserver;
+		private bool isInDebugMode;
+		
 		private GameMode gameMode;
 		
 		public ModuleManager(GameManager context)
@@ -37,9 +41,28 @@ namespace Modding
 			this.gameModeObserver = context.GameModeObservable.Subscribe(OnGameModeChanged);
 			this.customCommandManager = new CustomCommandManager(this);
 
-			this.gameContext.ContentManager.AddContentSource(customCommandManager);
+			this.gameContext.ContentManager.AddContentGenerator(customCommandManager);
 		}
-		
+
+		private async void OnGameSettingsChanged(ISettingsManager settingsManager)
+		{
+			var modSettings = new ModdingSettings(settingsManager);
+
+			if (isInDebugMode == modSettings.ModDebugMode)
+				return;
+
+			await gameContext.Shell.ShowInfoDialog(
+				"System message",
+				modSettings.ModDebugMode
+					? "You have enabled Mod Debug Mode. The game will now exit."
+					: "You have disabled Mod Debug Mode. The game will now exit."
+			);
+
+			await gameContext.SaveCurrentGame(true);
+			
+			PlatformHelper.QuitToDesktop();
+		}
+
 		internal async Task LocateAllGameModules()
 		{
 			this.allModules.Clear();
@@ -52,6 +75,11 @@ namespace Modding
 				await Task.Run(LocateMods);
 
 			await InitializeModules();
+
+			isInDebugMode = new ModdingSettings(gameContext.SettingsManager).ModDebugMode;
+
+			if (settingsObserver == null)
+				settingsObserver = this.gameContext.SettingsManager.ObserveChanges(OnGameSettingsChanged);
 		}
 
 		public async Task Shutdown()

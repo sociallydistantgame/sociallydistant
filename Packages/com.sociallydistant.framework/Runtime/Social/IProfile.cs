@@ -1,4 +1,5 @@
 ﻿using Core;
+using UnityEngine;
 using UnityEngine.Analytics;
 
 namespace Social
@@ -16,5 +17,9 @@ namespace Social
 		
 		string ChatName { get; }
 		string ChatUsername { get; }
+		Texture2D? Picture { get; }
+
+		bool IsFriendsWith(IProfile friend);
+		bool IsBlockedBy(IProfile user);
 	}
 }

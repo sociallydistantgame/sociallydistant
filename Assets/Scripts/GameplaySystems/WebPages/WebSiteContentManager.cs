@@ -10,13 +10,11 @@ namespace GameplaySystems.WebPages
 	public class WebSiteContentManager : IGameContentSource
 	{
 		/// <inheritdoc />
-		public async Task LoadAllContent(ContentCollectionBuilder builder)
+		public async Task LoadAllContent(ContentCollectionBuilder builder, IContentFinder finder)
 		{
-			await Task.Yield();
-			foreach (WebPageAsset website in Resources.LoadAll<WebPageAsset>("Websites"))
+			foreach (WebPageAsset website in await finder.FindContentOfType<WebPageAsset>())
 			{
 				builder.AddContent(website);
-				await Task.Yield();
 			}
 			
 		}
