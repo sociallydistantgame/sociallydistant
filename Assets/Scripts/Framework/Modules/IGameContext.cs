@@ -8,6 +8,7 @@ using Shell;
 using Shell.InfoPanel;
 using Social;
 using System.Threading.Tasks;
+using Shell.Common;
 
 namespace Modules
 {
@@ -17,6 +18,8 @@ namespace Modules
 	public interface IGameContext
 	{
 		TabbedToolCollection AvailableTools { get; }
+		
+		INotificationManager NotificationManager { get; }
 		
 		GameMode CurrentGameMode { get; }
 		

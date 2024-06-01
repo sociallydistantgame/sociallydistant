@@ -76,7 +76,8 @@ namespace UI.Windowing
 					ClickHandler = async () => await SwitchTools(tool),
 					Label = tool.Definition.Program.WindowTitle,
 					Icon = tool.Definition.Program.Icon,
-					IsActive = false
+					IsActive = false,
+					NotificationGroup = tool.Definition.NotificationGroup
 				});
 			}
 		}

@@ -30,6 +30,7 @@ namespace Core
 		IWorldTable<WorldRelationshipData> Relationships { get; }
 		IWorldTable<WorldDomainNameData> Domains { get; }
 		INarrativeObjectTable<WorldMailData> Emails { get; }
+		IWorldTable<WorldNotificationData> Notifications { get; }
 		
 		
 		IWorldFlagCollection WorldFlags { get; }

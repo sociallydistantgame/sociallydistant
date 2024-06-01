@@ -26,6 +26,7 @@
 		MissionFailures = 21,
 		NarrativeGuilds = 22,
 		NarrativeChannels = 23,
+		Notifications = 24,
 
 		
 		Latest

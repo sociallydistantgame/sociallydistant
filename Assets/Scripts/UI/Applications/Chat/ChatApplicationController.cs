@@ -9,6 +9,7 @@ using Core.WorldData.Data;
 using GamePlatform;
 using GameplaySystems.Chat;
 using GameplaySystems.Social;
+using Shell.Common;
 using Social;
 using TMPro;
 using UI.PlayerUI;
@@ -68,12 +69,15 @@ namespace UI.Applications.Chat
 		private IDisposable? typingObserver;
 		private IWorldManager worldManager;
 		private ISocialService socialService;
+		private INotificationGroup notificationGroup;
 		
 		private void Awake()
 		{
 			worldManager = GameManager.Instance.WorldManager;
 			socialService = GameManager.Instance.SocialService;
 			conversationManager = ConversationManager.Instance;
+
+			notificationGroup = GameManager.Instance.NotificationManager.GetNotificationGroup(NotificationGroups.Chat);
 			
 			this.AssertAllFieldsAreSerialized(typeof(ChatApplicationController));
 			this.MustGetComponentInParent(out uiManager);
@@ -85,10 +89,33 @@ namespace UI.Applications.Chat
 			{
 				pendingChatBoxRequestsObserver = conversationManager.ObservePendingChatBoxRequests(OnChatBoxControlRequested);
 			}
+
+			if (currentChannel != null)
+			{
+				userMessages.Clear();
+
+				foreach (IUserMessage? message in currentChannel.Messages)
+				{
+					userMessages.Add(message);
+					notificationGroup.MarkNotificationAsRead(message.Id);
+				}
+
+				UpdateMessageList();
+
+				this.messageSendObserver = currentChannel.SendObservable.Subscribe(OnMessageReceived);
+				this.messageDeleteObserver = currentChannel.EditObservable.Subscribe(OnMessageEdit);
+				this.messageDeleteObserver = currentChannel.DeleteObservable.Subscribe(OnMessageDelete);
+			}
 		}
 
 		private void OnDisable()
 		{
+			this.messageSendObserver?.Dispose();
+            this.messageSendObserver = null;
+			this.messageDeleteObserver?.Dispose();
+            this.messageDeleteObserver = null;
+			this.messageDeleteObserver?.Dispose();
+            this.messageDeleteObserver = null;
 			this.pendingChatBoxRequestsObserver?.Dispose();
 		}
 
@@ -309,6 +336,8 @@ namespace UI.Applications.Chat
 		
 		private void ConvertToUiMessage(IUserMessage userMessage, bool isNewMessage = false)
 		{
+			notificationGroup.MarkNotificationAsRead(userMessage.Id);
+			
 			var newMessageShowsAvatar = true;
 			if (messages.Count > 0)
 			{
@@ -323,6 +352,7 @@ namespace UI.Applications.Chat
 			{
 				messages.Add(new ChatMessageModel()
 				{
+					Id = userMessage.Id,
 					Date = userMessage.Date,
 					AuthorId = userMessage.Author.ProfileId,
 					UseBubbleStyle = !(currentGuild != null && currentChannel != null && currentChannel.ChannelType == MessageChannelType.Guild),

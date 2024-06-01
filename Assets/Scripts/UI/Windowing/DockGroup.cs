@@ -32,6 +32,7 @@ namespace UI.Windowing
 		{
 			DockIcon iconInstance = icons[index];
 
+			iconInstance.NotificationGroup = data.NotificationGroup;
 			iconInstance.UpdateIcon(data);
 		}
 		
@@ -152,6 +153,7 @@ namespace UI.Windowing
 			public string Label;
 			public bool IsActive;
 			public Action? ClickHandler;
+			public INotificationGroup? NotificationGroup;
 		}
 	}
 }

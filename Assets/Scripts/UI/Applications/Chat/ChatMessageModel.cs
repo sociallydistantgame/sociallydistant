@@ -7,6 +7,7 @@ namespace UI.Applications.Chat
 {
 	public class ChatMessageModel
 	{
+		public ObjectId Id;
 		public DateTime Date;
 		public ObjectId AuthorId;
 		public Texture2D? Avatar;

@@ -22,9 +22,11 @@ using Modules;
 using OS;
 using Player;
 using Shell;
+using Shell.Common;
 using Shell.InfoPanel;
 using Social;
 using UI.PlayerUI;
+using UI.Shell;
 using UI.Shell.InfoPanel;
 using UniRx;
 using UnityEngine;
@@ -75,7 +77,11 @@ namespace GamePlatform
 		private bool panicking;
 		private IUriManager uriManager;
 		private Subject<PlayerInfo> playerInfoSubject = new Subject<PlayerInfo>();
+		private NotificationManager notificationManager;
 
+		/// <inheritdoc />
+		public INotificationManager NotificationManager => notificationManager;
+		
 		public PlayerInstance PlayerInstance => this.playerInstance.Value;
 		public IObservable<PlayerInfo> PlayerInfoObservable => playerInfoSubject;
 		public IObservable<GameMode> GameModeObservable { get; private set; }
@@ -152,10 +158,13 @@ namespace GamePlatform
             
 			// Register mandatory content sources with ContentManager
 			contentManager.AddContentGenerator(new LocalGameDataSource()); // User profiles
+
+			this.notificationManager = new NotificationManager(this.worldManager);
 		}
 		
 		private void OnDestroy()
 		{
+			notificationManager.Dispose();
 			settingsManager.Dispose();
 			singleton.SetInstance(null);
 		}

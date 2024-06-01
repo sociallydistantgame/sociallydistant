@@ -9,6 +9,7 @@ using UnityExtensions;
 using ThisOtherThing.UI.Shapes;
 using System;
 using Shell;
+using Shell.Common;
 
 namespace UI.Shell.Dock
 {
@@ -27,7 +28,23 @@ namespace UI.Shell.Dock
 		private bool isActiveIcon;
 		private bool hovered = false;
 		private bool pressed = false;
+		private NotificationIndicator indicator = null!;
+		private INotificationGroup? notificationGroup;
+		private IDisposable? unreadObserver;
 
+		public INotificationGroup? NotificationGroup
+		{
+			get => notificationGroup;
+			set
+			{
+				if (notificationGroup == value)
+					return;
+
+				notificationGroup = value;
+				OnNotificationGroupChanged();
+			}
+		}
+		
 		public bool IsActiveIcon
 		{
 			get => isActiveIcon;
@@ -50,6 +67,14 @@ namespace UI.Shell.Dock
 			this.MustGetComponent(out button);
 			this.MustGetComponent(out popover);
 			this.MustGetComponent(out rectangle);
+			this.MustGetComponentInChildren(out indicator);
+		}
+
+		/// <inheritdoc />
+		protected override void OnDestroy()
+		{
+			unreadObserver?.Dispose();
+			base.OnDestroy();
 		}
 
 		/// <inheritdoc />
@@ -128,6 +153,25 @@ namespace UI.Shell.Dock
 			
 			pressed = false;
 			UpdateRectangle();
+		}
+
+		private void OnNotificationGroupChanged()
+		{
+			unreadObserver?.Dispose();
+			unreadObserver = null;
+
+			if (notificationGroup == null)
+			{
+				this.indicator.IsVisible = false;
+				return;
+			}
+
+			this.unreadObserver = notificationGroup.ObserveUnread(this.OnNotificationUnreadChanged);
+		}
+
+		private void OnNotificationUnreadChanged(bool unread)
+		{
+			indicator.IsVisible = unread;
 		}
 	}
 }

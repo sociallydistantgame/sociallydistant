@@ -35,6 +35,8 @@ namespace Core.WorldData
 		private readonly WorldDataTable<WorldDomainNameData> domains;
 		private readonly NarrativeObjectTable<WorldMailData> emails;
 		private readonly WorldDataTable<WorldWitnessedObjectData> witnessedObjects;
+		private readonly WorldDataTable<WorldNotificationData> notifications;
+		
 
 		internal IWorldDataObject<ProtectedWorldState> ProtectedWorldData => this.protectedWorldState;
 
@@ -44,7 +46,10 @@ namespace Core.WorldData
 		/// <inheritdoc />
         public IWorldDataObject<GlobalWorldData> GlobalWorldState => globalWorldState;
 
-        /// <inheritdoc />
+		/// <inheritdoc />
+		public IWorldTable<WorldNotificationData> Notifications => notifications;
+
+		/// <inheritdoc />
         public IWorldFlagCollection WorldFlags => worldFlags;
 
         /// <inheritdoc />
@@ -149,6 +154,7 @@ namespace Core.WorldData
 			domains = new WorldDataTable<WorldDomainNameData>(instanceIdGenerator, eventDispatcher);
 			emails = new NarrativeObjectTable<WorldMailData>(instanceIdGenerator, eventDispatcher);
 			witnessedObjects = new WorldDataTable<WorldWitnessedObjectData>(instanceIdGenerator, eventDispatcher);
+			notifications = new WorldDataTable<WorldNotificationData>(instanceIdGenerator, eventDispatcher);
 		}
 
 		public void Serialize(IWorldSerializer serializer)
@@ -181,6 +187,8 @@ namespace Core.WorldData
 			domains.Serialize(serializer, WorldRevision.DomainNames);
 			emails.Serialize(serializer, WorldRevision.Email);
 			witnessedObjects.Serialize(serializer, WorldRevision.MissionFailures);
+			notifications.Serialize(serializer, WorldRevision.Notifications);
+			
 			
 			eventDispatcher.PauseEvents = false;
 		}
@@ -189,6 +197,7 @@ namespace Core.WorldData
 		{
 			// You must wipe the world in reverse order of how you would create or serialize it.
 			// This ensures proper handling of deleting objects that depend on other objects.
+			notifications.Clear();
 			witnessedObjects.Clear();
 			emails.Clear();
 			domains.Clear();

@@ -1,4 +1,5 @@
 ﻿using ContentManagement;
+using Shell.Common;
 
 namespace Shell
 {
@@ -6,5 +7,6 @@ namespace Shell
 	{
 		IProgram Program { get; }
 		bool AllowUserTabs { get; }
+		INotificationGroup? NotificationGroup { get; }
 	}
 }

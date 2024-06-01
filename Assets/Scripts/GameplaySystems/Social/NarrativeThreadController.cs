@@ -5,6 +5,7 @@ using System.Linq;
 using System.Threading.Tasks;
 using Core;
 using Core.WorldData.Data;
+using Shell.Common;
 using Social;
 
 namespace GameplaySystems.Social
@@ -37,7 +38,7 @@ namespace GameplaySystems.Social
 				MarkNotTyping(sender);
 			}
 
-			worldManager.World.Messages.Add(new WorldMessageData
+			var messageData = new WorldMessageData
 			{
 				InstanceId = worldManager.GetNextObjectId(),
 				ChannelId = threadId,
@@ -51,7 +52,19 @@ namespace GameplaySystems.Social
 						Data = textMessage
 					}
 				}
-			});
+			};
+			
+			if (sender != player)
+			{
+				worldManager.World.Notifications.Add(new WorldNotificationData
+				{
+					InstanceId = worldManager.GetNextObjectId(),
+					CorrelationId = messageData.InstanceId,
+					GroupId = NotificationGroups.Chat
+				});
+			}
+			
+			worldManager.World.Messages.Add(messageData);
 		}
 
 		/// <inheritdoc />

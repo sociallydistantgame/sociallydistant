@@ -14,3 +14,4 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   program: {fileID: 11400000, guid: ea66c4f3bc7dac8469dc2ddc91f11418, type: 2}
   allowUserTabs: 0
+  notificationGroupId: Chat

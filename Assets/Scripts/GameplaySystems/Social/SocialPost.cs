@@ -16,6 +16,9 @@ namespace GameplaySystems.Social
 		public ObjectId ChannelId => ObjectId.Invalid;
 
 		/// <inheritdoc />
+		public ObjectId Id => data.InstanceId;
+
+		/// <inheritdoc />
 		public IProfile Author => socialService.GetProfileById(data.Author);
 
 		/// <inheritdoc />
