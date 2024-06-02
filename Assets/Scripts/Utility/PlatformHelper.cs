@@ -44,13 +44,26 @@ namespace Utility
 
 		public static void AppendException(this StringBuilder stringBuilder, Exception ex)
 		{
+			stringBuilder.AppendLine($"<b>{ex.GetType().FullName}:</b>");
+			stringBuilder.AppendLine(ex.Message);
+			
 			if (ShowStackTraces)
 			{
-				stringBuilder.Append(ex);
-			}
-			else
-			{
-				stringBuilder.Append(ex.Message);
+				stringBuilder.AppendLine();
+				stringBuilder.AppendLine("<b>Stack trace:</b>");
+				
+				string[] lines = ex.StackTrace.Split(Environment.NewLine);
+
+				const int maxLines = 4;
+
+				for (var i = 0; i < Math.Min(maxLines, lines.Length); i++)
+					stringBuilder.AppendLine(lines[i]);
+				
+				if (lines.Length > maxLines)
+				{
+					int more = lines.Length - maxLines;
+					stringBuilder.AppendLine($"<i>...{more} more</i>");
+				}
 			}
 		}
 	}
