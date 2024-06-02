@@ -396,7 +396,7 @@ namespace Core.Scripting.Parsing
 					: $"Expected closing ] but instead got '{tokenView.Previous.Text}'");
 			
 			
-			var commandData = new CommandData(CurrentScope, new TextArgumentEvaluator(commandName), argumentList, FileRedirectionType.None, null);
+			var commandData = new CommandData(new TextArgumentEvaluator(commandName), argumentList, FileRedirectionType.None, null);
 
 			return new SingleInstruction(commandData);
 		}
@@ -851,10 +851,10 @@ namespace Core.Scripting.Parsing
 		{
 			// No tokens left.
 			if (tokenView.Next == null)
-				return new CommandData(CurrentScope, name, arguments, FileRedirectionType.None, null);
+				return new CommandData(name, arguments, FileRedirectionType.None, null);
 
 			(FileRedirectionType redirectionType, IArgumentEvaluator? filePath) = await GetRedirectionTypeAndPath(tokenView);
-			return new CommandData(CurrentScope, name, arguments, redirectionType, filePath);
+			return new CommandData(name, arguments, redirectionType, filePath);
 		}
 		
 		private async Task<(FileRedirectionType, IArgumentEvaluator?)> GetRedirectionTypeAndPath(ArrayView<ShellToken> tokenView)

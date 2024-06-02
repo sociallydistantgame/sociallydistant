@@ -9,6 +9,7 @@ using System.Text;
 using System.Threading;
 using Core.Scripting;
 using GameplaySystems.Chat;
+using GameplaySystems.Hacking.Assets;
 using GameplaySystems.Social;
 using UnityEditor;
 using UnityEditor.AssetImporters;
@@ -24,6 +25,13 @@ namespace Editor.CustomImporters
 		{
 			var asset = ScriptableObject.CreateInstance<NpcGeneratorScript>();
 			asset.NarrativeId = shebang.Trim();
+			asset.SetScriptText(scriptText.ToString());
+			return asset;
+		}
+		
+		private UnityEngine.Object NetworkImporter(string shebang, StringBuilder scriptText)
+		{
+			var asset = ScriptableObject.CreateInstance<NetworkAsset>();
 			asset.SetScriptText(scriptText.ToString());
 			return asset;
 		}
@@ -52,6 +60,10 @@ namespace Editor.CustomImporters
 				{
 					"npc",
 					NpcImporter
+				},
+				{
+					"network",
+					NetworkImporter
 				}
 			};
 			var sb = new StringBuilder();

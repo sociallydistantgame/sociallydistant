@@ -4,11 +4,16 @@ using System;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Linq;
+using System.Text;
 using Core;
 using Core.WorldData;
 using Core.WorldData.Data;
 using System.Threading.Tasks;
+using Core.Scripting;
+using Core.Scripting.Instructions;
+using GamePlatform;
 using OS.Network;
+using UI.Shell;
 using UnityEngine;
 using InvalidOperationException = System.InvalidOperationException;
 using Random = System.Random;
@@ -19,6 +24,9 @@ namespace GameplaySystems.Hacking.Assets
 		ScriptableObject,
 		INetworkAsset
 	{
+		[SerializeField]
+		private string scriptText = string.Empty;
+		
 		[SerializeField]
 		private string narrativeId = string.Empty;
 
@@ -51,12 +59,61 @@ namespace GameplaySystems.Hacking.Assets
 
 		[SerializeField]
 		private List<UserData> users = new List<UserData>();
+
+		private ShellInstruction? scriptTree;
 		
 		public string NarrativeId => narrativeId;
 
 		public string NetworkName => networkName;
 
+		#if UNITY_EDITOR
+		public void SetScriptText(string text)
+		{
+			this.scriptText = text;
+
+			Task.Run(async () =>
+			{
+				await RebuildScriptTree();
+			}).Wait();
+		}
+		#endif
+
+		public async Task RebuildScriptTree()
+		{
+			var context = new UserScriptExecutionContext();
+			var console = new UnityTextConsole();
+
+			var runner = new InteractiveShell(context);
+			runner.Setup(console);
+
+			ShellInstruction script = await runner.ParseScript(this.scriptText);
+
+			var call = new SingleInstruction(new CommandData(new TextArgumentEvaluator("build"), Array.Empty<IArgumentEvaluator>(), FileRedirectionType.None, null));
+
+			var finalScript = new SequentialInstruction(new[] { script, call });
+
+			this.scriptTree = finalScript;
+		}
+
 		public async Task Build(IWorldManager worldManager)
+		{
+			if (this.scriptTree == null)
+				await this.RebuildScriptTree();
+
+			var context = new UserScriptExecutionContext();
+
+			context.ModuleManager.RegisterModule(new NetworkScriptFunctions(worldManager));
+
+			var console = new UnityTextConsole();
+
+			var runner = new InteractiveShell(context);
+			runner.Setup(console);
+
+			await runner.RunParsedScript(this.scriptTree!);
+		}
+		
+
+		public async Task BuildOld(IWorldManager worldManager)
 		{
 			await Task.Yield();
 			IWorld world = worldManager.World;

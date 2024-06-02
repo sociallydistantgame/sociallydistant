@@ -19,7 +19,7 @@ namespace Core.Scripting.Instructions
 		public FileRedirectionType RedirectionType { get; }
 		public IArgumentEvaluator? FilePath { get; }
 		
-		public CommandData(IScriptExecutionContext context, IArgumentEvaluator name, IEnumerable<IArgumentEvaluator> argumentSource, FileRedirectionType redirectionType, IArgumentEvaluator? path)
+		public CommandData(IArgumentEvaluator name, IEnumerable<IArgumentEvaluator> argumentSource, FileRedirectionType redirectionType, IArgumentEvaluator? path)
 		{
 			Name = name;
 			ArgumentList = argumentSource.ToArray();

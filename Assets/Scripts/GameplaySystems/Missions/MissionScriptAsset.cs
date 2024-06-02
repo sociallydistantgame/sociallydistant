@@ -289,7 +289,7 @@ namespace GameplaySystems.Missions
 			instructionList.Add(primaryTree);
 
 			var nameEvaulator = new TextArgumentEvaluator(entrypoint);
-			var command = new CommandData(null, nameEvaulator, Enumerable.Empty<IArgumentEvaluator>(), FileRedirectionType.None, null);
+			var command = new CommandData(nameEvaulator, Enumerable.Empty<IArgumentEvaluator>(), FileRedirectionType.None, null);
 			var single = new SingleInstruction(command);
 			
 			instructionList.Add(single);

@@ -12,6 +12,7 @@ namespace GameplaySystems.Missions
 		{
 			foreach (NetworkAsset asset in await finder.FindContentOfType<NetworkAsset>())
 			{
+				await asset.RebuildScriptTree();
 				builder.AddContent(asset);
 			}
 		}
