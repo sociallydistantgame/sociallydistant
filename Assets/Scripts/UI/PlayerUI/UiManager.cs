@@ -317,6 +317,14 @@ namespace UI.PlayerUI
 			dialog.Message = sb.ToString();
 			
 			dialog.Buttons.Add("OK");
+			dialog.Buttons.Add(new MessageBoxButtonData
+			{
+				Text = "Copy details",
+				ClickHandler = () =>
+				{
+					PlatformHelper.SetClipboardText(ex.ToString());
+				}
+			});
 		}
 
 		public static Camera UiCamera => mainCamera;

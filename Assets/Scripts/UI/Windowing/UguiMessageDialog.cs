@@ -178,7 +178,7 @@ namespace UI.Windowing
 				var underlyingButtonDefinition = new InfoBoxController.ButtonDefinition()
 				{
 					label = definition.Text,
-					clickHandler = () => HandleButtonClick(definition.Result)
+					clickHandler = () => HandleButtonClick(definition)
 				};
 
 				if (infoBoxController.Count <= i)
@@ -191,9 +191,15 @@ namespace UI.Windowing
 				infoBoxController.RemoveAt(infoBoxController.Count - 1);
 		}
 
-		private void HandleButtonClick(MessageDialogResult result)
+		private void HandleButtonClick(MessageBoxButtonData data)
 		{
-			DismissCallback?.Invoke(result);
+			if (data.ClickHandler != null)
+			{
+				data.ClickHandler();
+				return;
+			}
+			
+			DismissCallback?.Invoke(data.Result);
 			Close();
 		}
 	}
