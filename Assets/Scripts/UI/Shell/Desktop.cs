@@ -17,6 +17,7 @@ using UnityEngine.UI;
 using UnityExtensions;
 using Utility;
 using System.Threading.Tasks;
+using Cysharp.Threading.Tasks;
 
 namespace UI.Shell
 {
@@ -70,10 +71,9 @@ namespace UI.Shell
 			gameManager.UriManager.RegisterSchema("shell", new ShellUriSchemeHandler(this));
 		
 			this.UpdateUserDisplay();
-			await this.toolManager.StartFirstTool();
 			Show();
 		}
-
+		
 		private void OnDisable()
 		{
 			gameManager.UriManager.UnregisterSchema("web");
@@ -82,9 +82,15 @@ namespace UI.Shell
 			Hide();
 		}
 
-		private void Start()
+		private async void Start()
 		{
+			// Prevents a race condition since OnEnable is async
+			while (loginProcess == null)
+				await Task.Yield();
+
 			this.currentWorkspace = playerHolder.Value.UiManager.WindowManager.DefineWorkspace(this.workspaceArea);
+
+			await toolManager.StartFirstTool();
 		}
 
 		/// <inheritdoc />

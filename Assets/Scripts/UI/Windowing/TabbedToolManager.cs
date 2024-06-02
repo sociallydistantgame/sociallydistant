@@ -32,34 +32,29 @@ namespace UI.Windowing
 		private TabbedTool? currentTool;
 		private ITile tile;
 		private GameManager gameManager = null!;
-		
+
 		/// <inheritdoc />
 		protected override void Awake()
 		{
 			gameManager = GameManager.Instance;
-			
+
 			this.AssertAllFieldsAreSerialized(typeof(TabbedToolManager));
 			this.MustGetComponent(out tile);
 			this.MustGetComponentInParent(out shell);
 			this.tile.WindowClosed += OnTileClosed;
-			base.Awake();
-		}
-
-		/// <inheritdoc />
-		protected override void Start()
-		{
-			base.Start();
 
 			this.tools.Clear();
-			
+
 			// Really cursed bullshit linq code that I'd never get CAUGHT DEAD writing for trixel...
 			// that makes the terminal always show up first no matter what.
 			this.tools.AddRange(this.gameManager.AvailableTools
-				.OrderByDescending(x=>x.Equals(terminal))
-				.ThenBy(x=>x.Program.WindowTitle)
-				.Select(x=>new TabbedTool(x, shell)));
+				.OrderByDescending(x => x.Equals(terminal))
+				.ThenBy(x => x.Program.WindowTitle)
+				.Select(x => new TabbedTool(x, shell)));
 
 			this.BuildDock();
+
+			base.Awake();
 		}
 		
 		private void BuildDock()
@@ -81,7 +76,7 @@ namespace UI.Windowing
 				});
 			}
 		}
-
+		
 		private void MustGetToolGui<T>(out T behaviour) where T : MonoBehaviour
 		{
 			if (this.tile.ActiveContent is not RectTransformContentPanel contentPanel)
