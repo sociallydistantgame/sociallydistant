@@ -12,5 +12,7 @@ build() {
   device patient_records "Patient Records"
   device ed_workstation "Workstation: E.D. Triage Desk"
   
- 
+  service enable ssh ed_workstation 22
+  
+  forward 22 ed_workstation 22
 }

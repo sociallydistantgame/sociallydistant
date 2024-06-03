@@ -41,7 +41,7 @@ namespace DevTools
 				devMenu.PushMenu(new SetComputerLANMenu(world));
 			
 			if (GUILayout.Button("Manage LAN Forwarding Tables"))
-				devMenu.PushMenu(new ManageForwardingTablesMenu(world));
+				devMenu.PushMenu(new ManageForwardingTablesMenu());
 			
 			if (GUILayout.Button("Find Public Hosts"))
 				devMenu.PushMenu(new FindPublicHostsMenu(world));

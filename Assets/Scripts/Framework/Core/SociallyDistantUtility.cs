@@ -8,6 +8,7 @@ using System.Runtime.InteropServices;
 using System.Text;
 using ContentManagement;
 using Modules;
+using OS.Network;
 using UnityEngine.Analytics;
 
 namespace Core
@@ -39,6 +40,16 @@ namespace Core
 		};
 		
 		public static readonly string PlayerHomeId = "player";
+
+		public static string GetFriendlyNetError(ConnectionResultType result)
+		{
+			return result switch
+			{
+				ConnectionResultType.Connected => "Connected",
+				ConnectionResultType.TimedOut => "Connection timed out",
+				_ => "Connection refused"
+			};
+		}
 
 		public static PlayerLevelInfo GetPlayerLevelFromExperience(ulong experience)
 		{

@@ -13,9 +13,9 @@ namespace DevTools
 		/// <inheritdoc />
 		public string Name => "Manage Forwarding Tables";
 
-		public ManageForwardingTablesMenu(WorldManager world)
+		public ManageForwardingTablesMenu()
 		{
-			this.world = world;
+			this.world = WorldManager.Instance;
 			this.lans = world.World.LocalAreaNetworks.ToArray();
 		}
 		

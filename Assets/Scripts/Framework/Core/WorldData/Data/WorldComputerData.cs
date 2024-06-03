@@ -1,5 +1,6 @@
 ﻿#nullable enable
 
+using System.Collections.Generic;
 using Core.Serialization;
 
 namespace Core.WorldData.Data
@@ -13,6 +14,7 @@ namespace Core.WorldData.Data
 		private string hostname;
 		private long macAddress;
 		private string narrativeId;
+		private IReadOnlyList<NetworkServiceData> services;
 
 		/// <inheritdoc />
 		public ObjectId InstanceId
@@ -39,6 +41,18 @@ namespace Core.WorldData.Data
 			set => macAddress = value;
 		}
 
+		public IReadOnlyList<NetworkServiceData> Services
+		{
+			get
+			{
+				if (services == null)
+					services = new List<NetworkServiceData>();
+
+				return services;
+			}
+			set => services = value;
+		}
+
 		/// <inheritdoc />
 		public void Serialize(IWorldSerializer serializer)
 		{
@@ -46,6 +60,8 @@ namespace Core.WorldData.Data
 			SerializationUtility.SerializeAtRevision(ref narrativeId, serializer, WorldRevision.LocalNetworkNarrativeIds, default);
 			SerializationUtility.SerializeAtRevision(ref hostname, serializer, WorldRevision.AddedComputers, "localhost");
 			SerializationUtility.SerializeAtRevision(ref macAddress, serializer, WorldRevision.AddedMacAddresses, default);
+
+			SerializationUtility.SerializeCollectionAtRevision(ref services, serializer, WorldRevision.ComputersCanListen);
 		}
 	}
 }

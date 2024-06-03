@@ -1,5 +1,6 @@
 #nullable enable
 using System;
+using System.Collections.Generic;
 using System.Linq;
 using Core;
 using Core.Scripting;
@@ -124,7 +125,67 @@ namespace GameplaySystems.Hacking.Assets
 				return n;
 			});
 		}
+
+		[Function("service")]
+		public void SetupDeviceService(string clause, string serviceId, string deviceId, string rawPort)
+		{
+			bool enable = clause.ToLower() switch
+			{
+				"enable" => true,
+				"disable" => false,
+				_ => throw new InvalidOperationException("service: Argument 1 must either be 'enable' or 'disable'")
+			};
+			
+			ushort port = ushort.Parse(rawPort);
+			var fullNarrativeId = $"{networkId}:{deviceId}";
+
+			WorldComputerData device = worldManager.World.Computers.GetNarrativeObject(fullNarrativeId);
+
+			Dictionary<string, NetworkServiceData> services = device.Services.ToDictionary(x => x.Id, x => x);
+
+			services[serviceId] = new NetworkServiceData
+			{
+				Id = serviceId,
+				Enabled = enable,
+				Port = port
+			};
+
+			device.Services = services.Values.ToArray();
+
+			worldManager.World.Computers.Modify(device);
+		}
 		
-		
+		[Function("forward")]
+		private void ForwardPort(string outsideRaw, string deviceId, string insideRaw)
+		{
+			ushort outside = ushort.Parse(outsideRaw);
+			ushort inside = ushort.Parse(insideRaw);
+			
+			var fullNarrativeId = $"{networkId}:{deviceId}";
+
+			WorldLocalNetworkData network = worldManager.World.LocalAreaNetworks.GetNarrativeObject(networkId);
+			WorldComputerData device = worldManager.World.Computers.GetNarrativeObject(fullNarrativeId);
+			
+			WorldPortForwardingRule rule = worldManager.World.PortForwardingRules.FirstOrDefault(x => 
+				x.LanId==network.InstanceId &&
+				x.GlobalPort == outside);
+
+			var ruleIsNew = false;
+			if (rule.LanId != network.InstanceId)
+			{
+				ruleIsNew = true;
+				rule.InstanceId = worldManager.GetNextObjectId();
+			}
+
+			rule.LanId = network.InstanceId;
+			rule.GlobalPort = outside;
+			rule.LocalPort = inside;
+			rule.ComputerId = device.InstanceId;
+
+			if (ruleIsNew)
+				worldManager.World.PortForwardingRules.Add(rule);
+			else
+				worldManager.World.PortForwardingRules.Modify(rule);
+		}
 	}
 }

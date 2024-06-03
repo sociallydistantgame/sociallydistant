@@ -29,6 +29,7 @@ namespace Architecture
 		protected IVirtualFileSystem FileSystem { get; private set; }
 		protected string WorkingDirectory => proc.WorkingDirectory;
 		protected string HomeDirectory => proc.User.Home;
+		protected IUser User => proc.User;
 
 		public string ProcessName => proc.Name;
 		

@@ -27,7 +27,7 @@
 		NarrativeGuilds = 22,
 		NarrativeChannels = 23,
 		Notifications = 24,
-
+		ComputersCanListen = 25,
 		
 		Latest
 	}
