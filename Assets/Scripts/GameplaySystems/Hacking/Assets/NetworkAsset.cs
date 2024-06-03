@@ -20,13 +20,13 @@ using Random = System.Random;
 
 namespace GameplaySystems.Hacking.Assets
 {
-	public class NetworkAsset : 
+	public class NetworkAsset :
 		ScriptableObject,
 		INetworkAsset
 	{
 		[SerializeField]
 		private string scriptText = string.Empty;
-		
+
 		[SerializeField]
 		private string narrativeId = string.Empty;
 
@@ -35,7 +35,7 @@ namespace GameplaySystems.Hacking.Assets
 
 		[SerializeField]
 		private string ispId = string.Empty;
-		
+
 		[SerializeField]
 		private List<string> domains = new List<string>();
 
@@ -61,8 +61,14 @@ namespace GameplaySystems.Hacking.Assets
 		private List<UserData> users = new List<UserData>();
 
 		private ShellInstruction? scriptTree;
-		
-		public string NarrativeId => narrativeId;
+
+		public string NarrativeId
+		{
+			get => narrativeId;
+#if UNITY_EDITOR
+			set => this.narrativeId = value;
+#endif
+		}
 
 		public string NetworkName => networkName;
 
@@ -102,7 +108,7 @@ namespace GameplaySystems.Hacking.Assets
 
 			var context = new UserScriptExecutionContext();
 
-			context.ModuleManager.RegisterModule(new NetworkScriptFunctions(worldManager));
+			context.ModuleManager.RegisterModule(new NetworkScriptFunctions(worldManager, narrativeId));
 
 			var console = new UnityTextConsole();
 

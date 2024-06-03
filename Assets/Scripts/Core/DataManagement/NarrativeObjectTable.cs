@@ -13,9 +13,11 @@ namespace Core.DataManagement
 		private readonly WorldDataTable<TDataElement> underlyingTable;
 		private readonly Dictionary<string, ObjectId> narrativeIdLookup = new();
 		private readonly Dictionary<ObjectId, string> objectIdLookup = new();
+		private readonly bool createAutomatically;
 
-		public NarrativeObjectTable(UniqueIntGenerator idGenerator, DataEventDispatcher eventDispatcher)
+		public NarrativeObjectTable(UniqueIntGenerator idGenerator, DataEventDispatcher eventDispatcher, bool createImmediately = true)
 		{
+			this.createAutomatically = createImmediately;
 			this.idGenerator = idGenerator;
 			underlyingTable = new WorldDataTable<TDataElement>(idGenerator, eventDispatcher, true);
 		}
@@ -56,8 +58,11 @@ namespace Core.DataManagement
 				var element = new TDataElement();
 				element.InstanceId = idGenerator.GetNextValue();
 				element.NarrativeId = narrativeId;
-				
-				Add(element);
+
+				if (createAutomatically)
+					Add(element);
+				else
+					return element;
 			}
 
 			return this[narrativeIdLookup[narrativeId]];

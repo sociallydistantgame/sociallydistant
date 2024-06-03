@@ -101,6 +101,7 @@ namespace OS.Network.MessageTransport
 				catch (Exception ex)
 				{
 					completionSource.SetException(ex);
+					throw;
 				}
 			}
 		}

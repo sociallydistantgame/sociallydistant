@@ -5,6 +5,7 @@ namespace Core.WorldData.Data
 {
 	public struct WorldInternetServiceProviderData : 
 		IWorldData, 
+		INarrativeObject,
 		IDataWithId
 	{
 		private ObjectId instanceId;

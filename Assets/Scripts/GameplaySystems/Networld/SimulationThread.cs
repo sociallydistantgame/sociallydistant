@@ -3,12 +3,15 @@ using System;
 using System.Diagnostics;
 using System.Threading;
 using System.Threading.Tasks;
+using OS.Network.MessageTransport;
 using Debug = UnityEngine.Debug;
 
 namespace GameplaySystems.Networld
 {
 	public sealed class SimulationThread
 	{
+		private static readonly WorkQueue workQueue = new();
+		
 		private static SimulationThread? instance;
 		
 		private readonly CoreRouter coreRouter;
@@ -90,8 +93,20 @@ namespace GameplaySystems.Networld
 			while (simulationRunning)
 			{
 				stopwatch.Start();
+				
 				currentUpdate.Set();
-				await coreRouter.NetworkUpdate();
+
+				try
+				{
+					workQueue.RunPendingWork();
+					await coreRouter.NetworkUpdate();
+				}
+				catch (Exception ex)
+				{
+					Debug.LogError("Network simulation went ape-shit and threw an exception.");
+					Debug.LogException(ex);
+				}
+
 				currentUpdate.Reset();
 				stopwatch.Stop();
 
@@ -121,6 +136,11 @@ namespace GameplaySystems.Networld
 		public static async Task SynchronizeAsync()
 		{
 			await Task.Run(Synchronize);
+		}
+
+		public static void ScheduleWork(Action action)
+		{
+			workQueue.Enqueue(action);
 		}
 	}
 }

@@ -33,7 +33,7 @@ namespace OS.Network
 		public NetworkInterface(string name = "eth0")
 		{
 			this.Name = name;
-			this.MacAddress = (long) Random.Range(0, long.MaxValue >> 16);
+			this.MacAddress = NetUtility.GetRandomMacAddress();
 		}
 
 		public void MakeUnaddressable()

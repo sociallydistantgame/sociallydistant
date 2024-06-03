@@ -4,7 +4,8 @@ using Core.Serialization;
 namespace Core.WorldData.Data
 {
 	public struct WorldLocalNetworkData : 
-		IWorldData, 
+		IWorldData,
+		INarrativeObject,
 		IDataWithId
 	{
 		private ObjectId instanceId;

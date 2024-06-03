@@ -18,9 +18,9 @@ namespace Core.WorldData
 		private readonly WorldDataObject<ProtectedWorldState> protectedWorldState;
 		private readonly WorldDataObject<GlobalWorldData> globalWorldState;
 		private readonly WorldDataObject<WorldPlayerData> playerData;
-		private readonly WorldDataTable<WorldComputerData> computers;
-		private readonly WorldDataTable<WorldInternetServiceProviderData> internetProviders;
-		private readonly WorldDataTable<WorldLocalNetworkData> localAreaNetworks;
+		private readonly NarrativeObjectTable<WorldComputerData> computers;
+		private readonly NarrativeObjectTable<WorldInternetServiceProviderData> internetProviders;
+		private readonly NarrativeObjectTable<WorldLocalNetworkData> localAreaNetworks;
 		private readonly WorldDataTable<WorldNetworkConnection> networkConnections;
 		private readonly WorldDataTable<WorldPortForwardingRule> portForwardingRules;
 		private readonly WorldDataTable<WorldCraftedExploitData> craftedExploits;
@@ -83,13 +83,13 @@ namespace Core.WorldData
         public IWorldDataObject<WorldPlayerData> PlayerData => playerData;
 		
         /// <inheritdoc />
-        public IWorldTable<WorldComputerData> Computers => computers;
+        public INarrativeObjectTable<WorldComputerData> Computers => computers;
 		
         /// <inheritdoc />
-        public IWorldTable<WorldInternetServiceProviderData> InternetProviders => internetProviders;
+        public INarrativeObjectTable<WorldInternetServiceProviderData> InternetProviders => internetProviders;
 		
         /// <inheritdoc />
-        public IWorldTable<WorldLocalNetworkData> LocalAreaNetworks => localAreaNetworks;
+        public INarrativeObjectTable<WorldLocalNetworkData> LocalAreaNetworks => localAreaNetworks;
 		
         /// <inheritdoc />
         public IWorldTable<WorldNetworkConnection> NetworkConnections => networkConnections;
@@ -137,9 +137,9 @@ namespace Core.WorldData
 			protectedWorldState = new WorldDataObject<ProtectedWorldState>(eventDispatcher);
 			globalWorldState = new WorldDataObject<GlobalWorldData>(eventDispatcher);
 			playerData = new WorldDataObject<WorldPlayerData>(eventDispatcher);
-			computers = new WorldDataTable<WorldComputerData>(instanceIdGenerator, eventDispatcher);
-			internetProviders = new WorldDataTable<WorldInternetServiceProviderData>(instanceIdGenerator, eventDispatcher);
-			localAreaNetworks = new WorldDataTable<WorldLocalNetworkData>(instanceIdGenerator, eventDispatcher);
+			computers = new NarrativeObjectTable<WorldComputerData>(instanceIdGenerator, eventDispatcher);
+			internetProviders = new NarrativeObjectTable<WorldInternetServiceProviderData>(instanceIdGenerator, eventDispatcher, false);
+			localAreaNetworks = new NarrativeObjectTable<WorldLocalNetworkData>(instanceIdGenerator, eventDispatcher);
 			networkConnections = new WorldDataTable<WorldNetworkConnection>(instanceIdGenerator, eventDispatcher);
 			portForwardingRules = new WorldDataTable<WorldPortForwardingRule>(instanceIdGenerator, eventDispatcher);
 			craftedExploits = new WorldDataTable<WorldCraftedExploitData>(instanceIdGenerator, eventDispatcher);

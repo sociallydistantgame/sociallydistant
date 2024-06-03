@@ -47,8 +47,9 @@ namespace OS.Network
 
 		public static long GetRandomMacAddress()
 		{
-			ushort firstPart = (ushort) UnityEngine.Random.Range(0, ushort.MaxValue);
-			uint secondPart = (uint) UnityEngine.Random.Range(0, uint.MaxValue);
+			var random = new Random();
+			ushort firstPart = (ushort) random.Next(0, ushort.MaxValue);
+			uint secondPart = (uint) random.Next(int.MinValue, int.MaxValue);
 
 			return ((long) firstPart) | ((long) secondPart) << 32;
 		}

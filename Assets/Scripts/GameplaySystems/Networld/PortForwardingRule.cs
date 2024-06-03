@@ -2,6 +2,7 @@
 {
 	public class PortForwardingRule
 	{
+		public bool IsForOutgoing { get; set; }
 		public uint GlobalAddress { get; set; }
 		public uint InsideAddress { get; set; }
 		public uint OutsideAddress { get; set; }

@@ -6,6 +6,7 @@ namespace Core.WorldData.Data
 {
 	public struct WorldComputerData : 
 		IWorldData,
+		INarrativeObject,
 		IDataWithId
 	{
 		private ObjectId id;

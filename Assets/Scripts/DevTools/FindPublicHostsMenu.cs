@@ -17,7 +17,7 @@ namespace DevTools
 
 		public FindPublicHostsMenu(WorldManager world)
 		{
-			this.world = world;
+			this.world = WorldManager.Instance;
 			this.Name = "Find Public Hosts";
 		}
 		

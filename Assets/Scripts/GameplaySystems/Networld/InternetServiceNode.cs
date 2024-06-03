@@ -147,48 +147,56 @@ namespace GameplaySystems.Networld
 		
 		public void ConnectLan(LocalAreaNode node, uint publicAddress)
 		{
-			// Create an interface for the LAN to connect to
-			lanInterfaces.Add(node, neighbourInterfaces.Count);
 			var networkInterface = new NetworkInterface();
-			this.neighbourInterfaces.Add(networkInterface);
+			
+			SimulationThread.ScheduleWork(() =>
+			{
+				// Create an interface for the LAN to connect to
+				lanInterfaces.Add(node, neighbourInterfaces.Count);
+				this.neighbourInterfaces.Add(networkInterface);
 
-			// Connect the LAN to our network
-			node.NetworkInterface.Connect(networkInterface);
-			
-			// Make the two interfaces addressable
-			networkInterface.MakeAddressable(addressRange, publicAddress);
-			node.NetworkInterface.MakeAddressable(addressRange, publicAddress);
-			
-			// Keep track of the LAN so we can update it
-			this.localAreaNodes.Add(node);
+				// Connect the LAN to our network
+				node.NetworkInterface.Connect(networkInterface);
+
+				// Make the two interfaces addressable
+				networkInterface.MakeAddressable(addressRange, publicAddress);
+				node.NetworkInterface.MakeAddressable(addressRange, publicAddress);
+
+				// Keep track of the LAN so we can update it
+				this.localAreaNodes.Add(node);
+			});
 		}
 
 		public void DropClient(LocalAreaNode node)
 		{
-			// Which interface was this node connected to? If none, we stop.
-			if (!lanInterfaces.TryGetValue(node, out int index))
-				return;
-			
-			// Get that interface.
-			NetworkInterface ourInterface = this.neighbourInterfaces[index];
-			
-			// Remove it.
-			this.neighbourInterfaces.RemoveAt(index);
-			this.lanInterfaces.Remove(node);
-			
-			// Shift all interface indices above the one we just axed
-			foreach (LocalAreaNode key in lanInterfaces.Keys)
+			SimulationThread.ScheduleWork(() =>
 			{
-				if (lanInterfaces[key] > index)
-					lanInterfaces[key]--;
-			}
-			
-			// Drop the addresses on both interfaces
-			ourInterface.MakeUnaddressable();
-			node.NetworkInterface.MakeUnaddressable();
-			
-			// Disconnect them.
-			node.NetworkInterface.Disconnect();
+				// Which interface was this node connected to? If none, we stop.
+				if (!lanInterfaces.TryGetValue(node, out int index))
+					return;
+
+				// Get that interface.
+				NetworkInterface ourInterface = this.neighbourInterfaces[index];
+
+				// Remove it.
+				this.neighbourInterfaces.RemoveAt(index);
+				this.lanInterfaces.Remove(node);
+				this.localAreaNodes.Remove(node);
+
+				// Shift all interface indices above the one we just axed
+				foreach (LocalAreaNode key in lanInterfaces.Keys.ToArray())
+				{
+					if (lanInterfaces[key] > index)
+						lanInterfaces[key]--;
+				}
+
+				// Drop the addresses on both interfaces
+				ourInterface.MakeUnaddressable();
+				node.NetworkInterface.MakeUnaddressable();
+
+				// Disconnect them.
+				node.NetworkInterface.Disconnect();
+			});
 		}
 	}
 }

@@ -26,7 +26,7 @@ namespace DevTools
 		public void OnMenuGUI(DeveloperMenu devMenu)
 		{
 			if (GUILayout.Button("Set Player's ISP"))
-				devMenu.PushMenu(new SetPlayerIspMenu(world));
+				devMenu.PushMenu(new SetPlayerIspMenu());
 			
 			if (GUILayout.Button("Create ISP"))
 				devMenu.PushMenu(new CreateIspMenu(world));

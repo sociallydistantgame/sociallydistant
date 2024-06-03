@@ -11,7 +11,6 @@ namespace Core
 		ISerializableDataTable<TDataElement, WorldRevision, IWorldSerializer>
 		where TDataElement : struct, IWorldData, IDataWithId
 	{
-		
 	}
 
 	public interface INarrativeObjectTable<TDataElement> :

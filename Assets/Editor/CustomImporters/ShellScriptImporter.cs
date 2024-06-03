@@ -32,6 +32,11 @@ namespace Editor.CustomImporters
 		private UnityEngine.Object NetworkImporter(string shebang, StringBuilder scriptText)
 		{
 			var asset = ScriptableObject.CreateInstance<NetworkAsset>();
+			asset.NarrativeId = shebang;
+
+			if (string.IsNullOrWhiteSpace(asset.NarrativeId))
+				throw new InvalidOperationException("The shebang of a network script must specify the network's Narrative Identifier.");
+			
 			asset.SetScriptText(scriptText.ToString());
 			return asset;
 		}

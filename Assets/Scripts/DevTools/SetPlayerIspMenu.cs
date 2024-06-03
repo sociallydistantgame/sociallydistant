@@ -13,9 +13,9 @@ namespace DevTools
 		/// <inheritdoc />
 		public string Name => "Set Player ISP menu";
 
-		public SetPlayerIspMenu(WorldManager world)
+		public SetPlayerIspMenu()
 		{
-			this.world = world;
+			this.world = WorldManager.Instance;
 			this.providers = this.world.World.InternetProviders.ToArray();
 		}
 		

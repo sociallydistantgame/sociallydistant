@@ -13,9 +13,9 @@ namespace Core
 		
 		IWorldDataObject<GlobalWorldData> GlobalWorldState { get; }
 		IWorldDataObject<WorldPlayerData> PlayerData { get; }
-		IWorldTable<WorldComputerData> Computers { get; }
-		IWorldTable<WorldInternetServiceProviderData> InternetProviders { get; }
-		IWorldTable<WorldLocalNetworkData> LocalAreaNetworks { get; }
+		INarrativeObjectTable<WorldComputerData> Computers { get; }
+		INarrativeObjectTable<WorldInternetServiceProviderData> InternetProviders { get; }
+		INarrativeObjectTable<WorldLocalNetworkData> LocalAreaNetworks { get; }
 		IWorldTable<WorldNetworkConnection> NetworkConnections { get; }
 		IWorldTable<WorldPortForwardingRule> PortForwardingRules { get; }
 		IWorldTable<WorldCraftedExploitData> CraftedExploits { get; }

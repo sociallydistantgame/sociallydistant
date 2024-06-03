@@ -5,6 +5,7 @@ using System.Linq;
 using System.Threading.Tasks;
 using OS.Devices;
 using OS.Network;
+using UnityEngine;
 
 namespace GameplaySystems.Networld
 {
@@ -79,8 +80,11 @@ namespace GameplaySystems.Networld
 			// If our main interface isn't addressable, it means that we're not connected
 			// to an ISP in the network simulation and must drop the packet.
 			if (!NetworkInterface.Addressable)
+			{
+				Debug.LogWarning("Packet traversing through a LocalAreaNode is outbound, and the LAN has no connection to the Net. Packet will be dropped.");
 				return;
-			
+			}
+
 			// If the source address is that of our outbound interface, send it to the Internet straight away.
 			if (packet.SourceAddress == this.outboundInterface.NetworkAddress)
 			{
@@ -89,7 +93,8 @@ namespace GameplaySystems.Networld
 			}
 			
 			// Find a port-forwarding rule that matches all of the packet's attributes.
-			PortForwardingRule? rule = this.forwardingTable.FirstOrDefault(x => x.InsideAddress == packet.SourceAddress
+			PortForwardingRule? rule = this.forwardingTable.FirstOrDefault(x => x.IsForOutgoing 
+																				&& x.InsideAddress == packet.SourceAddress
 			                                                                    && x.InsidePort == packet.SourcePort
 			                                                                    && x.OutsideAddress == packet.DestinationAddress
 			                                                                    && x.OutsidePort == packet.DestinationPort);
@@ -102,11 +107,9 @@ namespace GameplaySystems.Networld
 					InsideAddress = packet.SourceAddress,
 					InsidePort = packet.SourcePort,
 					OutsideAddress = packet.DestinationAddress,
-					OutsidePort = packet.DestinationPort
+					OutsidePort = packet.DestinationPort,
+					IsForOutgoing = true
 				};
-				
-				// The global address will be that of our outgoing interface.
-				rule.GlobalAddress = NetworkInterface.NetworkAddress;
 				
 				// Global port is...complicated. These ports aren't treated as Listeners though, they're purely
 				// internal. This has the effect of firewalling these outside ports to anyone but the recipient
@@ -122,7 +125,7 @@ namespace GameplaySystems.Networld
 			}
 
 			// Change the source attributes to match the rule.
-			packet.SourceAddress = rule.GlobalAddress;
+			packet.SourceAddress = NetworkInterface.NetworkAddress;
 			packet.SourcePort = rule.GlobalPort;
 			
 			// Take a spin, now you're in with the techno set. We goin' surfin' on the fuckin' Internet.
@@ -186,7 +189,6 @@ namespace GameplaySystems.Networld
 			// Find a forwarding rule matching the destination address and port
 			PortForwardingRule? rule = forwardingTable.FirstOrDefault(x => (x.OutsideAddress==packet.SourceAddress || x.OutsideAddress==0)
 			                                                               && (x.OutsidePort == packet.SourcePort || x.OutsidePort==0)
-			                                                               && (x.GlobalAddress == packet.DestinationAddress || x.GlobalAddress == 0)
 			                                                               && x.GlobalPort == packet.DestinationPort);
 			
 			// If no rule was found, refuse the packet
@@ -353,7 +355,7 @@ namespace GameplaySystems.Networld
 			// Find an existing rule matching the criteria
 			PortForwardingRule? rule = forwardingTable.FirstOrDefault(x => x.InsideAddress == insideAddress
 			                                                               && x.InsidePort == insidePort
-			                                                               && x.GlobalAddress == 0
+			                                                               && !x.IsForOutgoing
 			                                                               && x.GlobalPort == outsidePort);
 			
 			// Create it if there's none.

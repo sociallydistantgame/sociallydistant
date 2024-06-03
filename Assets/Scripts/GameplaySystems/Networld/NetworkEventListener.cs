@@ -257,7 +257,10 @@ namespace GameplaySystems.Networld
 
 		private void UpdateInstance(InternetServiceProvider isp, WorldInternetServiceProviderData data)
 		{
-			
+			// During game load, this ensures we connect the player to the right ISP when the ISP is loaded.
+			WorldPlayerData player = this.world.World.PlayerData.Value;
+			if (player.PlayerInternetProvider == data.InstanceId)
+				this.OnPlayerDataModified(player, player);
 		}
 
 		private void UpdateLAN(LocalAreaNetwork lan, WorldLocalNetworkData data)
