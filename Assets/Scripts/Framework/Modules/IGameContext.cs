@@ -17,6 +17,8 @@ namespace Modules
 	/// </summary>
 	public interface IGameContext
 	{
+		IModuleManager ModuleManager { get; }
+		
 		TabbedToolCollection AvailableTools { get; }
 		
 		INotificationManager NotificationManager { get; }

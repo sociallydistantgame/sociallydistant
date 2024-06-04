@@ -16,6 +16,7 @@ namespace GameplaySystems.Networld
 	public class NetworkConnection : 
 		INetworkConnection
 	{
+		private readonly Guid id = Guid.NewGuid();
 		private readonly object sync = new object();
 		private readonly List<PacketQueue> queues = new List<PacketQueue>();
 		private readonly IHostNameResolver hostResolver;
@@ -65,6 +66,9 @@ namespace GameplaySystems.Networld
 			mainInfo.DefaultGateway = NetUtility.GetNetworkAddressString(deviceNode.DefaultGateway);
 			yield return mainInfo;
 		}
+
+		/// <inheritdoc />
+		public Guid Identifier => id;
 
 		/// <inheritdoc />
 		public bool Connected => this.deviceNode.NetworkInterface.Connected;
@@ -143,7 +147,8 @@ namespace GameplaySystems.Networld
 			if (listeners.ContainsKey(port))
 				throw new InvalidOperationException("Port " + port + " is already in use.");
 
-			var handle = new ListenerHandle(port, listeners, deviceNode, serverType, secLevel);
+			var queue = new PacketQueue(this);
+			var handle = new ListenerHandle(port, listeners, deviceNode, queue, serverType, secLevel);
 			var listener = new Listener(handle);
 			listeners.Add(port, listener);
 
@@ -297,7 +302,7 @@ namespace GameplaySystems.Networld
 			return result;
 		}
 
-		private sealed class PacketQueue : IDisposable
+		private sealed class PacketQueue : IPacketQueue
 		{
 			private volatile bool deleted;
 			
@@ -314,7 +319,22 @@ namespace GameplaySystems.Networld
 					this.connection.queues.Add(this);
 				this.acceptVoidPackets = acceptVoidPackets;
 			}
-			
+
+			/// <inheritdoc />
+			public event Action<Packet> Received;
+
+			/// <inheritdoc />
+			public bool TryDequeue(out Packet packet)
+			{
+				if (deleted)
+				{
+					packet = default;
+					return false;
+				}
+				
+				return queue.TryDequeue(out packet);
+			}
+
 			public void Enqueue(Packet packet)
 			{
 				if (deleted)
@@ -324,6 +344,7 @@ namespace GameplaySystems.Networld
 					return;
 				
 				queue.Enqueue(packet);
+				Received?.Invoke(packet);
 			}
 
 			public async Task<Packet> Dequeue(CancellationToken token)

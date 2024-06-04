@@ -2,12 +2,26 @@
 
 using System;
 using System.Collections;
+using System.Collections.Concurrent;
+using System.Threading;
 using System.Threading.Tasks;
 
 namespace OS.Network
 {
+	public interface IPacketQueue : 
+		IDisposable
+	{
+		event Action<Packet>? Received; 
+		
+		bool TryDequeue(out Packet packet);
+		void Enqueue(Packet packet);
+		Task<Packet> Dequeue(CancellationToken cancellationToken);
+	}
+	
 	public interface INetworkConnection : INetworkInterfaceEnumerator
 	{
+		Guid Identifier { get; }
+		
 		bool Connected { get; }
 		
         // restitch-needed: This is a Unity coroutine and can't be called by mods. Switch to a Task<PingResult> instead.

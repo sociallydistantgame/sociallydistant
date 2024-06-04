@@ -93,7 +93,10 @@ namespace GamePlatform
 		public IInfoPanelService InfoPanelService => this.infoPanelService;
 
 		private event Action? ModulesLoaded;
-		
+
+		/// <inheritdoc />
+		public IModuleManager ModuleManager => this.moduleManager;
+
 		/// <inheritdoc />
 		public TabbedToolCollection AvailableTools => availableTools;
         

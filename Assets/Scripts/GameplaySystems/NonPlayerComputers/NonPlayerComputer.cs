@@ -22,10 +22,7 @@ namespace GameplaySystems.NonPlayerComputers
 	{
 		[SerializeField]
 		private DeviceCoordinator deviceCoordinator = null!;
-
-		[SerializeField]
-		private NetworkSimulationHolder networkSimulation = null!;
-
+		
 		[Header("Computer configuration")]
 		[SerializeField]
 		private EnvironmentVariablesAsset environmentVariables = null!;
@@ -36,18 +33,21 @@ namespace GameplaySystems.NonPlayerComputers
 		private WorldComputerData worldData;
 		private ISystemProcess initProcess = null!;
 		private LocalAreaNetwork? currentLan;
-		private NetworkConnection? networkConnection;
+		private NonPlayerNetworkConnection networkConnection;
 		private SuperUser su;
 		private NonPlayerFileSystem fs;
 		private NpcFileOverrider fileOverrider;
 		private ISystemProcess systemd;
 		private IWorldManager world = null!;
+		private ServiceManager? serviceManager;
 		
 		/// <inheritdoc />
 		public string Name => worldData.HostName;
 
 		private async void Awake()
 		{
+			networkConnection = new NonPlayerNetworkConnection(this);
+			
 			world = GameManager.Instance.WorldManager;
 			
 			this.AssertAllFieldsAreSerialized(typeof(NonPlayerComputer));
@@ -62,6 +62,14 @@ namespace GameplaySystems.NonPlayerComputers
 			// Apply environment variables to the system
 			foreach (KeyValuePair<string, string> keyPair in environmentVariables)
 				initProcess.Environment[keyPair.Key] = keyPair.Value;
+
+			serviceManager = new ServiceManager(initProcess);
+			serviceManager.UpdateServices(worldData.Services);
+		}
+
+		private void Update()
+		{
+			serviceManager?.Update();
 		}
 
 		/// <inheritdoc />
@@ -124,27 +132,22 @@ namespace GameplaySystems.NonPlayerComputers
 		{
 			worldData = data;
 			RebuildVfs();
+
+			this.serviceManager?.UpdateServices(data.Services);
 		}
 
 		public void ConnectLan(LocalAreaNetwork lan)
 		{
-			if (currentLan == lan)
-				return;
-
-			currentLan = lan;
-			networkConnection = currentLan.CreateDevice(this);
+			serviceManager?.UpdateServices(Array.Empty<NetworkServiceData>());
+			networkConnection.Connect(lan);
+			serviceManager?.UpdateServices(worldData.Services);
 		}
 		
 		public void DisconnectLan()
 		{
-			if (currentLan == null)
-				return;
-
-			if (this.networkConnection!=null)
-				currentLan.DeleteDevice(this.networkConnection);
-
-			this.networkConnection = null;
-			this.currentLan = null;
+			serviceManager?.UpdateServices(Array.Empty<NetworkServiceData>());
+			networkConnection.Disconnect();
+			serviceManager?.UpdateServices(worldData.Services);
 		}
 
 		private void RebuildVfs()

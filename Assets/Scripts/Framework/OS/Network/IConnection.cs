@@ -1,6 +1,7 @@
 ﻿#nullable enable
 using System;
 using System.IO;
+using Core.Serialization;
 
 namespace OS.Network
 {
@@ -21,9 +22,9 @@ namespace OS.Network
 		private readonly IConnection connection;
 		private readonly MemoryStream writeBuffer = new();
 		private readonly MemoryStream readBuffer = new();
-		
-		
-		public bool AutoFlush { get; set; }
+
+
+		public bool AutoFlush { get; set; } = true;
 
 		public SimulatedNetworkStream(IConnection connection)
 		{
@@ -57,10 +58,25 @@ namespace OS.Network
 		/// <inheritdoc />
 		public override int Read(byte[] buffer, int offset, int count)
 		{
-			if (connection.Receive(out byte[] data))
-				readBuffer.Write(data, 0, data.Length);
-			
-			return readBuffer.Read(buffer, offset, count);
+			var readCount = 0;
+			while ((readCount += readBuffer.Read(buffer, offset + readCount, count - readCount)) < count)
+			{
+				if (connection.Receive(out byte[] data))
+				{
+					long currentPos = readBuffer.Position;
+					readBuffer.Seek(0, SeekOrigin.End);
+					long seekBase = readBuffer.Position - currentPos;
+					long seekAmount = seekBase + data.Length;
+					
+					readBuffer.Write(data, 0, data.Length);
+					readBuffer.Seek(-seekAmount, SeekOrigin.Current);
+				}
+
+				if (!connection.Connected)
+					break;
+			}
+
+			return readCount;
 		}
 
 		/// <inheritdoc />
@@ -102,5 +118,11 @@ namespace OS.Network
 			get => -1;
 			set => throw new NotSupportedException();
 		}
+	}
+
+	public interface IPacketMessage
+	{
+		void Write(IDataWriter writer);
+		void Read(IDataReader reader);
 	}
 }

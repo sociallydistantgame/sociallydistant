@@ -12,7 +12,7 @@ namespace GameplaySystems.Networld
 	public class LocalAreaNode : INetworkSwitch<NetworkInterface>
 	{
 		private readonly IHostNameResolver hostResolver;
-		private readonly Dictionary<INetworkConnection, DeviceNode> connections = new Dictionary<INetworkConnection, DeviceNode>();
+		private readonly Dictionary<Guid, DeviceNode> connections = new Dictionary<Guid, DeviceNode>();
 		private List<NetworkInterface> insideInterfaces = new List<NetworkInterface>();
 		private NetworkInterface outboundInterface = new NetworkInterface();
 		private List<DeviceNode> devices = new List<DeviceNode>();
@@ -300,14 +300,14 @@ namespace GameplaySystems.Networld
 			
 			// Return the NetworkConnection that the rest of the game is allowed to use.
 			NetworkConnection connection = deviceNode.NetworkConnection;
-			this.connections.Add(connection, deviceNode);
+			this.connections.Add(connection.Identifier, deviceNode);
 			return connection;
 		}
 
 		public void DeleteDevice(NetworkConnection connection)
 		{
 			// Find the device
-			if (!connections.TryGetValue(connection, out DeviceNode node))
+			if (!connections.TryGetValue(connection.Identifier, out DeviceNode node))
 				return;
 			
 			// Disconnect it from our LAN.
@@ -347,7 +347,7 @@ namespace GameplaySystems.Networld
 		
 		public ForwardingTableEntry GetForwardingRule(INetworkConnection connection, ushort insidePort, ushort outsidePort)
 		{
-			if (!connections.TryGetValue(connection, out DeviceNode node))
+			if (!connections.TryGetValue(connection.Identifier, out DeviceNode node))
 				throw new InvalidOperationException("Device is not a part of this LAN");
 
 			uint insideAddress = node.NetworkInterface.NetworkAddress;
@@ -379,7 +379,7 @@ namespace GameplaySystems.Networld
 
 		public bool ContainsDevice(INetworkConnection connection)
 		{
-			return this.connections.ContainsKey(connection);
+			return this.connections.ContainsKey(connection.Identifier);
 		}
 	}
 	

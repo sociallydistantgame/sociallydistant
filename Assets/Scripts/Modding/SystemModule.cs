@@ -9,7 +9,6 @@ using Core.Config;
 using Core.Config.SystemConfigCategories;
 using Core.Scripting;
 using Core.Scripting.GlobalCommands;
-using GamePlatform.ContentManagement;
 using GameplaySystems.Chat;
 using GameplaySystems.Missions;
 using GameplaySystems.WebPages;
@@ -17,7 +16,7 @@ using Modules;
 using Shell;
 using UI.PlayerUI;
 using UnityEngine;
-using Utility;
+using FuzzySharp;
 
 namespace Modding
 {
@@ -34,6 +33,7 @@ namespace Modding
 		private readonly ConversationLocator conversations = new();
 		private readonly WebSiteContentManager websites = new();
 		private readonly IHookListener debugWorldHook = new DebugWorldHook();
+		private NetworkServiceGenerator serviceGenerator;
 		private GraphicsSettings? graphicsSettings;
 		private AccessibilitySettings? a11ySettings;
 		private UiSettings uiSettings;
@@ -57,10 +57,10 @@ namespace Modding
 		protected override async Task OnInitialize()
 		{
 			RegisterHooks();
-			
-		
 			RegisterGlobalCommands();
-			
+
+			this.serviceGenerator = new NetworkServiceGenerator(Context.ModuleManager);
+			Context.ContentManager.AddContentGenerator(this.serviceGenerator);
 			
 			// System settings modules
 			graphicsSettings = Context.SettingsManager.RegisterSettingsCategory<GraphicsSettings>();

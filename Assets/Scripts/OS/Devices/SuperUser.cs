@@ -22,7 +22,7 @@ namespace OS.Devices
 		public bool CheckPassword(string password)
 		{
 			// root doesn't have a password.
-			return false;
+			return true;
 		}
 
 		public SuperUser(IComputer computer)

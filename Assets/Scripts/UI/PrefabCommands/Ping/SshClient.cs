@@ -1,8 +1,12 @@
 #nullable enable
 using System;
+using System.IO;
+using System.Text;
 using System.Threading.Tasks;
 using Architecture;
 using Core;
+using Core.Serialization.Binary;
+using NetworkServices.Ssh;
 using OS.Network;
 
 namespace UI.PrefabCommands.Ping
@@ -68,10 +72,39 @@ namespace UI.PrefabCommands.Ping
 		private async Task Authenticate(IConnection connection, string username)
 		{
 			await using var stream = new SimulatedNetworkStream(connection);
-			
-			
+			var writer = new BinaryDataWriter(new BinaryWriter(stream, Encoding.UTF8, true));
+			var reader = new BinaryDataReader(new BinaryReader(stream, Encoding.UTF8, true));
+			var messageToWrite = new SshMessage();
+			var messageRead = new SshMessage();
+
+			messageToWrite.Type = SshPacketType.Username;
+			messageToWrite.Data = Encoding.UTF8.GetBytes(username);
+			messageToWrite.Write(writer);
+
+			await Task.Run(() =>
+			{
+				messageRead.Read(reader);
+			});
+
+			if (messageRead.Type != SshPacketType.Username)
+				return;
+
+			do
+			{
+				Console.Write($"{username}'s password: ");
+				string password = await Console.ReadLineAsync();
+
+				messageToWrite.Type = SshPacketType.Password;
+				messageToWrite.Data = Encoding.UTF8.GetBytes(password);
+				messageToWrite.Write(writer);
+
+				await Task.Run(() =>
+				{
+					messageRead.Read(reader);
+				});
+			} while (messageRead.Type == SshPacketType.PasswordResult && messageRead.Data?.Length != 0);
 		}
-		
+
 		private string WithScheme(string raw)
 		{
 			if (!raw.StartsWith("ssh://"))

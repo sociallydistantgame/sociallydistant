@@ -1,5 +1,6 @@
 ﻿#nullable enable
 
+using System;
 using OS.FileSystems;
 using OS.Network;
 using Unity.IO.LowLevel.Unsafe;
@@ -7,6 +8,19 @@ using System.Threading.Tasks;
 
 namespace OS.Devices
 {
+	[AttributeUsage(AttributeTargets.Class, AllowMultiple = false)]
+	public sealed class NetworkServiceAttribute : Attribute
+	{
+		private readonly string id;
+
+		public string Id => id;
+		
+		public NetworkServiceAttribute(string id)
+		{
+			this.id = id;
+		}
+	}
+	
 	public interface IComputer
 	{
 		string Name { get; }

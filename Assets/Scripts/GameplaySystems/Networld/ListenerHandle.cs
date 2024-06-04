@@ -7,6 +7,7 @@ namespace GameplaySystems.Networld
 {
 	public sealed class ListenerHandle
 	{
+		private readonly IPacketQueue queue;
 		private ServerInfo serverInfo;
 		private DeviceNode? deviceNode;
 		private Dictionary<ushort, Listener>? listeners;
@@ -20,14 +21,14 @@ namespace GameplaySystems.Networld
 		                       && listeners != null
 		                       && listeners.ContainsKey(port);
 
-		public ListenerHandle(ushort port, Dictionary<ushort, Listener> listeners, DeviceNode node,  ServerType serverType, SecurityLevel secLevel)
+		public ListenerHandle(ushort port, Dictionary<ushort, Listener> listeners, DeviceNode node, IPacketQueue queue,  ServerType serverType, SecurityLevel secLevel)
 		{
 			this.deviceNode = node;
 			this.listeners = listeners;
 			this.port = port;
-
-			if (this.deviceNode != null)
-				this.deviceNode.UnhandledPacketReceived += OnPacketReceived;
+			this.queue = queue;
+			
+			this.queue.Received += OnPacketReceived;
 
 			ISystemProcess? serverProc = null;
 			//if (serverType != ServerType.Netcat)
@@ -36,8 +37,10 @@ namespace GameplaySystems.Networld
 			this.serverInfo = new ServerInfo(node.Computer, serverType, secLevel, serverProc);
 		}
 
-		private void OnPacketReceived(PacketEvent packetEvent)
+		private void OnPacketReceived(Packet packet)
 		{
+			var packetEvent = new PacketEvent(packet, deviceNode);
+			
 			if (packetEvent.Handled)
 				return;
 
@@ -51,10 +54,10 @@ namespace GameplaySystems.Networld
 		{
 			if (!IsValid)
 				return;
-
-			if (deviceNode != null)
-				deviceNode.UnhandledPacketReceived -= OnPacketReceived;
 			
+			queue.Received -= OnPacketReceived;
+
+			queue.Dispose();
 			listeners?.Remove(port);
 			listeners = null;
 			deviceNode = null;
