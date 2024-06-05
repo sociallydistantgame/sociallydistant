@@ -171,6 +171,13 @@ namespace GameplaySystems.Networld
 		
 		private void OnModifyConnection(WorldNetworkConnection subjectprevious, WorldNetworkConnection subjectnew)
 		{
+			// If nothing's changed then ignore the Modify event. Otherwise we'll needlessly wreak havoc in the simulation.
+			if (subjectprevious.ComputerId == subjectnew.ComputerId && subjectprevious.LanId == subjectnew.LanId)
+			{
+				Debug.LogWarning("Something caused a WorldNetworkConnection ModifyEvent but didn't actually change anything. Can we not? Please? Y'all are lucky Ritchie programs defensively.");
+				return;
+			}
+
 			HandleConnect(subjectnew);
 		}
 
@@ -196,7 +203,7 @@ namespace GameplaySystems.Networld
 			if (!npcComputers.TryGetComputer(data.ComputerId, out NonPlayerComputer computer))
 				return;
 			
-			// Get a LAN.
+			// Handle LAN changes
 			if (!lans.TryGetValue(data.LanId, out LocalAreaNetwork lan))
 				computer.DisconnectLan();
 			else
