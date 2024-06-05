@@ -56,6 +56,7 @@ namespace GameplaySystems.Hacking.Assets
 			WorldLocalNetworkData network = worldManager.World.LocalAreaNetworks.GetNarrativeObject(networkId);
 			WorldNetworkConnection connection = worldManager.World.NetworkConnections.FirstOrDefault(x => x.ComputerId == device.InstanceId);
 
+			ObjectId oldLanId = connection.LanId;
 			connection.LanId = network.InstanceId;
 			
 			if (connection.ComputerId != device.InstanceId)
@@ -67,7 +68,8 @@ namespace GameplaySystems.Hacking.Assets
 			}
 			else
 			{
-				worldManager.World.NetworkConnections.Modify(connection);
+				if (connection.LanId != oldLanId)
+					worldManager.World.NetworkConnections.Modify(connection);
 			}
 		}
 		
