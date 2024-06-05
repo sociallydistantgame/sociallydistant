@@ -165,6 +165,40 @@ namespace GameplaySystems.Networld
 			this.handle.Invalidate();
 		}
 
+		private void CloseConnectionInternal(uint id)
+		{
+			if (!this.connections.TryGetValue(id, out ConnectionHandle connection))
+				return;
+
+			// tell the other side we're hanging up
+
+			using (var ms = new MemoryStream())
+			{
+				using (var writer = new BinaryWriter(ms, Encoding.UTF8, true))
+				{
+					var dataWriter = new BinaryDataWriter(writer);
+					var transmission = new TransmissionProtocolMessage();
+					transmission.ConnectionId = id;
+
+					transmission.Write(dataWriter);
+				}
+
+				ms.Seek(0, SeekOrigin.Begin);
+				var packet = new Packet
+				{
+					PacketType = PacketType.Disconnect,
+					Data = ms.ToArray(),
+					DestinationAddress = connection.RemoteAddress,
+					DestinationPort = connection.RemotePort
+				};
+
+				handle.Send(packet);
+			}
+
+			// Drop the connection on our end.
+			this.connections.Remove(id);
+		}
+		
 		internal class ConnectionHandle
 		{
 			private Listener listener;
@@ -174,6 +208,9 @@ namespace GameplaySystems.Networld
 			private Queue<byte[]> receivedData = new Queue<byte[]>();
 			private SharedConnectionStateHandle sharedStateHandle;
 
+			public uint RemoteAddress => remoteADdress;
+			public ushort RemotePort => remotePort;
+			
 			public ServerInfo ServerInfo => sharedStateHandle.ServerInfo;
 
 			public bool IsValid => listener != null
@@ -229,6 +266,12 @@ namespace GameplaySystems.Networld
 				}
 
 				listener.handle.Send(actualPacket);
+			}
+
+			public void Close()
+			{
+				listener.CloseConnectionInternal(connectionId);
+				listener = null;
 			}
 		}
 	}

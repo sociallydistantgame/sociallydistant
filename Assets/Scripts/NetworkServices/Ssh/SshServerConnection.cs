@@ -48,7 +48,17 @@ namespace NetworkServices.Ssh
 			while (state != State.Done)
 			{
 				var message = new SshMessage();
-				message.Read(reader);
+				
+				try
+				{
+					message.Read(reader);
+				}
+				catch (EndOfStreamException)
+				{
+					// Server shut down by the game
+					state = State.Done;
+					break;
+				}
 
 				switch (state)
 				{

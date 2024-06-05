@@ -24,5 +24,11 @@ namespace GameplaySystems.Networld
 		{
 			handle.Send(data);
 		}
+
+		/// <inheritdoc />
+		public void Dispose()
+		{
+			handle.Close();
+		}
 	}
 }
