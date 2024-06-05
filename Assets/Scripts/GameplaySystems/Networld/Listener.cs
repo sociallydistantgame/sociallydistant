@@ -132,6 +132,24 @@ namespace GameplaySystems.Networld
 						
 						break;
 					}
+					case PacketType.Disconnect:
+					{
+						using var ms = new MemoryStream(packetEvent.Packet.Data);
+						using var binaryReader = new BinaryReader(ms, Encoding.UTF8);
+						using var dataReader = new BinaryDataReader(binaryReader);
+
+						var transmissionPacket = new TransmissionProtocolMessage();
+						transmissionPacket.Read(dataReader);
+
+						if (!connections.TryGetValue(transmissionPacket.ConnectionId, out ConnectionHandle connection))
+						{
+							packetEvent.Handle();
+							return;
+						}
+
+						connection.Close();
+						break;
+					}
 					case PacketType.Transmission:
 					{
 						using var ms = new MemoryStream(packetEvent.Packet.Data);

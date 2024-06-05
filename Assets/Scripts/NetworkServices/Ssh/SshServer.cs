@@ -42,6 +42,9 @@ namespace NetworkServices.Ssh
 			for (var i = 0; i < activeConnections.Count; i++)
 			{
 				activeConnections[i].Update();
+
+				if (this.activeConnections[i].IsDone)
+					this.activeConnections.RemoveAt(i);
 			}
 		}
 

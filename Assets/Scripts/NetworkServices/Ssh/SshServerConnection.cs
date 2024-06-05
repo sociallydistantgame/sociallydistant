@@ -15,11 +15,9 @@ namespace NetworkServices.Ssh
 	{
 		private readonly SshServer server;
 		private readonly SimulatedNetworkStream stream;
-		private readonly IDataWriter writer;
-		private readonly IDataReader reader;
 		private readonly Task thread;
 
-		public bool IsDone => thread.IsCanceled;
+		public bool IsDone => thread.IsCompleted;
 		
 		
 
@@ -27,19 +25,25 @@ namespace NetworkServices.Ssh
 		{
 			this.server = server;
 			stream = new SimulatedNetworkStream(connection);
-			writer = new BinaryDataWriter(new BinaryWriter(stream, Encoding.UTF8, true));
-			reader = new BinaryDataReader(new BinaryReader(stream, Encoding.UTF8, true));
-
+			
 			thread = Task.Run(ThreadUpdate);
 		}
 
 		public void Update()
 		{
-			
+			if (IsDone)
+			{
+				Dispose();
+				return;
+			}
 		}
 
 		private async void ThreadUpdate()
 		{
+			using var writer = new BinaryDataWriter(new BinaryWriter(stream, Encoding.UTF8, true));
+			using var reader = new BinaryDataReader(new BinaryReader(stream, Encoding.UTF8, true));
+
+			
 			var state = State.Username;
 			var willFail = false;
 			var attemptsLeft = 4;
@@ -177,8 +181,6 @@ namespace NetworkServices.Ssh
 		/// <inheritdoc />
 		public void Dispose()
 		{
-			writer.Dispose();
-			reader.Dispose();
 			stream?.Dispose();
 		}
 
