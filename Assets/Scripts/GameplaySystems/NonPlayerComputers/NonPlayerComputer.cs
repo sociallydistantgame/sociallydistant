@@ -56,6 +56,7 @@ namespace GameplaySystems.NonPlayerComputers
 			RebuildVfs();
 			
 			this.initProcess = this.deviceCoordinator.SetUpComputer(this, null);
+			this.initProcess.Environment["PS1"] = "[%u@%h %W]%$ ";
 			this.systemd = await this.initProcess.Fork();
 			this.systemd.Name = "systemd";
 			
