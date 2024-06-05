@@ -6,8 +6,9 @@ using Core.Serialization;
 using Core.Serialization.Binary;
 using OS.Network;
 using System.Threading.Tasks;
+using Core.Scripting;
 using OS.Devices;
-using UnityEditor;
+using OS.Network.MessageTransport;
 
 namespace NetworkServices.Ssh
 {
@@ -16,6 +17,7 @@ namespace NetworkServices.Ssh
 		private readonly SshServer server;
 		private readonly SimulatedNetworkStream stream;
 		private readonly Task thread;
+		private readonly WorkQueue workQueue = new();
 
 		public bool IsDone => thread.IsCompleted;
 		
@@ -36,9 +38,11 @@ namespace NetworkServices.Ssh
 				Dispose();
 				return;
 			}
+
+			workQueue.RunPendingWork();
 		}
 
-		private async void ThreadUpdate()
+		private async Task ThreadUpdate()
 		{
 			using var writer = new BinaryDataWriter(new BinaryWriter(stream, Encoding.UTF8, true));
 			using var reader = new BinaryDataReader(new BinaryReader(stream, Encoding.UTF8, true));
@@ -51,6 +55,18 @@ namespace NetworkServices.Ssh
 
 			while (state != State.Done)
 			{
+				if (state == State.Running)
+				{
+					if (desiredUsername == null)
+					{
+						state = State.Done;
+						continue;
+					}
+
+					await RunShell(desiredUsername, reader, writer);
+					state = State.Done;
+				}
+				
 				var message = new SshMessage();
 				
 				try
@@ -175,8 +191,65 @@ namespace NetworkServices.Ssh
 				}
 			}
 		}
+
+		private async Task RunShell(IUser user, IDataReader reader, IDataWriter writer)
+		{
+			var sshConsole = new SshConsole(writer);
+
+			await Task.WhenAll(
+				Task.Run(async () => { await ReadKeystrokes(sshConsole, reader); }),
+				workQueue.EnqueueAsync(async () => { await StartShell(user, sshConsole); })
+			);
+		}
+
+		private async Task ReadKeystrokes(SshConsole console, IDataReader reader)
+		{
+			while (console.Open)
+			{
+				var message = new SshMessage();
+				message.Read(reader);
+
+				switch (message.Type)
+				{
+					case SshPacketType.Text:
+					{
+						if (message.Data != null)
+						{
+							console.ProcessInput(message.Data);
+						}
+						break;
+					}
+					case SshPacketType.Disconnect:
+					{
+						console.Close();
+						break;
+					}
+				}
+			}
+		}
 		
-		
+		private async Task StartShell(IUser user, SshConsole console)
+		{
+			ISystemProcess process = await server.Fork(user);
+
+			var context = new OperatingSystemExecutionContext(process);
+			var shell = new InteractiveShell(context);
+			
+			shell.Setup(console);
+
+			while (console.Open)
+			{
+				try
+				{
+					await shell.Run();
+				}
+				catch (ScriptEndException endException)
+				{
+					process.Kill(endException.ExitCode);
+					console.Close();
+				}
+			}
+		}
 		
 		/// <inheritdoc />
 		public void Dispose()

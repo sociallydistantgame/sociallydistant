@@ -157,33 +157,7 @@ namespace UI.Terminal.SimpleTerminal
 
             return ret;
         }
-
-        public bool TryDequeueSubmittedInput(out string input)
-        {
-            // This will do the actual reading from the pty device.
-            // It also handles line-editing.
-            int ret = this.PtyRead();
-
-            // Re-render the line edit state
-            if (ret > 0 || this.lineEditorState.wasPositionReset)
-            {
-                this.lineEditorState.wasPositionReset = false;
-                this.SetupLineEditor();
-            }
-
-            // This will dequeue any submitted lines.
-            bool result = this.lineQueue.TryDequeue(out input);
-
-            if (result)
-            {
-                this.lineEditorState.isEditing = false;
-                this.WriteText(input);
-                this.WriteText(Environment.NewLine);
-            }
-
-            return result;
-        }
-
+        
         private int TerminalWrite(byte[] buf, int buflen, bool showControl)
         {
             var charsize = 0;
@@ -535,17 +509,6 @@ namespace UI.Terminal.SimpleTerminal
             return true;
         }
         
-        private void SetupLineEditor()
-        {
-            if (!this.lineEditorState.isEditing)
-            {
-                this.lineEditorState.isEditing = true;
-                this.lineEditorState.firstLineColumn = this.term.CursorLeft;
-                this.lineEditorState.firstLineRow = this.term.CursorTop;
-                this.prevLineCount = 0;
-            }
-        }
-
         private struct LineEditorState
         {
             public bool isEditing;

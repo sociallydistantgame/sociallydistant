@@ -13,6 +13,7 @@ namespace OS.Network
 
 
 		public bool AutoFlush { get; set; } = true;
+		public bool Connected => connection?.Connected == true;
 
 		public SimulatedNetworkStream(IConnection connection)
 		{
