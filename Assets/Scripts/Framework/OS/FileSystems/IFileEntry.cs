@@ -1,6 +1,7 @@
 ﻿#nullable enable
 using System.IO;
 using OS.Devices;
+using System.Threading.Tasks;
 
 namespace OS.FileSystems
 {
@@ -16,6 +17,6 @@ namespace OS.FileSystems
 		bool TryOpenWrite(IUser user, out Stream? stream);
 		bool TryOpenWriteAppend(IUser user, out Stream? stream);
 		
-		bool TryExecute(ISystemProcess process, ITextConsole console, string[] arguments);
+		Task<bool> TryExecute(ISystemProcess process, ITextConsole console, string[] arguments);
 	}
 }

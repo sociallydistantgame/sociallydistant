@@ -57,7 +57,7 @@ namespace NetworkServices.Ssh
 				{
 					message.Read(reader);
 				}
-				catch (EndOfStreamException)
+				catch (IOException)
 				{
 					// Server shut down by the game
 					state = State.Done;

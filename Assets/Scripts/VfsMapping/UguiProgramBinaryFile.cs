@@ -1,4 +1,5 @@
 ﻿#nullable enable
+using System.Threading.Tasks;
 using Architecture;
 using OS.Devices;
 using OS.FileSystems;
@@ -17,7 +18,7 @@ namespace VfsMapping
 		{ }
 
 		/// <inheritdoc />
-		public override bool TryExecute(ISystemProcess process, ITextConsole console, string[] arguments)
+		public override async Task<bool> TryExecute(ISystemProcess process, ITextConsole console, string[] arguments)
 		{
 			process.Name = Name;
 			
@@ -28,8 +29,8 @@ namespace VfsMapping
 				process.Kill();
 				return true;
 			}
-
-			desktop.OpenProgram(Asset, arguments, process, console);
+			
+			await desktop.OpenProgram(Asset, arguments, process, console);
 			return true;
 		}
 	}

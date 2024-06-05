@@ -1,5 +1,6 @@
 #nullable enable
 using System.IO;
+using System.Threading.Tasks;
 using OS.Devices;
 
 namespace OS.FileSystems.Host
@@ -58,9 +59,9 @@ namespace OS.FileSystems.Host
 		}
 
 		/// <inheritdoc />
-		public bool TryExecute(ISystemProcess process, ITextConsole console, string[] arguments)
+		public Task<bool> TryExecute(ISystemProcess process, ITextConsole console, string[] arguments)
 		{
-			return false;
+			return Task.FromResult(false);;
 		}
 	}
 }

@@ -35,6 +35,9 @@ namespace OS.Network
 		/// <inheritdoc />
 		public override void Flush()
 		{
+			if (!connection.Connected)
+				return;
+			
 			byte[] data = writeBuffer.ToArray();
 			
 			writeBuffer.SetLength(0);

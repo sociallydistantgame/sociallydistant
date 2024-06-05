@@ -1,6 +1,7 @@
 ﻿#nullable enable
 using System;
 using System.IO;
+using System.Threading.Tasks;
 using Architecture;
 using Core;
 using OS.Devices;
@@ -59,9 +60,9 @@ namespace VfsMapping
 		}
 
 		/// <inheritdoc />
-		public virtual bool TryExecute(ISystemProcess process, ITextConsole console, string[] arguments)
+		public virtual Task<bool> TryExecute(ISystemProcess process, ITextConsole console, string[] arguments)
 		{
-			return false;
+			return Task.FromResult(false);
 		}
 	}
 }

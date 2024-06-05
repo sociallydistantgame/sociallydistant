@@ -235,7 +235,7 @@ namespace OS.FileSystems
 				throw new FileNotFoundException();
 
 			ISystemProcess fork = await parentProcess.Fork();
-			if (!file.TryExecute(fork, console, arguments))
+			if (!await file.TryExecute(fork, console, arguments))
 			{
 				fork.Kill();
 				throw new InvalidOperationException("Permission denied");

@@ -1,7 +1,10 @@
 ﻿#nullable enable
+using System;
+using System.Threading.Tasks;
 using Architecture;
 using OS.Devices;
 using OS.FileSystems;
+using UnityEngine;
 
 namespace VfsMapping
 {
@@ -15,9 +18,18 @@ namespace VfsMapping
 		{ }
 
 		/// <inheritdoc />
-		public override bool TryExecute(ISystemProcess process, ITextConsole console, string[] arguments)
+		public override async Task<bool> TryExecute(ISystemProcess process, ITextConsole console, string[] arguments)
 		{
-			Asset.Main(process, console, arguments);
+			try
+			{
+				await Asset.Main(process, console, arguments);
+			}
+			catch (Exception ex)
+			{
+				Debug.LogException(ex);
+				process.Kill();
+			}
+
 			return true;
 		}
 	}

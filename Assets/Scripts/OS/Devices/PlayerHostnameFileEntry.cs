@@ -1,5 +1,6 @@
 ﻿using System.IO;
 using System.Text;
+using System.Threading.Tasks;
 using Core;
 using Core.WorldData.Data;
 using Modules;
@@ -86,9 +87,9 @@ namespace OS.Devices
 		}
 		
 		/// <inheritdoc />
-		public bool TryExecute(ISystemProcess process, ITextConsole console, string[] arguments)
+		public Task<bool> TryExecute(ISystemProcess process, ITextConsole console, string[] arguments)
 		{
-			return false;
+			return Task.FromResult(false);
 		}
 	}
 }

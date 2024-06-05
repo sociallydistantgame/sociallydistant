@@ -252,11 +252,17 @@ namespace GameplaySystems.Networld
 
 			public bool TryDequeueReceivedData(out byte[] data)
 			{
+				if (!IsValid)
+					throw new IOException($"The connection to {NetUtility.GetNetworkAddressString(RemoteAddress)}:{RemotePort} has been closed.");
+
 				return receivedData.TryDequeue(out data);
 			}
 
 			public void Send(byte[] data)
 			{
+				if (!IsValid)
+					throw new IOException($"The connection to {NetUtility.GetNetworkAddressString(RemoteAddress)}:{RemotePort} has been closed.");
+				
 				if (data.Length == 0)
 					return;
 
@@ -288,7 +294,7 @@ namespace GameplaySystems.Networld
 
 			public void Close()
 			{
-				listener.CloseConnectionInternal(connectionId);
+				listener?.CloseConnectionInternal(connectionId);
 				listener = null;
 			}
 		}
