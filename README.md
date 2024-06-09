@@ -7,7 +7,7 @@ This game is made using Unity, and uses Unity 2021.3.35f1 LTS.
 ## Accepting contributions!
 Feel free to submit pull requests to the game. If merged, they will be shipped in the next Steam release of Socially Distant. For more info, see the `CONTRIBUTING.md` and `LICENSE` files in the repo root.
 
->!Note
+> [!NOTE]
 >All contributors must sign the Developer Certificate of Origin before any pull requests are merged. More information is in `/CONTRIBUTING.md`.
 
 ## Project structure

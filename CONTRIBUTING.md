@@ -48,7 +48,7 @@ By making a contribution to this project, I certify that:
 By contributing to the game, you also agree that your code can and will be distributed under the terms of the MIT License (see `/LICENSE`), and thus will be included in the paid Steam version of the game with
 attribution.
 
->!Info
+> [!NOTE]
 >In the Steam version of the game, contributors will be listed in **System Settings** / **About** / **Open Source Contributions**.
 
 ## Pull request format
