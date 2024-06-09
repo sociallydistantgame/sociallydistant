@@ -83,6 +83,9 @@ Development of the next version of the game is done on a `work/VERSION` branch. 
 
 Only team members may create branches under the `work/` prefix.
 
+The `devel` branch is identical to `master`, but includes outside contributions destined for the next version of the game. The
+`work/VERSION` branches are rebased onto it.
+
 For all other contributors,
 
 1. Fork the project if you haven't already
@@ -90,7 +93,7 @@ For all other contributors,
 3. Name it after the feature you're working on, e.g. `ssh-hacking`, `accessibility-fixes`, `my-awesome-feature`
 4. Commit changes to that branch on your fork.
 5. Squash all of your commits into one, using the template above for the message.
-6. Create a pull request on this repository, requesting to merge your branch into the current `work/VERSION` branch.
+6. Create a pull request on this repository, requesting to merge your branch into the `devel` branch.
 
 ## Code review and code style
 All code contributions must look like it belongs in the game's codebase. If you're using Rider, it will enforce
