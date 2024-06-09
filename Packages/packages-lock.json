@@ -30,10 +30,11 @@
       }
     },
     "com.trixelcreative.audio": {
-      "version": "file:com.trixelcreative.audio",
+      "version": "https://github.com/sociallydistantgame/acidic-audio.git",
       "depth": 0,
-      "source": "embedded",
-      "dependencies": {}
+      "source": "git",
+      "dependencies": {},
+      "hash": "fcd342b17e371f4997e66fa70fec75d77e722bca"
     },
     "com.unity.2d.sprite": {
       "version": "1.0.0",
