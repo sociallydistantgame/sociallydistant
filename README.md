@@ -1,5 +1,5 @@
 # Socially Distant
-Socially Distant: is an up-coming hacking game following the story of a global ransomware attack disrupting a society forced into cyberspace by the spread of a deadly biological threat to humanity.
+Socially Distant is an up-coming hacking game following the story of a global ransomware attack disrupting a society forced into cyberspace by the spread of a deadly biological threat to humanity.
 
 ## Unity
 This game is made using Unity, and uses Unity 2021.3.35f1 LTS.
@@ -19,4 +19,4 @@ Feel free to submit pull requests to the game. If merged, they will be shipped i
 - Scenes are in `/Assets/Scenes`. The game's entry-point is `/Assets/Scenes/Bootstrap`
 
 ## SDSH scripts
-Many parts of the game use `sdsh` (Socially Distant SHell) scripts. These are `.sh` files in the bundled assets directory. They use a POSIX-like shell scripting language that the game interprets. When scripting gameplay encounters like missions and NPC interactions, always prefer `sdsh` over C#.
+Many parts of the game use `sdsh` (**S**ocially **D**istant **SH**ell) scripts. These are `.sh` files in the bundled assets directory. They use a POSIX-like shell scripting language that the game interprets. When scripting gameplay encounters like missions and NPC interactions, always prefer `sdsh` over C#.
