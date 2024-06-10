@@ -1,6 +1,5 @@
 #nullable enable
 using UnityEngine;
-using UnityEngine.UIElements;
 using UnityExtensions;
 
 namespace UI.ScrollViews
@@ -10,9 +9,6 @@ namespace UI.ScrollViews
 		IScrollViewController
 		where TViewModel : GridCellModel
 	{
-		[SerializeField]
-		private ScrollView unityScrollView = null!;
-
 		protected virtual void Awake()
 		{
 			this.AssertAllFieldsAreSerialized(typeof(GridController<TViewModel>));

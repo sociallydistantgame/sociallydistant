@@ -20,15 +20,6 @@ namespace UI.Windowing
 	{
 		[SerializeField]
 		private InfoBoxController infoBoxController = null!;
-
-		[SerializeField]
-		private SoundEffectAsset popupSound = null!;
-
-		[SerializeField]
-		private SoundEffectAsset errorPopupSound = null!;
-
-		[SerializeField]
-		private SoundEffectAsset warningSound = null!;
 		
 		private MessageBoxType messageType;
 		private IFloatingGui parentWindow;
@@ -152,21 +143,9 @@ namespace UI.Windowing
 			
 			parentWindow.MinimumSize = Vector2.zero;
 		}
-
-		private SoundEffectAsset GetMessageSound()
-		{
-			return this.messageType switch
-			{
-				MessageBoxType.Error => errorPopupSound,
-				MessageBoxType.Warning => warningSound,
-				_ => this.popupSound
-			};
-		}
 		
 		private void Start()
 		{
-			AudioManager.PlaySound(GetMessageSound());
-
 			this.infoBoxController.Color = this.MessageType switch
 			{
 				MessageBoxType.Warning => CommonColor.Yellow,
