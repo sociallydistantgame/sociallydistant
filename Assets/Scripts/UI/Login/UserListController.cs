@@ -1,52 +1,44 @@
 ﻿using System;
 using System.Collections.Generic;
-using Com.TheFallenGames.OSA.Core;
-using Com.TheFallenGames.OSA.CustomParams;
-using Com.TheFallenGames.OSA.DataHelpers;
 using GamePlatform;
+using UI.ScrollViews;
 
 namespace UI.Login
 {
-	public class UserListController : OSA<BaseParamsWithPrefab, UserViewsHolder>
+	public class UserListController : ScrollViewController<UserViewsHolder>
 	{
-		private SimpleDataHelper<UserListItemModel> users;
+		private ScrollViewItemList<UserListItemModel> users;
 
 		public event Action<IGameData?>? GameDataSelected; 
 		
 		/// <inheritdoc />
 		protected override void Awake()
 		{
-			users = new SimpleDataHelper<UserListItemModel>(this);
+			users = new ScrollViewItemList<UserListItemModel>(this);
 			base.Awake();
 		}
 
 		public void SetItems(IList<UserListItemModel> userList)
 		{
-			if (!this.IsInitialized)
-				this.Init();
-			
-			this.users.ResetItems(userList);
+			this.users.SetItems(userList);
 		}
         
 		/// <inheritdoc />
-		protected override UserViewsHolder CreateViewsHolder(int itemIndex)
+		protected override UserViewsHolder CreateModel(int itemIndex)
 		{
-			var vh = new UserViewsHolder();
+			var vh = new UserViewsHolder(itemIndex);
 			
-			vh.Init(_Params.ItemPrefab, _Params.Content, itemIndex, false);
-
+			// vh.Init(_Params.ItemPrefab, _Params.Content, itemIndex, false);
 			return vh;
 		}
 
 		/// <inheritdoc />
-		protected override void UpdateViewsHolder(UserViewsHolder newOrRecycled)
+		protected override void UpdateModel(UserViewsHolder newOrRecycled)
 		{
 			UserListItemModel model = users[newOrRecycled.ItemIndex];
 			newOrRecycled.UpdateView(model);
 
 			newOrRecycled.Callback = OnClickCallback;
-			
-			ScheduleComputeVisibilityTwinPass();
 		}
 
 		private void OnClickCallback(IGameData? gameData)

@@ -1,12 +1,15 @@
 ManifestFileVersion: 0
-CRC: 1220500757
+CRC: 109862515
 Hashes:
   AssetFileHash:
     serializedVersion: 2
-    Hash: 393f5010fe8191d7de0ce7e9841a8087
+    Hash: 908fb4fed1ac2391f0724a11fe0df06c
   TypeTreeHash:
     serializedVersion: 2
-    Hash: 553073df0f3a548873ef3eb8903d9f1b
+    Hash: 78754f63398f8021bebfaa8fed42ea5e
+  IncrementalBuildHash:
+    serializedVersion: 2
+    Hash: 908fb4fed1ac2391f0724a11fe0df06c
 HashAppended: 0
 ClassTypes:
 - Class: 1
@@ -19,34 +22,16 @@ ClassTypes:
   Script: {instanceID: 0}
 - Class: 48
   Script: {instanceID: 0}
-- Class: 83
+- Class: 114
   Script: {instanceID: 0}
 - Class: 114
-  Script: {fileID: 11500000, guid: 306cc8c2b49d7114eaa3623786fc2126, type: 3}
-- Class: 114
-  Script: {fileID: 11500000, guid: 30649d3a9faa99c48a7b1166b86bf2a0, type: 3}
-- Class: 114
-  Script: {fileID: 11500000, guid: 3245ec927659c4140ac4f8d17403cc18, type: 3}
-- Class: 114
-  Script: {fileID: 11500000, guid: 1344c3c82d62a2a41a3576d8abb8e3ea, type: 3}
-- Class: 114
-  Script: {fileID: 11500000, guid: 1aa08ab6e0800fa44ae55d278d1423e3, type: 3}
-- Class: 114
-  Script: {fileID: 11500000, guid: 2a4db7a114972834c8e4117be1d82ba3, type: 3}
-- Class: 114
-  Script: {fileID: 11500000, guid: 4e29b1a8efbd4b44bb3f3716e73f07ff, type: 3}
-- Class: 114
-  Script: {fileID: 11500000, guid: 2fafe2cfe61f6974895a912c3755e8f1, type: 3}
-- Class: 114
   Script: {fileID: 11500000, guid: fe87c0e1cc204ed48ad3b37840f39efc, type: 3}
-- Class: 114
-  Script: {fileID: 11500000, guid: 59f8146938fff824cb5fd77236b75775, type: 3}
-- Class: 114
-  Script: {fileID: 11500000, guid: 44d28379fcb4a7e43a9af444e0e585bb, type: 3}
 - Class: 114
   Script: {fileID: 11500000, guid: b48c56679aff44aea2907940c8ed1f75, type: 3}
 - Class: 114
   Script: {fileID: 11500000, guid: fd4582e99249491f8ff6a0fda3558a28, type: 3}
+- Class: 114
+  Script: {fileID: 11500000, guid: 306cc8c2b49d7114eaa3623786fc2126, type: 3}
 - Class: 114
   Script: {fileID: 11500000, guid: 9b698609715f64540ab40e7cac7891c8, type: 3}
 - Class: 114
@@ -72,9 +57,9 @@ ClassTypes:
 - Class: 114
   Script: {fileID: 11500000, guid: b269534199d870e459f546bfa5e1ee97, type: 3}
 - Class: 114
-  Script: {fileID: 11500000, guid: ba992be3360c42d08448b1d895ea2b94, type: 3}
+  Script: {fileID: 11500000, guid: 1344c3c82d62a2a41a3576d8abb8e3ea, type: 3}
 - Class: 114
-  Script: {fileID: 11500000, guid: 918d0aa6d07d4ab8856e75710d7474a4, type: 3}
+  Script: {fileID: 11500000, guid: ba992be3360c42d08448b1d895ea2b94, type: 3}
 - Class: 114
   Script: {fileID: 11500000, guid: cfe38981c14580c488c6d3c40bbdc823, type: 3}
 - Class: 114
@@ -104,15 +89,17 @@ ClassTypes:
 - Class: 114
   Script: {fileID: 11500000, guid: 1c68886eaf573044ab8f17499b97a4f4, type: 3}
 - Class: 114
-  Script: {fileID: 11500000, guid: 1c10147f7d75e0a498051e673e49128d, type: 3}
-- Class: 114
   Script: {fileID: 11500000, guid: 23f8112c9c72d3f4390867ac9fc6e9c1, type: 3}
+- Class: 114
+  Script: {fileID: 11500000, guid: 2fafe2cfe61f6974895a912c3755e8f1, type: 3}
+- Class: 114
+  Script: {fileID: 11500000, guid: 4e29b1a8efbd4b44bb3f3716e73f07ff, type: 3}
 - Class: 114
   Script: {fileID: 11500000, guid: 7940e46e3cc14053a100cbdf716f65af, type: 3}
 - Class: 114
   Script: {fileID: 11500000, guid: a24f382e8bcbda7428bfa6aa62902970, type: 3}
 - Class: 114
-  Script: {fileID: 11500000, guid: af6ae84cf1fb45a693566e7f5c210b61, type: 3}
+  Script: {fileID: 11500000, guid: 3245ec927659c4140ac4f8d17403cc18, type: 3}
 - Class: 114
   Script: {fileID: 11500000, guid: e766b6c6338a4cb4dac3a0de35ee181f, type: 3}
 - Class: 114
@@ -124,15 +111,11 @@ ClassTypes:
 - Class: 114
   Script: {fileID: 11500000, guid: e0267453efe5450f84f18668ebb5441f, type: 3}
 - Class: 114
-  Script: {fileID: 11500000, guid: 1f4beb4edb3408b4ab467be10f0f902d, type: 3}
-- Class: 114
   Script: {fileID: 11500000, guid: 8634e8d86b254e1cb912295d7d1c6f57, type: 3}
 - Class: 114
   Script: {fileID: 11500000, guid: f90221b01c9543b89e4232242f3a48d1, type: 3}
 - Class: 114
   Script: {fileID: 11500000, guid: f6ecce77ad5646628c7d48e7c41e83fe, type: 3}
-- Class: 114
-  Script: {fileID: 11500000, guid: 0f424996ca027ac4aa3f6d36012fa028, type: 3}
 - Class: 114
   Script: {fileID: 11500000, guid: 2b484c4cb3454839b7cecc247eaa4f55, type: 3}
 - Class: 114
@@ -151,10 +134,6 @@ ClassTypes:
   Script: {fileID: 11500000, guid: 31a19414c41e5ae4aae2af33fee712f6, type: 3}
 - Class: 114
   Script: {fileID: 11500000, guid: 54e31a42bf01654479efd4fb7939d022, type: 3}
-- Class: 114
-  Script: {fileID: 11500000, guid: 6a67e7f94fa9438c87aa82d7cee3504d, type: 3}
-- Class: 114
-  Script: {fileID: 11500000, guid: 86605bf903db4645b93ea26567673f65, type: 3}
 - Class: 114
   Script: {fileID: 11500000, guid: 3312d7739989d2b4e91e6319e9a96d76, type: 3}
 - Class: 114
@@ -176,8 +155,6 @@ ClassTypes:
 - Class: 114
   Script: {fileID: 11500000, guid: 77e43103068e0be4481965e7fb3e470e, type: 3}
 - Class: 114
-  Script: {fileID: 11500000, guid: 44e790c2efca8bf4bad58426460858d9, type: 3}
-- Class: 114
   Script: {fileID: 11500000, guid: 121268f4b5fb42caac458c9428d905fd, type: 3}
 - Class: 114
   Script: {fileID: 11500000, guid: 99a5fb674c0cb9345a81015c27a8717a, type: 3}
@@ -186,9 +163,9 @@ ClassTypes:
 - Class: 114
   Script: {fileID: 11500000, guid: 9085046f02f69544eb97fd06b6048fe2, type: 3}
 - Class: 114
-  Script: {fileID: 11500000, guid: 564b33ab99fec834ca7a11e35cee19d1, type: 3}
-- Class: 114
   Script: {fileID: 11500000, guid: 67db9e8f0e2ae9c40bc1e2b64352a6b4, type: 3}
+- Class: 114
+  Script: {fileID: 11500000, guid: 30649d3a9faa99c48a7b1166b86bf2a0, type: 3}
 - Class: 114
   Script: {fileID: 11500000, guid: 71c1514a6bd24e1e882cebbe1904ce04, type: 3}
 - Class: 114
@@ -230,7 +207,11 @@ ClassTypes:
 - Class: 114
   Script: {fileID: 11500000, guid: 709e059dfaa1020488a9e420d2634ac1, type: 3}
 - Class: 114
+  Script: {fileID: 11500000, guid: 2a4db7a114972834c8e4117be1d82ba3, type: 3}
+- Class: 114
   Script: {fileID: 11500000, guid: 7936c2d3674f4154b7db431896ca082c, type: 3}
+- Class: 114
+  Script: {fileID: 11500000, guid: 59f8146938fff824cb5fd77236b75775, type: 3}
 - Class: 114
   Script: {fileID: 11500000, guid: f9ee39084b944e179633c4a9feb3d6fb, type: 3}
 - Class: 114
@@ -252,6 +233,8 @@ ClassTypes:
 - Class: 114
   Script: {fileID: 11500000, guid: e11293edb791a04499bdf9461895abac, type: 3}
 - Class: 114
+  Script: {fileID: 11500000, guid: 1aa08ab6e0800fa44ae55d278d1423e3, type: 3}
+- Class: 114
   Script: {fileID: 11500000, guid: 31a2726d87a148faaec0fb11dcc37c3a, type: 3}
 - Class: 114
   Script: {fileID: 11500000, guid: 928c2ddc49f44318bb8b292645c95264, type: 3}
@@ -269,6 +252,8 @@ ClassTypes:
   Script: {fileID: 11500000, guid: c0013c7cc2be4ff887c5d11301b52f53, type: 3}
 - Class: 114
   Script: {fileID: 11500000, guid: b8e1551f60f040a780cf2caf5735edd4, type: 3}
+- Class: 114
+  Script: {fileID: 11500000, guid: 44e790c2efca8bf4bad58426460858d9, type: 3}
 - Class: 115
   Script: {instanceID: 0}
 - Class: 128
@@ -286,36 +271,6 @@ ClassTypes:
 SerializeReferenceClassIdentifiers:
 - AssemblyName: AYellowpaper.SerializedCollections
   ClassName: AYellowpaper.SerializedCollections.SerializedKeyValuePair`2[System.String,Architecture.UguiProgram]
-- AssemblyName: OSA.Core
-  ClassName: Com.TheFallenGames.OSA.Core.BaseParams/Effects
-- AssemblyName: OSA.Core
-  ClassName: Com.TheFallenGames.OSA.Core.BaseParams/NavigationParams
-- AssemblyName: OSA.Core
-  ClassName: Com.TheFallenGames.OSA.Core.BaseParams/Optimization
-- AssemblyName: OSA.Core
-  ClassName: Com.TheFallenGames.OSA.Core.Data.Animations.AnimationCancelling
-- AssemblyName: OSA.Core
-  ClassName: Com.TheFallenGames.OSA.Core.Data.Animations.AnimationFunctionType
-- AssemblyName: OSA.Core
-  ClassName: Com.TheFallenGames.OSA.Core.Data.Animations.AnimationParams
-- AssemblyName: OSA.Core
-  ClassName: Com.TheFallenGames.OSA.Core.Data.Animations.SmoothScrollCancellingEvents
-- AssemblyName: OSA.Core
-  ClassName: Com.TheFallenGames.OSA.Core.Data.Animations.UserAnimationsCancellingEvents
-- AssemblyName: OSA.Core
-  ClassName: Com.TheFallenGames.OSA.Core.Data.Gallery.GalleryAnimation/Vector3Space
-- AssemblyName: OSA.Core
-  ClassName: Com.TheFallenGames.OSA.Core.Data.Gallery.GalleryEffectParams
-- AssemblyName: OSA.Core
-  ClassName: Com.TheFallenGames.OSA.Core.Data.Gallery.GalleryRotation
-- AssemblyName: OSA.Core
-  ClassName: Com.TheFallenGames.OSA.Core.Data.Gallery.GalleryScale
-- AssemblyName: OSA.Core
-  ClassName: Com.TheFallenGames.OSA.CustomAdapters.GridView.GridParams
-- AssemblyName: OSA.Core
-  ClassName: Com.TheFallenGames.OSA.CustomAdapters.GridView.GridParams/GridConfig
-- AssemblyName: OSA.Core
-  ClassName: Com.TheFallenGames.OSA.CustomParams.BaseParamsWithPrefab
 - AssemblyName: Scripts
   ClassName: GameplaySystems.Hacking.Assets.NetworkAsset/DeviceName
 - AssemblyName: Scripts
@@ -327,17 +282,17 @@ SerializeReferenceClassIdentifiers:
 - AssemblyName: Scripts
   ClassName: GameplaySystems.Hacking.Assets.NetworkAsset/UserData
 - AssemblyName: Scripts
+  ClassName: OS.Network.Subnet
+- AssemblyName: Scripts
+  ClassName: Shell.Common.CompositeIcon
+- AssemblyName: Scripts
+  ClassName: Shell.Common.ShellColor
+- AssemblyName: Scripts
   ClassName: UI.Applications.FileManager.MimeTypeProgramMap
 - AssemblyName: Scripts
   ClassName: UI.Widgets.ButtonColorList
 - AssemblyName: Scripts
   ClassName: UI.Widgets.ButtonColors
-- AssemblyName: SociallyDistant.Runtime
-  ClassName: OS.Network.Subnet
-- AssemblyName: SociallyDistant.Runtime
-  ClassName: Shell.Common.CompositeIcon
-- AssemblyName: SociallyDistant.Runtime
-  ClassName: Shell.Common.ShellColor
 - AssemblyName: ThisOtherThing.UI
   ClassName: ThisOtherThing.UI.GeoUtils/AntiAliasingProperties
 - AssemblyName: ThisOtherThing.UI

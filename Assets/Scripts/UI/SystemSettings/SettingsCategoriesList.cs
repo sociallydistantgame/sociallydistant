@@ -1,45 +1,41 @@
 ﻿#nullable enable
 using System.Collections.Generic;
-using Com.TheFallenGames.OSA.Core;
-using Com.TheFallenGames.OSA.CustomParams;
-using Com.TheFallenGames.OSA.DataHelpers;
+using UI.ScrollViews;
 
 namespace UI.SystemSettings
 {
-	public class SettingsCategoriesList : OSA<BaseParamsWithPrefab, SettingsCategoriesViewsHolder>
+	public class SettingsCategoriesList : ScrollViewController<SettingsCategoriesViewsHolder>
 	{
-		private SimpleDataHelper<SettingsCategoryModel> models;
+		private ScrollViewItemList<SettingsCategoryModel> models;
 
 		/// <inheritdoc />
-		protected override void Start()
+		protected override void Awake()
 		{
-			models = new SimpleDataHelper<SettingsCategoryModel>(this);
-			base.Start();
+			models = new ScrollViewItemList<SettingsCategoryModel>(this);
+			base.Awake();
 		}
 
 		/// <inheritdoc />
-		protected override SettingsCategoriesViewsHolder CreateViewsHolder(int itemIndex)
+		protected override SettingsCategoriesViewsHolder CreateModel(int itemIndex)
 		{
-			var vh = new SettingsCategoriesViewsHolder();
+			var vh = new SettingsCategoriesViewsHolder(itemIndex);
 
-			vh.Init(_Params.ItemPrefab, _Params.Content, itemIndex);
+			//vh.Init(_Params.ItemPrefab, _Params.Content, itemIndex);
 			
 			return vh;
 		}
 
 		/// <inheritdoc />
-		protected override void UpdateViewsHolder(SettingsCategoriesViewsHolder newOrRecycled)
+		protected override void UpdateModel(SettingsCategoriesViewsHolder newOrRecycled)
 		{
 			SettingsCategoryModel? model = models[newOrRecycled.ItemIndex];
 
 			newOrRecycled.SetModel(model);
-			
-			ScheduleComputeVisibilityTwinPass();
 		}
 
 		public void SetItems(IList<SettingsCategoryModel> modelList)
 		{
-			this.models.ResetItems(modelList);
+			this.models.SetItems(modelList);
 		}
 	}
 }

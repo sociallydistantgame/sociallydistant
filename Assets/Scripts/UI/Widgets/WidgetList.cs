@@ -1,27 +1,25 @@
 ﻿using System.Collections.Generic;
 using AcidicGui.Widgets;
-using Com.TheFallenGames.OSA.Core;
-using Com.TheFallenGames.OSA.CustomParams;
-using Com.TheFallenGames.OSA.DataHelpers;
+using UI.ScrollViews;
 using UnityEngine;
 using UnityExtensions;
 
 namespace UI.Widgets
 {
-	public class WidgetList : OSA<BaseParamsWithPrefab, WidgetListViewsHolder>
+	public class WidgetList : ScrollViewController<WidgetListViewsHolder>
 	{
 		[SerializeField]
 		private SystemWidgets systemWidgets = null!;
 
 		private WidgetRecycleBin recycleBin;
-		private SimpleDataHelper<IWidget> widgets;
+		private ScrollViewItemList<IWidget> widgets;
 
 		/// <inheritdoc />
 		protected override void Awake()
 		{
 			base.Awake();
 			this.AssertAllFieldsAreSerialized(typeof(WidgetList));
-			widgets = new SimpleDataHelper<IWidget>(this);
+			widgets = new ScrollViewItemList<IWidget>(this);
 
 			recycleBin = this.systemWidgets.RecycleBin;
 		}
@@ -29,24 +27,21 @@ namespace UI.Widgets
 		/// <inheritdoc />
 		public void SetItems(IList<IWidget> widgetList)
 		{
-			if (!IsInitialized)
-				Init();
-			
-			this.widgets.ResetItems(widgetList);
+			this.widgets.SetItems(widgetList);
 		}
 		
 		/// <inheritdoc />
-		protected override WidgetListViewsHolder CreateViewsHolder(int itemIndex)
+		protected override WidgetListViewsHolder CreateModel(int itemIndex)
 		{
-			var vh = new WidgetListViewsHolder();
+			var vh = new WidgetListViewsHolder(itemIndex);
 
-			vh.Init(_Params.ItemPrefab, _Params.Content, itemIndex);
+			//vh.Init(_Params.ItemPrefab, _Params.Content, itemIndex);
 			
 			return vh;
 		}
 
 		/// <inheritdoc />
-		protected override void UpdateViewsHolder(WidgetListViewsHolder newOrRecycled)
+		protected override void UpdateModel(WidgetListViewsHolder newOrRecycled)
 		{
 			IWidget widget = widgets[newOrRecycled.ItemIndex];
 
@@ -69,11 +64,9 @@ namespace UI.Widgets
 
             newOrRecycled.WidgetController.UpdateUI();
             newOrRecycled.WidgetController.gameObject.SetActive(true);
-            
-			ScheduleComputeVisibilityTwinPass();
 		}
 
-		/// <inheritdoc />
+		/*/// <inheritdoc />
 		protected override void OnBeforeRecycleOrDisableViewsHolder(WidgetListViewsHolder inRecycleBinOrVisible, int newItemIndex)
 		{
 			base.OnBeforeRecycleOrDisableViewsHolder(inRecycleBinOrVisible, newItemIndex);
@@ -88,7 +81,6 @@ namespace UI.Widgets
 
 			inRecycleBinOrVisible.WidgetController = null;
 			inRecycleBinOrVisible.RecyclableWidget = null;
-
-		}
+		}*/
 	}
 }

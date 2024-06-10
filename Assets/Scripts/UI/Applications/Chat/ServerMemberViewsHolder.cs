@@ -25,5 +25,9 @@ namespace UI.Applications.Chat
 
 			text.SetText($"<b>{memberModel.DisplayName}</b>{Environment.NewLine}@{memberModel.Username}");
 		}
+
+		/// <inheritdoc />
+		public ServerMemberViewsHolder(int itemIndex) : base(itemIndex)
+		{ }
 	}
 }

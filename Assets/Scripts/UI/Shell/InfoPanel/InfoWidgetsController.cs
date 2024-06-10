@@ -1,49 +1,42 @@
 ﻿#nullable enable
-using System;
 using System.Collections.Generic;
-using Com.TheFallenGames.OSA.Core;
-using Com.TheFallenGames.OSA.CustomParams;
-using Com.TheFallenGames.OSA.DataHelpers;
 using Shell.InfoPanel;
+using UI.ScrollViews;
 
 namespace UI.Shell.InfoPanel
 {
-	public class InfoWidgetsController : OSA<BaseParamsWithPrefab, InfoWidgetViewsHolder>
+	public class InfoWidgetsController : ScrollViewController<InfoWidgetViewsHolder>
 	{
-		private SimpleDataHelper<InfoWidgetData> widgets;
+		private ScrollViewItemList<InfoWidgetData> widgets;
 
 		/// <inheritdoc />
 		protected override void Awake()
 		{
 			base.Awake();
-			widgets = new SimpleDataHelper<InfoWidgetData>(this);
+			widgets = new ScrollViewItemList<InfoWidgetData>(this);
 		}
 
 		public void SetItems(IList<InfoWidgetData> widgetData)
 		{
-			this.widgets.ResetItems(widgetData);
+			this.widgets.SetItems(widgetData);
 		}
 
 		/// <inheritdoc />
-		protected override InfoWidgetViewsHolder CreateViewsHolder(int itemIndex)
+		protected override InfoWidgetViewsHolder CreateModel(int itemIndex)
 		{
-			var viewsHolder = new InfoWidgetViewsHolder();
+			var viewsHolder = new InfoWidgetViewsHolder(itemIndex);
 			
-			viewsHolder.Init(_Params.ItemPrefab, _Params.Content, itemIndex);
+			//viewsHolder.Init(_Params.ItemPrefab, _Params.Content, itemIndex);
 
 			return viewsHolder;
 		}
 
 		/// <inheritdoc />
-		protected override void UpdateViewsHolder(InfoWidgetViewsHolder newOrRecycled)
+		protected override void UpdateModel(InfoWidgetViewsHolder newOrRecycled)
 		{
 			InfoWidgetData data = this.widgets[newOrRecycled.ItemIndex];
 
 			newOrRecycled.SetInfo(data);
-
-			// THANK you, Restitched, for having implemented an OSA controller with auto-sizing elements.
-			// My god, this was annoying to debug.
-			ScheduleComputeVisibilityTwinPass();
 		}
 	}
 }

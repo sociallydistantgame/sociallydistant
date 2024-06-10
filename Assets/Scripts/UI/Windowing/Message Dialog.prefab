@@ -79,9 +79,9 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   infoBoxController: {fileID: 3525700772477604915}
-  popupSound: {fileID: 11400000, guid: c964c5b860e1b1947be472f9cd691c8c, type: 2}
-  errorPopupSound: {fileID: 11400000, guid: e0e3cb501595b554dabe059fcf1e793a, type: 2}
-  warningSound: {fileID: 11400000, guid: 98f359ac96e9dd3419654063d2cd2765, type: 2}
+  popupSound: {fileID: 0}
+  errorPopupSound: {fileID: 0}
+  warningSound: {fileID: 0}
 --- !u!114 &3687316460796897603
 MonoBehaviour:
   m_ObjectHideFlags: 0

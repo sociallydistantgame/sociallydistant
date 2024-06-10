@@ -1,14 +1,12 @@
 ﻿#nullable enable
 
-using Com.TheFallenGames.OSA.Core;
 using UI.Widgets;
 using UnityEngine.UI;
-using UnityExtensions;
-using Utility;
 using System;
 using GamePlatform;
 using Shell;
 using UI.Shell.InfoPanel;
+using UnityExtensions;
 
 namespace UI.Login
 {
@@ -44,5 +42,9 @@ namespace UI.Login
 		{
 			Callback?.Invoke(gameData);
 		}
+
+		/// <inheritdoc />
+		public UserViewsHolder(int itemIndex) : base(itemIndex)
+		{ }
 	}
 }

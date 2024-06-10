@@ -24,5 +24,9 @@ namespace UI.Applications.Email
 			view.Callback = Callback;
 			view.UpdateMessage(message);
 		}
+
+		/// <inheritdoc />
+		public MailMessageListViewsHolder(int itemIndex) : base(itemIndex)
+		{ }
 	}
 }

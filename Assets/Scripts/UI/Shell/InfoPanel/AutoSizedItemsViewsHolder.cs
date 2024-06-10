@@ -1,15 +1,15 @@
 ﻿#nullable enable
-using Com.TheFallenGames.OSA.Core;
+using UI.ScrollViews;
 using UnityEngine;
 using UnityEngine.UI;
 
 namespace UI.Shell.InfoPanel
 {
-	public abstract class AutoSizedItemsViewsHolder : BaseItemViewsHolder
+	public abstract class AutoSizedItemsViewsHolder : ScrollViewModel
 	{
 		protected virtual bool Horizontal => false;
 		
-		/// <inheritdoc />
+		/*/// <inheritdoc />
 		public override void MarkForRebuild()
 		{
 			base.MarkForRebuild();
@@ -19,6 +19,10 @@ namespace UI.Shell.InfoPanel
                 root.SetSizeWithCurrentAnchors(RectTransform.Axis.Horizontal, ((RectTransform) root.GetChild(0)).rect.width);
 			else
 				root.SetSizeWithCurrentAnchors(RectTransform.Axis.Vertical, ((RectTransform) root.GetChild(0)).rect.height);
-		}
+		}*/
+
+		/// <inheritdoc />
+		protected AutoSizedItemsViewsHolder(int itemIndex) : base(itemIndex)
+		{ }
 	}
 }

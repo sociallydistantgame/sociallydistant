@@ -1,46 +1,40 @@
 ﻿using System.Collections.Generic;
-using Com.TheFallenGames.OSA.Core;
-using Com.TheFallenGames.OSA.CustomParams;
-using Com.TheFallenGames.OSA.DataHelpers;
+using UI.ScrollViews;
 
 namespace UI.Websites.SocialMedia
 {
-	public class SocialPostListView : OSA<BaseParamsWithPrefab, SocialPostViewsHolder>
+	public class SocialPostListView : ScrollViewController<SocialPostViewsHolder>
 	{
-		private SimpleDataHelper<SocialPostModel> posts;
+		private ScrollViewItemList<SocialPostModel> posts;
 
 		/// <inheritdoc />
 		protected override void Awake()
 		{
-			Init();
-
-			posts = new SimpleDataHelper<SocialPostModel>(this);
+			posts = new ScrollViewItemList<SocialPostModel>(this);
 			base.Awake();
 		}
 
 		public void SetItems(IList<SocialPostModel> items)
 		{
-			this.posts.ResetItems(items);
+			this.posts.SetItems(items);
 		}
 		
 		/// <inheritdoc />
-		protected override SocialPostViewsHolder CreateViewsHolder(int itemIndex)
+		protected override SocialPostViewsHolder CreateModel(int itemIndex)
 		{
-			var vh = new SocialPostViewsHolder();
+			var vh = new SocialPostViewsHolder(itemIndex);
 
-			vh.Init(_Params.ItemPrefab, _Params.Content, itemIndex);
+			//vh.Init(_Params.ItemPrefab, _Params.Content, itemIndex);
 			
 			return vh;
 		}
 
 		/// <inheritdoc />
-		protected override void UpdateViewsHolder(SocialPostViewsHolder newOrRecycled)
+		protected override void UpdateModel(SocialPostViewsHolder newOrRecycled)
 		{
 			SocialPostModel post = posts[newOrRecycled.ItemIndex];
 
 			newOrRecycled.SetData(post);
-
-			ScheduleComputeVisibilityTwinPass();
 		}
 	}
 }

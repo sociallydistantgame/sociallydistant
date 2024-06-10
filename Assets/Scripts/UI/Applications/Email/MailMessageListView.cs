@@ -1,17 +1,15 @@
 ﻿#nullable enable
 using System.Collections.Generic;
 using System.Linq;
-using Com.TheFallenGames.OSA.Core;
-using Com.TheFallenGames.OSA.CustomParams;
-using Com.TheFallenGames.OSA.DataHelpers;
 using Social;
 using System;
+using UI.ScrollViews;
 
 namespace UI.Applications.Email
 {
-	public sealed class MailMessageListView : OSA<BaseParamsWithPrefab, MailMessageListViewsHolder>
+	public sealed class MailMessageListView : ScrollViewController<MailMessageListViewsHolder>
 	{
-		private SimpleDataHelper<IMailMessage> messages;
+		private ScrollViewItemList<IMailMessage> messages;
 
 		public event Action<IMailMessage>? ItemSelected;
 		
@@ -19,36 +17,31 @@ namespace UI.Applications.Email
 		protected override void Awake()
 		{
 			base.Awake();
-			this.messages = new SimpleDataHelper<IMailMessage>(this);
+			this.messages = new ScrollViewItemList<IMailMessage>(this);
 		}
 
 		public void SetItems(IEnumerable<IMailMessage> source)
 		{
-			if (!IsInitialized)
-				this.Init();
-			
-			this.messages.ResetItems(source.ToList());
+			this.messages.SetItems(source.ToList());
 		}
 		
 		/// <inheritdoc />
-		protected override MailMessageListViewsHolder CreateViewsHolder(int itemIndex)
+		protected override MailMessageListViewsHolder CreateModel(int itemIndex)
 		{
-			var vh = new MailMessageListViewsHolder();
+			var vh = new MailMessageListViewsHolder(itemIndex);
 
-			vh.Init(_Params.ItemPrefab, _Params.Content, itemIndex);
+			//vh.Init(_Params.ItemPrefab, _Params.Content, itemIndex);
 			
 			return vh;
 		}
 
 		/// <inheritdoc />
-		protected override void UpdateViewsHolder(MailMessageListViewsHolder newOrRecycled)
+		protected override void UpdateModel(MailMessageListViewsHolder newOrRecycled)
 		{
 			IMailMessage message = messages[newOrRecycled.ItemIndex];
 
 			newOrRecycled.Callback = OnItemSelected;
 			newOrRecycled.UpdateViews(message);
-			
-			ScheduleComputeVisibilityTwinPass();
 		}
 
 		private void OnItemSelected(IMailMessage message)

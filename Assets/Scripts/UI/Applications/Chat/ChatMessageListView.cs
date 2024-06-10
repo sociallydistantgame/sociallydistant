@@ -1,47 +1,44 @@
 ﻿using System.Collections.Generic;
-using Com.TheFallenGames.OSA.Core;
-using Com.TheFallenGames.OSA.CustomParams;
-using Com.TheFallenGames.OSA.DataHelpers;
+using UI.ScrollViews;
 
 namespace UI.Applications.Chat
 {
-	public class ChatMessageListView : OSA<BaseParamsWithPrefab, ChatMessageViewsHolder>
+	public class ChatMessageListView : ScrollViewController<ChatMessageViewsHolder>
 	{
-		private SimpleDataHelper<ChatMessageModel> messages;
+		private ScrollViewItemList<ChatMessageModel> messages;
 
 		/// <inheritdoc />
 		protected override void Awake()
 		{
 			base.Awake();
-			messages = new SimpleDataHelper<ChatMessageModel>(this);
+			messages = new ScrollViewItemList<ChatMessageModel>(this);
 		}
 
 		public void SetItems(IList<ChatMessageModel> messageList)
 		{
-			if (!IsInitialized)
-				Init();
-			
-			messages.ResetItems(messageList);
+			messages.SetItems(messageList);
 		}
 
 		/// <inheritdoc />
-		protected override ChatMessageViewsHolder CreateViewsHolder(int itemIndex)
+		protected override ChatMessageViewsHolder CreateModel(int itemIndex)
 		{
-			var vh = new ChatMessageViewsHolder();
+			var vh = new ChatMessageViewsHolder(itemIndex);
 
-			vh.Init(_Params.ItemPrefab, _Params.Content, itemIndex);
+			//vh.Init(_Params.ItemPrefab, _Params.Content, itemIndex);
 			
 			return vh;
 		}
 
 		/// <inheritdoc />
-		protected override void UpdateViewsHolder(ChatMessageViewsHolder newOrRecycled)
+		protected override void UpdateModel(ChatMessageViewsHolder newOrRecycled)
 		{
 			ChatMessageModel model = messages[newOrRecycled.ItemIndex];
-
 			newOrRecycled.UpdateView(model);
+		}
+
+		public void ScrollTo(int index, float offset)
+		{
 			
-			ScheduleComputeVisibilityTwinPass(true);
 		}
 	}
 }

@@ -1,53 +1,46 @@
 ﻿using System;
 using System.Collections.Generic;
-using Com.TheFallenGames.OSA.Core;
-using Com.TheFallenGames.OSA.CustomParams;
-using Com.TheFallenGames.OSA.DataHelpers;
 using Social;
+using UI.ScrollViews;
 
 namespace UI.Applications.Chat
 {
-	public class GuildListView : OSA<BaseParamsWithPrefab, GuildViewsHolder>
+	public class GuildListView : ScrollViewController<GuildViewsHolder>
 	{
-		private SimpleDataHelper<GuildItemModel> guildItems;
+		private ScrollViewItemList<GuildItemModel> guildItems;
 
 		public event Action<IGuild>? GuildSelected; 
 		
 		/// <inheritdoc />
 		protected override void Awake()
 		{
-			guildItems = new SimpleDataHelper<GuildItemModel>(this);
+			guildItems = new ScrollViewItemList<GuildItemModel>(this);
 			base.Awake();
 		}
 
 		public void SetItems(IList<GuildItemModel> items)
 		{
-			if (!IsInitialized)
-				this.Init();
-
-			this.guildItems.ResetItems(items);
+			this.guildItems.SetItems(items);
 		}
 
 		/// <inheritdoc />
-		protected override GuildViewsHolder CreateViewsHolder(int itemIndex)
+		protected override GuildViewsHolder CreateModel(int itemIndex)
 		{
-			var vh = new GuildViewsHolder();
+			var vh = new GuildViewsHolder(itemIndex);
 			
-			vh.Init(_Params.ItemPrefab, _Params.Content, itemIndex);
+			//vh.Init(_Params.ItemPrefab, _Params.Content, itemIndex);
 
 			return vh;
 		}
 
 		/// <inheritdoc />
-		protected override void UpdateViewsHolder(GuildViewsHolder newOrRecycled)
+		protected override void UpdateModel(GuildViewsHolder newOrRecycled)
 		{
 			GuildItemModel model = guildItems[newOrRecycled.ItemIndex];
 
 			newOrRecycled.UpdateModel(model);
 			
 			newOrRecycled.Callback = OnGuildSelected;
-			
-			ScheduleComputeVisibilityTwinPass();
 		}
 
 		private void OnGuildSelected(IGuild guild)

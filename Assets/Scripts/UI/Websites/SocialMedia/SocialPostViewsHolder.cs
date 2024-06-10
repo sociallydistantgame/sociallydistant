@@ -18,5 +18,9 @@ namespace UI.Websites.SocialMedia
 		{
 			view.SetData(model);
 		}
+
+		/// <inheritdoc />
+		public SocialPostViewsHolder(int itemIndex) : base(itemIndex)
+		{ }
 	}
 }

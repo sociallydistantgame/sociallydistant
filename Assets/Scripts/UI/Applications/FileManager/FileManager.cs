@@ -4,22 +4,16 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using Architecture;
-using Com.TheFallenGames.OSA.Core;
-using Com.TheFallenGames.OSA.Core.SubComponents;
 using Core;
 using OS.Devices;
-using UI.Windowing;
 using OS.FileSystems;
 using Shell;
 using Shell.Common;
 using Shell.Windowing;
-using TMPro;
 using UI.Shell.Common;
 using UI.UiHelpers;
 using UnityEngine;
-using UnityEngine.UI;
 using UnityExtensions;
-using Utility;
 
 namespace UI.Applications.FileManager
 {

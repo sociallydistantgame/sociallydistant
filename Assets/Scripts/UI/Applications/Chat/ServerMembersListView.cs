@@ -1,48 +1,41 @@
 ﻿using System;
 using System.Collections.Generic;
-using Com.TheFallenGames.OSA.Core;
-using Com.TheFallenGames.OSA.CustomParams;
-using Com.TheFallenGames.OSA.DataHelpers;
+using UI.ScrollViews;
 
 namespace UI.Applications.Chat
 {
-	public class ServerMembersListView : OSA<BaseParamsWithPrefab, ServerMemberViewsHolder>
+	public class ServerMembersListView : ScrollViewController<ServerMemberViewsHolder>
 	{
-		private SimpleDataHelper<ServerMember> members;
+		private ScrollViewItemList<ServerMember> members;
 
 		/// <inheritdoc />
 		protected override void Awake()
 		{
 			base.Awake();
-			members = new SimpleDataHelper<ServerMember>(this);
+			members = new ScrollViewItemList<ServerMember>(this);
 		}
 
 		public void SetItems(IList<ServerMember> memberList)
 		{
-			if (!IsInitialized)
-				Init();
-			
-			this.members.ResetItems(memberList);
+			this.members.SetItems(memberList);
 		}
 
 		/// <inheritdoc />
-		protected override ServerMemberViewsHolder CreateViewsHolder(int itemIndex)
+		protected override ServerMemberViewsHolder CreateModel(int itemIndex)
 		{
-			var vh = new ServerMemberViewsHolder();
+			var vh = new ServerMemberViewsHolder(itemIndex);
 			
-			vh.Init(_Params.ItemPrefab, _Params.Content, itemIndex);
+			//vh.Init(_Params.ItemPrefab, _Params.Content, itemIndex);
 
 			return vh;
 		}
 
 		/// <inheritdoc />
-		protected override void UpdateViewsHolder(ServerMemberViewsHolder newOrRecycled)
+		protected override void UpdateModel(ServerMemberViewsHolder newOrRecycled)
 		{
 			ServerMember member = members[newOrRecycled.ItemIndex];
 
 			newOrRecycled.UpdateMember(member);
-			
-			ScheduleComputeVisibilityTwinPass();
 		}
 	}
 }

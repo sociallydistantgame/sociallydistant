@@ -39,5 +39,9 @@ namespace UI.SystemSettings
 			
 			systemSettings.ShowCategory(model);
 		}
+
+		/// <inheritdoc />
+		public SettingsCategoriesViewsHolder(int itemIndex) : base(itemIndex)
+		{ }
 	}
 }

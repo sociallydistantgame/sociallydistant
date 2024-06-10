@@ -21,5 +21,9 @@ namespace UI.Shell.InfoPanel
 		{
 			view.SetData(data);
 		}
+
+		/// <inheritdoc />
+		public InfoWidgetViewsHolder(int itemIndex) : base(itemIndex)
+		{ }
 	}
 }

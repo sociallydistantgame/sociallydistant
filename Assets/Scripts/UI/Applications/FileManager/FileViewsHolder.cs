@@ -1,12 +1,11 @@
 #nullable enable
-using Com.TheFallenGames.OSA.CustomAdapters.GridView;
-using UnityEngine;
-using UnityExtensions;
 using System;
+using UI.ScrollViews;
+using UnityExtensions;
 
 namespace UI.Applications.FileManager
 {
-	public class FileViewsHolder : CellViewsHolder
+	public class FileViewsHolder : GridCellModel
 	{
 		private ShellFileView view;
 
@@ -24,5 +23,9 @@ namespace UI.Applications.FileManager
 			view.Callback = Callback;
 			view.UpdateData(fileData);
 		}
+
+		/// <inheritdoc />
+		public FileViewsHolder(int itemIndex) : base(itemIndex)
+		{ }
 	}
 }
