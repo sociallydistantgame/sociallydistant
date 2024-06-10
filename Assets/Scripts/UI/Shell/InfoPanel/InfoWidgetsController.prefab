@@ -176,6 +176,8 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 3150404997951431908}
+  - component: {fileID: 3364131381596282631}
+  - component: {fileID: 3897695241668309058}
   m_Layer: 5
   m_Name: Content
   m_TagString: Untagged
@@ -198,11 +200,51 @@ RectTransform:
   m_Father: {fileID: 2155589011317968879}
   m_RootOrder: 0
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
-  m_AnchorMin: {x: 0, y: 0}
+  m_AnchorMin: {x: 0, y: 1}
   m_AnchorMax: {x: 1, y: 1}
-  m_AnchoredPosition: {x: 0, y: 0}
+  m_AnchoredPosition: {x: 8.5, y: 0}
   m_SizeDelta: {x: 0, y: 0}
-  m_Pivot: {x: 0.5, y: 0.5}
+  m_Pivot: {x: 0.5, y: 1}
+--- !u!114 &3364131381596282631
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 3266575193321816834}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 59f8146938fff824cb5fd77236b75775, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  m_Padding:
+    m_Left: 0
+    m_Right: 0
+    m_Top: 0
+    m_Bottom: 0
+  m_ChildAlignment: 0
+  m_Spacing: 0
+  m_ChildForceExpandWidth: 1
+  m_ChildForceExpandHeight: 0
+  m_ChildControlWidth: 1
+  m_ChildControlHeight: 1
+  m_ChildScaleWidth: 1
+  m_ChildScaleHeight: 1
+  m_ReverseArrangement: 0
+--- !u!114 &3897695241668309058
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 3266575193321816834}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 3245ec927659c4140ac4f8d17403cc18, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  m_HorizontalFit: 0
+  m_VerticalFit: 2
 --- !u!1 &7544529835724988518
 GameObject:
   m_ObjectHideFlags: 0
@@ -215,7 +257,6 @@ GameObject:
   - component: {fileID: 4897624464582946205}
   - component: {fileID: 6910338861809412679}
   - component: {fileID: 5873437412582799752}
-  - component: {fileID: 5402080654995400014}
   m_Layer: 5
   m_Name: Scrollbar Vertical
   m_TagString: Untagged
@@ -331,36 +372,6 @@ MonoBehaviour:
   m_OnValueChanged:
     m_PersistentCalls:
       m_Calls: []
---- !u!114 &5402080654995400014
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 7544529835724988518}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 44e790c2efca8bf4bad58426460858d9, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  hideWhenNotNeeded: 1
-  autoHide: 1
-  autoHideFadeEffect: 1
-  autoHideCollapseEffect: 0
-  autoHideTime: 1
-  autoHideFadeEffectMinAlpha: 0.8
-  autoHideCollapseEffectMinScale: 0.2
-  minSize: 0.1
-  minCompressedSize: 0.1
-  maxSize: 1
-  sizeUpdateInterval: 0.01
-  skippedFramesBetweenPositionChanges: 0
-  ignoreDragWithoutPointerDown: 0
-  scrollRect: {fileID: 0}
-  viewport: {fileID: 0}
-  OnScrollbarSizeChanged:
-    m_PersistentCalls:
-      m_Calls: []
 --- !u!1 &8363747642744712228
 GameObject:
   m_ObjectHideFlags: 0
@@ -428,89 +439,11 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 367f561919d69ef4fab57f3cb988308d, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  _Params:
-    _Content: {fileID: 3150404997951431908}
-    _Viewport: {fileID: 2155589011317968879}
-    _Orientation: 0
-    _Scrollbar: {fileID: 5873437412582799752}
-    _ScrollSensivity: 100
-    _ScrollSensivityOnXAxis: 100
-    _ContentPadding:
-      m_Left: 0
-      m_Right: 0
-      m_Top: 0
-      m_Bottom: 0
-    _Gravity: 1
-    _ContentSpacing: 6
-    _DefaultItemSize: 100
-    _ForwardDragToParents: 0
-    _ForwardDragSameDirectionAtBoundary: 0
-    _DragEnabled: 1
-    _ScrollEnabled: 1
-    _UseUnscaledTime: 1
-    _ItemTransversalSize: 0
-    _Effects:
-      _ContentVisual: {fileID: 0}
-      _ElasticMovement: 1
-      _PullElasticity: 0.3
-      _ReleaseTime: 0.1
-      _Inertia: 1
-      _InertiaDecelerationRate: 0.865
-      _CutMovementOnPointerDown: 1
-      _MaxSpeed: 10000
-      _TransientSpeedBetweenDrags: 1
-      _LoopItems: 0
-      _ContentVisualParallaxEffect: -0.85
-      _Gallery:
-        _OverallAmount: 0
-        _Scale:
-          _Amount: 1
-          _ViewportPivot: 0.5
-          _Exponent: 1
-          _MinValue: 0
-          _TransformSpace:
-            _From: {x: 0, y: 0, z: 0}
-            _To: {x: 1, y: 1, z: 1}
-        _Rotation:
-          _Amount: 0
-          _ViewportPivot: 0.5
-          _Exponent: 1
-          _TransformSpace:
-            _From: {x: 0, y: 0, z: 0}
-            _To: {x: 0, y: 0, z: 0}
-      _GalleryEffectAmount: 0
-      _GalleryEffectViewportPivot: 0.5
-    _Navigation:
-      _Enabled: 0
-      _MaxSearchDepthForViewsHolder: 2
-      _ScrollDuration: 0.1
-      _Centered: 0
-      _AdditionalSpacingTowardsEdge: 0
-    _Animation:
-      _SmoothScrollType: 0
-      _Cancel:
-        _SmoothScroll:
-          _OnCountChanges: 1
-          _OnSizeChanges: 1
-          _OnScrollTo: 1
-        _UserAnimations:
-          _OnCountChanges: 1
-          _OnSizeChanges: 1
-          _OnScrollTo: 1
-          _OnBeginSmoothScroll: 1
-      _OnDoneWhenCancelled: 0
-    _Optimization:
-      _RecycleBinCapacity: -1
-      _ScaleToZeroInsteadOfDisable: 0
-      _ForceLayoutRebuildOnBeginSmoothScroll: 1
-      _ForceLayoutRebuildOnDrag: 0
-      _KeepItemsSortedInHierarchy: 0
-      _KeepItemsPoolOnEmptyList: 0
-      _KeepItemsPoolOnLayoutRebuild: 0
-      _KeepItemsSizesOnLayoutRebuild: 0
-    _ItemPrefab: {fileID: 473945571560783155, guid: 36369f4b568ca844b90a4d483a894529, type: 3}
-    _PrefabControlsDefaultItemSize: 0
-    _AlsoControlItemTransversalSize: 0
+  viewport: {fileID: 2155589011317968879}
+  content: {fileID: 3150404997951431908}
+  itemPrefab: {fileID: 5850089974849722018, guid: 36369f4b568ca844b90a4d483a894529, type: 3}
+  scrollBar: {fileID: 5873437412582799752}
+  isHorizontal: 0
 --- !u!114 &1489756992864513233
 MonoBehaviour:
   m_ObjectHideFlags: 0
