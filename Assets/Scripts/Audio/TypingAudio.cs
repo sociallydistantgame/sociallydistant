@@ -14,9 +14,6 @@ namespace Audio
 	[RequireComponent(typeof(TMP_InputField))]
 	public sealed class TypingAudio : MonoBehaviour
 	{
-		[SerializeField]
-		private SoundEffectAsset typingSound = null!;
-		
 		private TMP_InputField inputField;
 		private IDisposable? settingsObserver;
 		private bool soundEnabled = true;
@@ -54,8 +51,6 @@ namespace Audio
 		{
 			if (!soundEnabled)
 				return;
-			
-			AudioManager.PlaySound(typingSound);
 		}
 	}
 }

@@ -304,6 +304,10 @@ PrefabInstance:
       propertyPath: m_Name
       value: Members View
       objectReference: {fileID: 0}
+    - target: {fileID: 4254250134457055375, guid: 356a3299a081f7545abff2fcf777654f, type: 3}
+      propertyPath: m_SizeDelta.y
+      value: 0
+      objectReference: {fileID: 0}
     - target: {fileID: 4572099358260122974, guid: 356a3299a081f7545abff2fcf777654f, type: 3}
       propertyPath: m_Pivot.x
       value: 0.5
@@ -386,6 +390,14 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 4572099358260122974, guid: 356a3299a081f7545abff2fcf777654f, type: 3}
       propertyPath: m_LocalEulerAnglesHint.z
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 6348148300514418922, guid: 356a3299a081f7545abff2fcf777654f, type: 3}
+      propertyPath: m_AnchorMax.x
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 6348148300514418922, guid: 356a3299a081f7545abff2fcf777654f, type: 3}
+      propertyPath: m_AnchorMax.y
       value: 0
       objectReference: {fileID: 0}
     m_RemovedComponents: []

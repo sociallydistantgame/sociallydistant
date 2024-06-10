@@ -35,13 +35,6 @@ namespace UI.Applications.Chat
 
 		[SerializeField]
 		private HorizontalLayoutGroup messageLayout = null!;
-
-		[Header("Sound")]
-		[SerializeField]
-		private SoundEffectAsset playerMessageSound = null!;
-
-		[SerializeField]
-		private SoundEffectAsset npcMessageSound = null!;
 		
 		private IList<IWidget>? builtWidgets;
 		
@@ -102,8 +95,6 @@ namespace UI.Applications.Chat
 
 		private void DoMessageAnimation(bool isFromPlayer)
 		{
-			AudioManager.PlaySound(isFromPlayer ? playerMessageSound : npcMessageSound);
-			
 			RectTransform t = (RectTransform) this.transform;
 			t.localScale = Vector3.zero;
 			
