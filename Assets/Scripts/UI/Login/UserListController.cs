@@ -26,9 +26,7 @@ namespace UI.Login
 		/// <inheritdoc />
 		protected override UserViewsHolder CreateModel(int itemIndex)
 		{
-			var vh = new UserViewsHolder(itemIndex);
-			
-			// vh.Init(_Params.ItemPrefab, _Params.Content, itemIndex, false);
+			var vh = new UserViewsHolder();
 			return vh;
 		}
 

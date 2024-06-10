@@ -26,10 +26,7 @@ namespace UI.Applications.Chat
 		/// <inheritdoc />
 		protected override GuildViewsHolder CreateModel(int itemIndex)
 		{
-			var vh = new GuildViewsHolder(itemIndex);
-			
-			//vh.Init(_Params.ItemPrefab, _Params.Content, itemIndex);
-
+			var vh = new GuildViewsHolder();
 			return vh;
 		}
 

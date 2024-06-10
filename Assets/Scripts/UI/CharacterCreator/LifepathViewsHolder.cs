@@ -39,9 +39,5 @@ namespace UI.CharacterCreator
 			if (value)
 				Callback?.Invoke(lifepathId);
 		}
-
-		/// <inheritdoc />
-		public LifepathViewsHolder(int itemIndex) : base(itemIndex)
-		{ }
 	}
 }

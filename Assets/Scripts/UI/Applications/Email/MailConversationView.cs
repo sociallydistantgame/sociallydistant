@@ -36,10 +36,7 @@ namespace UI.Applications.Email
 		/// <inheritdoc />
 		protected override MailConversationItemViewsHolder CreateModel(int itemIndex)
 		{
-			var vh = new MailConversationItemViewsHolder(itemIndex);
-
-			//vh.Init(_Params.ItemPrefab, _Params.Content, itemIndex, false);
-			
+			var vh = new MailConversationItemViewsHolder();
 			return vh;
 		}
 

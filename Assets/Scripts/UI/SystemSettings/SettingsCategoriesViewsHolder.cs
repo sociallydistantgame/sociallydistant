@@ -2,6 +2,7 @@
 using AcidicGui.Components;
 using UI.Shell.InfoPanel;
 using UnityExtensions;
+using System;
 
 namespace UI.SystemSettings
 {
@@ -9,7 +10,8 @@ namespace UI.SystemSettings
 	{
 		private ListItemWithHeader view = null!;
 		private SettingsCategoryModel? model;
-		private SystemSettingsController systemSettings = null!;
+
+		public Action<SettingsCategoryModel>? ClickCallback;
 		
 		/// <inheritdoc />
 		public override void CollectViews()
@@ -17,9 +19,7 @@ namespace UI.SystemSettings
 			root.MustGetComponentInChildren(out view);
 
 			view.Activator.onClick.AddListener(OnListItemClick);
-			
-			view.MustGetComponentInParent(out systemSettings);
-			
+
 			base.CollectViews();
 		}
 
@@ -36,12 +36,8 @@ namespace UI.SystemSettings
 		{
 			if (model == null)
 				return;
-			
-			systemSettings.ShowCategory(model);
-		}
 
-		/// <inheritdoc />
-		public SettingsCategoriesViewsHolder(int itemIndex) : base(itemIndex)
-		{ }
+			ClickCallback?.Invoke(model);
+		}
 	}
 }

@@ -19,9 +19,5 @@ namespace UI.Applications.Chat
 		{
 			view.UpdateMessage(model);
 		}
-
-		/// <inheritdoc />
-		public ChatMessageViewsHolder(int itemIndex) : base(itemIndex)
-		{ }
 	}
 }

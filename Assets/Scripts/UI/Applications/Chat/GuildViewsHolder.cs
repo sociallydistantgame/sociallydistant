@@ -30,9 +30,5 @@ namespace UI.Applications.Chat
 		{
 			Callback?.Invoke(guild);
 		}
-
-		/// <inheritdoc />
-		public GuildViewsHolder(int itemIndex) : base(itemIndex)
-		{ }
 	}
 }

@@ -22,10 +22,7 @@ namespace UI.Websites.SocialMedia
 		/// <inheritdoc />
 		protected override SocialPostViewsHolder CreateModel(int itemIndex)
 		{
-			var vh = new SocialPostViewsHolder(itemIndex);
-
-			//vh.Init(_Params.ItemPrefab, _Params.Content, itemIndex);
-			
+			var vh = new SocialPostViewsHolder();
 			return vh;
 		}
 

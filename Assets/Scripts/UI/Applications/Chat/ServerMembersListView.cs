@@ -23,10 +23,7 @@ namespace UI.Applications.Chat
 		/// <inheritdoc />
 		protected override ServerMemberViewsHolder CreateModel(int itemIndex)
 		{
-			var vh = new ServerMemberViewsHolder(itemIndex);
-			
-			//vh.Init(_Params.ItemPrefab, _Params.Content, itemIndex);
-
+			var vh = new ServerMemberViewsHolder();
 			return vh;
 		}
 

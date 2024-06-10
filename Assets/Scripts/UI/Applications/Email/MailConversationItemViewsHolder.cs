@@ -21,9 +21,5 @@ namespace UI.Applications.Email
 		{
 			view.UpdateView(message);
 		}
-
-		/// <inheritdoc />
-		public MailConversationItemViewsHolder(int itemIndex) : base(itemIndex)
-		{ }
 	}
 }

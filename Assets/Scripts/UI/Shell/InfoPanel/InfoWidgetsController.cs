@@ -24,10 +24,7 @@ namespace UI.Shell.InfoPanel
 		/// <inheritdoc />
 		protected override InfoWidgetViewsHolder CreateModel(int itemIndex)
 		{
-			var viewsHolder = new InfoWidgetViewsHolder(itemIndex);
-			
-			//viewsHolder.Init(_Params.ItemPrefab, _Params.Content, itemIndex);
-
+			var viewsHolder = new InfoWidgetViewsHolder();
 			return viewsHolder;
 		}
 

@@ -24,10 +24,5 @@ namespace UI.Widgets
 			root.MustGetComponent(out customView);
 			base.CollectViews();
 		}
-
-
-		/// <inheritdoc />
-		public WidgetListViewsHolder(int itemIndex) : base(itemIndex)
-		{ }
 	}
 }

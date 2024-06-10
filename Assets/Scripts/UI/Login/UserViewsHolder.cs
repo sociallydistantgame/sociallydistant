@@ -17,15 +17,15 @@ namespace UI.Login
 		private IGameData? gameData;
 
 		public Action<IGameData?>? Callback;
-		
+
 		/// <inheritdoc />
 		public override void CollectViews()
 		{
 			root.MustGetComponentInChildren(out button);
 			root.MustGetComponentInChildren(out view);
-			
+
 			button.onClick.AddListener(OnClick);
-			
+
 			base.CollectViews();
 		}
 
@@ -42,9 +42,5 @@ namespace UI.Login
 		{
 			Callback?.Invoke(gameData);
 		}
-
-		/// <inheritdoc />
-		public UserViewsHolder(int itemIndex) : base(itemIndex)
-		{ }
 	}
 }

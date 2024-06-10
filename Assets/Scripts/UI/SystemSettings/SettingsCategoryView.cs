@@ -9,6 +9,8 @@ namespace UI.SystemSettings
 		private readonly SystemSettingsViewController controller;
 		private SettingsCategoryModel? model;
 
+		
+		
 		public SettingsCategoryView(SystemSettingsViewController controller)
 		{
 			this.controller = controller;

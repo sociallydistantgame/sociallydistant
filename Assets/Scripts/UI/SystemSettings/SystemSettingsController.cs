@@ -58,6 +58,7 @@ namespace UI.SystemSettings
 
 		public void ShowCategory(SettingsCategoryModel model)
 		{
+			this.categoriesList.OnItemClicked += this.ShowCategory;
 			this.currentCategory = model.Category;
 			RefreshModels();
 			

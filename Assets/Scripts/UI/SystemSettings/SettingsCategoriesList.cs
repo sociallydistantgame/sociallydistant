@@ -1,6 +1,7 @@
 ﻿#nullable enable
 using System.Collections.Generic;
 using UI.ScrollViews;
+using System;
 
 namespace UI.SystemSettings
 {
@@ -8,6 +9,8 @@ namespace UI.SystemSettings
 	{
 		private ScrollViewItemList<SettingsCategoryModel> models;
 
+		public event Action<SettingsCategoryModel>? OnItemClicked;
+		
 		/// <inheritdoc />
 		protected override void Awake()
 		{
@@ -18,10 +21,7 @@ namespace UI.SystemSettings
 		/// <inheritdoc />
 		protected override SettingsCategoriesViewsHolder CreateModel(int itemIndex)
 		{
-			var vh = new SettingsCategoriesViewsHolder(itemIndex);
-
-			//vh.Init(_Params.ItemPrefab, _Params.Content, itemIndex);
-			
+			var vh = new SettingsCategoriesViewsHolder();
 			return vh;
 		}
 
@@ -30,12 +30,18 @@ namespace UI.SystemSettings
 		{
 			SettingsCategoryModel? model = models[newOrRecycled.ItemIndex];
 
+			newOrRecycled.ClickCallback = ClickHandler;
 			newOrRecycled.SetModel(model);
 		}
 
 		public void SetItems(IList<SettingsCategoryModel> modelList)
 		{
 			this.models.SetItems(modelList);
+		}
+		
+		private void ClickHandler(SettingsCategoryModel model)
+		{
+			OnItemClicked?.Invoke(model);
 		}
 	}
 }

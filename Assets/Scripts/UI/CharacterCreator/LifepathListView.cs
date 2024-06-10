@@ -29,10 +29,7 @@ namespace UI.CharacterCreator
 		/// <inheritdoc />
 		protected override LifepathViewsHolder CreateModel(int itemIndex)
 		{
-			var vh = new LifepathViewsHolder(itemIndex);
-			
-			//vh.Init(_Params.ItemPrefab, _Params.Content, itemIndex, false);
-
+			var vh = new LifepathViewsHolder();
 			return vh;
 		}
 

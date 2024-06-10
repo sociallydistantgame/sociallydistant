@@ -28,10 +28,7 @@ namespace UI.Applications.Email
 		/// <inheritdoc />
 		protected override MailMessageListViewsHolder CreateModel(int itemIndex)
 		{
-			var vh = new MailMessageListViewsHolder(itemIndex);
-
-			//vh.Init(_Params.ItemPrefab, _Params.Content, itemIndex);
-			
+			var vh = new MailMessageListViewsHolder();
 			return vh;
 		}
 

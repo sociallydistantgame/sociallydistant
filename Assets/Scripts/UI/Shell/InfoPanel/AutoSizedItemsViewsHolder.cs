@@ -20,9 +20,5 @@ namespace UI.Shell.InfoPanel
 			else
 				root.SetSizeWithCurrentAnchors(RectTransform.Axis.Vertical, ((RectTransform) root.GetChild(0)).rect.height);
 		}*/
-
-		/// <inheritdoc />
-		protected AutoSizedItemsViewsHolder(int itemIndex) : base(itemIndex)
-		{ }
 	}
 }

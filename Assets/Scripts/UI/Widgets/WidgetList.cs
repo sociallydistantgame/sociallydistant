@@ -33,10 +33,7 @@ namespace UI.Widgets
 		/// <inheritdoc />
 		protected override WidgetListViewsHolder CreateModel(int itemIndex)
 		{
-			var vh = new WidgetListViewsHolder(itemIndex);
-
-			//vh.Init(_Params.ItemPrefab, _Params.Content, itemIndex);
-			
+			var vh = new WidgetListViewsHolder();
 			return vh;
 		}
 
@@ -66,10 +63,10 @@ namespace UI.Widgets
             newOrRecycled.WidgetController.gameObject.SetActive(true);
 		}
 
-		/*/// <inheritdoc />
-		protected override void OnBeforeRecycleOrDisableViewsHolder(WidgetListViewsHolder inRecycleBinOrVisible, int newItemIndex)
+		/// <inheritdoc />
+		protected override void OnBeforeDestroyViewsHolder(WidgetListViewsHolder inRecycleBinOrVisible)
 		{
-			base.OnBeforeRecycleOrDisableViewsHolder(inRecycleBinOrVisible, newItemIndex);
+			base.OnBeforeDestroyViewsHolder(inRecycleBinOrVisible);
 
 			if (inRecycleBinOrVisible.RecyclableWidget == null)
 				return;
@@ -81,6 +78,6 @@ namespace UI.Widgets
 
 			inRecycleBinOrVisible.WidgetController = null;
 			inRecycleBinOrVisible.RecyclableWidget = null;
-		}*/
+		}
 	}
 }
