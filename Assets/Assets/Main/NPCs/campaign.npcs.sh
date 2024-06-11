@@ -14,5 +14,7 @@ profile() {
 }
 
 feed() {
-  # TODO
+  post test
+  body This is a test.
+  send
 }

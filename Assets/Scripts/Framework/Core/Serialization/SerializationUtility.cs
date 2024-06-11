@@ -1103,7 +1103,7 @@ namespace Core.Serialization
 			
 			if (serializer.IsWriting)
 			{
-				int elementCount = collection.Count;
+				int elementCount = collection?.Count ?? 0;
 				SerializeAtRevision(ref elementCount, serializer, revision, elementCount);
 				
 				for (var i = 0; i < elementCount; i++)
