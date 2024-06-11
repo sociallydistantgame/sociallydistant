@@ -67,8 +67,8 @@ namespace GameplaySystems.Social
 
 			runList.Add(parsed);
 
-			runList.Add(new SingleInstruction(new CommandData(null, new TextArgumentEvaluator("profile"), Array.Empty<IArgumentEvaluator>(), FileRedirectionType.None, null)));
-			runList.Add(new SingleInstruction(new CommandData(null, new TextArgumentEvaluator("feed"), Array.Empty<IArgumentEvaluator>(), FileRedirectionType.None, null)));
+			runList.Add(new SingleInstruction(new CommandData(new TextArgumentEvaluator("profile"), Array.Empty<IArgumentEvaluator>(), FileRedirectionType.None, null)));
+			runList.Add(new SingleInstruction(new CommandData(new TextArgumentEvaluator("feed"), Array.Empty<IArgumentEvaluator>(), FileRedirectionType.None, null)));
 
 			return new SequentialInstruction(runList);
 		}
