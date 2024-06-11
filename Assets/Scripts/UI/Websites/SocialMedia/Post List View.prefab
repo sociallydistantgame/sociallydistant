@@ -10,7 +10,8 @@ GameObject:
   m_Component:
   - component: {fileID: 818422469861990761}
   - component: {fileID: 6000310990370568541}
-  m_Layer: 0
+  - component: {fileID: 1528379338650418368}
+  m_Layer: 5
   m_Name: Post List View
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -52,10 +53,24 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   viewport: {fileID: 1602199745050101271}
-  content: {fileID: 1602199745050101271}
+  content: {fileID: 5406625656124213664}
   itemPrefab: {fileID: 4245947792408340369, guid: 9e8729b5df9a384428afd36a82e53058, type: 3}
   scrollBar: {fileID: 532749799456397769}
   isHorizontal: 0
+--- !u!114 &1528379338650418368
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 670816867663833826}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 3312d7739989d2b4e91e6319e9a96d76, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  m_Padding: {x: 0, y: 0, z: 0, w: 0}
+  m_Softness: {x: 0, y: 0}
 --- !u!1 &2876225260548443713
 GameObject:
   m_ObjectHideFlags: 0
@@ -65,7 +80,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 1589860300985228959}
-  m_Layer: 0
+  m_Layer: 5
   m_Name: Sliding Area
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -105,7 +120,7 @@ GameObject:
   - component: {fileID: 7753335410088606656}
   - component: {fileID: 1562891054394804788}
   - component: {fileID: 532749799456397769}
-  m_Layer: 0
+  m_Layer: 5
   m_Name: Scrollbar
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -231,7 +246,7 @@ GameObject:
   - component: {fileID: 1179203405401405197}
   - component: {fileID: 8764954976658987523}
   - component: {fileID: 3049785335973642242}
-  m_Layer: 0
+  m_Layer: 5
   m_Name: Handle
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -307,7 +322,7 @@ GameObject:
   - component: {fileID: 5406625656124213664}
   - component: {fileID: 149159867941221792}
   - component: {fileID: 8044237089327089916}
-  m_Layer: 0
+  m_Layer: 5
   m_Name: Content
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -355,7 +370,7 @@ MonoBehaviour:
   m_Spacing: 0
   m_ChildForceExpandWidth: 1
   m_ChildForceExpandHeight: 0
-  m_ChildControlWidth: 0
+  m_ChildControlWidth: 1
   m_ChildControlHeight: 1
   m_ChildScaleWidth: 1
   m_ChildScaleHeight: 1
@@ -383,7 +398,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 1602199745050101271}
-  m_Layer: 0
+  m_Layer: 5
   m_Name: Viewport
   m_TagString: Untagged
   m_Icon: {fileID: 0}

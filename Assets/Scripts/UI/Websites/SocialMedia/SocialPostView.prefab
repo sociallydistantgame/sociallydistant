@@ -12,7 +12,7 @@ GameObject:
   - component: {fileID: 6699757354152960736}
   - component: {fileID: 1623140128519581646}
   - component: {fileID: 6683188719347794174}
-  m_Layer: 0
+  m_Layer: 5
   m_Name: DocumentElementList
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -58,7 +58,7 @@ MonoBehaviour:
     m_Bottom: 0
   m_ChildAlignment: 0
   m_Spacing: 6
-  m_ChildForceExpandWidth: 0
+  m_ChildForceExpandWidth: 1
   m_ChildForceExpandHeight: 0
   m_ChildControlWidth: 1
   m_ChildControlHeight: 1
@@ -109,7 +109,7 @@ GameObject:
   - component: {fileID: 966474866354219624}
   - component: {fileID: 8760532252792047785}
   - component: {fileID: 6632154356833875728}
-  m_Layer: 0
+  m_Layer: 5
   m_Name: Views
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -187,9 +187,9 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 6184124950646531058}
-  - component: {fileID: 1254224794831148803}
   - component: {fileID: 5387023888559800233}
-  m_Layer: 0
+  - component: {fileID: 18708356380319456}
+  m_Layer: 5
   m_Name: SocialPostView
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -215,22 +215,8 @@ RectTransform:
   m_AnchorMin: {x: 0, y: 1}
   m_AnchorMax: {x: 0, y: 1}
   m_AnchoredPosition: {x: 0, y: 0}
-  m_SizeDelta: {x: 100, y: 0}
+  m_SizeDelta: {x: 100, y: 40}
   m_Pivot: {x: 0, y: 1}
---- !u!114 &1254224794831148803
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 4245947792408340369}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 3245ec927659c4140ac4f8d17403cc18, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  m_HorizontalFit: 0
-  m_VerticalFit: 2
 --- !u!114 &5387023888559800233
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -251,12 +237,32 @@ MonoBehaviour:
   m_ChildAlignment: 0
   m_Spacing: 0
   m_ChildForceExpandWidth: 1
-  m_ChildForceExpandHeight: 1
+  m_ChildForceExpandHeight: 0
   m_ChildControlWidth: 1
   m_ChildControlHeight: 1
   m_ChildScaleWidth: 1
   m_ChildScaleHeight: 1
   m_ReverseArrangement: 0
+--- !u!114 &18708356380319456
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 4245947792408340369}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 306cc8c2b49d7114eaa3623786fc2126, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  m_IgnoreLayout: 0
+  m_MinWidth: -1
+  m_MinHeight: -1
+  m_PreferredWidth: -1
+  m_PreferredHeight: -1
+  m_FlexibleWidth: 1
+  m_FlexibleHeight: -1
+  m_LayoutPriority: 1
 --- !u!1001 &3014285743551336235
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -267,6 +273,10 @@ PrefabInstance:
     - target: {fileID: 2748126272175008836, guid: 81f6921457578d54e9080655c2e94e4b, type: 3}
       propertyPath: m_Name
       value: User Avatar
+      objectReference: {fileID: 0}
+    - target: {fileID: 2748126272175008836, guid: 81f6921457578d54e9080655c2e94e4b, type: 3}
+      propertyPath: m_Layer
+      value: 5
       objectReference: {fileID: 0}
     - target: {fileID: 6157683397810042323, guid: 81f6921457578d54e9080655c2e94e4b, type: 3}
       propertyPath: m_Pivot.x
@@ -351,6 +361,10 @@ PrefabInstance:
     - target: {fileID: 6157683397810042323, guid: 81f6921457578d54e9080655c2e94e4b, type: 3}
       propertyPath: m_LocalEulerAnglesHint.z
       value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 8590695241368186117, guid: 81f6921457578d54e9080655c2e94e4b, type: 3}
+      propertyPath: m_Layer
+      value: 5
       objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: 81f6921457578d54e9080655c2e94e4b, type: 3}
