@@ -17,9 +17,6 @@ namespace Core.Scripting.Instructions
 		public SequentialInstruction(IEnumerable<ShellInstruction> instructionSource)
 		{
 			instructions = instructionSource.Where(x=>x is not null).ToArray();
-
-			if (instructions.Length < 1)
-				throw new InvalidOperationException("Sequential instructions must have at least one sub-instruction.");
 		}
 
 		/// <inheritdoc />

@@ -18,12 +18,12 @@ namespace GameplaySystems.Social
 		private WorldProfileData profile;
 		private bool pendingChanges;
 
-		public NpcGeneratorFunctions(IWorldManager world)
+		public NpcGeneratorFunctions(IWorldManager world, string target)
 		{
 			this.world = world;
+			ChangeNpc(target);
 		}
-
-		[Function("npc")]
+		
 		private void ChangeNpc(string narrativeId)
 		{
 			if (narrativeId == "player") 

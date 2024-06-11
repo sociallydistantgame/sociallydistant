@@ -1,14 +1,12 @@
-﻿#!npcs
+﻿#!npc chr_local_news
 
-# The character the player interacts with during cutscenes
-npc chr_storyteller
+profile() {
+  username newciphertoday
+  displayname New Cipher Today
+  bio Breaking news and local stories that matter most to the citizens of New Cipher.
+  pronoun enby
+}
 
-# The developer of the ransomware
-npc chr_ground_zero
-
-# New Cipher Today
-npc chr_local_news
-username newciphertoday
-displayname New Cipher Today
-bio Breaking news and local stories that matter most to the citizens of New Cipher.
-pronoun enby
+feed() {
+  # TODO
+}

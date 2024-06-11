@@ -23,6 +23,7 @@ namespace Editor.CustomImporters
 		private UnityEngine.Object NpcImporter(string shebang, StringBuilder scriptText)
 		{
 			var asset = ScriptableObject.CreateInstance<NpcGeneratorScript>();
+			asset.NarrativeId = shebang.Trim();
 			asset.SetScriptText(scriptText.ToString());
 			return asset;
 		}
@@ -49,7 +50,7 @@ namespace Editor.CustomImporters
 					ChatImporter
 				},
 				{
-					"npcs",
+					"npc",
 					NpcImporter
 				}
 			};
