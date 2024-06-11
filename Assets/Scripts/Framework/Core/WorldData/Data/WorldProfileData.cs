@@ -21,6 +21,7 @@ namespace Core.WorldData.Data
 		private string socialName;
 		private string mailName;
 		private string socialBio;
+		private ushort attributes;
 
 		/// <inheritdoc />
 		public void Serialize(IWorldSerializer serializer)
@@ -43,6 +44,12 @@ namespace Core.WorldData.Data
 			
 		}
 
+		public CharacterAttributes Attributes
+		{
+			get => (CharacterAttributes) attributes;
+			set => attributes = (ushort) value;
+		}
+		
 		/// <inheritdoc />
 		public ObjectId InstanceId
 		{

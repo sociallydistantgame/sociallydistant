@@ -1,4 +1,5 @@
 ﻿using Core;
+using Core.WorldData.Data;
 using UnityEngine;
 using UnityEngine.Analytics;
 
@@ -7,6 +8,8 @@ namespace Social
 	public interface IProfile
 	{
 		ObjectId ProfileId { get; }
+		
+		CharacterAttributes Attributes { get; }
 		
 		string SocialHandle { get; }
 		

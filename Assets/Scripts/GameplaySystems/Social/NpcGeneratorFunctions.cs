@@ -42,6 +42,25 @@ namespace GameplaySystems.Social
 			pendingChanges = true;
 		}
 
+		[Function("attributes")]
+		private void SetCharacterAttributes(string[] attribNames)
+		{
+			ThrowIfInvalidId();
+
+			var newAttributes = CharacterAttributes.None;
+
+			foreach (string attribName in attribNames)
+			{
+				if (!Enum.TryParse(attribName, true, out CharacterAttributes attrib))
+					throw new InvalidOperationException($"Unrecognized character attribute name {attribName} for NPC {this.profile.NarrativeId}");
+
+				newAttributes |= attrib;
+			}
+
+			pendingChanges = profile.Attributes != newAttributes;
+			profile.Attributes = newAttributes;
+		}
+
 		[Function("displayname")]
 		public void SetDisplayName(string[] args)
 		{

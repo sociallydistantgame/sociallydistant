@@ -1,5 +1,6 @@
 ﻿#nullable enable
 using Core;
+using Core.WorldData.Data;
 using Social;
 using UnityEngine;
 using UnityEngine.Analytics;
@@ -10,6 +11,9 @@ namespace GameplaySystems.Social
 	{
 		/// <inheritdoc />
 		public ObjectId ProfileId => ObjectId.Invalid;
+
+		/// <inheritdoc />
+		public CharacterAttributes Attributes => CharacterAttributes.None;
 
 		/// <inheritdoc />
 		public string SocialHandle { get; }

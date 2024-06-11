@@ -27,6 +27,9 @@ namespace GameplaySystems.Social
 		public ObjectId ProfileId => data.InstanceId;
 
 		/// <inheritdoc />
+		public CharacterAttributes Attributes => data.Attributes;
+
+		/// <inheritdoc />
 		public string SocialHandle => data.ChatUsername;
 
 		/// <inheritdoc />
