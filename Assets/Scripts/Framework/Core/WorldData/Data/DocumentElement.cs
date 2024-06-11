@@ -26,5 +26,33 @@ namespace Core.WorldData.Data
 			get => data;
 			set => data = value;
 		}
+
+		public static bool operator ==(DocumentElement a, DocumentElement b)
+		{
+			return (a.ElementType == b.ElementType && a.Data == b.Data);
+		}
+
+		public static bool operator !=(DocumentElement a, DocumentElement b)
+		{
+			return !(a == b);
+		}
+
+		/// <inheritdoc />
+		public override bool Equals(object obj)
+		{
+			return obj is DocumentElement element && element == this;
+		}
+
+		/// <inheritdoc />
+		public override int GetHashCode()
+		{
+			return HashCode.Combine(ElementType, Data);
+		}
+
+		/// <inheritdoc />
+		public override string ToString()
+		{
+			return $"(ElementType={ElementType}, Data={Data})";
+		}
 	}
 }

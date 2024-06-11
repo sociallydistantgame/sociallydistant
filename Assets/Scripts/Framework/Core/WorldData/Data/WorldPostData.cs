@@ -6,12 +6,14 @@ namespace Core.WorldData.Data
 {
 	public struct WorldPostData :
 		IWorldData,
-		IDataWithId
+		IDataWithId,
+		INarrativeObject
 	{
 		private ObjectId id;
 		private ObjectId author;
 		private DateTime date;
 		private IReadOnlyList<DocumentElement> documentElements;
+		private string narrativeId;
 		
 		/// <inheritdoc />
 		public void Serialize(IWorldSerializer serializer)
@@ -45,6 +47,13 @@ namespace Core.WorldData.Data
 		{
 			get => documentElements;
 			set => documentElements = value;
+		}
+
+		/// <inheritdoc />
+		public string NarrativeId
+		{
+			get => narrativeId;
+			set => narrativeId = value;
 		}
 	}
 }

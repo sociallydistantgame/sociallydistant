@@ -1,5 +1,6 @@
 ﻿#nullable enable
 using System;
+using System.Collections.Generic;
 using System.Linq;
 using ContentManagement;
 using Core;
@@ -18,6 +19,10 @@ namespace GameplaySystems.Social
 		private WorldProfileData profile;
 		private bool pendingChanges;
 
+		private bool posting;
+		private bool postChanged;
+		private WorldPostData post;
+		
 		public NpcGeneratorFunctions(IWorldManager world, string target)
 		{
 			this.world = world;
@@ -117,6 +122,12 @@ namespace GameplaySystems.Social
 		
 		public void SavePendingChanges()
 		{
+			if (posting)
+			{
+				Debug.LogWarning("A social post was being created during an NPC update, but the post was never sent.");
+				SendPost();
+			}
+
 			if (!pendingChanges)
 				return;
 
@@ -207,6 +218,103 @@ namespace GameplaySystems.Social
 				return world.World.PlayerData.Value.PlayerProfile;
 
 			return world.World.Profiles.GetNarrativeObject(id).InstanceId;
+		}
+
+		[Function("post")]
+		private void StartPost(string id)
+		{
+			ThrowIfPosting();
+
+			string fullId = $"{profile.NarrativeId}:{id}";
+
+			post = world.World.Posts.GetNarrativeObject(fullId);
+
+			if (post.Author != profile.InstanceId)
+			{
+				post.Author = profile.InstanceId;
+				postChanged = true;
+			}
+
+			posting = true;
+		}
+
+		[Function("body")]
+		private void SetPostText(string text)
+		{
+			ThrowIfNotPosting();
+
+			List<DocumentElement> document = post.DocumentElements?.ToList() ?? new List<DocumentElement>();
+
+			if (document.Count == 0)
+			{
+				document.Add(new DocumentElement
+				{
+					ElementType = DocumentElementType.Text,
+					Data = text
+				});
+			}
+			else
+			{
+				// Find an existing text element. If we can't find one, then we insert it at index 0.
+				var existingIndex = -1;
+
+				for (var i = 0; i < document.Count; i++)
+				{
+					if (document[i].ElementType == DocumentElementType.Text)
+					{
+						existingIndex = i;
+						break;
+					}
+				}
+
+				if (existingIndex == -1)
+				{
+					document.Insert(0, new DocumentElement
+					{
+						ElementType = DocumentElementType.Text,
+						Data = text
+					});
+				}
+				else
+				{
+					// Swap it with item 0 and update
+					DocumentElement element = document[existingIndex];
+					document[existingIndex] = document[0];
+
+					element.Data = text;
+					
+					document[0] = element;
+				}
+			}
+
+			postChanged = post.DocumentElements?.SequenceEqual(document) == true;
+			post.DocumentElements = document;
+		}
+
+		[Function("send")]
+		private void SendPost()
+		{
+			ThrowIfNotPosting();
+
+			posting = false;
+			
+			if (postChanged)
+				world.World.Posts.Modify(post);
+
+			postChanged = false;
+			post = default;
+		}
+
+		private void ThrowIfNotPosting()
+		{
+			if (!posting)
+				throw new InvalidOperationException("Cannot perform this operation unless creating a social post.");
+		}
+		
+		private void ThrowIfPosting()
+		{
+			if (posting)
+				throw new InvalidOperationException("Cannot start a new post when already creating a social post. End the current post with `send` first.");
 		}
 		
 		private enum ScriptPronoun

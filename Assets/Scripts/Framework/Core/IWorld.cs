@@ -21,7 +21,7 @@ namespace Core
 		IWorldTable<WorldCraftedExploitData> CraftedExploits { get; }
 		IWorldTable<WorldHackableData> Hackables { get; }
 		INarrativeObjectTable<WorldProfileData> Profiles { get; }
-		IWorldTable<WorldPostData> Posts { get; }
+		INarrativeObjectTable<WorldPostData> Posts { get; }
 		IWorldTable<WorldWitnessedObjectData> WitnessedObjects { get; }
 		IWorldTable<WorldMessageData> Messages { get; }
 		INarrativeObjectTable<WorldChannelData> Channels { get; }

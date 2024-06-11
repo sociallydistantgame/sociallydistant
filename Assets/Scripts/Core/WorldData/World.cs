@@ -26,7 +26,7 @@ namespace Core.WorldData
 		private readonly WorldDataTable<WorldCraftedExploitData> craftedExploits;
 		private readonly WorldDataTable<WorldHackableData> hackables;
 		private readonly NarrativeObjectTable<WorldProfileData> profiles;
-		private readonly WorldDataTable<WorldPostData> posts;
+		private readonly NarrativeObjectTable<WorldPostData> posts;
 		private readonly WorldDataTable<WorldMessageData> messages;
 		private readonly NarrativeObjectTable<WorldChannelData> channels;
 		private readonly NarrativeObjectTable<WorldGuildData> guilds;
@@ -102,7 +102,7 @@ namespace Core.WorldData
         public INarrativeObjectTable<WorldProfileData> Profiles => profiles;
 
         /// <inheritdoc />
-        public IWorldTable<WorldPostData> Posts => posts;
+        public INarrativeObjectTable<WorldPostData> Posts => posts;
 
         /// <inheritdoc />
         public IWorldTable<WorldWitnessedObjectData> WitnessedObjects => witnessedObjects;
@@ -140,7 +140,7 @@ namespace Core.WorldData
 			craftedExploits = new WorldDataTable<WorldCraftedExploitData>(instanceIdGenerator, eventDispatcher);
 			hackables = new WorldDataTable<WorldHackableData>(instanceIdGenerator, eventDispatcher);
         	profiles = new NarrativeObjectTable<WorldProfileData>(instanceIdGenerator, eventDispatcher);
-        	posts = new WorldDataTable<WorldPostData>(instanceIdGenerator, eventDispatcher);
+        	posts = new NarrativeObjectTable<WorldPostData>(instanceIdGenerator, eventDispatcher);
         	messages = new WorldDataTable<WorldMessageData>(instanceIdGenerator, eventDispatcher);
         	channels = new NarrativeObjectTable<WorldChannelData>(instanceIdGenerator, eventDispatcher);
         	guilds = new NarrativeObjectTable<WorldGuildData>(instanceIdGenerator, eventDispatcher);
