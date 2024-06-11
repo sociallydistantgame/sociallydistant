@@ -41,7 +41,7 @@ namespace Core.WorldData.Data
 			SerializationUtility.SerializeAtRevision(ref ignored, serializer, WorldRevision.ChatAndSocialMedia, default);
 			SerializationUtility.SerializeAtRevision(ref socialBio, serializer, WorldRevision.ChatAndSocialMedia, default);
 			SerializationUtility.SerializeAtRevision(ref narrativeId, serializer, WorldRevision.NarrativeProfiles, default);
-			
+			SerializationUtility.SerializeAtRevision(ref attributes, serializer, WorldRevision.CharacterAttributes, default);
 		}
 
 		public CharacterAttributes Attributes

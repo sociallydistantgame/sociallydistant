@@ -21,6 +21,8 @@ namespace Core.WorldData.Data
 			SerializationUtility.SerializeAtRevision(ref id, serializer, WorldRevision.ChatAndSocialMedia, default);
 			SerializationUtility.SerializeAtRevision(ref author, serializer, WorldRevision.ChatAndSocialMedia, default);
 			SerializationUtility.SerializeAtRevision(ref date, serializer, WorldRevision.ChatAndSocialMedia, default);
+			SerializationUtility.SerializeAtRevision(ref narrativeId, serializer, WorldRevision.CharacterAttributes, default);
+			
 			SerializationUtility.SerializeCollectionAtRevision(ref documentElements, serializer, WorldRevision.ChatAndSocialMedia);
 		}
 

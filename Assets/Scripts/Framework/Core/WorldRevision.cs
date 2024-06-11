@@ -28,6 +28,7 @@
 		NarrativeChannels = 23,
 		Notifications = 24,
 		ComputersCanListen = 25,
+		CharacterAttributes = 26,
 		
 		Latest
 	}
