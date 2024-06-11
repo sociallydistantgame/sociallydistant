@@ -3,6 +3,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using AcidicGui.Widgets;
+using GamePlatform;
 using GameplaySystems.Social;
 using GameplaySystems.WebPages;
 using Social;
@@ -16,10 +17,6 @@ namespace UI.Websites.SocialMedia
 {
 	public class SocialProfileWebPage : WebPage
 	{
-		[Header("Dependencies")]
-		[SerializeField]
-		private SocialServiceHolder socialService = null!;
-		
 		[Header("UI")]
 		[SerializeField]
 		private SocialProfileInfoView profileInfo = null!;
@@ -34,10 +31,13 @@ namespace UI.Websites.SocialMedia
 
 		private SocialMediaWebsite website;
 		private IProfile? profile = null;
+		private ISocialService socialService;
 		
 		/// <inheritdoc />
 		protected override void Awake()
 		{
+			socialService = GameManager.Instance.SocialService;
+			
 			this.AssertAllFieldsAreSerialized(typeof(SocialProfileWebPage));
 			this.MustGetComponentInParent(out website);
 			base.Awake();
@@ -63,32 +63,24 @@ namespace UI.Websites.SocialMedia
 			var isPrivate = false;
 			var isBlocked = false;
 
-			if (socialService.Value != null)
-			{
-				profileInfo.FollowerCount = socialService.Value.GetFollowers(profile).Count();
-				profileInfo.FollowingCount = socialService.Value.GetFollowing(profile).Count();
-                
-				IProfile player = socialService.Value.PlayerProfile;
+			profileInfo.FollowerCount = socialService.GetFollowers(profile).Count();
+			profileInfo.FollowingCount = socialService.GetFollowing(profile).Count();
 
-				isBlocked = socialService.Value.GetBlockedProfiles(profile)
-					.Contains(player);
+			IProfile player = socialService.PlayerProfile;
 
-				isPrivate = isBlocked
-				            || (profile != player
-				                && profile.IsPrivate
-				                && !socialService.Value.GetFollowing(profile).Contains(player));
-			}
-			else
-			{
-				profileInfo.FollowingCount = 0;
-				profileInfo.FollowerCount = 0;
-			}
-			
+			isBlocked = socialService.GetBlockedProfiles(profile)
+				.Contains(player);
+
+			isPrivate = isBlocked
+			            || (profile != player
+			                && profile.IsPrivate
+			                && !socialService.GetFollowing(profile).Contains(player));
+
 			bool isBlockedOrPrivate = isPrivate || isBlocked;
 
 			profileInfo.ShowStats = !isBlockedOrPrivate;
 			profileInfo.ShowPronoun = !isBlockedOrPrivate;
-			
+
 			sidebar.SetItems(BuildRelationships(isBlockedOrPrivate));
 
 			SetupInitialFeed(isBlockedOrPrivate);
@@ -100,18 +92,16 @@ namespace UI.Websites.SocialMedia
 
 			if (isBlockedOrPrivate)
 				return;
-
-			if (socialService.Value == null)
-				return;
-
+			
 			if (this.profile == null)
 				return;
 
-			foreach (IUserMessage post in socialService.Value.GetSocialPosts(this.profile))
+			foreach (IUserMessage post in socialService.GetSocialPosts(this.profile))
 			{
 				uiPosts.Add(ConvertPost(post));
 			}
 
+			this.listView.SetItems(uiPosts);
 		}
 
 		private void ShowProfileWithHistory(IProfile profile)
@@ -131,9 +121,6 @@ namespace UI.Websites.SocialMedia
 			if (profile == null)
 				return builder.Build();
 			
-			if (socialService.Value == null)
-				return builder.Build();
-            
 			if (isBlockedOrPrivate)
 				return builder.Build();
 
@@ -143,7 +130,7 @@ namespace UI.Websites.SocialMedia
 			var followerCount = 0;
 			var followingCount = 0;
 			
-			foreach (IProfile follower in socialService.Value.GetFollowers(profile))
+			foreach (IProfile follower in socialService.GetFollowers(profile))
 			{
 				builder.AddWidget(new ListItemWidget<IProfile>()
 				{
@@ -156,7 +143,7 @@ namespace UI.Websites.SocialMedia
 				followerCount++;
 			}
 			
-			foreach (IProfile follower in socialService.Value.GetFollowing(profile))
+			foreach (IProfile follower in socialService.GetFollowing(profile))
 			{
 				builder.AddWidget(new ListItemWidget<IProfile>()
 				{

@@ -239,10 +239,12 @@ namespace GameplaySystems.Social
 		}
 
 		[Function("body")]
-		private void SetPostText(string text)
+		private void SetPostText(string[] textData)
 		{
 			ThrowIfNotPosting();
 
+			string text = string.Join(" ", textData);
+			
 			List<DocumentElement> document = post.DocumentElements?.ToList() ?? new List<DocumentElement>();
 
 			if (document.Count == 0)
@@ -287,7 +289,7 @@ namespace GameplaySystems.Social
 				}
 			}
 
-			postChanged = post.DocumentElements?.SequenceEqual(document) == true;
+			postChanged |= post.DocumentElements?.SequenceEqual(document) == false;
 			post.DocumentElements = document;
 		}
 
