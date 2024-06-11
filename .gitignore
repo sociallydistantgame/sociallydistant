@@ -62,3 +62,6 @@ crashlytics-build.properties
 # Crash dumps and other weird crap
 mono_crash*
 .attach_pid*
+
+# Asset bundles for Socially Distant
+Assets/StreamingAssets/SystemAssets/
