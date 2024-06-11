@@ -6,7 +6,7 @@ using UnityEngine.Events;
 
 namespace UI.Applications.FileManager
 {
-	public class FileGridAdapter : GridController<FileViewsHolder>
+	public class FileGridAdapter : ScrollViewController<FileViewsHolder>
 	{
 		[SerializeField]
 		public UnityEvent<string> onFileDoubleClicked = new UnityEvent<string>();
@@ -28,7 +28,7 @@ namespace UI.Applications.FileManager
 		/// <inheritdoc />
 		protected override FileViewsHolder CreateModel(int itemIndex)
 		{
-			var vh = new FileViewsHolder(itemIndex);
+			var vh = new FileViewsHolder();
 			return vh;
 		}
 

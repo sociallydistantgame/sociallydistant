@@ -28,13 +28,10 @@ namespace UI.Widgets
 
 		[SerializeField]
 		private Image? spriteIcon;
-
-		private UiManager uiManager = null!;
-
+		
 		private void Awake()
 		{
 			this.AssertAllFieldsAreSerialized(typeof(CompositeIconWidget));
-			this.MustGetComponentInParent(out uiManager);
 		}
 
 		private void Start()
@@ -66,9 +63,6 @@ namespace UI.Widgets
 			
 			if (this.gameObject.activeSelf != shouldBeActive)
 				this.gameObject.SetActive(shouldBeActive);
-			
-			if (uiManager == null)
-				return;
 			
 			// prefer sprites over text
 			if (textIcon != null && (icon.spriteIcon != null || string.IsNullOrEmpty(icon.textIcon)))
