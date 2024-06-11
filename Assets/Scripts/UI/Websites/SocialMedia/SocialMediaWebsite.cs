@@ -2,6 +2,7 @@
 
 using System;
 using System.Linq;
+using GamePlatform;
 using GameplaySystems.Social;
 using GameplaySystems.WebPages;
 using JetBrains.Annotations;
@@ -14,10 +15,6 @@ namespace UI.Websites.SocialMedia
 {
 	public class SocialMediaWebsite : WebSite
 	{
-		[Header("Dependencies")]
-		[SerializeField]
-		private SocialServiceHolder socialService = null!;
-
 		[Header("UI")]
 		[SerializeField]
 		private SocialTimelineWebPage timelineWebPage = null!;
@@ -30,11 +27,14 @@ namespace UI.Websites.SocialMedia
 		
 		[SerializeField]
 		private Toggle otherPagesToggle = null!;
-		
+
+		private ISocialService socialService;
 		
 		/// <inheritdoc />
 		protected override void Awake()
 		{
+			socialService = GameManager.Instance.SocialService;
+			
 			base.Awake();
 			this.AssertAllFieldsAreSerialized(typeof(SocialMediaWebsite));
 		}
@@ -54,10 +54,7 @@ namespace UI.Websites.SocialMedia
 		[UsedImplicitly]
 		private void ShowProfile(string username)
 		{
-			if (socialService.Value == null)
-				return;
-
-			IProfile? user = socialService.Value.Profiles
+			IProfile? user = socialService.Profiles
 				.FirstOrDefault(x => x.SocialHandle == username);
 
 			if (user == null)
@@ -68,7 +65,7 @@ namespace UI.Websites.SocialMedia
 
 		public void ShowProfile(IProfile profile)
 		{
-			if (socialService.Value != null && profile == socialService.Value.PlayerProfile)
+			if (profile == socialService.PlayerProfile)
 			{
 				playerProfileToggle.SetIsOnWithoutNotify(true);
 			}
@@ -88,11 +85,8 @@ namespace UI.Websites.SocialMedia
 		{
 			if (!value)
 				return;
-
-			if (socialService.Value == null)
-				return;
-
-			ShowProfile(socialService.Value.PlayerProfile);
+			
+			ShowProfile(socialService.PlayerProfile);
 		}
 	}
 }
