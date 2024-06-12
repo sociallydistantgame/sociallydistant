@@ -21,6 +21,11 @@ namespace UI.Widgets.Settings
 		[SerializeField]
 		private Color humanColor = Color.blue;
 
+		[SerializeField]
+		private Material avatarMaterial = null!;
+		
+		private Material? materialInstance = null!;
+		
 		public bool UseDarkMode
 		{
 			get => useDarkMode;
@@ -39,9 +44,6 @@ namespace UI.Widgets.Settings
 			get => humanColor;
 			set
 			{
-				if (humanColor == value)
-					return;
-
 				humanColor = value;
 				UpdateUI();
 			}
@@ -50,10 +52,13 @@ namespace UI.Widgets.Settings
 		private void Awake()
 		{
 			this.AssertAllFieldsAreSerialized(typeof(DefaultAvatarRenderer));
-			
-			
-			
 			UpdateUI();
+		}
+
+		private void OnDestroy()
+		{
+			if (materialInstance != null)
+				Destroy(materialInstance);
 		}
 
 		private void UpdateUI()
@@ -61,15 +66,14 @@ namespace UI.Widgets.Settings
 			ring.ShapeProperties.OutlineColor = humanColor;
 			ring.ForceMeshUpdate();
 
-			Material avatarMaterial = image.material;
+			if (materialInstance == null)
+				materialInstance = Instantiate(avatarMaterial);
 
-			avatarMaterial.SetColor("_Color", useDarkMode ? Color.white : Color.black);
-			avatarMaterial.SetColor("_ForegroundColor", humanColor);
-		}
-
-		private void OnValidate()
-		{
-			UpdateUI();
+			materialInstance.SetColor("_BackgroundColor", useDarkMode ? Color.white : Color.black);
+			materialInstance.SetColor("_ForegroundColor", humanColor);
+			materialInstance.SetColor("_Color", image.color);
+			
+			image.material = materialInstance;
 		}
 	}
 }

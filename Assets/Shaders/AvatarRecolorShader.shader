@@ -3,8 +3,9 @@ Shader "Ritchie/AvatarRecolorShader"
       Properties
     {
         [PerRendererData] _MainTex ("Sprite Texture", 2D) = "white" {}
-        _Color ("Background Color", Color) = (1,1,1,1)
-        _ForegroundColor ("Foreground Color", Color) = (0,0,0,1)
+        _Color ("UI Tint Color", Color) = (1,1,1,1)
+        _BackgroundColor ("Background Color", Color) = (0,0,0,1)
+        _ForegroundColor ("Foreground Color", Color) = (0,0,1,1)
         
 
         _StencilComp ("Stencil Comparison", Float) = 8
@@ -78,6 +79,7 @@ Shader "Ritchie/AvatarRecolorShader"
 
             sampler2D _MainTex;
             fixed4 _Color;
+            fixed4 _BackgroundColor;
             fixed4 _ForegroundColor;
             fixed4 _TextureSampleAdd;
             float4 _ClipRect;
@@ -123,7 +125,7 @@ Shader "Ritchie/AvatarRecolorShader"
 
                 // This replaces the cyan with the foreground color and magenta with background.
                 // The lerp helps preserve the anti-aliasing baked into the texture, if any.
-                color = lerp(_Color, _ForegroundColor, color.g);
+                color = lerp(_BackgroundColor, _ForegroundColor, color.g) * _Color;
                 
                 #ifdef UNITY_UI_CLIP_RECT
                 color.a *= UnityGet2DClipping(IN.worldPosition.xy, _ClipRect);

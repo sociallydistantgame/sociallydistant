@@ -171,6 +171,9 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   defaultAvatarRenderer: {fileID: 7913924386969304191}
   customAvatar: {fileID: 1680862974273840805}
+  customAvatarTexture: {fileID: 0}
+  defaultColor: {r: 1, g: 0.92156863, b: 0.015686275, a: 1}
+  size: 16
 --- !u!1 &2480039107855181188
 GameObject:
   m_ObjectHideFlags: 0
@@ -457,3 +460,4 @@ MonoBehaviour:
   ring: {fileID: 7982956839578794015}
   useDarkMode: 0
   humanColor: {r: 0, g: 0, b: 1, a: 1}
+  avatarMaterial: {fileID: 2100000, guid: 674d092ae7060b88e8b4a0944e4558c7, type: 2}
