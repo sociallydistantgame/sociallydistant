@@ -118,7 +118,7 @@ namespace GameplaySystems.Missions
 					// if we got a null, the command wasn't found
 					if (result == null)
 					{
-						HandleCommandNotFound(commandName, console);
+						HandleCommandNotFound(commandName, commandArgs, console);
 						return;
 					}
 					
@@ -144,7 +144,7 @@ namespace GameplaySystems.Missions
 		}
 
 		/// <inheritdoc />
-		public void HandleCommandNotFound(string name, ITextConsole console)
+		public void HandleCommandNotFound(string name, string[] args, ITextConsole console)
 		{
 			throw new InvalidOperationException($"{Title}: {name}: Command not found. Mission will be forcibly abandoned and game will be reset.");
 		}

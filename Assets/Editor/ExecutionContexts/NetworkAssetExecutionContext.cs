@@ -57,7 +57,7 @@ namespace Editor.ExecutionContexts
 		}
 
 		/// <inheritdoc />
-		public void HandleCommandNotFound(string name, ITextConsole console)
+		public void HandleCommandNotFound(string name, string[] args, ITextConsole console)
 		{
 			throw new InvalidOperationException($"Command not found: {name}");
 		}

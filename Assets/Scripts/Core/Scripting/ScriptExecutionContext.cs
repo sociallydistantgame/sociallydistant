@@ -106,7 +106,7 @@ namespace Core.Scripting
 		}
 
 		/// <inheritdoc />
-		public void HandleCommandNotFound(string name, ITextConsole console)
+		public void HandleCommandNotFound(string name, string[] args, ITextConsole console)
 		{
 			// Throw it as an exception.
 			throw new InvalidOperationException($"Script execution error: Command {name} not found.");

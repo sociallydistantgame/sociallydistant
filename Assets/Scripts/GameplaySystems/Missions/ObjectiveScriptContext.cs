@@ -85,9 +85,9 @@ namespace GameplaySystems.Missions
 		}
 
 		/// <inheritdoc />
-		public void HandleCommandNotFound(string name, ITextConsole console)
+		public void HandleCommandNotFound(string name, string[] args, ITextConsole console)
 		{
-			underlyingContext.HandleCommandNotFound(name, console);
+			underlyingContext.HandleCommandNotFound(name, args, console);
 		}
 
 		/// <inheritdoc />

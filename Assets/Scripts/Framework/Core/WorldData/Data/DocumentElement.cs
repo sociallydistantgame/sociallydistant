@@ -1,11 +1,16 @@
 ﻿using System;
 using Core.Serialization;
+using UnityEngine;
 
 namespace Core.WorldData.Data
 {
+	[Serializable]
 	public struct DocumentElement : IWorldData
 	{
+		[SerializeField]
 		private byte elementType;
+		
+		[SerializeField]
 		private string data;
 		
 		/// <inheritdoc />

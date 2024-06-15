@@ -185,7 +185,7 @@ namespace Core.Scripting
 		}
 
 		/// <inheritdoc />
-		public void HandleCommandNotFound(string name, ITextConsole console)
+		public void HandleCommandNotFound(string name, string[] args, ITextConsole console)
 		{
 			console.WriteText($"sh: \x1b[1m{name}\x1b[0m: \x1b[91mCommand not found.\x1b[0m{Environment.NewLine}");
 		}

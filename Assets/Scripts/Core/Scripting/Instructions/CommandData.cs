@@ -57,7 +57,7 @@ namespace Core.Scripting.Instructions
 			// Hand execution off to the execution context.
 			int? commandExitStatus = await context.TryExecuteCommandAsync(realName, args, realConsole);
 			if (!commandExitStatus.HasValue)
-				context.HandleCommandNotFound(realName, realConsole);
+				context.HandleCommandNotFound(realName, args, realConsole);
 			
 			if (realConsole is IDisposable disposable)
 				disposable.Dispose();

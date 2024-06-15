@@ -136,9 +136,9 @@ namespace Core.Scripting
 		}
 
 		/// <inheritdoc />
-		public void HandleCommandNotFound(string name, ITextConsole console)
+		public void HandleCommandNotFound(string name, string[] args, ITextConsole console)
 		{
-			scriptContext.HandleCommandNotFound(name, console);
+			scriptContext.HandleCommandNotFound(name, args, console);
 		}
 
 		/// <inheritdoc />

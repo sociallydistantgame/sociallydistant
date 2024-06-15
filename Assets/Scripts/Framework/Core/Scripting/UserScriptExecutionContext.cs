@@ -77,7 +77,7 @@ namespace Core.Scripting
 		}
 
 		/// <inheritdoc />
-		public void HandleCommandNotFound(string name, ITextConsole console)
+		public void HandleCommandNotFound(string name, string[] args, ITextConsole console)
 		{
 			if (OnCommandNotFound != null)
 				OnCommandNotFound(name, console);

@@ -14,7 +14,7 @@ namespace Core.Scripting
 
 		ITextConsole OpenFileConsole(ITextConsole realConsole, string filePath, FileRedirectionType mode);
 
-		void HandleCommandNotFound(string name, ITextConsole console);
+		void HandleCommandNotFound(string name, string[] args, ITextConsole console);
 		void DeclareFunction(string name, IScriptFunction body);
 	}
 }

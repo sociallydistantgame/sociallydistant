@@ -185,7 +185,7 @@ namespace GameplaySystems.Missions
 			}
 
 			/// <inheritdoc />
-			public void HandleCommandNotFound(string name, ITextConsole console)
+			public void HandleCommandNotFound(string name, string[] args, ITextConsole console)
 			{
 				throw new InvalidOperationException($"Command {name} not found or not supported during mission script import. Make sure you are not running any commands in the top-level scope of the script.");
 			}

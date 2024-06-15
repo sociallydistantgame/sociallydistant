@@ -148,7 +148,7 @@ namespace Editor.CustomImporters
 		}
 
 		/// <inheritdoc />
-		public void HandleCommandNotFound(string name, ITextConsole console)
+		public void HandleCommandNotFound(string name, string[] args, ITextConsole console)
 		{
 			throw new InvalidOperationException($"{this.Title}: {name}: Command not found.");
 		}

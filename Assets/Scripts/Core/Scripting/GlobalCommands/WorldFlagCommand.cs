@@ -59,7 +59,7 @@ namespace Core.Scripting.GlobalCommands
 					commandName = args[2];
 
 					if (!(await context.TryExecuteCommandAsync(commandName, args.Skip(3).ToArray(), console)).HasValue)
-						context.HandleCommandNotFound(commandName, console);
+						context.HandleCommandNotFound(commandName, args, console);
 					
 					break;
 				case "run-if-unset" :
@@ -72,7 +72,7 @@ namespace Core.Scripting.GlobalCommands
 					commandName = args[2];
 					
 					if (!(await context.TryExecuteCommandAsync(commandName, args.Skip(3).ToArray(), console)).HasValue)
-						context.HandleCommandNotFound(commandName, console);
+						context.HandleCommandNotFound(commandName, args, console);
 
 					break;
 				default:

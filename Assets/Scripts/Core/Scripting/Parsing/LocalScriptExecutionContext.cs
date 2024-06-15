@@ -84,12 +84,9 @@ namespace Core.Scripting.Parsing
 		}
 
 		/// <inheritdoc />
-		public void HandleCommandNotFound(string name, ITextConsole console)
+		public void HandleCommandNotFound(string name, string[] args, ITextConsole console)
 		{
-			if (name == "start")
-				throw new InvalidOperationException("Could not find mission start function! Cannot start the mission.");
-			
-			underlyingContext.HandleCommandNotFound(name, console);
+			underlyingContext.HandleCommandNotFound(name, args, console);
 		}
 
 		/// <inheritdoc />
