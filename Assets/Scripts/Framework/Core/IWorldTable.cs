@@ -18,5 +18,7 @@ namespace Core
 		where TDataElement : struct, IWorldData, IDataWithId, INarrativeObject
 	{
 		TDataElement GetNarrativeObject(string narrativeId);
+
+		bool ContainsNarrativeId(string narrativeId);
 	}
 }

@@ -1,5 +1,6 @@
 #nullable enable
 using System;
+using System.Linq;
 using ContentManagement;
 using Core.WorldData.Data;
 using DevTools;
@@ -42,6 +43,8 @@ namespace GameplaySystems.Social
 		internal void Update(WorldNewsData data, IContentManager contentManager)
 		{
 			Date = data.Date;
+
+			articleAsset = contentManager.GetContentOfType<IArticleAsset>().FirstOrDefault(x => x.NarrativeId == data.NarrativeId);
 		}
 	}
 }

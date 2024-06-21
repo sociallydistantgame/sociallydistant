@@ -29,6 +29,9 @@ namespace GameplaySystems.Social
 		[SerializeField]
 		private DocumentElement[] body = Array.Empty<DocumentElement>();
 
+		[SerializeField]
+		private ArticleFlags articleFlags;
+		
 		/// <inheritdoc />
 		public string NarrativeId
 		{
@@ -82,6 +85,16 @@ namespace GameplaySystems.Social
 			set => body = value;
 #endif
 		}
+
+		/// <inheritdoc />
+		public ArticleFlags Flags
+		{
+			get => articleFlags;
+#if UNITY_EDITOR
+			set => articleFlags = value;
+#endif
+		}
+
 
 		/// <inheritdoc />
 		public Task<Texture2D?> GetFeaturedImage()

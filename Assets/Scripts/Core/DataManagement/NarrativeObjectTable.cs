@@ -69,6 +69,12 @@ namespace Core.DataManagement
 		}
 
 		/// <inheritdoc />
+		public bool ContainsNarrativeId(string narrativeId)
+		{
+			return this.narrativeIdLookup.ContainsKey(narrativeId);
+		}
+
+		/// <inheritdoc />
 		public IEnumerator<TDataElement> GetEnumerator()
 		{
 			return underlyingTable.GetEnumerator();

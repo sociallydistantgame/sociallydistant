@@ -78,6 +78,11 @@ namespace GameplaySystems.Social
 			newsManager = new NewsManager(this, worldManager, game.ContentManager);
 		}
 
+		private void Update()
+		{
+			newsManager.Update();
+		}
+		
 		private void OnDestroy()
 		{
 			game.ScriptSystem.UnregisterHookListener(CommonScriptHooks.AfterWorldStateUpdate, characterUpdateHook);

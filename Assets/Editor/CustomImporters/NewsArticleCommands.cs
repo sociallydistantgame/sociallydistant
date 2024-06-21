@@ -1,5 +1,7 @@
 #nullable enable
+using System;
 using Core.Scripting;
+using DevTools;
 using GameplaySystems.Social;
 
 namespace Editor.CustomImporters
@@ -13,7 +15,7 @@ namespace Editor.CustomImporters
 			this.asset = asset;
 		}
 
-		[Function("title")]
+		[Function("headline")]
 		private void SetTitle(string[] args)
 		{
 			asset.Title = string.Join(" ", args);
@@ -41,6 +43,22 @@ namespace Editor.CustomImporters
 		private void SetExcerpt(string[] text)
 		{
 			asset.Excerpt = string.Join(" ", text);
+		}
+
+		[Function("flags")]
+		public void SetFlags(string[] flags)
+		{
+			ArticleFlags newFlags = default;
+
+			foreach (string flag in flags)
+			{
+				if (!Enum.TryParse(flag, true, out ArticleFlags flagValue))
+					throw new InvalidOperationException($"'{flag}' is not a valid news article flag.");
+
+				newFlags |= flagValue;
+			}
+
+			asset.Flags = newFlags;
 		}
 	}
 }

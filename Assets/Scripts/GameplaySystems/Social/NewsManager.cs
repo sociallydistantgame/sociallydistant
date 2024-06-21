@@ -1,10 +1,13 @@
 #nullable enable
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using ContentManagement;
 using Core;
 using Core.WorldData.Data;
+using DevTools;
 using Social;
+using Time = UnityEngine.Time;
 
 namespace GameplaySystems.Social
 {
@@ -15,6 +18,10 @@ namespace GameplaySystems.Social
 		private readonly IContentManager contentManager;
 		private readonly List<NewsArticle> articles = new();
 		private readonly Dictionary<ObjectId, int> articlesById = new();
+
+		private const float UpdateIntervalSeconds = 2;
+		
+		private float updateTime = 0;
 
 		public NewsManager(ISocialService socialService, IWorldManager worldManager, IContentManager contentManager)
 		{
@@ -95,6 +102,56 @@ namespace GameplaySystems.Social
 		{
 			return articles.Where(x => x.HostName == hostname)
 				.OrderByDescending(x => x.Date);
+		}
+
+		internal void Update()
+		{
+			updateTime += Time.deltaTime;
+
+			if (updateTime < UpdateIntervalSeconds)
+				return;
+
+			updateTime = 0;
+			PostNewArticles();
+		}
+
+		private void PostNewArticles()
+		{
+			foreach (IArticleAsset asset in contentManager.GetContentOfType<IArticleAsset>())
+			{
+				if (asset.Flags.HasFlag(ArticleFlags.Scripted))
+					continue;
+
+				bool shouldPost = asset.Flags.HasFlag(ArticleFlags.Old);
+
+				if (shouldPost)
+				{
+					if (worldManager.World.NewsArticles.ContainsNarrativeId(asset.NarrativeId))
+						continue;
+
+					ObjectId id = worldManager.GetNextObjectId();
+
+					var data = new WorldNewsData()
+					{
+						InstanceId = id,
+						NarrativeId = asset.NarrativeId,
+						Date = asset.Flags.HasFlag(ArticleFlags.Old)
+							? DateTime.MinValue.AddMonths(id.Id)
+							: worldManager.World.GlobalWorldState.Value.Now
+					};
+					
+					worldManager.World.NewsArticles.Add(data);
+				}
+				else
+				{
+					if (!worldManager.World.NewsArticles.ContainsNarrativeId(asset.NarrativeId))
+						continue;
+
+					WorldNewsData data = worldManager.World.NewsArticles.GetNarrativeObject(asset.NarrativeId);
+					worldManager.World.NewsArticles.Remove(data);
+				}
+				
+			}
 		}
 	}
 }
