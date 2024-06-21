@@ -29,6 +29,7 @@
 		Notifications = 24,
 		ComputersCanListen = 25,
 		CharacterAttributes = 26,
+		Articles,
 		
 		Latest
 	}

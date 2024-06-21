@@ -31,8 +31,8 @@ namespace Core
 		IWorldTable<WorldDomainNameData> Domains { get; }
 		INarrativeObjectTable<WorldMailData> Emails { get; }
 		IWorldTable<WorldNotificationData> Notifications { get; }
-		
-		
+		INarrativeObjectTable<WorldNewsData> NewsArticles { get; }
+
 		IWorldFlagCollection WorldFlags { get; }
 
 		ulong PlayerExperience { get; }

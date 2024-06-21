@@ -25,5 +25,6 @@ namespace Social
 		IProfile GetProfileById(ObjectId id);
 		IProfile GetNarrativeProfile(string narrativeIdentifier);
 		INarrativeThread? GetNarrativeThread(NarrativeThread threadType, string guildId, string channelId, bool create, params string[] nonPlayerActors);
+		INewsManager News { get; }
 	}
 }

@@ -28,7 +28,7 @@ namespace GameplaySystems.Social
 		private PlayerInstanceHolder playerInstance = null!;
 
 		private readonly CharacterUpdateHook characterUpdateHook = new();
-		
+
 		private Dictionary<ObjectId, Profile> profiles = new Dictionary<ObjectId, Profile>();
 		private ObjectId playerProfileId;
 		private EmptyProfile unloadedPlayerProfile = new EmptyProfile();
@@ -39,6 +39,7 @@ namespace GameplaySystems.Social
 		private SocialPostManager socialPostManager;
 		private IWorldManager worldManager = null!;
 		private IGameContext game;
+		private NewsManager newsManager;
 
 		/// <inheritdoc />
 		public IProfile PlayerProfile
@@ -56,7 +57,7 @@ namespace GameplaySystems.Social
 		{
 			game = GameManager.Instance;
 			worldManager = GameManager.Instance.WorldManager;
-			
+
 			this.AssertAllFieldsAreSerialized(typeof(SocialService));
 		}
 
@@ -68,13 +69,13 @@ namespace GameplaySystems.Social
 			memberManager = new ChatMemberManager(this, worldManager);
 			masterGuildList = new GuildList(channelManager, memberManager, worldManager);
 			socialPostManager = new SocialPostManager(this, worldManager);
-			
+
 			worldManager.Callbacks.AddModifyCallback<WorldPlayerData>(OnPlayerDataUpdated);
-			
+
 			worldManager.Callbacks.AddCreateCallback<WorldProfileData>(OnProfileCreated);
 			worldManager.Callbacks.AddModifyCallback<WorldProfileData>(OnProfileModified);
 			worldManager.Callbacks.AddDeleteCallback<WorldProfileData>(OnProfileDeleted);
-			
+			newsManager = new NewsManager(this, worldManager, game.ContentManager);
 		}
 
 		private void OnDestroy()
@@ -104,7 +105,7 @@ namespace GameplaySystems.Social
 		{
 			if (!profiles.TryGetValue(subjectnew.InstanceId, out Profile profile))
 				return;
-			
+
 			profile.SetData(subjectnew);
 		}
 
@@ -115,7 +116,7 @@ namespace GameplaySystems.Social
 				profile = new Profile(this);
 				profiles.Add(subject.InstanceId, profile);
 			}
-			
+
 			profile.SetData(subject);
 		}
 
@@ -131,7 +132,7 @@ namespace GameplaySystems.Social
 					continue;
 
 				ObjectId friendId = relationship.Source == user.ProfileId ? relationship.Target : relationship.Source;
-                
+
 				if (!profiles.TryGetValue(friendId, out Profile target))
 					continue;
 
@@ -234,7 +235,7 @@ namespace GameplaySystems.Social
 						Name = $"__DMChannel__",
 						Description = "This is a DM channel"
 					};
-					
+
 					worldManager.World.Channels.Add(newChannel);
 
 					worldManager.World.Members.Add(new WorldMemberData()
@@ -244,7 +245,7 @@ namespace GameplaySystems.Social
 						GroupType = MemberGroupType.GroupDirectMessage,
 						ProfileId = user.ProfileId
 					});
-					
+
 					worldManager.World.Members.Add(new WorldMemberData()
 					{
 						InstanceId = worldManager.GetNextObjectId(),
@@ -254,7 +255,7 @@ namespace GameplaySystems.Social
 					});
 				}
 			}
-			
+
 			// Now, find all world member data for DM channels where the member is the user we're searching for.
 			foreach (WorldMemberData memberData in worldManager.World.Members)
 			{
@@ -291,7 +292,7 @@ namespace GameplaySystems.Social
 		{
 			foreach (IUserMessage ownPost in GetSocialPosts(profile))
 				yield return ownPost;
-			
+
 			foreach (IProfile follow in GetFollowing(profile))
 			{
 				foreach (IUserMessage post in GetSocialPosts(follow))
@@ -304,7 +305,7 @@ namespace GameplaySystems.Social
 		{
 			if (id.IsInvalid)
 				return new EmptyProfile();
-			
+
 			return profiles[id];
 		}
 
@@ -328,10 +329,10 @@ namespace GameplaySystems.Social
 				modify = true;
 				profileDAta.ChatName = narrativeIdentifier;
 			}
-			
+
 			if (modify)
 				worldManager.World.Profiles.Modify(profileDAta);
-			
+
 			return profiles[profileDAta.InstanceId];
 		}
 
@@ -358,7 +359,7 @@ namespace GameplaySystems.Social
 			{
 				profileIds[i + 1] = nonPlayerProfiles[i].ProfileId;
 			}
-			
+
 			switch (threadType)
 			{
 				case NarrativeThread.DirectMessage:
@@ -377,7 +378,7 @@ namespace GameplaySystems.Social
 					{
 						threadData.InstanceId = worldManager.GetNextObjectId();
 						threadData.ChannelType = MessageChannelType.DirectMessage;
-						
+
 						world.Channels.Add(threadData);
 
 						foreach (ObjectId profileId in profileIds)
@@ -412,7 +413,7 @@ namespace GameplaySystems.Social
 						// We do not invite players to guilds unless a script is starting.
 						if (!create)
 							return null;
-						
+
 						world.Members.Add(new WorldMemberData()
 						{
 							InstanceId = worldManager.GetNextObjectId(),
@@ -434,11 +435,11 @@ namespace GameplaySystems.Social
 								GroupType = MemberGroupType.Guild
 							});
 					}
-					
+
 					// Now we can grab a channel to create the thread in
 					// It'll also be created if it doesn't exist.
 					IChatChannel channel = guild.GetNarrativeChannel(channelId);
-					
+
 					return new NarrativeThreadController(worldManager, this.PlayerProfile, channel.Id);
 				}
 				default:
@@ -449,6 +450,9 @@ namespace GameplaySystems.Social
 				}
 			}
 		}
+
+		/// <inheritdoc />
+		public INewsManager News => newsManager;
 	}
 
 	public sealed class CharacterUpdateHook : IHookListener
@@ -463,3 +467,4 @@ namespace GameplaySystems.Social
 		}
 	}
 }
+	

@@ -36,7 +36,8 @@ namespace Core.WorldData
 		private readonly NarrativeObjectTable<WorldMailData> emails;
 		private readonly WorldDataTable<WorldWitnessedObjectData> witnessedObjects;
 		private readonly WorldDataTable<WorldNotificationData> notifications;
-		
+		private readonly NarrativeObjectTable<WorldNewsData> newsArticles;
+
 
 		internal IWorldDataObject<ProtectedWorldState> ProtectedWorldData => this.protectedWorldState;
 
@@ -130,6 +131,9 @@ namespace Core.WorldData
         /// <inheritdoc />
         public IWorldTable<WorldRelationshipData> Relationships => relationships;
         public INarrativeObjectTable<WorldMailData> Emails => emails;
+
+        /// <inheritdoc />
+        public INarrativeObjectTable<WorldNewsData> NewsArticles => newsArticles;
         
         public World(UniqueIntGenerator instanceIdGenerator, DataEventDispatcher eventDispatcher)
         {
@@ -155,6 +159,8 @@ namespace Core.WorldData
 			emails = new NarrativeObjectTable<WorldMailData>(instanceIdGenerator, eventDispatcher);
 			witnessedObjects = new WorldDataTable<WorldWitnessedObjectData>(instanceIdGenerator, eventDispatcher);
 			notifications = new WorldDataTable<WorldNotificationData>(instanceIdGenerator, eventDispatcher);
+			newsArticles = new NarrativeObjectTable<WorldNewsData>(instanceIdGenerator, eventDispatcher);
+			
 		}
 
 		public void Serialize(IWorldSerializer serializer)
@@ -188,7 +194,7 @@ namespace Core.WorldData
 			emails.Serialize(serializer, WorldRevision.Email);
 			witnessedObjects.Serialize(serializer, WorldRevision.MissionFailures);
 			notifications.Serialize(serializer, WorldRevision.Notifications);
-			
+			newsArticles.Serialize(serializer, WorldRevision.Articles);
 			
 			eventDispatcher.PauseEvents = false;
 		}
@@ -197,6 +203,7 @@ namespace Core.WorldData
 		{
 			// You must wipe the world in reverse order of how you would create or serialize it.
 			// This ensures proper handling of deleting objects that depend on other objects.
+			newsArticles.Clear();
 			notifications.Clear();
 			witnessedObjects.Clear();
 			emails.Clear();
