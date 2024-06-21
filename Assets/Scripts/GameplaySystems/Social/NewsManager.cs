@@ -59,6 +59,7 @@ namespace GameplaySystems.Social
 			{
 				index = articles.Count;
 				articles.Add(new NewsArticle(this.socialService));
+				articlesById.Add(subject.InstanceId, index);
 			}
 
 			UpdateArticle(subject.InstanceId, subject);
