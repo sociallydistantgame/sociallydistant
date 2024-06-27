@@ -1,0 +1,10 @@
+{
+  "version": 2,
+  "dgSpecHash": "cb1vKVKVpCi4gkwQiK6X0vTDsBVuGhjPGU5fK/VaznQewE42NlJk/Q/n720iol5I7uzeF0hp8910R5CuPNfTIg==",
+  "success": true,
+  "projectFilePath": "/home/ritchie/Projects/Alkaline Thunder/sociallydistant/src/SociallyDistant/SociallyDistant.csproj",
+  "expectedPackageFiles": [
+    "/home/ritchie/.nuget/packages/microsoft.aspnetcore.app.ref/8.0.6/microsoft.aspnetcore.app.ref.8.0.6.nupkg.sha512"
+  ],
+  "logs": []
+}

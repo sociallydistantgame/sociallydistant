@@ -1,0 +1,10 @@
+ManifestFileVersion: 0
+CRC: 3681702720
+AssetBundleManifest:
+  AssetBundleInfos:
+    Info_0:
+      Name: sociallydistantmain
+      Dependencies: {}
+    Info_1:
+      Name: devdata
+      Dependencies: {}
