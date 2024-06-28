@@ -17,4 +17,10 @@ public struct LayoutRect
         Width = width;
         Height = height;
     }
+
+    public static LayoutRect operator -(LayoutRect rect, Padding padding)
+    {
+        return new LayoutRect(rect.Left + padding.Left, rect.Top + padding.Top, rect.Width - padding.Horizontal,
+            rect.Height - padding.Vertical);
+    }
 }

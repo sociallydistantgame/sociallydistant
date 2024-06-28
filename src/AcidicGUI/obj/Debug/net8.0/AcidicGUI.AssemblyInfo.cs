@@ -13,7 +13,7 @@ using System.Reflection;
 [assembly: System.Reflection.AssemblyCompanyAttribute("AcidicGUI")]
 [assembly: System.Reflection.AssemblyConfigurationAttribute("Debug")]
 [assembly: System.Reflection.AssemblyFileVersionAttribute("1.0.0.0")]
-[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+cd68bfbfcd40ad9524938aca09e0d02fb7e3ba08")]
+[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+d444aef668e17d8aaadfa81a6deb909ef6c8dd8b")]
 [assembly: System.Reflection.AssemblyProductAttribute("AcidicGUI")]
 [assembly: System.Reflection.AssemblyTitleAttribute("AcidicGUI")]
 [assembly: System.Reflection.AssemblyVersionAttribute("1.0.0.0")]

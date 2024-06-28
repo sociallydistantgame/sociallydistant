@@ -23,6 +23,10 @@ public sealed class GuiService :
         this.context = sociallyDistantContext;
         this.acidicGui = new GuiManager(this);
         this.acidicGui.TopLevels.Add(test);
+        this.test.Content = new Box();
+
+        this.test.Padding = 60;
+        this.test.Margin = 60;
     }
 
     public override void Update(GameTime gameTime)
