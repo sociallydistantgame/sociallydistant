@@ -16,6 +16,7 @@ using SociallyDistant.Core.Shell;
 using SociallyDistant.Core.Shell.Common;
 using SociallyDistant.Core.Shell.InfoPanel;
 using SociallyDistant.Core.Social;
+using SociallyDistant.Core.UI;
 using SociallyDistant.DevTools;
 using SociallyDistant.GamePlatform;
 using SociallyDistant.GamePlatform.ContentManagement;
@@ -31,7 +32,8 @@ internal sealed class SociallyDistantGame :
 	private static readonly string gameDataPath =
 		Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData), "acidic light",
 			"Socially Distant");
-	
+
+	private readonly GuiService gui;
 	private static readonly WorkQueue globalSchedule = new();
 	private static SociallyDistantGame instance = null!;
 	private readonly DevToolsManager devTools;
@@ -84,6 +86,9 @@ internal sealed class SociallyDistantGame :
 	public IShellContext Shell { get; }
 
 	/// <inheritdoc />
+	public Game GameInstance => this;
+	
+	/// <inheritdoc />
 	public IContentManager ContentManager => contentManager;
 
 	/// <inheritdoc />
@@ -131,7 +136,9 @@ internal sealed class SociallyDistantGame :
 		this.uriManager = new UriManager(this);
 		this.scriptSystem = new ScriptSystem(this);
 		this.socialService = new SocialService();
-		
+		this.gui = new GuiService(this);
+
+		Components.Add(gui);
 		Components.Add(devTools);
 
 		IsMouseVisible = true;

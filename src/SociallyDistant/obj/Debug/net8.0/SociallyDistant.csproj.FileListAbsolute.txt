@@ -37,3 +37,5 @@
 /home/ritchie/Projects/Alkaline Thunder/sociallydistant/src/SociallyDistant/bin/Debug/net8.0/runtimes/win-x86/native/cimgui.dll
 /home/ritchie/Projects/Alkaline Thunder/sociallydistant/src/SociallyDistant/bin/Debug/net8.0/Monogame.ImGuiNet.dll
 /home/ritchie/Projects/Alkaline Thunder/sociallydistant/src/SociallyDistant/bin/Debug/net8.0/Monogame.ImGuiNet.pdb
+/home/ritchie/Projects/Alkaline Thunder/sociallydistant/src/SociallyDistant/bin/Debug/net8.0/AcidicGUI.dll
+/home/ritchie/Projects/Alkaline Thunder/sociallydistant/src/SociallyDistant/bin/Debug/net8.0/AcidicGUI.pdb

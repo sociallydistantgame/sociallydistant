@@ -136,6 +136,14 @@
         }
       },
       "System.Runtime.CompilerServices.Unsafe/4.4.0": {},
+      "AcidicGUI/1.0.0": {
+        "dependencies": {
+          "MonoGame.Framework.DesktopGL": "3.8.1.303"
+        },
+        "runtime": {
+          "AcidicGUI.dll": {}
+        }
+      },
       "MonoGame.ImGuiNet/1.1.0": {
         "dependencies": {
           "ImGui.NET": "1.90.1.1",
@@ -148,7 +156,7 @@
       },
       "SociallyDistant.Framework/1.0.0": {
         "dependencies": {
-          "MonoGame.Framework.DesktopGL": "3.8.1.303",
+          "AcidicGUI": "1.0.0",
           "Serilog": "4.0.0",
           "Serilog.Sinks.Console": "6.0.0",
           "System.Reactive": "6.0.1"
@@ -227,6 +235,11 @@
       "sha512": "sha512-9dLLuBxr5GNmOfl2jSMcsHuteEg32BEfUotmmUkmZjpR3RpVHE8YQwt0ow3p6prwA1ME8WqDVZqrr8z6H8G+Kw==",
       "path": "system.runtime.compilerservices.unsafe/4.4.0",
       "hashPath": "system.runtime.compilerservices.unsafe.4.4.0.nupkg.sha512"
+    },
+    "AcidicGUI/1.0.0": {
+      "type": "project",
+      "serviceable": false,
+      "sha512": ""
     },
     "MonoGame.ImGuiNet/1.1.0": {
       "type": "project",

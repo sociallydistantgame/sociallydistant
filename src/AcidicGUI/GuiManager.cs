@@ -1,0 +1,63 @@
+﻿using System.Runtime.CompilerServices;
+using AcidicGUI.Layout;
+using AcidicGUI.Rendering;
+using AcidicGUI.Widgets;
+
+namespace AcidicGUI;
+
+public sealed class GuiManager
+{
+    private readonly IGuiContext context;
+    private readonly Widget.TopLevelCollection topLevels;
+    private readonly GuiBatcher batcher;
+
+    private float screenWidth;
+    private float screenHeight;
+    private bool isRendering = false;
+
+    public bool IsRendering => isRendering;
+    public IOrderedCollection<Widget> TopLevels => topLevels;
+    
+    public GuiManager(IGuiContext context)
+    {
+        this.context = context;
+        this.topLevels = new Widget.TopLevelCollection(this);
+        this.batcher = new GuiBatcher(context);
+    }
+
+    public void UpdateLayout()
+    {
+        var mustRebuildLayout = false;
+        var tolerance = 0.001f;
+
+        if (MathF.Abs(screenWidth - context.PhysicalScreenWidget) >= tolerance
+            || MathF.Abs(screenHeight - context.PhysicalScreenHeight) >= tolerance)
+        {
+            screenWidth = context.PhysicalScreenWidget;
+            screenHeight = context.PhysicalScreenHeight;
+
+            mustRebuildLayout = true;
+        }
+
+        var layoutRect = new LayoutRect(0, 0, screenWidth, screenHeight);
+        foreach (Widget topLevel in topLevels)
+        {
+            if (mustRebuildLayout)
+                topLevel.InvalidateLayout();
+
+            topLevel.UpdateLayout(context, layoutRect);
+        }
+    }
+
+    public void Render()
+    {
+        isRendering = true;
+
+        foreach (Widget widget in topLevels)
+            widget.RenderInternal(batcher);
+        
+        batcher.RenderBatch();
+        
+        isRendering = false;
+    }
+}

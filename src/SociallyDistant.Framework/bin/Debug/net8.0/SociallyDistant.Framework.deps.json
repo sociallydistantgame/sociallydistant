@@ -8,7 +8,7 @@
     ".NETCoreApp,Version=v8.0": {
       "SociallyDistant.Framework/1.0.0": {
         "dependencies": {
-          "MonoGame.Framework.DesktopGL": "3.8.1.303",
+          "AcidicGUI": "1.0.0",
           "Serilog": "4.0.0",
           "Serilog.Sinks.Console": "6.0.0",
           "System.Reactive": "6.0.1"
@@ -93,6 +93,14 @@
             "fileVersion": "6.0.1.7420"
           }
         }
+      },
+      "AcidicGUI/1.0.0": {
+        "dependencies": {
+          "MonoGame.Framework.DesktopGL": "3.8.1.303"
+        },
+        "runtime": {
+          "AcidicGUI.dll": {}
+        }
       }
     }
   },
@@ -129,6 +137,11 @@
       "sha512": "sha512-rHaWtKDwCi9qJ3ObKo8LHPMuuwv33YbmQi7TcUK1C264V3MFnOr5Im7QgCTdLniztP3GJyeiSg5x8NqYJFqRmg==",
       "path": "system.reactive/6.0.1",
       "hashPath": "system.reactive.6.0.1.nupkg.sha512"
+    },
+    "AcidicGUI/1.0.0": {
+      "type": "project",
+      "serviceable": false,
+      "sha512": ""
     }
   }
 }

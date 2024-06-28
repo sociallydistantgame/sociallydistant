@@ -1,4 +1,5 @@
 ﻿#nullable enable
+using Microsoft.Xna.Framework;
 using SociallyDistant.Core.ContentManagement;
 using SociallyDistant.Core.Core;
 using SociallyDistant.Core.Core.Config;
@@ -16,6 +17,8 @@ namespace SociallyDistant.Core.Modules
 	/// </summary>
 	public interface IGameContext
 	{
+		Game GameInstance { get; }
+
 		IModuleManager ModuleManager { get; }
 		
 		TabbedToolCollection AvailableTools { get; }

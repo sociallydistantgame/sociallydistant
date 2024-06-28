@@ -170,6 +170,19 @@
           }
         }
       },
+      "AcidicGUI/1.0.0": {
+        "type": "project",
+        "framework": ".NETCoreApp,Version=v8.0",
+        "dependencies": {
+          "MonoGame.Framework.DesktopGL": "3.8.1.303"
+        },
+        "compile": {
+          "bin/placeholder/AcidicGUI.dll": {}
+        },
+        "runtime": {
+          "bin/placeholder/AcidicGUI.dll": {}
+        }
+      },
       "MonoGame.ImGuiNet/1.1.0": {
         "type": "project",
         "framework": ".NETCoreApp,Version=v8.0",
@@ -189,7 +202,7 @@
         "type": "project",
         "framework": ".NETCoreApp,Version=v8.0",
         "dependencies": {
-          "MonoGame.Framework.DesktopGL": "3.8.1.303",
+          "AcidicGUI": "1.0.0",
           "Serilog": "4.0.0",
           "Serilog.Sinks.Console": "6.0.0",
           "System.Reactive": "6.0.1"
@@ -425,6 +438,11 @@
         "useSharedDesignerContext.txt",
         "version.txt"
       ]
+    },
+    "AcidicGUI/1.0.0": {
+      "type": "project",
+      "path": "../AcidicGUI/AcidicGUI.csproj",
+      "msbuildProject": "../AcidicGUI/AcidicGUI.csproj"
     },
     "MonoGame.ImGuiNet/1.1.0": {
       "type": "project",

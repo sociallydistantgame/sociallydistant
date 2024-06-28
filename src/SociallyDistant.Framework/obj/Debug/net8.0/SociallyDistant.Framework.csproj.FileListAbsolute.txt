@@ -11,3 +11,6 @@
 /home/ritchie/Projects/Alkaline Thunder/sociallydistant/src/SociallyDistant.Framework/obj/Debug/net8.0/refint/SociallyDistant.Framework.dll
 /home/ritchie/Projects/Alkaline Thunder/sociallydistant/src/SociallyDistant.Framework/obj/Debug/net8.0/SociallyDistant.Framework.pdb
 /home/ritchie/Projects/Alkaline Thunder/sociallydistant/src/SociallyDistant.Framework/obj/Debug/net8.0/ref/SociallyDistant.Framework.dll
+/home/ritchie/Projects/Alkaline Thunder/sociallydistant/src/SociallyDistant.Framework/bin/Debug/net8.0/AcidicGUI.dll
+/home/ritchie/Projects/Alkaline Thunder/sociallydistant/src/SociallyDistant.Framework/bin/Debug/net8.0/AcidicGUI.pdb
+/home/ritchie/Projects/Alkaline Thunder/sociallydistant/src/SociallyDistant.Framework/obj/Debug/net8.0/SociallyDistant.Framework.csproj.CopyComplete
