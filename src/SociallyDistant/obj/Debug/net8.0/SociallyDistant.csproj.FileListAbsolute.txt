@@ -29,3 +29,11 @@
 /home/ritchie/Projects/Alkaline Thunder/sociallydistant/src/SociallyDistant/obj/Debug/net8.0/SociallyDistant.genruntimeconfig.cache
 /home/ritchie/Projects/Alkaline Thunder/sociallydistant/src/SociallyDistant/obj/Debug/net8.0/ref/SociallyDistant.dll
 /home/ritchie/Projects/Alkaline Thunder/sociallydistant/src/SociallyDistant/bin/Debug/net8.0/System.Reactive.dll
+/home/ritchie/Projects/Alkaline Thunder/sociallydistant/src/SociallyDistant/bin/Debug/net8.0/ImGui.NET.dll
+/home/ritchie/Projects/Alkaline Thunder/sociallydistant/src/SociallyDistant/bin/Debug/net8.0/runtimes/linux-x64/native/libcimgui.so
+/home/ritchie/Projects/Alkaline Thunder/sociallydistant/src/SociallyDistant/bin/Debug/net8.0/runtimes/osx/native/libcimgui.dylib
+/home/ritchie/Projects/Alkaline Thunder/sociallydistant/src/SociallyDistant/bin/Debug/net8.0/runtimes/win-arm64/native/cimgui.dll
+/home/ritchie/Projects/Alkaline Thunder/sociallydistant/src/SociallyDistant/bin/Debug/net8.0/runtimes/win-x64/native/cimgui.dll
+/home/ritchie/Projects/Alkaline Thunder/sociallydistant/src/SociallyDistant/bin/Debug/net8.0/runtimes/win-x86/native/cimgui.dll
+/home/ritchie/Projects/Alkaline Thunder/sociallydistant/src/SociallyDistant/bin/Debug/net8.0/Monogame.ImGuiNet.dll
+/home/ritchie/Projects/Alkaline Thunder/sociallydistant/src/SociallyDistant/bin/Debug/net8.0/Monogame.ImGuiNet.pdb

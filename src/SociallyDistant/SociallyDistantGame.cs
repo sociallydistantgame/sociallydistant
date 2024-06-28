@@ -1,5 +1,4 @@
-﻿using System;
-using System.Reactive.Linq;
+﻿using System.Reactive.Linq;
 using System.Reactive.Subjects;
 using Microsoft.Xna.Framework;
 using Serilog;
@@ -17,6 +16,7 @@ using SociallyDistant.Core.Shell;
 using SociallyDistant.Core.Shell.Common;
 using SociallyDistant.Core.Shell.InfoPanel;
 using SociallyDistant.Core.Social;
+using SociallyDistant.DevTools;
 using SociallyDistant.GamePlatform;
 using SociallyDistant.GamePlatform.ContentManagement;
 using SociallyDistant.GameplaySystems.Social;
@@ -34,7 +34,7 @@ internal sealed class SociallyDistantGame :
 	
 	private static readonly WorkQueue globalSchedule = new();
 	private static SociallyDistantGame instance = null!;
-	
+	private readonly DevToolsManager devTools;
 	private readonly Subject<PlayerInfo> playerInfoSubject = new();
 	private readonly IObservable<PlayerInfo> playerInfoObservable;
 	private readonly TabbedToolCollection tabbedTools;
@@ -54,6 +54,8 @@ internal sealed class SociallyDistantGame :
 	private PlayerInfo playerInfo = new();
 	private bool initialized;
 
+	public bool IsGameActive => CurrentGameMode == GameMode.OnDesktop;
+	
 	/// <inheritdoc />
 	public IModuleManager ModuleManager => moduleManager;
 
@@ -120,7 +122,8 @@ internal sealed class SociallyDistantGame :
 			observer.OnNext(playerInfo);
 			return playerInfoSubject.Subscribe(observer);
 		});
-		
+
+		this.devTools = new DevToolsManager(this);
 		this.settingsManager = new SettingsManager();
 		this.contentManager = new ContentManager(this);
 		this.moduleManager = new ModuleManager(this);
@@ -128,19 +131,22 @@ internal sealed class SociallyDistantGame :
 		this.uriManager = new UriManager(this);
 		this.scriptSystem = new ScriptSystem(this);
 		this.socialService = new SocialService();
+		
+		Components.Add(devTools);
 
+		IsMouseVisible = true;
 	}
 
 	protected override void Initialize()
 	{
-		initializeTask = InitializeAsync();
 		base.Initialize();
+		initializeTask = InitializeAsync();
 	}
 
 	private async Task InitializeAsync()
 	{
 		await moduleManager.LocateAllGameModules();
-		await contentManager.RefreshContentDatabaseAsync();
+		await contentManager.RefreshContentDatabaseAsync(); 
 	}
 
 	/// <inheritdoc />
@@ -186,6 +192,13 @@ internal sealed class SociallyDistantGame :
 		}
 
 		base.Update(gameTime);
+	}
+
+	protected override void Draw(GameTime gameTime)
+	{
+		GraphicsDevice.Clear(Color.Black);
+		
+		base.Draw(gameTime);
 	}
 
 	public static SociallyDistantGame Instance => instance;

@@ -24,7 +24,7 @@ namespace TrixelCreative.TrixelAudio.Editor.CustomInspectors
 		{
 			base.OnInspectorGUI();
 
-			if (GUILayout.Button("Preview Sound Effect"))
+			if (ImGui.Button("Preview Sound Effect"))
 			{
 				PreviewSound();
 			}

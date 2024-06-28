@@ -105,6 +105,9 @@
             "projectReferences": {
               "/home/ritchie/Projects/Alkaline Thunder/sociallydistant/src/SociallyDistant.Framework/SociallyDistant.Framework.csproj": {
                 "projectPath": "/home/ritchie/Projects/Alkaline Thunder/sociallydistant/src/SociallyDistant.Framework/SociallyDistant.Framework.csproj"
+              },
+              "/home/ritchie/Projects/Alkaline Thunder/sociallydistant/vendor/MonoGame.ImGuiNet/MonoGame.ImGuiNet/Monogame.ImGuiNet.csproj": {
+                "projectPath": "/home/ritchie/Projects/Alkaline Thunder/sociallydistant/vendor/MonoGame.ImGuiNet/MonoGame.ImGuiNet/Monogame.ImGuiNet.csproj"
               }
             }
           }
@@ -118,6 +121,79 @@
       "frameworks": {
         "net8.0": {
           "targetAlias": "net8.0",
+          "imports": [
+            "net461",
+            "net462",
+            "net47",
+            "net471",
+            "net472",
+            "net48",
+            "net481"
+          ],
+          "assetTargetFallback": true,
+          "warn": true,
+          "downloadDependencies": [
+            {
+              "name": "Microsoft.AspNetCore.App.Ref",
+              "version": "[8.0.6, 8.0.6]"
+            }
+          ],
+          "frameworkReferences": {
+            "Microsoft.NETCore.App": {
+              "privateAssets": "all"
+            }
+          },
+          "runtimeIdentifierGraphPath": "/usr/share/dotnet/sdk/8.0.106/PortableRuntimeIdentifierGraph.json"
+        }
+      }
+    },
+    "/home/ritchie/Projects/Alkaline Thunder/sociallydistant/vendor/MonoGame.ImGuiNet/MonoGame.ImGuiNet/Monogame.ImGuiNet.csproj": {
+      "version": "1.1.0",
+      "restore": {
+        "projectUniqueName": "/home/ritchie/Projects/Alkaline Thunder/sociallydistant/vendor/MonoGame.ImGuiNet/MonoGame.ImGuiNet/Monogame.ImGuiNet.csproj",
+        "projectName": "MonoGame.ImGuiNet",
+        "projectPath": "/home/ritchie/Projects/Alkaline Thunder/sociallydistant/vendor/MonoGame.ImGuiNet/MonoGame.ImGuiNet/Monogame.ImGuiNet.csproj",
+        "packagesPath": "/home/ritchie/.nuget/packages/",
+        "outputPath": "/home/ritchie/Projects/Alkaline Thunder/sociallydistant/vendor/MonoGame.ImGuiNet/MonoGame.ImGuiNet/obj/",
+        "projectStyle": "PackageReference",
+        "configFilePaths": [
+          "/home/ritchie/.nuget/NuGet/NuGet.Config"
+        ],
+        "originalTargetFrameworks": [
+          "net8.0"
+        ],
+        "sources": {
+          "https://api.nuget.org/v3/index.json": {}
+        },
+        "frameworks": {
+          "net8.0": {
+            "targetAlias": "net8.0",
+            "projectReferences": {}
+          }
+        },
+        "warningProperties": {
+          "warnAsError": [
+            "NU1605"
+          ]
+        }
+      },
+      "frameworks": {
+        "net8.0": {
+          "targetAlias": "net8.0",
+          "dependencies": {
+            "ImGui.NET": {
+              "target": "Package",
+              "version": "[1.90.1.1, )"
+            },
+            "MonoGame.Content.Builder.Task": {
+              "target": "Package",
+              "version": "[3.8.1.303, )"
+            },
+            "MonoGame.Framework.DesktopGL": {
+              "target": "Package",
+              "version": "[3.8.1.303, )"
+            }
+          },
           "imports": [
             "net461",
             "net462",

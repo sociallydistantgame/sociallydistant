@@ -22,7 +22,7 @@ namespace TrixelCreative.TrixelAudio.Editor.CustomInspectors
 		{
 			base.OnInspectorGUI();
 
-			if (GUILayout.Button("Reimport"))
+			if (ImGui.Button("Reimport"))
 			{
 				currentAsset.Reimport();
 			}

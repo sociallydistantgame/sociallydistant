@@ -13,7 +13,7 @@ using System.Reflection;
 [assembly: System.Reflection.AssemblyCompanyAttribute("SociallyDistant")]
 [assembly: System.Reflection.AssemblyConfigurationAttribute("Debug")]
 [assembly: System.Reflection.AssemblyFileVersionAttribute("1.0.0.0")]
-[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+96b81aaf1c4dc92ec02c08ac7909f236cdd25b47")]
+[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+86e471ea54e0cac8099cdf52f5335b5d98dae41c")]
 [assembly: System.Reflection.AssemblyProductAttribute("SociallyDistant")]
 [assembly: System.Reflection.AssemblyTitleAttribute("SociallyDistant")]
 [assembly: System.Reflection.AssemblyVersionAttribute("1.0.0.0")]
