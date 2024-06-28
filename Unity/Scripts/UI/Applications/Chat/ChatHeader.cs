@@ -11,19 +11,19 @@ namespace UI.Applications.Chat
 	public class ChatHeader : MonoBehaviour
 	{
 		[Header("UI")]
-		[SerializeField]
+		
 		private TextMeshProUGUI channelTitleText = null!;
 
-		[SerializeField]
+		
 		private TextMeshProUGUI channelDescriptionText = null!;
 
-		[SerializeField]
+		
 		private RectTransform guildIconArea = null!;
 
-		[SerializeField]
+		
 		private RectTransform userIconArea = null!;
 
-		[SerializeField]
+		
 		private AvatarWidgetController userImage = null!;
 		
 		private void Awake()

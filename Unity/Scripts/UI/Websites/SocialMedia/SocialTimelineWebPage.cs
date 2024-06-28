@@ -14,14 +14,14 @@ namespace UI.Websites.SocialMedia
 	public class SocialTimelineWebPage : WebPage
 	{
 		[Header("Dependencies")]
-		[SerializeField]
+		
 		private SocialServiceHolder socialService = null!;
 		
 		[Header("UI")]
-		[SerializeField]
+		
 		private SocialPostListView listView = null!;
 
-		[SerializeField]
+		
 		private WidgetList sidebar = null!;
         
 		private readonly ReactiveCollection<SocialPostModel> uiPosts = new ReactiveCollection<SocialPostModel>();

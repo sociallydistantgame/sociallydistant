@@ -10,7 +10,7 @@ namespace UI.Widgets
 {
 	public sealed class RichEmbedWidgetController : WidgetController
 	{
-		[SerializeField]
+		
 		private InfoBoxController infoBoxController = null!;
 
 		private void Awake()

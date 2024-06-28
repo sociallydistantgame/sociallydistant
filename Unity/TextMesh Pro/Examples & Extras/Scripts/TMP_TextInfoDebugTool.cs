@@ -22,7 +22,7 @@ namespace TMPro.Examples
         [TextArea(2, 2)]
         public string ObjectStats;
 
-        [SerializeField]
+        
         private TMP_Text m_TextComponent;
 
         private Transform m_Transform;

@@ -10,16 +10,16 @@ namespace UI.Widgets.Settings
 {
 	public sealed class SettingsFieldController : WidgetController
 	{
-		[SerializeField]
+		
 		private TextMeshProUGUI text;
 
-		[SerializeField]
+		
 		private HorizontalLayoutGroup layout = null!;
 		
-		[SerializeField]
+		
 		private CompositeIconWidget iconWidget = null!;
 
-		[SerializeField]
+		
 		private RectTransform slot = null!;
 		
 		public string Title { get; set; }

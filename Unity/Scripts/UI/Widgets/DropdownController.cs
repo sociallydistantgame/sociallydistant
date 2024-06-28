@@ -8,7 +8,7 @@ namespace UI.Widgets
 {
 	public sealed class DropdownController : WidgetController
 	{
-		[SerializeField]
+		
 		private TMP_Dropdown dropdown = null!;
 		
 		public int CurrentIndex { get; set; } = -1;

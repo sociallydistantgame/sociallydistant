@@ -27,19 +27,19 @@ namespace DevTools
 		private Vector2 scrollPosition;
 
 		[Header("Dependencies")]
-		[SerializeField]
+		
 		private SocialServiceHolder socialServiceHolder = null!;
 		
-		[SerializeField]
+		
 		private DeviceCoordinator deviceCoordinator = null!;
 		
-		[SerializeField]
+		
 		private PlayerInstanceHolder playerInstance = null!;
 
-		[SerializeField]
+		
 		private NetworkSimulationHolder networkSimulation = null!;
 
-		[SerializeField]
+		
 		private GamePlatformHolder platform = null!;
 		
 		private GameManager gameManager = null!;

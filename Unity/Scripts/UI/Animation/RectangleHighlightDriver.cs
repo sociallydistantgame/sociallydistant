@@ -10,7 +10,7 @@ namespace UI.Animation
 {
 	public class RectangleHighlightDriver : AnimatedHighlightDriver
 	{
-		[SerializeField]
+		
 		private Rectangle rectangle = null!;
 
 		private void Awake()

@@ -13,10 +13,10 @@ namespace VfsMapping
 		where TAssetType : UnityEngine.Object, IUnlockableAsset
 		where TFileEntryType : UnlockableAssetFileEntry<TAssetType>
 	{
-		[SerializeField]
+		
 		private PlayerInstanceHolder player = null!;
 		
-		[SerializeField]
+		
 		private string[] searchDirectories = Array.Empty<string>();
 		
 		/// <inheritdoc />

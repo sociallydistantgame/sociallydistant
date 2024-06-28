@@ -9,7 +9,7 @@ namespace AcidicGui.Forms
 	[RequireComponent(typeof(Toggle))]
 	public class RequiredToggle : FormValidator
 	{
-		[SerializeField]
+		
 		private string errorText = "Field must be checked";
 		
 		private Toggle toggle = null!;

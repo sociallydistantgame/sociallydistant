@@ -10,19 +10,19 @@ namespace UI.Applications.FileManager
 {
 	public class FileManagerToolbar : MonoBehaviour
 	{
-		[SerializeField]
+		
 		private TextMeshProUGUI currentPathText = null!;
 
-		[SerializeField]
+		
 		private Button backButton = null!;
 
-		[SerializeField]
+		
 		private Button forwardButton = null!;
 
-		[SerializeField]
+		
 		private Button upButton = null!;
 
-		[SerializeField]
+		
 		private Button createDirectoryButton = null!;
 
 		public UnityEvent backPressed = new UnityEvent();

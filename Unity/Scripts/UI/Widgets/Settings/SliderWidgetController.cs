@@ -10,7 +10,7 @@ namespace UI.Widgets.Settings
 {
 	public class SliderWidgetController : WidgetController
 	{
-		[SerializeField]
+		
 		private Slider slider = null!;
 		
 		public Action<float>? Callback { get; set; }

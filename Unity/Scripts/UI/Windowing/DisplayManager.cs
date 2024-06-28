@@ -12,13 +12,13 @@ namespace UI.Windowing
 {
 	public class DisplayManager : UIBehaviour
 	{
-		[SerializeField]
+		
 		private DockGroup iconGroup = null!;
 		
-		[SerializeField]
+		
 		private RectTransform networkViewer = null!;
 
-		[SerializeField]
+		
 		private UguiProgram applicationLauncherProgram = null!;
 
 		private Desktop desktop = null!;

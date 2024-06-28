@@ -9,7 +9,7 @@ namespace AYellowpaper.SerializedCollections.Editor
 {
     public sealed class EditorUserSettings : ScriptableObject
     {
-        [SerializeField]
+        
         private bool _alwaysShowSearch = false;
         [SerializeField, Range(1, 10)]
         private int _pageCountForSearch = 1;

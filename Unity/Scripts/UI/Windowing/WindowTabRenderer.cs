@@ -14,10 +14,10 @@ namespace UI.Windowing
 		UIBehaviour,
 		ITAbRenderer
 	{
-		[SerializeField]
+		
 		private WindowTab tabTemplate = null!;
 
-		[SerializeField]
+		
 		private Button newTabButton = null!;
 		
 		private readonly List<WindowTab> tabInstances = new List<WindowTab>();

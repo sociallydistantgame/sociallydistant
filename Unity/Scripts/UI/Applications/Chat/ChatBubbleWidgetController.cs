@@ -12,19 +12,19 @@ namespace UI.Applications.Chat
 {
 	public class ChatBubbleWidgetController : SettingsWidgetController<ChatBubbleWidget>
 	{
-		[SerializeField]
+		
 		private TextMeshProUGUI label = null!;
 
-		[SerializeField]
+		
 		private Rectangle bubble = null!;
 		
 		private string? text;
 		private bool usePlayerColor;
 
-		[SerializeField]
+		
 		private Color npcColor;
 
-		[SerializeField]
+		
 		private Color playerColor;
 		
 		/// <inheritdoc />

@@ -12,10 +12,10 @@ namespace UI.Applications.Chat
 {
 	public sealed class ConversationBranchList : MonoBehaviour
 	{
-		[SerializeField]
+		
 		private RectTransform fewItemsList = null!;
 		
-		[SerializeField]
+		
 		private ConversationBranchItemView itemPrefab = null!;
 		
 		private readonly List<IBranchDefinition> currentList = new();

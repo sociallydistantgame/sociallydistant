@@ -14,25 +14,25 @@ namespace UI.Social
 	public class SocialProfileInfoView : MonoBehaviour
 	{
 		[Header("UI")]
-		[SerializeField]
+		
 		private Image coverImage = null!;
 
-		[SerializeField]
+		
 		private Image avatarImage = null!;
 
-		[SerializeField]
+		
 		private TextMeshProUGUI fullNameText = null!;
 
-		[SerializeField]
+		
 		private TextMeshProUGUI usernameText = null!;
 
-		[SerializeField]
+		
 		private TextMeshProUGUI bioText = null!;
 
-		[SerializeField]
+		
 		private TextMeshProUGUI statsText = null!;
 		
-		[SerializeField]
+		
 		private TextMeshProUGUI pronounText = null!;
 
 		private int followerCount;

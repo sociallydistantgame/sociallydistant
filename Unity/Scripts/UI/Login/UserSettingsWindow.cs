@@ -15,20 +15,20 @@ namespace UI.Login
 	public class UserSettingsWindow : MonoBehaviour
 	{
 		[Header("Dependencies")]
-		[SerializeField]
+		
 		private PlayerInstanceHolder playerHolder = null!;
 
 		[Header("UI")]
-		[SerializeField]
+		
 		private Button browseButton = null!;
 
-		[SerializeField]
+		
 		private Button deleteButton = null!;
 
-		[SerializeField]
+		
 		private TextMeshProUGUI fullName = null!;
 
-		[SerializeField]
+		
 		private TextMeshProUGUI shellString = null!;
 
 		private DialogHelper dialogHelper = null!;

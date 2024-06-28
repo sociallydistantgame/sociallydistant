@@ -11,13 +11,13 @@ namespace UI.Applications.Chat
 {
 	public sealed class ConversationBranchItemView : MonoBehaviour
 	{
-		[SerializeField]
+		
 		private AvatarWidgetController avatar = null!;
 		
-		[SerializeField]
+		
 		private TextMeshProUGUI characterName = null!;
 
-		[SerializeField]
+		
 		private TextMeshProUGUI messageTExt = null!;
 		
 		private IBranchDefinition? currentBranch;

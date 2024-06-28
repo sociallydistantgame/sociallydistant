@@ -10,44 +10,44 @@ namespace TrixelCreative.TrixelAudio.Core
 	public sealed class AudioManager : MonoBehaviour
 	{
 		[Header("Settings")]
-		[SerializeField]
+		
 		[Tooltip("The maximum number of sounds that can be played at once. Increase this value if sounds sometimes refuse to play, decrease this value to save on memory.")]
 		private int maximumSoundsAtOnce = 20;
 
-		[SerializeField]
+		
 		[Tooltip("The primary AudioMixer asset used by your game. Volume settings on the AudioManager apply to this mixer's groups.")]
 		private AudioMixer primaryAudioMixer = null!;
 		
-		[SerializeField]
+		
 		[Tooltip("The mixer group on which to play normal game sounds")]
 		private AudioMixerGroup soundsGroup = null;
 
-		[SerializeField]
+		
 		[Tooltip("The mixer group on which to play GUI navigation sounds")]
 		private AudioMixerGroup guiSoundsGroup = null!;
 
-		[SerializeField]
+		
 		[Tooltip("The mixer group on which to play speech/dialogue sounds.")]
 		private AudioMixerGroup dialogueGrroup = null!;
 
-		[SerializeField]
+		
 		[Tooltip("The mixer group on which to play background music.")]
 		private AudioMixerGroup musicGroup = null!;
 
-		[SerializeField]
+		
 		private string soundsVolumeParameter = string.Empty;
 		
-		[SerializeField]
+		
 		private string guiSoundsVolumeParameter = string.Empty;
 		
-		[SerializeField]
+		
 		private string dialogueVolumeParameter = string.Empty;
 		
-		[SerializeField]
+		
 		private string musicVolumeParameter = string.Empty;
 
 		[Header("GUI")]
-		[SerializeField]
+		
 		private UserInterfaceSoundSchemeAsset? guiSounds = null;
 		
 		private static AudioManager? current;

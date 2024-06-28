@@ -20,36 +20,36 @@ namespace UI.Controllers
 		IList<InfoBoxController.ButtonDefinition>
 	{
 		[Header("Settings")]
-		[SerializeField]
+		
 		private string title = string.Empty;
 
 		[TextArea]
-		[SerializeField]
+		
 		private string text = string.Empty;
 		
-		[SerializeField]
+		
 		private CommonColor widgetColor;
 
-		[SerializeField]
+		
 		private List<ButtonDefinition> buttons = new List<ButtonDefinition>();
 		
 		[Header("UI")]
-		[SerializeField]
+		
 		private Rectangle indicator = null!;
 
-		[SerializeField]
+		
 		private TextMeshProUGUI titleComponent = null!;
 
-		[SerializeField]
+		
 		private TextMeshProUGUI messageTextComponent = null!;
 
-		[SerializeField]
+		
 		private StaticWidgetList widgets = null!;
 
-		[SerializeField]
+		
 		private RectTransform buttonsArea = null!;
 
-		[SerializeField]
+		
 		private ButtonWidget buttonWidgetTemplate = null!;
 
 		private List<ButtonWidget> buttonInstances = new List<ButtonWidget>();

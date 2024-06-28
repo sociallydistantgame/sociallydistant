@@ -7,7 +7,7 @@ namespace UI.Widgets
 {
 	public class StaticWidgetList : MonoBehaviour
 	{
-		[SerializeField]
+		
 		private SystemWidgets widgetAssembler = null!;
 
 		private readonly List<StaticWidgetHolder> widgetHolders = new List<StaticWidgetHolder>();

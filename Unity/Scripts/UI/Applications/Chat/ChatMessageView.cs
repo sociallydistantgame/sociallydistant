@@ -18,22 +18,22 @@ namespace UI.Applications.Chat
 	public class ChatMessageView : MonoBehaviour
 	{
 		[Header("UI")]
-		[SerializeField]
+		
 		private StaticWidgetList documentArea = null!;
 
-		[SerializeField]
+		
 		private CanvasGroup canvasGroup = null!;
 		
-		[SerializeField]
+		
 		private AvatarWidgetController avatar = null!;
 
-		[SerializeField]
+		
 		private RectTransform bubbleSpacer = null!;
 
-		[SerializeField]
+		
 		private VerticalLayoutGroup documentLayout = null!;
 
-		[SerializeField]
+		
 		private HorizontalLayoutGroup messageLayout = null!;
 		
 		private IList<IWidget>? builtWidgets;

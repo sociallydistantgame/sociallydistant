@@ -19,7 +19,7 @@ namespace UI.Windowing
 	{
 		private bool isDragging;
 		
-		[SerializeField]
+		
 		private UguiWindow window = null!;
 
 		private Canvas rootCanvas;

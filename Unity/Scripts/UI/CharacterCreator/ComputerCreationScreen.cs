@@ -12,10 +12,10 @@ namespace UI.CharacterCreator
 {
 	public class ComputerCreationScreen : CharacterCreatorView
 	{
-		[SerializeField]
+		
 		private WidgetList widgetList = null!;
 
-		[SerializeField]
+		
 		private TextMeshProUGUI terminalText = null!;
 
 		/// <inheritdoc />

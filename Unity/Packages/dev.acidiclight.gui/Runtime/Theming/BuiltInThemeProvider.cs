@@ -4,7 +4,7 @@ namespace AcidicGui.Theming
 {
 	public class BuiltInThemeProvider : ThemeProviderComponent<BuiltInTheme, BuiltInThemeEngine>
 	{
-		[SerializeField]
+		
 		private BuiltInTheme theme = null!;
 		
 		/// <inheritdoc />

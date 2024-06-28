@@ -1,0 +1,13 @@
+/home/ritchie/Projects/Alkaline Thunder/sociallydistant/src/SociallyDistant.Framework/obj/Debug/net8.0/SociallyDistant.Framework.csproj.AssemblyReference.cache
+/home/ritchie/Projects/Alkaline Thunder/sociallydistant/src/SociallyDistant.Framework/obj/Debug/net8.0/SociallyDistant.Framework.GeneratedMSBuildEditorConfig.editorconfig
+/home/ritchie/Projects/Alkaline Thunder/sociallydistant/src/SociallyDistant.Framework/obj/Debug/net8.0/SociallyDistant.Framework.AssemblyInfoInputs.cache
+/home/ritchie/Projects/Alkaline Thunder/sociallydistant/src/SociallyDistant.Framework/obj/Debug/net8.0/SociallyDistant.Framework.AssemblyInfo.cs
+/home/ritchie/Projects/Alkaline Thunder/sociallydistant/src/SociallyDistant.Framework/obj/Debug/net8.0/SociallyDistant.Framework.csproj.CoreCompileInputs.cache
+/home/ritchie/Projects/Alkaline Thunder/sociallydistant/src/SociallyDistant.Framework/obj/Debug/net8.0/SociallyDistant.Framework.sourcelink.json
+/home/ritchie/Projects/Alkaline Thunder/sociallydistant/src/SociallyDistant.Framework/bin/Debug/net8.0/SociallyDistant.Framework.deps.json
+/home/ritchie/Projects/Alkaline Thunder/sociallydistant/src/SociallyDistant.Framework/bin/Debug/net8.0/SociallyDistant.Framework.dll
+/home/ritchie/Projects/Alkaline Thunder/sociallydistant/src/SociallyDistant.Framework/bin/Debug/net8.0/SociallyDistant.Framework.pdb
+/home/ritchie/Projects/Alkaline Thunder/sociallydistant/src/SociallyDistant.Framework/obj/Debug/net8.0/SociallyDistant.Framework.dll
+/home/ritchie/Projects/Alkaline Thunder/sociallydistant/src/SociallyDistant.Framework/obj/Debug/net8.0/refint/SociallyDistant.Framework.dll
+/home/ritchie/Projects/Alkaline Thunder/sociallydistant/src/SociallyDistant.Framework/obj/Debug/net8.0/SociallyDistant.Framework.pdb
+/home/ritchie/Projects/Alkaline Thunder/sociallydistant/src/SociallyDistant.Framework/obj/Debug/net8.0/ref/SociallyDistant.Framework.dll

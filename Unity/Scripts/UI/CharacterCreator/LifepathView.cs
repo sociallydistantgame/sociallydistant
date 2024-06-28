@@ -10,13 +10,13 @@ namespace UI.CharacterCreator
 	public class LifepathView : MonoBehaviour
 	{
 		[Header("UI")]
-		[SerializeField]
+		
 		private Image previewImage = null!;
 
-		[SerializeField]
+		
 		private TextMeshProUGUI title = null!;
 
-		[SerializeField]
+		
 		private TextMeshProUGUI description = null!;
 
 		private Toggle toggle;

@@ -7,19 +7,19 @@ namespace AcidicGui.Widgets
 {
 	public class ListItemWidgetController : WidgetController
 	{
-		[SerializeField]
+		
 		private RectTransform slot = null!;
 		
-		[SerializeField]
+		
 		private Toggle toggle;
 
-		[SerializeField]
+		
 		private TextMeshProUGUI label = null!;
 
-		[SerializeField]
+		
 		private AnimatedHighlight animatedHighlight = null!;
 		
-		[SerializeField]
+		
 		private TextMeshProUGUI description = null!;
 
 		private bool ignoreCallback;

@@ -22,23 +22,23 @@ namespace UI.CharacterCreator
 	public class CharacterCreatorController : Controller<CharacterCreatorView>
 	{
 		[Header("UI")]
-		[SerializeField]
+		
 		private TextMeshProUGUI titleText = null!;
 
-		[SerializeField]
+		
 		private TextMeshProUGUI descriptionText = null!;
 
-		[SerializeField]
+		
 		private Button backButton = null!;
 
-		[SerializeField]
+		
 		private Button forwardButton = null!;
 
-		[SerializeField]
+		
 		private TextMeshProUGUI progressText = null!;
 		
 		[Header("Screens")]
-		[SerializeField]
+		
 		private CharacterCreatorView[] screens = Array.Empty<CharacterCreatorView>();
 		
 		private readonly CharacterCreatorState state = new();

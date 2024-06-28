@@ -12,10 +12,10 @@ namespace UI.Websites.SocialMedia
 {
 	public class SocialPostController : MonoBehaviour
 	{
-		[SerializeField]
+		
 		private RawImage avatarImage = null!;
 
-		[SerializeField]
+		
 		private StaticWidgetList widgetList = null!;
 		
 		private void Awake()

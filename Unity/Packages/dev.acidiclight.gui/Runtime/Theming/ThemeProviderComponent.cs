@@ -20,7 +20,7 @@ namespace AcidicGui.Theming
 		where TTheme : ITheme<TThemeEngine>
 		where TThemeEngine : IThemeEngine
 	{
-		[SerializeField]
+		
 		[ReadOnly]
 		[HideInInspector]
 		private AcidicGUISettings acidicGuiSettings = null!;

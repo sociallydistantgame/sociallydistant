@@ -15,17 +15,17 @@ namespace UI.Shell.InfoPanel
 		private InfoWidgetData data;
 
 		[Header("Dependencies")]
-		[SerializeField]
+		
 		private InfoPanelService infoPanelService = null!;
 		
 		[Header("UI")]
-		[SerializeField]
+		
 		private TextMeshProUGUI textIcon = null!;
 
-		[SerializeField]
+		
 		private TextMeshProUGUI text = null!;
 
-		[SerializeField]
+		
 		private Button closeButton = null!;
 		
 		private void Awake()

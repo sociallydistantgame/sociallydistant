@@ -9,11 +9,11 @@ namespace UI.PlayerUI
 {
 	public sealed class GuiSettingsListener : SettingsListener
 	{
-		[SerializeField]
+		
 		private GuiLayer visualLayer;
 
 		[Range(-500, 500)]
-		[SerializeField]
+		
 		private int layerOffset = 0;
 		
 		private Canvas canvas;

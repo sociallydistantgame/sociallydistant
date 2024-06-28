@@ -10,7 +10,7 @@ namespace UI.ScriptableCommands
 	[CreateAssetMenu(menuName = "ScriptableObject/Scriptable Commands/Screen Reader Test")]
 	public class TtsTest : ScriptableCommand
 	{
-		[SerializeField]
+		
 		private ScreenReaderHolder screenReader = null!;
 		
 		/// <inheritdoc />

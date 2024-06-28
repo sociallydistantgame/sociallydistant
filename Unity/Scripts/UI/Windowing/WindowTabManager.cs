@@ -15,10 +15,10 @@ namespace UI.Windowing
 		UIBehaviour,
 		ITabbedContent
 	{
-		[SerializeField]
+		
 		private RectTransform windowContentArea = null!;
 
-		[SerializeField]
+		
 		private WindowTabRenderer tabRenderer = null!;
 		
 		private readonly Dictionary<RectTransformContentPanel, IDisposable> titleObservers = new Dictionary<RectTransformContentPanel, IDisposable>();

@@ -13,11 +13,11 @@ namespace GameModes.Career.Scripts.GamePlatform.Steamworks
 		private bool isSteamRunning;
 		
 		[Header("Holder")]
-		[SerializeField]
+		
 		private GamePlatformHolder platformHolder = null!;
 
 		[Header("Configuration")]
-		[SerializeField]
+		
 		private uint steamAppId;
 
 		private void Awake()

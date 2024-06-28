@@ -7,10 +7,10 @@ namespace UI.Applications.Chat
 	public class GuildHeaderWidgetController : SettingsWidgetController<GuildHeaderWidget>
 	{
 		[Header("UI")]
-		[SerializeField]
+		
 		private TextMeshProUGUI guildNameText = null!;
 
-		[SerializeField]
+		
 		private TextMeshProUGUI serverStatsText = null!;
 		
 		private string? guildName;

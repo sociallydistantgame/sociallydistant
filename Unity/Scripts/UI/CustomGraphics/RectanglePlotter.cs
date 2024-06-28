@@ -11,7 +11,7 @@ namespace UI.CustomGraphics
 	public class RectanglePlotter : MaskableGraphic
 	{
 		[Tooltip("Choose whether to render the default graphic when no rectangles are plotted.")]
-		[SerializeField]
+		
 		private bool renderDefaultGraphic = false;
 		
 		private readonly ConcurrentBag<RectangleElement> rectangles = new ConcurrentBag<RectangleElement>();

@@ -14,10 +14,10 @@ namespace UI.CharacterCreator
 {
 	public class CharacterIdentityScreen : CharacterCreatorView
 	{
-		[SerializeField]
+		
 		private SocialProfileInfoView socialProfile = null!;
 		
-		[SerializeField]
+		
 		private WidgetList widgetList;
 
 		private CharacterCreatorState state;

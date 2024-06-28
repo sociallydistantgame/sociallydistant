@@ -13,13 +13,13 @@ namespace UI.Popovers
 		private RectTransform myRect = null!;
 		
 		[Header("UI")]
-		[SerializeField]
+		
 		private RectTransform popoverTransform = null!;
 		
-		[SerializeField]
+		
 		private CanvasGroup popoverCanvasGroup = null!;
 
-		[SerializeField]
+		
 		private TextMeshProUGUI popoverLabel = null!;
 		
 		private void Awake()

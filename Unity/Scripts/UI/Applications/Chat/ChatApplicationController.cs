@@ -25,31 +25,31 @@ namespace UI.Applications.Chat
 	public class ChatApplicationController : MonoBehaviour
 	{
 		[Header("UI")]
-		[SerializeField]
+		
 		private ChatHeader chatHeader = null!;
 
-		[SerializeField]
+		
 		private ServerMembersController serverMembers = null!;
 
-		[SerializeField]
+		
 		private TypingIndicator typingIndicator = null!;
 		
-		[SerializeField]
+		
 		private ChatConversationController conversationController = null!;
 
-		[SerializeField]
+		
 		private GuildListView guildList = null!;
 
-		[SerializeField]
+		
 		private Toggle homeButton = null!;
 
-		[SerializeField]
+		
 		private WidgetList channelList = null!;
 
-		[SerializeField]
+		
 		private TMP_InputField messageInputField = null!;
 
-		[SerializeField]
+		
 		private ConversationBranchList branchList = null!;
 		
 		private readonly List<ChatMessageModel> messages = new List<ChatMessageModel>();

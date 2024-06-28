@@ -5,13 +5,13 @@ namespace TrixelCreative.TrixelAudio.Data
 	[CreateAssetMenu(menuName = "TrixelAudio/Song Asset")]
 	public class SongAsset : ScriptableObject
 	{
-		[SerializeField]
+		
 		private string songTitle = string.Empty;
 		
-		[SerializeField]
+		
 		private string artist = string.Empty;
 
-		[SerializeField]
+		
 		private AudioClip audioClip = null!;
 
 		public string Title => songTitle;

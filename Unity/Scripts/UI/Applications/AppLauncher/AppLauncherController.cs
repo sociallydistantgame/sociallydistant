@@ -19,11 +19,11 @@ namespace UI.Applications.AppLauncher
 		UIBehaviour,
 		IProgramOpenHandler
 	{
-		[SerializeField]
+		
 		private PlayerInstanceHolder playerInstance = null!;
 		
 		[Header("UI")]
-		[SerializeField]
+		
 		private FileGridAdapter grid = null!;
 
 		private readonly List<UguiProgram> programs = new List<UguiProgram>();

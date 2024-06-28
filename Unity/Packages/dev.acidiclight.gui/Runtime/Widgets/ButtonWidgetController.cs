@@ -7,10 +7,10 @@ namespace AcidicGui.Widgets
 {
 	public class ButtonWidgetController : WidgetController
 	{
-		[SerializeField]
+		
 		private Button button = null!;
 
-		[SerializeField]
+		
 		private TextMeshProUGUI text = null!;
 		
 		public string Text { get; set; } = string.Empty;

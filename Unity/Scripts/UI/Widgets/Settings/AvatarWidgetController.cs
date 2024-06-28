@@ -10,19 +10,19 @@ namespace UI.Widgets.Settings
 {
 	public sealed class AvatarWidgetController : WidgetController
 	{
-		[SerializeField]
+		
 		private DefaultAvatarRenderer defaultAvatarRenderer = null!;
 		
-		[SerializeField]
+		
 		private RawImage customAvatar = null!;
 
-		[SerializeField]
+		
 		private Texture2D? customAvatarTexture = null;
 
-		[SerializeField]
+		
 		private Color defaultColor = Color.yellow;
 
-		[SerializeField]
+		
 		private AvatarSize size = AvatarSize.Icon;
         
 		private LayoutElement layout;

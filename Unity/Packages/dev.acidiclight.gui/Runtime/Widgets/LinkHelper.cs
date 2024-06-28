@@ -11,10 +11,10 @@ namespace AcidicGui.Widgets
 		IPointerDownHandler,
 		IPointerUpHandler
 	{
-		[SerializeField]
+		
 		private TextMeshProUGUI text = null!;
 		
-		[SerializeField]
+		
 		private bool allowHttpLinks = false;
 
 		private Canvas rootCanvas = null!;

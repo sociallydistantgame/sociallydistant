@@ -8,9 +8,9 @@ namespace AYellowpaper.SerializedCollections.KeysGenerators
 {
     public class KeyListGeneratorSelectorWindow : EditorWindow
     {
-        [SerializeField]
+        
         private int _selectedIndex;
-        [SerializeField]
+        
         private ModificationType _modificationType;
 
         private KeyListGenerator _generator;

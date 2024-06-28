@@ -14,13 +14,13 @@ namespace UI.Tweening.Base
 		private Coroutine? tweenCoroutine;
 		
 		[Header("Settings")]
-		[SerializeField]
+		
 		private TTweenerSettings tweenerSettings = null!;
 
-		[SerializeField]
+		
 		private float timeScale = 1;
 
-		[SerializeField]
+		
 		private PlayMode defaultPlayMode;
 		
 		private void Awake()

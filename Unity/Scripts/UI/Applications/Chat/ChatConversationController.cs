@@ -8,7 +8,7 @@ namespace UI.Applications.Chat
 {
 	public class ChatConversationController : MonoBehaviour
 	{
-		[SerializeField]
+		
 		private ChatMessageListView listView = null!;
 
 		private float scrollDelay = 0.25f;

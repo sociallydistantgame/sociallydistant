@@ -20,25 +20,25 @@ namespace UI.Applications.Email
 		MonoBehaviour,
 		IProgramOpenHandler
 	{
-		[SerializeField]
+		
 		private InboxMode inboxMode;
 
-		[SerializeField]
+		
 		private TextMeshProUGUI myUserName = null!;
 
-		[SerializeField]
+		
 		private TextMeshProUGUI myEmailAddress = null!;
 
-		[SerializeField]
+		
 		private MailMessageListView messageList = null!;
 
-		[SerializeField]
+		
 		private TextMeshProUGUI currentSubject = null!;
 
-		[SerializeField]
+		
 		private TextMeshProUGUI messageStatus = null!;
 
-		[SerializeField]
+		
 		private MailConversationView conversation = null!;
 		
 		private IMailMessage? currentMessage = null;

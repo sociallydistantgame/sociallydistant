@@ -5,7 +5,7 @@ namespace AcidicGui.Widgets
 {
 	public class ListWidgetController : WidgetController
 	{
-		[SerializeField]
+		
 		private ToggleGroup toggleGroup = null!;
 
 		public ToggleGroup ToggleGroup => toggleGroup;

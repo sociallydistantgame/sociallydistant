@@ -8,7 +8,7 @@ namespace UI.Applications.Chat
 {
 	public sealed class TypingIndicatorAvatar : MonoBehaviour
 	{
-		[SerializeField]
+		
 		private RawImage avatar = null!;
 
 		private void Awake()

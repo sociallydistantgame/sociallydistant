@@ -25,36 +25,36 @@ namespace UI.Widgets
 		IDeselectHandler
 	{
 		[Header("Sound")]
-		[SerializeField]
+		
 		private SoundEffectAsset switchSound = null!;
 
-		[SerializeField]
+		
 		private SoundEffectAsset switchOffSound = null!;
 		
 		[Header("UI")]
-		[SerializeField]
+		
 		private Toggle toggle = null!;
 
-		[SerializeField]
+		
 		private Rectangle background = null!;
 
-		[SerializeField]
+		
 		private RectTransform nub = null!;
 
 		[Header("Background - When Off")]
-		[SerializeField]
+		
 		private ColorBlock backgroundWhenOff;
 		
 		[Header("Background - When On")]
-		[SerializeField]
+		
 		private ColorBlock backgroundWhenOn;
 		
 		[Header("Border - When Off")]
-		[SerializeField]
+		
 		private ColorBlock borderWhenOff;
 		
 		[Header("Border - When On")]
-		[SerializeField]
+		
 		private ColorBlock borderWhenOn;
 
 		private LTDescr? borderAnimation;

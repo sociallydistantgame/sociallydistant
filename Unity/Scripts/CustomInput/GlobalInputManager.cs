@@ -18,11 +18,11 @@ namespace CustomInput
 		private readonly List<IInputManager> inputManagers = new List<IInputManager>();
 		
 		[Header("Dependencies")]
-		[SerializeField]
+		
 		private PlayerInstanceHolder playerHolder = null!;
 
 		[FormerlySerializedAs("windowDragService")]
-		[SerializeField]
+		
 		private WindowFocusService windowFocusService = null!;
 
 		private void Awake()

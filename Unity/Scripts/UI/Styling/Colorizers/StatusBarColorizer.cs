@@ -15,29 +15,29 @@ namespace UI.Styling.Colorizers
 	public class StatusBarColorizer : UIBehaviour
 	{
 		[Header("Colors")]
-		[SerializeField]
+		
 		private Color normalBright;
 		
-		[SerializeField]
+		
 		private Color panicBright;
 		
-		[SerializeField]
+		
 		private Color normalDark;
 		
-		[SerializeField]
+		
 		private Color panicDark;
 
 		[Header("Visualizer settings")]
-		[SerializeField]
+		
 		private float panicPulsesPerSecond = 4;
 
-		[SerializeField]
+		
 		private float panicPulseLength = 0.1f;
 
-		[SerializeField]
+		
 		private float safetyPulseHold = 1;
 
-		[SerializeField]
+		
 		private float safetyPulseDecay = 0.5f;
 
 		private GameManager gameManagerHolder = null!;

@@ -16,16 +16,16 @@ namespace UI.Websites.SocialMedia
 	public class SocialMediaWebsite : WebSite
 	{
 		[Header("UI")]
-		[SerializeField]
+		
 		private SocialTimelineWebPage timelineWebPage = null!;
 		
-		[SerializeField]
+		
 		private SocialProfileWebPage profileView = null!;
 
-		[SerializeField]
+		
 		private Toggle playerProfileToggle = null!;
 		
-		[SerializeField]
+		
 		private Toggle otherPagesToggle = null!;
 
 		private ISocialService socialService;

@@ -18,17 +18,17 @@ namespace UI.Windowing
 		private ObservableList<UguiWorkspaceDefinition> workspaces = new ObservableList<UguiWorkspaceDefinition>();
 		
 		[Header("Configuration")]
-		[SerializeField]
+		
 		private RectTransform fallbackWorkspaceArea = null!;
 		
 		[Header("Prefabs")]
-		[SerializeField]
+		
 		private UguiWindow windowPrefab = null!;
 
-		[SerializeField]
+		
 		private UguiMessageDialog messageDialogPrefab = null!;
 
-		[SerializeField]
+		
 		private UguiOverlay overlayPrefab = null!;
 		
 		/// <inheritdoc />

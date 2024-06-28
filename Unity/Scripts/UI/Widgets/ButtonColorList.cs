@@ -7,16 +7,16 @@ namespace UI.Widgets
 	[Serializable]
 	public sealed class ButtonColorList
 	{
-		[SerializeField]
+		
 		private Color normalColor;
 
-		[SerializeField]
+		
 		private Color highlightedColor;
 
-		[SerializeField]
+		
 		private Color pressedColor;
 
-		[SerializeField]
+		
 		private Color focusedColor;
 
 		public Color NormalColor => normalColor;

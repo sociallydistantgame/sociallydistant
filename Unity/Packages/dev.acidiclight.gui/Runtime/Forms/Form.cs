@@ -11,14 +11,14 @@ namespace AcidicGui.Forms
 		public class FormSubmittedEvent : UnityEvent {}
 		
 		[Tooltip("Button that acts as the form's submit button. When pressed, this button will validate the form and fire the form's OnSubmit event.")]
-		[SerializeField]
+		
 		private Button? submitButton;
 
 		[Tooltip("Whether to trigger form submission when a text entry commits edited text to its value. Note: Multi-line text entries are ignored.")]
-		[SerializeField]
+		
 		private bool submitOnTextEntry = true;
 
-		[SerializeField]
+		
 		private FormSubmittedEvent onSubmit = new FormSubmittedEvent();
 
 		public FormSubmittedEvent OnSubmit => onSubmit;

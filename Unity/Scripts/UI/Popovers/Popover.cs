@@ -19,10 +19,10 @@ namespace UI.Popovers
 		private bool isCountingDown = false;
 		private PopoverLayer? popoverLayer;
 		
-		[SerializeField]
+		
 		private string text = string.Empty;
 
-		[SerializeField]
+		
 		private float delaySeconds = 0.1f;
 		
 		public string Text

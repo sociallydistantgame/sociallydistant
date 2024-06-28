@@ -1,9 +1,13 @@
 {
   "version": 2,
-  "dgSpecHash": "cb1vKVKVpCi4gkwQiK6X0vTDsBVuGhjPGU5fK/VaznQewE42NlJk/Q/n720iol5I7uzeF0hp8910R5CuPNfTIg==",
+  "dgSpecHash": "bSNQZKVNNLO8wrA3tlZA1GE99iUODKGrX6iBSB1tVztmy2nqYH+2tn2NeF55HEtfSb++hqKDvwCCTA/t6YGE+g==",
   "success": true,
   "projectFilePath": "/home/ritchie/Projects/Alkaline Thunder/sociallydistant/src/SociallyDistant/SociallyDistant.csproj",
   "expectedPackageFiles": [
+    "/home/ritchie/.nuget/packages/monogame.framework.desktopgl/3.8.1.303/monogame.framework.desktopgl.3.8.1.303.nupkg.sha512",
+    "/home/ritchie/.nuget/packages/serilog/4.0.0/serilog.4.0.0.nupkg.sha512",
+    "/home/ritchie/.nuget/packages/serilog.sinks.console/6.0.0/serilog.sinks.console.6.0.0.nupkg.sha512",
+    "/home/ritchie/.nuget/packages/system.reactive/6.0.1/system.reactive.6.0.1.nupkg.sha512",
     "/home/ritchie/.nuget/packages/microsoft.aspnetcore.app.ref/8.0.6/microsoft.aspnetcore.app.ref.8.0.6.nupkg.sha512"
   ],
   "logs": []

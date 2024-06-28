@@ -22,22 +22,22 @@ namespace UI.Applications.TextEditor
 		IProgramOpenHandler,
 		IWindowCloseBlocker
 	{
-		[SerializeField]
+		
 		private Button newButton = null!;
 
-		[SerializeField]
+		
 		private Button openButton = null!;
 
-		[SerializeField]
+		
 		private Button saveButton = null!;
 
-		[SerializeField]
+		
 		private Button saveAsButton = null!;
 
-		[SerializeField]
+		
 		private TextMeshProUGUI currentPathText = null!;
 			
-		[SerializeField]
+		
 		private TMP_InputField inputField = null!;
 
 		private DialogHelper dialogHelper = null!;

@@ -18,13 +18,13 @@ namespace UI.Websites.SocialMedia
 	public class SocialProfileWebPage : WebPage
 	{
 		[Header("UI")]
-		[SerializeField]
+		
 		private SocialProfileInfoView profileInfo = null!;
 
-		[SerializeField]
+		
 		private WidgetList sidebar = null!;
 
-		[SerializeField]
+		
 		private SocialPostListView listView = null!;
 
 		private readonly ReactiveCollection<SocialPostModel> uiPosts = new ReactiveCollection<SocialPostModel>();

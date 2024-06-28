@@ -16,13 +16,13 @@ namespace UI.SystemSettings
 		MonoBehaviour, 
 		IShowOrHide
 	{
-		[SerializeField]
+		
 		private RectTransform headerArea = null!;
 
-		[SerializeField]
+		
 		private TextMeshProUGUI categoryTitle = null!;
 
-		[SerializeField]
+		
 		private WidgetList widgetList = null!;
 		
 		private TransitionController transition = null!;

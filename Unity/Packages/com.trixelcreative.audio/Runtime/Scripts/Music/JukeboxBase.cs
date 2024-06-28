@@ -11,10 +11,10 @@ namespace TrixelCreative.TrixelAudio.Music
 	{
 		private SongPlayerState? currentSongState;
 
-		[SerializeField]
+		
 		private SongAsset? song;
 
-		[SerializeField]
+		
 		private bool loop = false;
 
 		public PlaybackState PlaybackState

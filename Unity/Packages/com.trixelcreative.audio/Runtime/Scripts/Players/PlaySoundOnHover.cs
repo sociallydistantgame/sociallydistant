@@ -12,7 +12,7 @@ namespace TrixelCreative.TrixelAudio.Players
 		AudioPlayerBase,
 		IPointerEnterHandler
 	{
-		[SerializeField]
+		
 		private SoundEffectAsset? onHoverSound;
 
 		/// <inheritdoc />
@@ -30,13 +30,13 @@ namespace TrixelCreative.TrixelAudio.Players
 	{
 		private Collider2D[] colliders = Array.Empty<Collider2D>();
 
-		[SerializeField]
+		
 		private SoundBankAsset soundBank = null!;
 
-		[SerializeField]
+		
 		private string[] ignoredTags = Array.Empty<string>();
 
-		[SerializeField]
+		
 		private LayerMask allowedLayers;
 		
 		/// <summary>

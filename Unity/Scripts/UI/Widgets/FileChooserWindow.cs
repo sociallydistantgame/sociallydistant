@@ -25,25 +25,25 @@ namespace UI.Widgets
 		MonoBehaviour,
 		IWindowCloseBlocker
 	{
-		[SerializeField]
+		
 		private FileManagerToolbar toolbar = null!;
 		
-		[SerializeField]
+		
 		private Button selectButton = null!;
 
-		[SerializeField]
+		
 		private TMP_Dropdown filterSelect = null!;
 
-		[SerializeField]
+		
 		private TMP_InputField nameInput = null!;
 		
-		[SerializeField]
+		
 		private Button cancelButton = null!;
 
-		[SerializeField]
+		
 		private WidgetList placesList = null!;
 
-		[SerializeField]
+		
 		private FileGridAdapter fileList = null!;
 		
 		public string Filter { get; set; } = string.Empty;

@@ -9,17 +9,17 @@ namespace TrixelCreative.TrixelAudio.Data
         ScriptableObject,
         ISoundEffect
     {
-        [SerializeField]
+        
         private string soundEffectName = string.Empty;
 
-        [SerializeField]
+        
         private AudioClip? audioClip;
 
-        [SerializeField]
+        
         [Range(0, 1)]
         private float volume = 1;
 
-        [SerializeField]
+        
         [Range(0, 2)]
         private float pitch = 1;
 

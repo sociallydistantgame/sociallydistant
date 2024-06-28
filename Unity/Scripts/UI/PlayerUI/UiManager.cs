@@ -28,42 +28,42 @@ namespace UI.PlayerUI
 		IShellContext
 	{
 		[Header("Prefabs")]
-		[SerializeField]
+		
 		private BootScreen bootScreenPrefab = null!;
 		
-		[SerializeField]
+		
 		private GameObject characterCreatorPrefab = null!;
 		
-		[SerializeField]
+		
 		private GameObject desktopPrefab = null!;
 
-		[SerializeField]
+		
 		private GameObject backdropPrefab = null!;
 
-		[SerializeField]
+		
 		private GameObject loginScreenPrefab = null!;
 
-		[SerializeField]
+		
 		private GameObject windowManagerPrefab = null!;
 
-		[SerializeField]
+		
 		private GameObject popoverLayerPrefab = null!;
 
-		[SerializeField]
+		
 		private GameObject systemSettingsPrefab = null!;
 
 		[Header("Dialogs")]
-		[SerializeField]
+		
 		private FileChooserWindow fileChooser = null!;
 
 		[Header("Fonts")]
-		[SerializeField]
+		
 		private TMP_FontAsset sansSerifFont = null!;
 
-		[SerializeField]
+		
 		private TMP_FontAsset serifFont = null!;
 
-		[SerializeField]
+		
 		private TMP_FontAsset monospaceFont = null!;
 
 		private static Camera mainCamera = null!;

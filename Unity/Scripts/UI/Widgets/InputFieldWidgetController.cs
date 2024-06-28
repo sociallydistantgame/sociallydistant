@@ -15,16 +15,16 @@ namespace UI.Widgets
 {
 	public sealed class InputFieldWidgetController : WidgetController
 	{
-		[SerializeField]
+		
 		private Rectangle border = null!;
 		
-		[SerializeField]
+		
 		private TMP_InputField inputField = null!;
 
-		[SerializeField]
+		
 		private TextMeshProUGUI placeholder = null!;
 
-		[SerializeField]
+		
 		private InputFieldAnimationDriver borderHighlight = null!;
 		
 		public bool UseFullBorder { get; set; }

@@ -16,26 +16,26 @@ namespace UI.Applications.WebBrowser
 	public class WebBrowserController : MonoBehaviour
 	{
 		[Header("UI")]
-		[SerializeField]
+		
 		private Button backButton = null!;
 
-		[SerializeField]
+		
 		private Button forwardButton = null!;
 
-		[SerializeField]
+		
 		private Button homeButton = null!;
 
-		[SerializeField]
+		
 		private Button navigateButton = null!;
 
-		[SerializeField]
+		
 		private TMP_InputField addressBar = null!;
 
-		[SerializeField]
+		
 		private RectTransform pageArea = null!;
 
 		[Header("Settings")]
-		[SerializeField]
+		
 		private WebPageAsset homepage = null!;
 
 		public string CurrentUrl => addressBar.text;

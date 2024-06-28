@@ -11,26 +11,26 @@ namespace UI.Widgets
 	public class ButtonBackgroundUpdater : UIBehaviour
 	{
 		[Header("Settings")]
-		[SerializeField]
+		
 		private ButtonColor buttonColort;
 
-		[SerializeField]
+		
 		private ButtonTextureSet blueInactive;
 		
-		[SerializeField]
+		
 		private ButtonTextureSet blueActive;
 		
-		[SerializeField]
+		
 		private ButtonTextureSet redInactive;
 		
-		[SerializeField]
+		
 		private ButtonTextureSet redActive;
 		
 		[Header("Components")]
-		[SerializeField]
+		
 		private Button button = null!;
 
-		[SerializeField]
+		
 		private Image image = null!;
 
 		/// <inheritdoc />

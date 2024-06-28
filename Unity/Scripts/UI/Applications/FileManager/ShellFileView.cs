@@ -13,10 +13,10 @@ namespace UI.Applications.FileManager
 		MonoBehaviour,
 		IPointerClickHandler
 	{
-		[SerializeField]
+		
 		private CompositeIconWidget icon = null!;
 
-		[SerializeField]
+		
 		private TextMeshProUGUI text = null!;
 
 		private Button button;

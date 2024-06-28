@@ -16,7 +16,7 @@ namespace UI.Boot
 {
 	public class BootScreen : MonoBehaviour
 	{
-		[SerializeField]
+		
 		private SimpleTerminalRenderer terminal = null!;
 
 		private Task? bootTask = null;

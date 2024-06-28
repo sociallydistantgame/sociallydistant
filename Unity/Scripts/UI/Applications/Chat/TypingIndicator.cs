@@ -10,10 +10,10 @@ namespace UI.Applications.Chat
 {
 	public sealed class TypingIndicator : MonoBehaviour
 	{
-		[SerializeField]
+		
 		private RectTransform avatarArea = null!;
 
-		[SerializeField]
+		
 		private TypingIndicatorAvatar template = null!;
 
 		private readonly List<TypingIndicatorAvatar> avatars = new();

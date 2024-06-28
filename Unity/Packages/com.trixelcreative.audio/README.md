@@ -42,7 +42,7 @@ public class Stuffy : MonoBehaviour
 // Good
 public class Stuffy : MonoBehaviour
 {
-    [SerializeField]
+    
     private Craftbook craftbook;
 }
 ```
@@ -55,7 +55,7 @@ By default, all serialized fields are treated as non-nullable reference types. H
 ```csharp
 public class Stuffy : MonoBehaviour
 {
-    [SerializeField]
+    
     private Craftbook craftbook;
     
     private void Awake()

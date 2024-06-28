@@ -16,7 +16,7 @@ namespace UI.Applications.Email
 {
 	public sealed class ConversationItemView : MonoBehaviour
 	{
-		[SerializeField]
+		
 		private StaticWidgetList widgetList = null!;
 		
 		private MissionManager? missionManager = null!;

@@ -16,7 +16,7 @@ namespace VfsMapping
 		where TAssetType : UnityEngine.Object, INamedAsset
 		where TFileEntryType : AssetFileEntry<TAssetType>
 	{
-		[SerializeField]
+		
 		private string[] searchDirectories = Array.Empty<string>();
 		
 		/// <inheritdoc />

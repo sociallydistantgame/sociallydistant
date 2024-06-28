@@ -26,17 +26,17 @@ namespace UI.Shell
 		IProgramOpener,
 		IDesktop
 	{
-		[SerializeField]
+		
 		private PlayerInstanceHolder playerHolder = null!;
 
 		[Header("UI")]
-		[SerializeField]
+		
 		private RectTransform workspaceArea = null!;
 
-		[SerializeField]
+		
 		private TabbedToolManager toolManager = null!;
 		
-		[SerializeField]
+		
 		private StatusBarController statusBarController = null!;
 		
 		private IWorkspaceDefinition currentWorkspace = null!;

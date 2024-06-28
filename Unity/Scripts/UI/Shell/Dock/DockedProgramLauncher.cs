@@ -26,13 +26,13 @@ namespace UI.Shell.Dock
 		private Button button = null!;
 		private Popover popover = null!;
 
-		[SerializeField]
+		
 		private PlayerInstanceHolder player = null!;
 		
-		[SerializeField]
+		
 		private UguiProgram program = null!;
 
-		[SerializeField]
+		
 		private string[] arguments = Array.Empty<string>();
 		
 		private void Awake()

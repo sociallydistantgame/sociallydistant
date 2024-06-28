@@ -8,7 +8,7 @@ namespace UI.Applications.FileManager
 {
 	public class FileGridAdapter : ScrollViewController<FileViewsHolder>
 	{
-		[SerializeField]
+		
 		public UnityEvent<string> onFileDoubleClicked = new UnityEvent<string>();
 		
 		private ScrollViewItemList<ShellFileModel> data;

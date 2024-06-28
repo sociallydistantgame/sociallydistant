@@ -9,20 +9,20 @@ namespace UI.Tweening.Base
 		where T : struct
 	{
 		[Header("Settings")]
-		[SerializeField]
+		
 		private float durationInSeconds;
 
-		[SerializeField]
+		
 		private CurveFunction curveFunction;
 
-		[SerializeField]
+		
 		private EasingMode easingMode;
 		
 		[Header("Values")]
-		[SerializeField]
+		
 		private T startValue;
 
-		[SerializeField]
+		
 		private T endValue;
 		
 		public float DurationSeconds => durationInSeconds;

@@ -14,56 +14,56 @@ namespace UI.Widgets
 	{
 		private WidgetRecycleBin? recycleBin;
 
-		[SerializeField]
+		
 		private SectionWidgetController sectionPrefab = null!;
 
-		[SerializeField]
+		
 		private ButtonWidgetController buttonPrefab = null!;
 
-		[SerializeField]
+		
 		private AvatarWidgetController avatarPrefab = null!;
 		
-		[SerializeField]
+		
 		private DropdownController dropdownPrefab = null!;
 		
-		[SerializeField]
+		
 		private InputFieldWidgetController inputFieldPrefab = null!;
 		
-		[SerializeField]
+		
 		private LabelWidgetController labelPrefab = null!;
 
-		[SerializeField]
+		
 		private SwitchWidgetController switchPrefab = null!;
 		
-		[SerializeField]
+		
 		private ImageWidgetController imagePrefab = null!;
 
-		[SerializeField]
+		
 		private RawImageWidgetController rawImagePrefab = null!;
 
-		[SerializeField]
+		
 		private SliderWidgetController sliderPrefab = null!;
 
 		
-		[SerializeField]
+		
 		private ListWidgetController listPrefab = null!;
 
-		[SerializeField]
+		
 		private ListItemWidgetController listItemPrefab = null!;
 
 		[Header("Settings widgets")]
-		[SerializeField]
+		
 		private SettingsFieldController settingsField = null!;
 		
 		[Header("Chat")]
-		[SerializeField]
+		
 		private ChatBubbleWidgetController chatBubblePrefab = null!;
 
-		[SerializeField]
+		
 		private GuildHeaderWidgetController guildHeaderPrefab = null!;
 
 		[Header("Rich Embeds")]
-		[SerializeField]
+		
 		private RichEmbedWidgetController richEmbedPrefab = null!;
 		
 		/// <inheritdoc />

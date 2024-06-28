@@ -20,10 +20,10 @@ namespace UI.Windowing
 		IDeselectHandler
 	{
 		[Header("UI")]
-		[SerializeField]
+		
 		private TextMeshProUGUI label = null!;
 
-		[SerializeField]
+		
 		private Button closeButton = null!;
 		
 		private readonly Color normalBackgroundColor = GuiHelpers.GetPackedColor(0x444444ff);

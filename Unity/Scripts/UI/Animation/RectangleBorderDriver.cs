@@ -8,7 +8,7 @@ namespace UI.Animation
 {
 	public class RectangleBorderDriver : AnimatedHighlightDriver
 	{
-		[SerializeField]
+		
 		private Rectangle rectangle = null!;
 
 		private void Awake()

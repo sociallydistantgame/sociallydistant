@@ -15,7 +15,7 @@ namespace UI.Applications.Terminal
 {
 	public sealed class TerminalSettingsListener : SettingsListener
 	{
-		[SerializeField]
+		
 		private SimpleTerminalRenderer terminalEmulator = null!;
 		
 		private WindowHintProvider hintProvider;

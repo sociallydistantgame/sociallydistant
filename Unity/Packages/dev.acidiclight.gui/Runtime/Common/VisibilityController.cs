@@ -12,7 +12,7 @@ namespace AcidicGui.Common
 	[RequireComponent(typeof(CanvasGroup))]
 	public class VisibilityController : TransitionController
 	{
-		[SerializeField]
+		
 		private bool isVisible = true;
 
 		private CanvasGroup canvasGroup;

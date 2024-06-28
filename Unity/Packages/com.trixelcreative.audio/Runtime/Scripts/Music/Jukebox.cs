@@ -6,7 +6,7 @@ namespace TrixelCreative.TrixelAudio.Music
 {
 	public class Jukebox : JukeboxBase
 	{
-		[SerializeField]
+		
 		private bool playOnAwake = true;
 		
 		private void Start()

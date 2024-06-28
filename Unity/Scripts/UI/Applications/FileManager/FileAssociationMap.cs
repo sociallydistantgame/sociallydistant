@@ -15,10 +15,10 @@ namespace UI.Applications.FileManager
 	[CreateAssetMenu(menuName = "ScriptableObject/File Manager/File Association Map")]
 	public class FileAssociationMap : ScriptableObject
 	{
-		[SerializeField]
+		
 		private PlayerInstanceHolder player = null!;
 
-		[SerializeField]
+		
 		private MimeTypeProgramMap mimeTypeAssociations = new MimeTypeProgramMap();
 		
 		public async Task<ISystemProcess?> OpenFile(ISystemProcess parentProcess, string filePath)

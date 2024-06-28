@@ -6,7 +6,7 @@ namespace TrixelCreative.TrixelAudio.Players
 {
 	public class SoundEvent : AudioPlayerBase
 	{
-		[SerializeField]
+		
 		private SoundEffectAsset? soundEffect;
 
 		public void Play()

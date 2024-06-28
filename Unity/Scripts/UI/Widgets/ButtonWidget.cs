@@ -11,7 +11,7 @@ namespace UI.Widgets
 {
 	public class ButtonWidget : MonoBehaviour
 	{
-		[SerializeField]
+		
 		private TextMeshProUGUI label = null!;
 
 		private Button button = null!;

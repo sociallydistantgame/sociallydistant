@@ -18,13 +18,13 @@ namespace UI.Windowing
 {
 	public class TabbedToolManager : UIBehaviour
 	{
-		[SerializeField]
+		
 		private DockGroup iconGroup = null!;
 
-		[SerializeField]
+		
 		private MainToolGroup terminal = null!;
 
-		[SerializeField]
+		
 		private MainToolGroup browser = null!;
 		
 		private Desktop shell;

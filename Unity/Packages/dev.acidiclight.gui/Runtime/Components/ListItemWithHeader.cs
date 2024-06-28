@@ -12,25 +12,25 @@ namespace AcidicGui.Components
 	public class ListItemWithHeader : MonoBehaviour
 	{
 		[Header("UI")]
-		[SerializeField]
+		
 		private RectTransform headerRect = null!;
 		
-		[SerializeField]
+		
 		private Button activator = null!;
 
-		[SerializeField]
+		
 		private TextMeshProUGUI headerText = null!;
 
-		[SerializeField]
+		
 		private TextMeshProUGUI itemText = null!;
 
-		[SerializeField]
+		
 		private string? title;
 
-		[SerializeField]
+		
 		private string value = string.Empty;
 
-		[SerializeField]
+		
 		private AnimatedHighlight animatedHighlight = null!;
 		
 		public string Value

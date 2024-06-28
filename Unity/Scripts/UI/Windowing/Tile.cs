@@ -15,10 +15,10 @@ namespace UI.Windowing
 		UIBehaviour,
 		ITile
 	{
-		[SerializeField]
+		
 		private PlayerInstanceHolder playerHolder = null!;
 
-		[SerializeField]
+		
 		private bool recreateWindowOnClose = false;
 		
 		private RectTransform rectTRansform;

@@ -13,10 +13,10 @@ namespace UI.Windowing
 		MonoBehaviour,
 		IColorable
 	{
-		[SerializeField]
+		
 		private CommonColor borderColor = CommonColor.Cyan;
 		
-		[SerializeField]
+		
 		private Rectangle borderRectangle = null!;
 
 		private bool useClientBackground = true;

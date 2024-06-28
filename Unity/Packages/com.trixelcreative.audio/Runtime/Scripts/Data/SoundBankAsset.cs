@@ -9,10 +9,10 @@ namespace TrixelCreative.TrixelAudio.Data
 	[CreateAssetMenu(menuName = "TrixelAudio/Sound Bank")]
 	public class SoundBankAsset : ScriptableObject
 	{
-		[SerializeField]
+		
 		private string soundBankName = string.Empty;
 
-		[SerializeField]
+		
 		private SoundEffectAsset[] soundEffects = Array.Empty<SoundEffectAsset>();
 
 		public bool TryGetRandomSound(out SoundEffectAsset sound)
@@ -38,7 +38,7 @@ namespace TrixelCreative.TrixelAudio.Data
 #if UNITY_EDITOR
 
 		[Header("Import Sound Effects")]
-		[SerializeField]
+		
 		private string assetFolder = string.Empty;
 
 		public void Reimport()

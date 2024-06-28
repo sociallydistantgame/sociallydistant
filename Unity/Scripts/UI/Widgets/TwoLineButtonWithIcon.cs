@@ -14,13 +14,13 @@ namespace UI.Widgets
 	public class TwoLineButtonWithIcon : MonoBehaviour
 	{
 		[Header("UI")]
-		[SerializeField]
+		
 		private TextMeshProUGUI title = null!;
 		
-		[SerializeField]
+		
 		private TextMeshProUGUI text = null!;
 		
-		[SerializeField]
+		
 		private CompositeIconWidget icon = null!;
 
 		private Button baseButton = null!;

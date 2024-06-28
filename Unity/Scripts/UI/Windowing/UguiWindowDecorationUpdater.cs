@@ -14,14 +14,14 @@ namespace UI.Windowing
 		private bool isActive;
 		
 		[Header("dependencies")]
-		[SerializeField]
+		
 		private WindowFocusService focusService = null!;
 
 		[Header("Configuration")]
-		[SerializeField]
+		
 		private Sprite unskinnedActiveDecoration = null!;
 		
-		[SerializeField]
+		
 		private Sprite unskinnedInactiveDecoration = null!;
 
 		private void Awake()

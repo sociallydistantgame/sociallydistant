@@ -19,14 +19,14 @@ namespace UI.Widgets
 	public class CompositeIconWidget : MonoBehaviour
 	{
 		[Header("Appearance")]
-		[SerializeField]
+		
 		private CompositeIcon icon;
 
 		[Header("UI")]
-		[SerializeField]
+		
 		private TextMeshProUGUI? textIcon;
 
-		[SerializeField]
+		
 		private Image? spriteIcon;
 		
 		private void Awake()

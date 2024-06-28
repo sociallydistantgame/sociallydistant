@@ -10,7 +10,7 @@ namespace UI.Applications.Chat
 	public class ServerMembersController : MonoBehaviour
 	{
 		[Header("UI")]
-		[SerializeField]
+		
 		private ServerMembersListView listView = null!;
 
 		public bool IsVisible

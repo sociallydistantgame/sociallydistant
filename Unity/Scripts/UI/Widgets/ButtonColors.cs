@@ -7,10 +7,10 @@ namespace UI.Widgets
 	[Serializable]
 	public sealed class ButtonColors
 	{
-		[SerializeField]
+		
 		private ButtonColorList background = new();
 
-		[SerializeField]
+		
 		private ButtonColorList border = new();
 
 		public ButtonColorList Background => background;

@@ -10,16 +10,16 @@ namespace AcidicGui.Forms
 	public class InputFieldValidator : FormValidator
 	{
 		[Header("Requirements")]
-		[SerializeField]
+		
 		private bool mustBeNonEmpty;
 
-		[SerializeField]
+		
 		private bool mustNotBeWhitespace;
 		
-		[SerializeField]
+		
 		private int minCharacters;
 		
-		[SerializeField]
+		
 		private int maxCharacters;
 		
 		private TMP_InputField inputField;

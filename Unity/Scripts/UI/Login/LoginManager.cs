@@ -24,45 +24,45 @@ namespace UI.Login
 {
 	public class LoginManager : MonoBehaviour
 	{
-		[SerializeField]
+		
 		private PlayerInstanceHolder playerHolder = null!;
 		
 		[Header("UI")]
-		[SerializeField]
+		
 		private RectTransform userListAreaTransform = null!;
 
-		[SerializeField]
+		
 		private RectTransform currentUserAreaTransform = null!;
 		
-		[SerializeField]
+		
 		private TextMeshProUGUI gameVersion = null!;
 		
-		[SerializeField]
+		
 		private WidgetList userListController = null!;
 
-		[SerializeField]
+		
 		private Button backButton = null!;
 		
-		[SerializeField]
+		
 		private Button startGameButton = null!;
 
-		[SerializeField]
+		
 		private Button manageUserButton = null!;
 		
-		[SerializeField]
+		
 		private Button createUserButton = null!;
 		
-		[SerializeField]
+		
 		private AvatarWidgetController avatarImage = null!;
 
-		[SerializeField]
+		
 		private TextMeshProUGUI displayName = null!;
 
-		[SerializeField]
+		
 		private TextMeshProUGUI usernameText = null!;
 
 		[Header("Prefabs")]
-		[SerializeField]
+		
 		private UserSettingsWindow userSettingsWindowPrefab = null!;
 		
 		private IGameData? gameToLoad;

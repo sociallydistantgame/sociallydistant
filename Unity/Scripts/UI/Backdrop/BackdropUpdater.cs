@@ -11,16 +11,16 @@ namespace UI.Backdrop
 	public class BackdropUpdater : MonoBehaviour
 	{
 		[Header("Backdrops")]
-		[SerializeField]
+		
 		private Texture2D dayTime = null!;
 		
-		[SerializeField]
+		
 		private Texture2D nightTime = null!;
 		
-		[SerializeField]
+		
 		private Texture2D dayTimePanic = null!;
 		
-		[SerializeField]
+		
 		private Texture2D nightTimePanic = null!;
 		
 		private IWorldManager worldManager = null!;

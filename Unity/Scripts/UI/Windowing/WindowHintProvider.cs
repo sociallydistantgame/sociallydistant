@@ -6,7 +6,7 @@ namespace UI.Windowing
 {
 	public sealed class WindowHintProvider : MonoBehaviour
 	{
-		[SerializeField]
+		
 		private WindowHints hints;
 
 		public WindowHints Hints

@@ -24,40 +24,40 @@ namespace UI.Windowing
 	{
 		[FormerlySerializedAs("dragService")]
 		[Header("Dependencies")]
-		[SerializeField]
+		
 		private WindowFocusService focusService = null!;
 
-		[SerializeField]
+		
 		private PlayerInstanceHolder player = null!;
 		
 		[Header("UI")]
-		[SerializeField]
+		
 		private DecorationManager decorationManager = null!;
 		
-		[SerializeField]
+		
 		private CompositeIconWidget iconWidget = null!;
 		
-		[SerializeField]
+		
 		private RectTransform clientArea = null!;
 
-		[SerializeField]
+		
 		private Button closeButton = null!;
 		
-		[SerializeField]
+		
 		private WindowTabManager tabManager = null!;
 		
 		[Header("Settings")]
-		[SerializeField]
+		
 		private bool allowClosing = true;
 
-		[SerializeField]
+		
 		private bool allowMinimizing = true;
 
-		[SerializeField]
+		
 		private WindowHints defaultWindowHints;
 
 		[Header("Prefabs")]
-		[SerializeField]
+		
 		private RectTransform windowOverlayPrefab = null!;
 		
 		private static UguiWindow? firstWindow = null!;

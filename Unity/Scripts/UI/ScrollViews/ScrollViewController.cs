@@ -13,16 +13,16 @@ namespace UI.ScrollViews
 		IScrollViewController
 		where TViewModel : ScrollViewModel
 	{
-		[SerializeField]
+		
 		private RectTransform content = null!;
 
-		[SerializeField]
+		
 		private GameObject itemPrefab = null!;
 
-		[SerializeField]
+		
 		private Scrollbar scrollBar = null!;
 		
-		[SerializeField]
+		
 		private bool isHorizontal = false;
 
 		private bool isInitialized;

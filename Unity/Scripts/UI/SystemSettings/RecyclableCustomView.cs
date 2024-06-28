@@ -6,7 +6,7 @@ namespace UI.SystemSettings
 {
 	public class RecyclableCustomView : MonoBehaviour
 	{
-		[SerializeField]
+		
 		private RectTransform viewsRect = null!;
 
 		public RectTransform ViewsRect => viewsRect;

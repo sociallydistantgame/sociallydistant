@@ -16,7 +16,7 @@ namespace AcidicGui
 		private static AcidicGUISettings? cached;
 		
 		[Header("Theming")]
-		[SerializeField]
+		
 		private ThemeSettings themeSettings = null!;
         
 		public ThemeSettings ThemeSettings => themeSettings;

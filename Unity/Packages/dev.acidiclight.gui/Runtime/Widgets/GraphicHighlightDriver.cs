@@ -7,7 +7,7 @@ namespace AcidicGui.Widgets
 	[RequireComponent(typeof(Graphic))]
 	public sealed class GraphicHighlightDriver : AnimatedHighlightDriver
 	{
-		[SerializeField]
+		
 		private Graphic graphic;
 
 		private void Awake()

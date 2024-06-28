@@ -34,67 +34,67 @@ namespace UI.Terminal.SimpleTerminal
 		IDragHandler
 	{
 		[Header("Color Plotters")]
-		[SerializeField]
+		
 		private RectanglePlotter backgroundColorPlotter = null!;
 
 		[Header("Text")]
-		[SerializeField]
+		
 		private TMP_FontAsset font;
 		
-		[SerializeField]
+		
 		private int fontSize;
 
-		[SerializeField]
+		
 		private TextMeshProUGUI textMeshPro = null!;
 
 		[Header("Sound Effects")]
-		[SerializeField]
+		
 		private bool enableTypingSounds = true;
 
-		[SerializeField]
+		
 		private bool audibleBell = true;
 		
-		[SerializeField]
+		
 		private SoundEffectAsset asciiBeep = null!;
 
-		[SerializeField]
+		
 		private SoundEffectAsset typingSound = null!;
 		
 		[Header("Appearance")]
-		[SerializeField]
+		
 		private int minimumColumnCount = 132;
 		
-		[SerializeField]
+		
 		private int minimumRowCount = 43;
 		
 		[Header("Settings")]
-		[SerializeField]
+		
 		private bool allowAltScreen = true;
 
-		[SerializeField]
+		
 		private string vtiden = "st";
 		
 		[Header("Timing")]
-		[SerializeField]
+		
 		private float minLatency;
 
-		[SerializeField]
+		
 		private float doubleClickTime = 0;
 
-		[SerializeField]
+		
 		private float trippleClickTime = 0;
 
-		[SerializeField]
+		
 		private float maxLatency;
 
-		[SerializeField]
+		
 		private float blinkTimeout;
 
-		[SerializeField]
+		
 		private int mouseScrollLineCount = 3;
 
 		[Header("Layout")]
-		[SerializeField]
+		
 		private VerticalLayoutGroup textAreaGroup = null!;
 
 		private readonly WorkQueue workQueue = new WorkQueue();

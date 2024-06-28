@@ -23,13 +23,13 @@ namespace UI.Applications.FileManager
 
 	{
 		[Header("UI")]
-		[SerializeField]
+		
 		private FileManagerToolbar toolbar = null!;
         
-		[SerializeField]
+		
 		private FileGridAdapter filesGrid = null!;
 
-		[SerializeField]
+		
 		private FileAssociationMap fileAssociations = null!;
 		
 		private ISystemProcess process = null!;

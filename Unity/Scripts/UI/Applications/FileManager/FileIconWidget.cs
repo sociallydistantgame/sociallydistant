@@ -22,10 +22,10 @@ namespace UI.Applications.FileManager
 		private string currentPath;
 		private IVirtualFileSystem vfs;
 		
-		[SerializeField]
+		
 		private CompositeIconWidget icon = null!;
 		
-		[SerializeField]
+		
 		private TextMeshProUGUI text = null!;
 
 		public event Action<string>? OnFileClicked; 

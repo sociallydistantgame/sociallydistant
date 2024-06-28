@@ -5,7 +5,7 @@ namespace AcidicGui.Widgets
 {
 	public class ImageWidgetController : WidgetController
 	{
-		[SerializeField]
+		
 		private Image image = null!;
 		
 		public Sprite? Sprite { get; set; }

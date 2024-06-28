@@ -22,10 +22,10 @@ namespace UI.SystemSettings
 {
 	public class SystemSettingsController : Controller<SettingsCategoryView>
 	{
-		[SerializeField]
+		
 		private SettingsCategoriesList categoriesList = null!;
 
-		[SerializeField]
+		
 		private SystemSettingsViewController viewController = null!;
 		
 		private readonly List<SettingsCategoryModel> allCategories = new List<SettingsCategoryModel>();

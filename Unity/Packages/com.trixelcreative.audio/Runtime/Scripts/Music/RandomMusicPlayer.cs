@@ -13,14 +13,14 @@ namespace TrixelCreative.TrixelAudio.Music
 	{
 		private bool isWaitingForDelay = false;
 		
-		[SerializeField]
+		
 		private PlaylistAsset playlist = null!;
 
 		[Header("Playlist Delays")]
-		[SerializeField]
+		
 		private float minimumDelayBetweenTracks = 0f;
 
-		[SerializeField]
+		
 		private float maximumDelayBetweenTracks = 0f;
 		
 		private SongAsset? currentlyPlayingSong = null;

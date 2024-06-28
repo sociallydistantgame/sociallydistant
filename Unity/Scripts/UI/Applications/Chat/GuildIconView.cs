@@ -11,10 +11,10 @@ namespace UI.Applications.Chat
 	public class GuildIconView : MonoBehaviour
 	{
 		[Header("UI")]
-		[SerializeField]
+		
 		private Toggle toggle = null!;
 
-		[SerializeField]
+		
 		private RawImage iconImage = null!;
 
 		private Popover popover;

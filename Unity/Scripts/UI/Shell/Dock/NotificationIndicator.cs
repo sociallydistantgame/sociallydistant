@@ -7,7 +7,7 @@ namespace UI.Shell.Dock
 {
 	public sealed class NotificationIndicator : MonoBehaviour
 	{
-		[SerializeField]
+		
 		private bool isBeingShown = false;
 		
 		private CanvasGroup canvasGroup;

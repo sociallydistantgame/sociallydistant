@@ -10,10 +10,10 @@ namespace UI.Widgets
 {
 	public sealed class InputFieldAnimationDriver : AnimatedHighlightDriver
 	{
-		[SerializeField]
+		
 		private Image underline = null!;
 
-		[SerializeField]
+		
 		private Rectangle fullBorder = null!;
         
 		private bool useFullBorder = false;

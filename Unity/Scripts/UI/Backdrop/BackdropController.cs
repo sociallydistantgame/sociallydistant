@@ -17,10 +17,10 @@ namespace UI.Backdrop
 		private Coroutine? backdropCoroutine;
 
 		[Header("Components")]
-		[SerializeField]
+		
 		private RawImage backdropImage = null!;
 
-		[SerializeField]
+		
 		private RawImage temporaryBackdropImage = null!;
 
 		private void Awake()

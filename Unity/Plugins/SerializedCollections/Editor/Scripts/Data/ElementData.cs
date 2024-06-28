@@ -7,7 +7,7 @@ namespace AYellowpaper.SerializedCollections.Editor.Data
     [System.Serializable]
     internal class ElementData
     {
-        [SerializeField]
+        
         private bool _isListToggleActive = false;
 
         public ElementSettings Settings { get; }

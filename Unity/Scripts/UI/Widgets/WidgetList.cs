@@ -8,7 +8,7 @@ namespace UI.Widgets
 {
 	public class WidgetList : ScrollViewController<WidgetListViewsHolder>
 	{
-		[SerializeField]
+		
 		private SystemWidgets systemWidgets = null!;
 
 		private WidgetRecycleBin recycleBin;

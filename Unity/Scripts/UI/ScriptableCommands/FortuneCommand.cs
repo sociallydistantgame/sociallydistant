@@ -9,7 +9,7 @@ namespace UI.ScriptableCommands
 	[CreateAssetMenu(menuName = "ScriptableObject/Scriptable Commands/Fortune")]
 	public class FortuneCommand : ScriptableCommand
 	{
-		[SerializeField]
+		
 		private FortunesTable fortunesTable = null!;
 		
 		/// <inheritdoc />

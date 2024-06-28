@@ -8,7 +8,7 @@ namespace Accessibility
 {
 	public class ScreenReaderBootstrap : MonoBehaviour
 	{
-		[SerializeField]
+		
 		private ScreenReaderHolder holder = null!;
 
 		private void Awake()

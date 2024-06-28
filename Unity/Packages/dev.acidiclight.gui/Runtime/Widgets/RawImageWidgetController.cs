@@ -5,7 +5,7 @@ namespace AcidicGui.Widgets
 {
 	public class RawImageWidgetController : WidgetController
 	{
-		[SerializeField]
+		
 		private RawImage rawImage = null!;
 		
 		public Texture2D? Texture { get; set; }

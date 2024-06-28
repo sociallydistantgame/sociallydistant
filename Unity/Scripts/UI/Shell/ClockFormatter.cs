@@ -14,11 +14,11 @@ namespace UI.Shell
 	public class ClockFormatter : MonoBehaviour
 	{
 		[Header("Configuration")]
-		[SerializeField]
+		
 		[Multiline]
 		private string textFormat = string.Empty;
 
-		[SerializeField]
+		
 		private bool abbreviateDayOfWeek;
 
 		private TextMeshProUGUI text= null!;

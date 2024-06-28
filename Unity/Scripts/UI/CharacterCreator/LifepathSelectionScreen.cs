@@ -13,11 +13,11 @@ namespace UI.CharacterCreator
 {
 	public class LifepathSelectionScreen : CharacterCreatorView
 	{
-		[SerializeField]
+		
 		private LifepathAsset[] lifepaths = Array.Empty<LifepathAsset>();
 
 		[Header("UI")]
-		[SerializeField]
+		
 		private LifepathListView lifepathListView = null!;
 
 		private ToggleGroup toggleGroup;

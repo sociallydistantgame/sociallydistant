@@ -9,19 +9,19 @@ namespace UI.Widgets
 {
 	public sealed class ButtonAnimation : MonoBehaviour
 	{
-		[SerializeField]
+		
 		private bool useDangerTheme = false;
 		
-		[SerializeField]
+		
 		private ButtonColors normalTheme = new();
 		
-		[SerializeField]
+		
 		private ButtonColors dangerTheme = new();
 		
-		[SerializeField]
+		
         private RectangleHighlightDriver backgroundDriver;
         
-		[SerializeField]
+		
         private RectangleBorderDriver borderDriver;
         
 		

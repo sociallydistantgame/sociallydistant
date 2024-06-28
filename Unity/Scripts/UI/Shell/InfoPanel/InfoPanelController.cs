@@ -13,10 +13,10 @@ namespace UI.Shell.InfoPanel
 {
 	public class InfoPanelController : MonoBehaviour
 	{
-		[SerializeField]
+		
 		private InfoPanelService infoPanelService = null!;
 		
-		[SerializeField]
+		
 		private InfoWidgetsController widgetsArea = null!;
 		
 		private readonly List<InfoWidgetData> widgetList = new List<InfoWidgetData>();

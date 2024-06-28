@@ -33,7 +33,7 @@ namespace TMPro
             get { return m_OnCharacterSelection; }
             set { m_OnCharacterSelection = value; }
         }
-        [SerializeField]
+        
         private CharacterSelectionEvent m_OnCharacterSelection = new CharacterSelectionEvent();
 
 
@@ -45,7 +45,7 @@ namespace TMPro
             get { return m_OnSpriteSelection; }
             set { m_OnSpriteSelection = value; }
         }
-        [SerializeField]
+        
         private SpriteSelectionEvent m_OnSpriteSelection = new SpriteSelectionEvent();
 
 
@@ -57,7 +57,7 @@ namespace TMPro
             get { return m_OnWordSelection; }
             set { m_OnWordSelection = value; }
         }
-        [SerializeField]
+        
         private WordSelectionEvent m_OnWordSelection = new WordSelectionEvent();
 
 
@@ -69,7 +69,7 @@ namespace TMPro
             get { return m_OnLineSelection; }
             set { m_OnLineSelection = value; }
         }
-        [SerializeField]
+        
         private LineSelectionEvent m_OnLineSelection = new LineSelectionEvent();
 
 
@@ -81,7 +81,7 @@ namespace TMPro
             get { return m_OnLinkSelection; }
             set { m_OnLinkSelection = value; }
         }
-        [SerializeField]
+        
         private LinkSelectionEvent m_OnLinkSelection = new LinkSelectionEvent();
 
 

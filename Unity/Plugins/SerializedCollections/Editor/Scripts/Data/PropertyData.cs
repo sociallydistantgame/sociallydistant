@@ -7,13 +7,13 @@ namespace AYellowpaper.SerializedCollections.Editor.Data
     [System.Serializable]
     internal class PropertyData
     {
-        [SerializeField]
+        
         private float _keyLabelWidth;
-        [SerializeField]
+        
         private ElementData _keyData;
-        [SerializeField]
+        
         private ElementData _valueData;
-        [SerializeField]
+        
         private bool _alwaysShowSearch = false;
 
         public bool AlwaysShowSearch

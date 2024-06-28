@@ -7,9 +7,9 @@ namespace AYellowpaper.SerializedCollections.KeysGenerators
     [KeyListGenerator("Int Range", typeof(int))]
     public class IntRangeGenerator : KeyListGenerator
     {
-        [SerializeField]
+        
         private int _startValue = 1;
-        [SerializeField]
+        
         private int _endValue = 10;
 
         public override IEnumerable GetKeys(Type type)

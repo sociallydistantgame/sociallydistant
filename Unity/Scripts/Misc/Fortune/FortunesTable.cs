@@ -10,7 +10,7 @@ namespace Misc.Fortune
 	[CreateAssetMenu(menuName = "ScriptableObject/Miscellaneous/Fortunes Table")]
 	public class FortunesTable : ScriptableObject
 	{
-		[SerializeField]
+		
 		private string[] fortunes = Array.Empty<string>();
 
 		public string GetRandomFortune()

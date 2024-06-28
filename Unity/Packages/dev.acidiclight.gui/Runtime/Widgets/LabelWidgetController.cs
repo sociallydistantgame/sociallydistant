@@ -5,10 +5,10 @@ namespace AcidicGui.Widgets
 {
 	public class LabelWidgetController : WidgetController
 	{
-		[SerializeField]
+		
 		private TextMeshProUGUI labelText = null!;
 
-		[SerializeField]
+		
 		private LinkHelper linkHelper = null!;
 		
 		public string Text { get; set; } = string.Empty;

@@ -13,7 +13,7 @@ namespace TrixelCreative.TrixelAudio.Players
 		AudioPlayerBase,
 		IPointerClickHandler
 	{
-		[SerializeField]
+		
 		private SoundEffectAsset? onClickSound;
 		
 		/// <inheritdoc />

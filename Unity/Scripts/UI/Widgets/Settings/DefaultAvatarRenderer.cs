@@ -9,19 +9,19 @@ namespace UI.Widgets.Settings
 {
 	public sealed class DefaultAvatarRenderer : MonoBehaviour
 	{
-		[SerializeField]
+		
 		private Image image = null!;
 
-		[SerializeField]
+		
 		private Rectangle ring = null!;
 
-		[SerializeField]
+		
 		private bool useDarkMode;
 		
-		[SerializeField]
+		
 		private Color humanColor = Color.blue;
 
-		[SerializeField]
+		
 		private Material avatarMaterial = null!;
 		
 		private Material? materialInstance = null!;

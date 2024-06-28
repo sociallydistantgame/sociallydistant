@@ -18,20 +18,20 @@ namespace UI.Controllers
 {
 	public class StatusBarController : UIBehaviour
 	{
-		[SerializeField]
+		
 		private PlayerInstanceHolder player = null!;
 		
 		[Header("UI")]
-		[SerializeField]
+		
 		private RectTransform userArea = null!;
 
-		[SerializeField]
+		
 		private TextMeshProUGUI userText = null!;
 
-		[SerializeField]
+		
 		private Button systemSettingsButton = null!;
 
-		[SerializeField]
+		
 		private Button logoutButton = null!;
 
 		private GameMode gameMode;

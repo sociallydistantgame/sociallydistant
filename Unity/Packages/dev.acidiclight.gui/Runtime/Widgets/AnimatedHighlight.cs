@@ -15,22 +15,22 @@ namespace AcidicGui.Widgets
 		ISelectHandler,
 		IDeselectHandler
 	{
-		[SerializeField]
+		
 		private AnimatedHighlightDriver? driver = null!;
 
-		[SerializeField]
+		
 		private float durationInSeconds = 0.1f;
 		
-		[SerializeField]
+		
 		private Color defaultColor;
 
-		[SerializeField]
+		
 		private Color hoverColor;
 
-		[SerializeField]
+		
 		private Color pressedColor;
 
-		[SerializeField]
+		
 		private Color activeColor;
 
 		private bool pressed;

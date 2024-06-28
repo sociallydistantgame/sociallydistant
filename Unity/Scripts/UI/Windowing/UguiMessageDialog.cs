@@ -18,7 +18,7 @@ namespace UI.Windowing
 		MonoBehaviour,
 		IMessageDialog
 	{
-		[SerializeField]
+		
 		private InfoBoxController infoBoxController = null!;
 		
 		private MessageBoxType messageType;

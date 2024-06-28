@@ -15,7 +15,7 @@ namespace UI.Windowing
 		UIBehaviour,
 		IList<DockGroup.IconDefinition>
 	{
-		[SerializeField]
+		
 		private DockIcon iconPrefab = null!;
 
 		private readonly List<DockIcon> icons = new List<DockIcon>();

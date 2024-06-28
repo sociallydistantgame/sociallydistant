@@ -10,7 +10,7 @@ namespace UI.Applications.Email
 {
 	public sealed class MailMessageView : MonoBehaviour
 	{
-		[SerializeField]
+		
 		private TextMeshProUGUI subjectAndSender = null!;
 
 		private Button button;
