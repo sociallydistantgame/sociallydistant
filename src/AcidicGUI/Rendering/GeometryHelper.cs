@@ -67,10 +67,10 @@ public class GeometryHelper
 
         float smallerHalf = MathF.Min(halfWidth, halfHeight);
 
-        radiusTopLeft = MathHelper.Clamp(radiusTopLeft * smallerHalf, 0, smallerHalf);
-        radiusBottomLeft = MathHelper.Clamp(radiusBottomLeft * smallerHalf, 0, smallerHalf);
-        radiusTopRight = MathHelper.Clamp(radiusTopRight * smallerHalf, 0, smallerHalf);
-        radiusBottomRight = MathHelper.Clamp(radiusBottomRight * smallerHalf, 0, smallerHalf);
+        radiusTopLeft = MathHelper.Clamp(radiusTopLeft, 0, smallerHalf);
+        radiusBottomLeft = MathHelper.Clamp(radiusBottomLeft, 0, smallerHalf);
+        radiusTopRight = MathHelper.Clamp(radiusTopRight, 0, smallerHalf);
+        radiusBottomRight = MathHelper.Clamp(radiusBottomRight, 0, smallerHalf);
 
         if (radiusTopLeft <= 0 && radiusTopRight <= 0 && radiusBottomLeft <= 0 && radiusBottomRight <= 0)
         {
@@ -161,10 +161,10 @@ public class GeometryHelper
 
         float smallerHalf = MathF.Min(halfWidth, halfHeight);
         
-        radiusTopLeft = MathHelper.Clamp(radiusTopLeft * smallerHalf, 0, smallerHalf);
-        radiusBottomLeft = MathHelper.Clamp(radiusBottomLeft * smallerHalf, 0, smallerHalf);
-        radiusTopRight = MathHelper.Clamp(radiusTopRight * smallerHalf, 0, smallerHalf);
-        radiusBottomRight = MathHelper.Clamp(radiusBottomRight * smallerHalf, 0, smallerHalf);
+        radiusTopLeft = MathHelper.Clamp(radiusTopLeft, 0, smallerHalf);
+        radiusBottomLeft = MathHelper.Clamp(radiusBottomLeft, 0, smallerHalf);
+        radiusTopRight = MathHelper.Clamp(radiusTopRight, 0, smallerHalf);
+        radiusBottomRight = MathHelper.Clamp(radiusBottomRight, 0, smallerHalf);
 
         
         if (radiusTopLeft <= 0 && radiusTopRight <= 0 && radiusBottomLeft <= 0 && radiusBottomRight <= 0)
