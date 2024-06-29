@@ -25,7 +25,7 @@ public sealed class Box : Widget
     protected override void RebuildGeometry(GeometryHelper geometry)
     {
         geometry.AddRoundedRectangle(ContentArea, 6f, Color.Red);
-        geometry.AddRoundedRectangleOutline(ContentArea, 1f,  6f, Color.Cyan);
+        geometry.AddRoundedRectangleOutline(ContentArea, 30f,  6f, Color.Cyan);
         
     }
 }

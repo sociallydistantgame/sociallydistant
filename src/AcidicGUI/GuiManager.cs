@@ -10,6 +10,7 @@ public sealed class GuiManager
     private readonly IGuiContext context;
     private readonly Widget.TopLevelCollection topLevels;
     private readonly GuiBatcher batcher;
+    private readonly Queue<Widget> widgetsNeedingLayoutUpdate = new();
 
     private float screenWidth;
     private float screenHeight;
@@ -39,13 +40,20 @@ public sealed class GuiManager
             mustRebuildLayout = true;
         }
 
-        var layoutRect = new LayoutRect(0, 0, screenWidth, screenHeight);
-        foreach (Widget topLevel in topLevels)
+        if (mustRebuildLayout)
         {
-            if (mustRebuildLayout)
+            foreach (Widget topLevel in topLevels)
+            {
                 topLevel.InvalidateLayout();
+            }
+        }
 
-            topLevel.UpdateLayout(context, layoutRect);
+        if (widgetsNeedingLayoutUpdate.Count > 0)
+        {
+            var layoutRect = new LayoutRect(0, 0, screenWidth, screenHeight);
+            
+            while (widgetsNeedingLayoutUpdate.TryDequeue(out Widget? widget))
+                widget.UpdateLayout(context, layoutRect);
         }
     }
 
@@ -59,5 +67,10 @@ public sealed class GuiManager
         batcher.RenderBatch();
         
         isRendering = false;
+    }
+
+    internal void SubmitForLayoutUpdateInternal(Widget widget)
+    {
+        widgetsNeedingLayoutUpdate.Enqueue(widget);
     }
 }

@@ -52,6 +52,8 @@ public sealed class GuiService :
 
     public override void Draw(GameTime gameTime)
     {
+        //Game.GraphicsDevice.BlendState = BlendState.AlphaBlend;
+
         acidicGui.Render();
     }
 

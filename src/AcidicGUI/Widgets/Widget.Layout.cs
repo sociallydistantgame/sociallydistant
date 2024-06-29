@@ -90,11 +90,17 @@ public partial class Widget
 
             return Parent.LayoutRoot;
         }
+        protected set
+        {
+            layoutRoot = value;
+        }
     }
 
     public void InvalidateLayout()
     {
         LayoutRoot.InvalidateLayoutInternal();
+        
+        GuiManager?.SubmitForLayoutUpdateInternal(LayoutRoot);
     }
 
     public void UpdateLayout(IGuiContext context, LayoutRect availableSpace)

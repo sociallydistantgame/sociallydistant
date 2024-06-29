@@ -4,7 +4,7 @@ using Microsoft.Xna.Framework;
 
 namespace AcidicGUI.Widgets;
 
-public class FlexPanel : Widget
+public class FlexPanel : ContainerWidget
 {
     private Direction direction;
     private float spacing;

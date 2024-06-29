@@ -3,7 +3,7 @@ using AcidicGUI.Layout;
 
 namespace AcidicGUI.Widgets;
 
-public sealed class StackPanel : Widget
+public sealed class StackPanel : ContainerWidget
 {
     private float spacing;
     private Direction direction;
