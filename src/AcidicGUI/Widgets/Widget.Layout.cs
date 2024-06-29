@@ -1,5 +1,5 @@
-using System.Numerics;
 using AcidicGUI.Layout;
+using Microsoft.Xna.Framework;
 
 namespace AcidicGUI.Widgets;
 
@@ -13,6 +13,8 @@ public partial class Widget
     private Vector2? cachedContentSize;
     private Padding padding;
     private Padding margin;
+    private Vector2 minimumSize;
+    private Vector2 maximumSize;
 
     public Padding Margin
     {
@@ -30,6 +32,46 @@ public partial class Widget
         set
         {
             padding = value;
+            InvalidateLayout();
+        }
+    }
+
+    public Vector2 MinimumSize
+    {
+        get => minimumSize;
+        set
+        {
+            minimumSize = value;
+            InvalidateLayout();
+        }
+    }
+    
+    public Vector2 MaximumSize
+    {
+        get => maximumSize;
+        set
+        {
+            maximumSize = value;
+            InvalidateLayout();
+        }
+    }
+
+    public HorizontalAlignment HorizontalAlignment
+    {
+        get => horizontalAlignment;
+        set
+        {
+            horizontalAlignment = value;
+            InvalidateLayout();
+        }
+    }
+    
+    public VerticalAlignment VerticalAlignment
+    {
+        get => verticalAlignment;
+        set
+        {
+            verticalAlignment = value;
             InvalidateLayout();
         }
     }
@@ -62,8 +104,6 @@ public partial class Widget
 
         var contentSize = GetCachedContentSize();
         
-        // TODO: Padding and margin
-
         var left = 0f;
         var top = 0f;
         var width = 0f;
@@ -137,7 +177,30 @@ public partial class Widget
         if (cachedContentSize != null)
             return cachedContentSize.Value;
 
-        cachedContentSize = GetContentSize();
+        Vector2 contentSize = GetContentSize();
+        
+        contentSize.X += margin.Horizontal;
+        contentSize.Y += margin.Vertical;
+        
+        if (maximumSize.X > 0)
+        {
+            contentSize.X = Math.Min(Math.Max(contentSize.X, minimumSize.X), maximumSize.X);
+        }
+        else
+        {
+            contentSize.X = Math.Max(contentSize.X, minimumSize.X);
+        }
+
+        if (maximumSize.Y > 0)
+        {
+            contentSize.Y = Math.Min(Math.Max(contentSize.Y, minimumSize.Y), maximumSize.Y);
+        }
+        else
+        {
+            contentSize.Y = Math.Max(contentSize.Y, minimumSize.Y);
+        }
+
+        cachedContentSize = contentSize;
         return cachedContentSize.Value;
     }
     
@@ -153,7 +216,7 @@ public partial class Widget
         
         foreach (Widget child in children)
         {
-            Vector2 childSize = child.GetContentSize();
+            Vector2 childSize = child.GetCachedContentSize();
 
             result.X = MathF.Max(result.X, childSize.X);
             result.Y = MathF.Max(result.Y, childSize.Y);

@@ -1,3 +1,4 @@
+using AcidicGUI.CustomProperties;
 using AcidicGUI.Rendering;
 
 namespace AcidicGUI.Widgets;
@@ -5,6 +6,7 @@ namespace AcidicGUI.Widgets;
 public abstract partial class Widget
 {
     private readonly WidgetCollection children;
+    private readonly Dictionary<Type, CustomPropertyObject> customProperties = new();
     
     private Widget? parent;
     private GuiManager? guiManager;
@@ -65,5 +67,18 @@ public abstract partial class Widget
         {
             child.RenderInternal(batcher);
         }
+    }
+    
+    public T GetCustomProperties<T>() where T : CustomPropertyObject
+    {
+        var type = typeof(T);
+
+        if (!customProperties.TryGetValue(type, out CustomPropertyObject? obj))
+        {
+            obj = (CustomPropertyObject)Activator.CreateInstance(type, new object[] { this })!;
+            customProperties.Add(type, obj);
+        }
+
+        return (T)obj;
     }
 }

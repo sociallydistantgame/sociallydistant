@@ -1,4 +1,6 @@
 using AcidicGUI;
+using AcidicGUI.CustomProperties;
+using AcidicGUI.Layout;
 using AcidicGUI.Rendering;
 using AcidicGUI.Widgets;
 using Microsoft.Xna.Framework;
@@ -14,7 +16,7 @@ public sealed class GuiService :
     private readonly IGameContext context;
     private readonly GuiManager acidicGui;
     private readonly IGuiContext guiContext;
-    private readonly Box test = new();
+    private readonly FlexPanel test = new();
     private SpriteEffect? defaultEffect;
     private Texture2D? white = null;
 
@@ -23,10 +25,24 @@ public sealed class GuiService :
         this.context = sociallyDistantContext;
         this.acidicGui = new GuiManager(this);
         this.acidicGui.TopLevels.Add(test);
-        this.test.Content = new Box();
+        
+        test.Spacing = 6;
+        test.Direction = Direction.Vertical;
+        
+        for (var i = 0; i < 6; i++)
+        {
+            var box = new Box();
 
-        this.test.Padding = 60;
-        this.test.Margin = 60;
+            box.MinimumSize = new Vector2(100, 30);
+
+            if (i % 2 == 0)
+            {
+                box.GetCustomProperties<FlexPanelProperties>()
+                    .Mode = FlexMode.Proportional;
+            }
+            
+            this.test.ChildWidgets.Add(box);
+        }
     }
 
     public override void Update(GameTime gameTime)
