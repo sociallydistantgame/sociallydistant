@@ -1,9 +1,11 @@
 ﻿using System.Reactive.Linq;
 using System.Reactive.Subjects;
 using Microsoft.Xna.Framework;
+using Microsoft.Xna.Framework.Graphics;
 using Serilog;
 using SociallyDistant.Core;
 using SociallyDistant.Core.Config;
+using SociallyDistant.Core.Config.SystemConfigCategories;
 using SociallyDistant.Core.ContentManagement;
 using SociallyDistant.Core.Core;
 using SociallyDistant.Core.Core.Config;
@@ -51,10 +53,14 @@ internal sealed class SociallyDistantGame :
 	private readonly ContentManager contentManager;
 	private readonly SettingsManager settingsManager;
 	private readonly ScriptSystem scriptSystem;
+    private readonly VertexPositionColorTexture[] virtualScreenVertices = new VertexPositionColorTexture[4];
+    private readonly int[] virtualScreenIndices = new[] { 0, 1, 2, 2, 1, 3 };
 
 	private Task initializeTask;
 	private PlayerInfo playerInfo = new();
 	private bool initialized;
+	private RenderTarget2D? virtualScreen;
+	private SpriteEffect? virtualScreenShader;
 
 	public bool IsGameActive => CurrentGameMode == GameMode.OnDesktop;
 	
@@ -142,18 +148,47 @@ internal sealed class SociallyDistantGame :
 		Components.Add(devTools);
 
 		IsMouseVisible = true;
+
+		graphicsManager.HardwareModeSwitch = false;
+		graphicsManager.PreparingDeviceSettings += OnGraphicsDeviceCreation;
+	}
+
+	private void OnGraphicsDeviceCreation(object? sender, PreparingDeviceSettingsEventArgs e)
+	{
+		settingsManager.Load();
+
+		var graphicsSettings = new GraphicsSettings(settingsManager);
+
+		var presentationParameters = e.GraphicsDeviceInformation.PresentationParameters;
+		
+		ApplyGraphicsSettingsInternal(graphicsSettings, presentationParameters, false);
 	}
 
 	protected override void Initialize()
 	{
 		base.Initialize();
+
+		var graphicsSettings = new GraphicsSettings(settingsManager);
+		graphicsManager.IsFullScreen = graphicsSettings.Fullscreen;
+		graphicsManager.ApplyChanges();
+
+		ApplyVirtualDisplayMode(graphicsSettings);
+		
 		initializeTask = InitializeAsync();
+	}
+
+	protected override void OnExiting(object sender, EventArgs args)
+	{
+		settingsManager.Save();
+		base.OnExiting(sender, args);
 	}
 
 	private async Task InitializeAsync()
 	{
 		await moduleManager.LocateAllGameModules();
-		await contentManager.RefreshContentDatabaseAsync(); 
+		await contentManager.RefreshContentDatabaseAsync();
+
+		settingsManager.ObserveChanges(OnGameSettingsChanged);
 	}
 
 	/// <inheritdoc />
@@ -204,7 +239,6 @@ internal sealed class SociallyDistantGame :
 	protected override void Draw(GameTime gameTime)
 	{
 		GraphicsDevice.Clear(Color.Black);
-		
 		base.Draw(gameTime);
 	}
 
@@ -232,5 +266,82 @@ internal sealed class SociallyDistantGame :
 	public static void ScheduleAction(Action action)
 	{
 		globalSchedule.Enqueue(action);
+	}
+
+	private void ApplyVirtualDisplayMode(GraphicsSettings settings)
+	{
+		if (!TryParseResolution(settings.DisplayResolution, out DisplayMode mode))
+		{
+			Log.Warning("Resolution stored in settings is missing or unsupported, so using default.");
+			settings.DisplayResolution = $"{mode.Width}x{mode.Height}";
+		}
+
+		gui.SetVirtualScreenSize(mode.Width, mode.Height);
+	}
+
+	private bool TryParseResolution(string? resolution, out DisplayMode displayMode)
+	{
+		displayMode = GraphicsAdapter.DefaultAdapter.CurrentDisplayMode;
+
+		if (string.IsNullOrWhiteSpace(resolution))
+			return false;
+
+		string[] parts = resolution.Split('x');
+
+		if (parts.Length != 2)
+			return false;
+
+		if (!int.TryParse(parts[0], out int width))
+			return false;
+
+		if (!int.TryParse(parts[1], out int height))
+			return false;
+
+		var supportedModes = GraphicsAdapter.DefaultAdapter.SupportedDisplayModes
+			.Where(x => x.Width == width && x.Height == height).ToArray();
+
+		if (supportedModes.Length == 0)
+			return false;
+
+		displayMode = supportedModes.First();
+		return true;
+	}
+	
+	private void ApplyGraphicsSettingsInternal(GraphicsSettings settings, PresentationParameters parameters,
+		bool explicitApply)
+	{
+		var defaultScreenSize = GraphicsAdapter.DefaultAdapter.CurrentDisplayMode;
+
+		// When going into fullscreen mode, we render to a virtual display and blit it.
+		if (settings.Fullscreen)
+		{
+			parameters.BackBufferWidth = defaultScreenSize.Width;
+			parameters.BackBufferHeight = defaultScreenSize.Height;
+		}
+		else
+		{
+			if (!TryParseResolution(settings.DisplayResolution, out DisplayMode mode))
+			{
+				Log.Warning("Resolution stored in settings is missing or unsupported, so using default.");
+				settings.DisplayResolution = $"{mode.Width}x{mode.Height}";
+			}
+			
+			parameters.BackBufferWidth = mode.Width;
+			parameters.BackBufferHeight = mode.Height;
+		}
+
+		if (explicitApply)
+		{
+			graphicsManager.ApplyChanges();
+			ApplyVirtualDisplayMode(settings);
+		}
+	}
+
+	private void OnGameSettingsChanged(ISettingsManager settings)
+	{
+		var graphicsSettings = new GraphicsSettings(settings);
+		var parameters = GraphicsDevice.PresentationParameters;
+		
+		ApplyGraphicsSettingsInternal(graphicsSettings, parameters, true);
 	}
 }

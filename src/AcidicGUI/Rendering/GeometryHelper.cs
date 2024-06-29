@@ -36,7 +36,7 @@ public class GeometryHelper
     public void AddQuad(int a, int b, int c, int d)
     {
         AddTriangle(a, b, c);
-        AddTriangle(b, c, d);
+        AddTriangle(c, b, d);
     }
 
     public GuiMesh ExportMesh()
@@ -100,13 +100,13 @@ public class GeometryHelper
         AddQuad(innerBL, innerBR, outerBL2, outerBR2);
         AddQuad(innerTL, innerTR, innerBL, innerBR);
         
-        AddQuarterCircleAroundPivotVertices(innerTL, outerTL2, radiusTopLeft, -1, -1, color);
-        AddQuarterCircleAroundPivotVertices(innerTR, outerTR2, radiusTopRight, 1, -1, color);
-        AddQuarterCircleAroundPivotVertices(innerBL, outerBL2, radiusBottomLeft, -1, 1, color);
-        AddQuarterCircleAroundPivotVertices(innerBR, outerBR2, radiusBottomRight, 1, 1, color);
+        AddQuarterCircleAroundPivotVertices(innerTL, outerTL2, radiusTopLeft, -1, -1, true, color);
+        AddQuarterCircleAroundPivotVertices(innerTR, outerTR2, radiusTopRight, 1, -1, false, color);
+        AddQuarterCircleAroundPivotVertices(innerBL, outerBL2, radiusBottomLeft, -1, 1, false, color);
+        AddQuarterCircleAroundPivotVertices(innerBR, outerBR2, radiusBottomRight, 1, 1, true, color);
     }
 
-    private void AddQuarterCircleAroundPivotVertices(int pivotVertex, int extent, float radius, float directionH, float directionV, Color color)
+    private void AddQuarterCircleAroundPivotVertices(int pivotVertex, int extent, float radius, float directionH, float directionV, bool reverseWinding, Color color)
     {
         Vector3 center = vertices[pivotVertex].Position;
 
@@ -125,7 +125,10 @@ public class GeometryHelper
             
             int next = AddVertex(new Vector2(x1, y1), color);
 
-            AddTriangle(last, next, pivotVertex);
+            if (reverseWinding)
+                AddTriangle(pivotVertex, next, last);
+            else
+                AddTriangle(last, next, pivotVertex);
 
             last = next;
         }
@@ -200,13 +203,13 @@ public class GeometryHelper
         AddQuad(innerTR3, outerTR1, innerBR3, outerBR1);
         AddQuad(innerBL2, innerBR2, outerBL2, outerBR2);
         
-        AddRoundedRectangleOutlineCurve(cTL, innerTL, thickness, radiusTopLeft, -1, -1, color);
-        AddRoundedRectangleOutlineCurve(cTR, innerTR, thickness, radiusTopRight, 1, -1, color);
-        AddRoundedRectangleOutlineCurve(cBL, innerBL, thickness, radiusBottomLeft, -1, 1, color);
-        AddRoundedRectangleOutlineCurve(cBR, innerBR, thickness, radiusBottomRight, 1, 1, color);
+        AddRoundedRectangleOutlineCurve(cTL, innerTL, thickness, radiusTopLeft, -1, -1, true, color);
+        AddRoundedRectangleOutlineCurve(cTR, innerTR, thickness, radiusTopRight, 1, -1, false, color);
+        AddRoundedRectangleOutlineCurve(cBL, innerBL, thickness, radiusBottomLeft, -1, 1, false, color);
+        AddRoundedRectangleOutlineCurve(cBR, innerBR, thickness, radiusBottomRight, 1, 1, true, color);
     }
 
-    private void AddRoundedRectangleOutlineCurve(Vector2 center, int innerCorner, float thickness, float radius, float directionH, float directionV, Color color)
+    private void AddRoundedRectangleOutlineCurve(Vector2 center, int innerCorner, float thickness, float radius, float directionH, float directionV, bool reverseWinding, Color color)
     {
         const int segments = 16;
 
@@ -234,20 +237,39 @@ public class GeometryHelper
             int nextInner = AddVertex(new Vector2(xInner, yInner), color);
             int nextOuter = AddVertex(new Vector2(xOuter, yOuter), color);
 
-            if (i > 0)
+            if (reverseWinding)
             {
-                AddTriangle(currentInner, currentOuter, nextInner);
-                AddTriangle(currentOuter, nextInner, nextOuter);
-            }
-
-            if (connectToInnerCorner)
-            {
-                if (i == 0 || i == segments - 1)
+                if (i > 0)
                 {
-                    AddTriangle(nextOuter, nextInner, innerCorner);
+                    AddTriangle(nextInner, currentOuter, currentInner);
+                    AddTriangle(nextOuter, currentOuter, nextInner);
+                }
+
+                if (connectToInnerCorner)
+                {
+                    if (i == 0 || i == segments - 1)
+                    {
+                        AddTriangle(innerCorner, nextInner, nextOuter);
+                    }
                 }
             }
-            
+            else
+            {
+                if (i > 0)
+                {
+                    AddTriangle(currentInner, currentOuter, nextInner);
+                    AddTriangle(nextInner, currentOuter, nextOuter);
+                }
+
+                if (connectToInnerCorner)
+                {
+                    if (i == 0 || i == segments - 1)
+                    {
+                        AddTriangle(nextOuter, nextInner, innerCorner);
+                    }
+                }
+            }
+
             currentInner = nextInner;
             currentOuter = nextOuter;
         }

@@ -153,7 +153,9 @@ namespace SociallyDistant.Core.Config
 		/// <inheritdoc />
 		public void SetString(string key, string value)
 		{
-			ResetKey(key);
+			if (allSettings.ContainsKey(key))
+				allSettings.Remove(key);
+			
 			allSettings.Add(key, new SettingsValue
 			{
 				Type = SettingsType.String,

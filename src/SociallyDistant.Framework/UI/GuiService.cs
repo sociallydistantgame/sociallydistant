@@ -17,8 +17,11 @@ public sealed class GuiService :
     private readonly GuiManager acidicGui;
     private readonly IGuiContext guiContext;
     private readonly FlexPanel test = new();
+    private readonly int[] screenQuad = new int[] { 0, 1, 2, 2, 1, 3 };
+    private readonly VertexPositionColorTexture[] screenQuadVerts = new VertexPositionColorTexture[4];
     private SpriteEffect? defaultEffect;
     private Texture2D? white = null;
+    private RenderTarget2D? virtualScreen;
 
     public GuiService(IGameContext sociallyDistantContext) : base(sociallyDistantContext.GameInstance)
     {
@@ -45,6 +48,31 @@ public sealed class GuiService :
         }
     }
 
+    public void SetVirtualScreenSize(int width, int height)
+    {
+        virtualScreen?.Dispose();
+        virtualScreen = new RenderTarget2D(Game.GraphicsDevice, width, height, false, SurfaceFormat.Rgba64, DepthFormat.Depth24Stencil8);
+
+        int physicalWidth = Game.GraphicsDevice.PresentationParameters.BackBufferWidth;
+        int physicalHeight = Game.GraphicsDevice.PresentationParameters.BackBufferHeight;
+        
+        screenQuadVerts[0].Position = new Vector3(0, 0, 0);
+        screenQuadVerts[0].Color = Color.White;
+        screenQuadVerts[0].TextureCoordinate = new Vector2(0, 0);
+        
+        screenQuadVerts[1].Position = new Vector3(physicalWidth, 0, 0);
+        screenQuadVerts[1].Color = Color.White;
+        screenQuadVerts[1].TextureCoordinate = new Vector2(1, 0);
+        
+        screenQuadVerts[2].Position = new Vector3(0, physicalHeight, 0);
+        screenQuadVerts[2].Color = Color.White;
+        screenQuadVerts[2].TextureCoordinate = new Vector2(0, 1);
+        
+        screenQuadVerts[3].Position = new Vector3(physicalWidth, physicalHeight, 0);
+        screenQuadVerts[3].Color = Color.White;
+        screenQuadVerts[3].TextureCoordinate = new Vector2(1, 1);
+    }
+    
     public override void Update(GameTime gameTime)
     {
         acidicGui.UpdateLayout();
@@ -52,13 +80,24 @@ public sealed class GuiService :
 
     public override void Draw(GameTime gameTime)
     {
-        //Game.GraphicsDevice.BlendState = BlendState.AlphaBlend;
+        if (virtualScreen == null)
+            return;
 
+        Game.GraphicsDevice.BlendState = BlendState.AlphaBlend;
+        Game.GraphicsDevice.RasterizerState = RasterizerState.CullCounterClockwise;
+        
+        Game.GraphicsDevice.SetRenderTarget(virtualScreen);
+        Game.GraphicsDevice.Clear(Color.Transparent);
+        
         acidicGui.Render();
+        
+        Game.GraphicsDevice.SetRenderTarget(null);
+
+        Render(screenQuadVerts, screenQuad, virtualScreen);
     }
 
-    public float PhysicalScreenWidget => Game.GraphicsDevice.Viewport.Width;
-    public float PhysicalScreenHeight => Game.GraphicsDevice.Viewport.Height;
+    public float PhysicalScreenWidget => virtualScreen?.Width ?? Game.GraphicsDevice.Viewport.Width;
+    public float PhysicalScreenHeight => virtualScreen?.Height ?? Game.GraphicsDevice.Viewport.Height;
     
     public void Render(VertexPositionColorTexture[] vertices, int[] indices, Texture2D? texture)
     {
@@ -81,8 +120,9 @@ public sealed class GuiService :
         
         var graphics = Game.GraphicsDevice;
 
-        graphics.Textures[0] = texture ?? white;
         defaultEffect.Techniques[0].Passes[0].Apply();
+        graphics.Textures[0] = texture ?? white;
+        graphics.SamplerStates[0] = SamplerState.LinearClamp;
         graphics.DrawUserIndexedPrimitives<VertexPositionColorTexture>(PrimitiveType.TriangleList, vertices, 0,
             vertices.Length, indices, 0, indices.Length / 3);
     }

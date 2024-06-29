@@ -26,6 +26,7 @@ namespace SociallyDistant.DevTools
 
 		internal void Initialize()
 		{
+			menus.Add(new SettingsDebugMenu());
 			menus.Add(new UriRunnerMenu(gameManager));
 			menus.Add(new GameManagerDebug(gameManager));
 			menus.Add(new HackablesMenu());
