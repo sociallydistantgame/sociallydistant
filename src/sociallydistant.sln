@@ -1,0 +1,45 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio Version 17
+VisualStudioVersion = 17.0.31903.59
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SociallyDistant", "SociallyDistant\SociallyDistant.csproj", "{55561D11-E31F-48DC-B287-FA26735BF2D7}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SociallyDistant.Framework", "SociallyDistant.Framework\SociallyDistant.Framework.csproj", "{DC4316A9-4392-46DE-A989-69477468CFFE}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Vendor", "Vendor", "{B74BB29C-5074-4A30-94AC-0F21ECD64BC6}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Monogame.ImGuiNet", "..\vendor\MonoGame.ImGuiNet\MonoGame.ImGuiNet\Monogame.ImGuiNet.csproj", "{8EC7096F-EC5D-4F9D-B34A-A279B63029A1}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "AcidicGUI", "AcidicGUI\AcidicGUI.csproj", "{0C90DA20-EE40-43A4-AEDD-11294DE4D10E}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{55561D11-E31F-48DC-B287-FA26735BF2D7}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{55561D11-E31F-48DC-B287-FA26735BF2D7}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{55561D11-E31F-48DC-B287-FA26735BF2D7}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{55561D11-E31F-48DC-B287-FA26735BF2D7}.Release|Any CPU.Build.0 = Release|Any CPU
+		{DC4316A9-4392-46DE-A989-69477468CFFE}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{DC4316A9-4392-46DE-A989-69477468CFFE}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{DC4316A9-4392-46DE-A989-69477468CFFE}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{DC4316A9-4392-46DE-A989-69477468CFFE}.Release|Any CPU.Build.0 = Release|Any CPU
+		{8EC7096F-EC5D-4F9D-B34A-A279B63029A1}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{8EC7096F-EC5D-4F9D-B34A-A279B63029A1}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{8EC7096F-EC5D-4F9D-B34A-A279B63029A1}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{8EC7096F-EC5D-4F9D-B34A-A279B63029A1}.Release|Any CPU.Build.0 = Release|Any CPU
+		{0C90DA20-EE40-43A4-AEDD-11294DE4D10E}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{0C90DA20-EE40-43A4-AEDD-11294DE4D10E}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{0C90DA20-EE40-43A4-AEDD-11294DE4D10E}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{0C90DA20-EE40-43A4-AEDD-11294DE4D10E}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(NestedProjects) = preSolution
+		{8EC7096F-EC5D-4F9D-B34A-A279B63029A1} = {B74BB29C-5074-4A30-94AC-0F21ECD64BC6}
+	EndGlobalSection
+EndGlobal
