@@ -13,7 +13,7 @@ using System.Reflection;
 [assembly: System.Reflection.AssemblyCompanyAttribute("SociallyDistant.Framework")]
 [assembly: System.Reflection.AssemblyConfigurationAttribute("Debug")]
 [assembly: System.Reflection.AssemblyFileVersionAttribute("1.0.0.0")]
-[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+54498eff7be647461031c628e3bd9f00afde59bc")]
+[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+fe78a7450476bc013b0a86a2b3a1f5c8f3f98f9e")]
 [assembly: System.Reflection.AssemblyProductAttribute("SociallyDistant.Framework")]
 [assembly: System.Reflection.AssemblyTitleAttribute("SociallyDistant.Framework")]
 [assembly: System.Reflection.AssemblyVersionAttribute("1.0.0.0")]

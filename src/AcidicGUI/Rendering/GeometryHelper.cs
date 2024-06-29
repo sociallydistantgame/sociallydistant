@@ -99,51 +99,38 @@ public class GeometryHelper
         AddQuad(innerTR, outerTR1, innerBR, outerBR1);
         AddQuad(innerBL, innerBR, outerBL2, outerBR2);
         AddQuad(innerTL, innerTR, innerBL, innerBR);
+        
+        AddQuarterCircleAroundPivotVertices(innerTL, outerTL2, radiusTopLeft, -1, -1, color);
+        AddQuarterCircleAroundPivotVertices(innerTR, outerTR2, radiusTopRight, 1, -1, color);
+        AddQuarterCircleAroundPivotVertices(innerBL, outerBL2, radiusBottomLeft, -1, 1, color);
+        AddQuarterCircleAroundPivotVertices(innerBR, outerBR2, radiusBottomRight, 1, 1, color);
+    }
 
-        Vector3 cTL = vertices[innerTL].Position;
-        Vector3 cTR = vertices[innerTR].Position;
-        Vector3 cBL = vertices[innerBL].Position;
-        Vector3 cBR = vertices[innerBR].Position;
+    private void AddQuarterCircleAroundPivotVertices(int pivotVertex, int extent, float radius, float directionH, float directionV, Color color)
+    {
+        Vector3 center = vertices[pivotVertex].Position;
 
-        int tlLast = outerTL2;
-        int trLast = outerTR2;
-        var blLast = outerBL2;
-        int brLast = outerBR2;
+        int last = extent;
+
+        const int segments = 16;
 
         for (var i = 0; i < segments; i++)
         {
             var t = (i / ((float) segments - 1f)) * MathF.PI * 0.5f;
             var x = MathF.Sin(t);
             var y = MathF.Cos(t);
+            
+            float x1 = x * (radius * directionH) + center.X;
+            float y1 = y * (radius * directionV) + center.Y;
+            
+            int next = AddVertex(new Vector2(x1, y1), color);
 
-            float xTL = x * -radiusTopLeft + cTL.X;
-            float yTL = y * -radiusTopLeft + cTL.Y;
-            float xTR = x * radiusTopRight + cTR.X;
-            float yTR = y * -radiusTopRight + cTR.Y;
-            float xBL = x * -radiusTopLeft + cBL.X;
-            float yBL = y * radiusTopLeft + cBL.Y;
-            float xBR = x * radiusTopRight + cBR.X;
-            float yBR = y * radiusTopRight + cBR.Y;
-            
+            AddTriangle(last, next, pivotVertex);
 
-            int tl = AddVertex(new Vector2(xTL, yTL), color);
-            int tr = AddVertex(new Vector2(xTR, yTR), color);
-            int bl = AddVertex(new Vector2(xBL, yBL), color);
-            int br = AddVertex(new Vector2(xBR, yBR), color);
-            
-            AddTriangle(tlLast, tl, innerTL);
-            AddTriangle(trLast, innerTR, tr);
-            AddTriangle(blLast, bl, innerBL);
-            AddTriangle(brLast, innerBR, br);
-            
-            
-            tlLast = tl;
-            trLast = tr;
-            blLast = bl;
-            brLast = br;
+            last = next;
         }
     }
-
+    
     public void AddRoundedRectangleOutline(LayoutRect rectangle, float thickness, float uniformRadius, Color color)
     {
         AddRoundedRectangleOutline(rectangle, thickness, uniformRadius, uniformRadius, uniformRadius, uniformRadius,
@@ -155,11 +142,17 @@ public class GeometryHelper
     {
         if (thickness <= 0)
             return;
-
+        
         float halfWidth = rectangle.Width / 2;
         float halfHeight = rectangle.Height / 2;
 
         float smallerHalf = MathF.Min(halfWidth, halfHeight);
+        
+        if (thickness >= smallerHalf)
+        {
+            AddRoundedRectangle(rectangle, radiusTopLeft, radiusTopRight, radiusBottomLeft, radiusBottomRight, color);
+            return;
+        }
         
         radiusTopLeft = MathHelper.Clamp(radiusTopLeft, 0, smallerHalf);
         radiusBottomLeft = MathHelper.Clamp(radiusBottomLeft, 0, smallerHalf);
@@ -169,11 +162,24 @@ public class GeometryHelper
         
         if (radiusTopLeft <= 0 && radiusTopRight <= 0 && radiusBottomLeft <= 0 && radiusBottomRight <= 0)
             return;
+
+        float offsetTL = MathF.Max(radiusTopLeft, thickness);
+        float offsetTR = MathF.Max(radiusTopRight, thickness);
+        float offsetBL = MathF.Max(radiusBottomLeft, thickness);
+        float offsetBR = MathF.Max(radiusBottomRight, thickness);
         
         int innerTL = AddVertex(new Vector2(rectangle.Left + thickness, rectangle.Top + thickness), color);
         int innerTR = AddVertex(new Vector2(rectangle.Right - thickness, rectangle.Top + thickness), color);
         int innerBL = AddVertex(new Vector2(rectangle.Left + thickness, rectangle.Bottom - thickness), color);
         int innerBR = AddVertex(new Vector2(rectangle.Right - thickness, rectangle.Bottom - thickness), color);
+        int innerTL2 = AddVertex(new Vector2(rectangle.Left + radiusTopLeft, rectangle.Top + thickness), color);
+        int innerTR2 = AddVertex(new Vector2(rectangle.Right - radiusTopRight, rectangle.Top + thickness), color);
+        int innerBL2 = AddVertex(new Vector2(rectangle.Left + radiusBottomLeft, rectangle.Bottom - thickness), color);
+        int innerBR2 = AddVertex(new Vector2(rectangle.Right - radiusBottomRight, rectangle.Bottom - thickness), color);
+        int innerTL3 = AddVertex(new Vector2(rectangle.Left + thickness, rectangle.Top + radiusTopLeft), color);
+        int innerTR3 = AddVertex(new Vector2(rectangle.Right - thickness, rectangle.Top + radiusTopRight), color);
+        int innerBL3 = AddVertex(new Vector2(rectangle.Left + thickness, rectangle.Bottom - radiusBottomLeft), color);
+        int innerBR3 = AddVertex(new Vector2(rectangle.Right - thickness, rectangle.Bottom - radiusBottomRight), color);
 
         int outerTL1 = AddVertex(new Vector2(rectangle.Left, rectangle.Top + radiusTopLeft), color);
         int outerTL2 = AddVertex(new Vector2(rectangle.Left + radiusTopLeft, rectangle.Top), color);
@@ -189,74 +195,61 @@ public class GeometryHelper
         Vector2 cBL = new Vector2(rectangle.Left + radiusBottomLeft, rectangle.Bottom - radiusBottomLeft);
         Vector2 cBR = new Vector2(rectangle.Right - radiusBottomRight, rectangle.Bottom - radiusBottomRight);
         
-        AddQuad(outerTL1, innerTL, outerBL1, innerBL);
-        AddQuad(outerTL2, outerTR2, innerTL, innerTR);
-        AddQuad(innerTR, outerTR1, innerBR, outerBR1);
-        AddQuad(innerBL, innerBR, outerBL2, outerBR2);
+        AddQuad(outerTL1, innerTL3, outerBL1, innerBL3);
+        AddQuad(outerTL2, outerTR2, innerTL2, innerTR2);
+        AddQuad(innerTR3, outerTR1, innerBR3, outerBR1);
+        AddQuad(innerBL2, innerBR2, outerBL2, outerBR2);
+        
+        AddRoundedRectangleOutlineCurve(cTL, innerTL, thickness, radiusTopLeft, -1, -1, color);
+        AddRoundedRectangleOutlineCurve(cTR, innerTR, thickness, radiusTopRight, 1, -1, color);
+        AddRoundedRectangleOutlineCurve(cBL, innerBL, thickness, radiusBottomLeft, -1, 1, color);
+        AddRoundedRectangleOutlineCurve(cBR, innerBR, thickness, radiusBottomRight, 1, 1, color);
+    }
 
+    private void AddRoundedRectangleOutlineCurve(Vector2 center, int innerCorner, float thickness, float radius, float directionH, float directionV, Color color)
+    {
         const int segments = 16;
-        int currentOuterTL = outerTL1;
-        int currentInnerTL = innerTL;
-        int currentOuterTR = outerTR1;
-        int currentInnerTR = innerTR;
-        int currentOuterBL = outerBL1;
-        int currentInnerBL = innerBL;
-        int currentOuterBR = outerBR1;
-        int currentInnerBR = innerBR;
+
+        var connectToInnerCorner = false;
+        if (radius < thickness)
+        {
+            connectToInnerCorner = true;
+            thickness = radius;
+        }
+        
+        int currentInner = 0;
+        int currentOuter = 0;
+        
         for (var i = 0; i < segments; i++)
         {
             var t = (i / ((float) segments - 1f)) * MathF.PI * 0.5f;
             var x = MathF.Sin(t);
             var y = MathF.Cos(t);
-
-            var outerXTL = x * -radiusTopLeft + cTL.X;
-            var outerYTL = y * -radiusTopLeft + cTL.Y;
-            var innerXTL = x * (-radiusTopLeft + thickness) + cTL.X;
-            var innerYTL = y * (-radiusTopLeft + thickness) + cTL.Y;
-            var outerXTR = x * radiusTopRight + cTR.X;
-            var outerYTR = y * -radiusTopRight + cTR.Y;
-            var innerXTR = x * (radiusTopRight - thickness) + cTR.X;
-            var innerYTR = y * (-radiusTopRight + thickness) + cTR.Y;
             
-            var outerXBL = x * -radiusBottomLeft + cBL.X;
-            var outerYBL = y * radiusBottomLeft + cBL.Y;
-            var innerXBL = x * (-radiusBottomLeft + thickness) + cBL.X;
-            var innerYBL = y * (radiusBottomLeft - thickness) + cBL.Y;
-            var outerXBR = x * radiusBottomRight + cBR.X;
-            var outerYBR = y * radiusBottomRight + cBR.Y;
-            var innerXBR = x * (radiusBottomRight - thickness) + cBR.X;
-            var innerYBR = y * (radiusBottomRight - thickness) + cBR.Y;
-
-            int nextInnerTL = AddVertex(new Vector2(innerXTL, innerYTL), color);
-            int nextOuterTL = AddVertex(new Vector2(outerXTL, outerYTL), color);
-            int nextInnerTR = AddVertex(new Vector2(innerXTR, innerYTR), color);
-            int nextOuterTR = AddVertex(new Vector2(outerXTR, outerYTR), color);
-            int nextInnerBL = AddVertex(new Vector2(innerXBL, innerYBL), color);
-            int nextOuterBL = AddVertex(new Vector2(outerXBL, outerYBL), color);
-            int nextInnerBR = AddVertex(new Vector2(innerXBR, innerYBR), color);
-            int nextOuterBR = AddVertex(new Vector2(outerXBR, outerYBR), color);
+            var xOuter = x * (radius * directionH) + center.X;
+            var yOuter = y * (radius * directionV) + center.Y;
+            var xInner = x * ((radius * directionH) + (thickness * -directionH)) + center.X;
+            var yInner = y * ((radius * directionV) + (thickness * -directionV)) + center.Y;
+            
+            int nextInner = AddVertex(new Vector2(xInner, yInner), color);
+            int nextOuter = AddVertex(new Vector2(xOuter, yOuter), color);
 
             if (i > 0)
             {
-                AddTriangle(currentInnerTL, currentOuterTL, nextInnerTL);
-                AddTriangle(currentOuterTL, nextInnerTL, nextOuterTL);
-                AddTriangle(currentInnerTR, currentOuterTR, nextInnerTR);
-                AddTriangle(currentOuterTR, nextInnerTR, nextOuterTR);
-                
-                AddTriangle(currentInnerBL, currentOuterBL, nextInnerBL);
-                AddTriangle(currentOuterBL, nextInnerBL, nextOuterBL);
-                AddTriangle(currentInnerBR, currentOuterBR, nextInnerBR);
-                AddTriangle(currentOuterBR, nextInnerBR, nextOuterBR);
+                AddTriangle(currentInner, currentOuter, nextInner);
+                AddTriangle(currentOuter, nextInner, nextOuter);
             }
 
-            currentInnerTL = nextInnerTL;
-            currentOuterTL = nextOuterTL;
-            currentInnerTR = nextInnerTR;
-            currentOuterTR = nextOuterTR;
-            currentInnerBL = nextInnerBL;
-            currentOuterBL = nextOuterBL;
-            currentInnerBR = nextInnerBR;
-            currentOuterBR = nextOuterBR;
+            if (connectToInnerCorner)
+            {
+                if (i == 0 || i == segments - 1)
+                {
+                    AddTriangle(nextOuter, nextInner, innerCorner);
+                }
+            }
+            
+            currentInner = nextInner;
+            currentOuter = nextOuter;
         }
     }
 }
