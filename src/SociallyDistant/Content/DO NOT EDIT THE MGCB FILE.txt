@@ -1,0 +1,26 @@
+This is the root of Socially Distant's content assets directory.
+
+Inside this directory, you will find textures, shaders, game scripts, and
+other assets needed by the open-source version of the game. It does not
+include assets used by Career Mode.
+
+You will also find a "Content.mgcb" file. If you're experienced with
+MonoGame, and want to import new assets, you may be tempted to edit
+this file with the MonoGame Content Editor.
+
+Don't.
+
+YOUR CHANGES WILL BE WIPED.
+
+Socially Distant uses AutoPipeline, which generates the MGCB file on the fly
+during game build. This allows Career assets to be slipstreamed into the
+build via a build script you don't have access to. 
+
+If you want to add new assets to the game, just place them into the Content
+directory and build the game. If the assets are supported by the game, they'll
+automatically be processed by MGCB without any user intervention.
+
+IF YOU NEED TO CHANGE HOW A SPECIFIC ASSET GETS BUILT:
+
+Edit the "ContentOverrides.targets" file instead. AutoPipeline will use this
+to apply any import settings you set.  

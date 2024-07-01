@@ -1,0 +1,54 @@
+/outputDir:bin/Debug/net8.0/
+/intermediateDir:obj/Debug/net8.0/
+/platform:DesktopGL
+/config:
+/profile:Reach
+/compress:false
+
+#begin Backgrounds/Socially-Distant-Bg-wallpapers-dark-distorted.jpg
+/importer:TextureImporter
+/processor:TextureProcessor
+/processorParam:ColorKeyColor=255,0,255,255
+/processorParam:ColorKeyEnabled=false
+/processorParam:GenerateMipmaps=false
+/processorParam:PremultiplyAlpha=false
+/processorParam:ResizeToPowerOfTwo=false
+/processorParam:MakeSquare=false
+/processorParam:TextureFormat=color
+/build:Backgrounds/Socially-Distant-Bg-wallpapers-dark-distorted.jpg
+
+#begin Backgrounds/Socially-Distant-Bg-wallpapers-dark-normal.jpg
+/importer:TextureImporter
+/processor:TextureProcessor
+/processorParam:ColorKeyColor=255,0,255,255
+/processorParam:ColorKeyEnabled=false
+/processorParam:GenerateMipmaps=false
+/processorParam:PremultiplyAlpha=false
+/processorParam:ResizeToPowerOfTwo=false
+/processorParam:MakeSquare=false
+/processorParam:TextureFormat=color
+/build:Backgrounds/Socially-Distant-Bg-wallpapers-dark-normal.jpg
+
+#begin Backgrounds/Socially-Distant-Bg-wallpapers-light-distorted.jpg
+/importer:TextureImporter
+/processor:TextureProcessor
+/processorParam:ColorKeyColor=255,0,255,255
+/processorParam:ColorKeyEnabled=false
+/processorParam:GenerateMipmaps=false
+/processorParam:PremultiplyAlpha=false
+/processorParam:ResizeToPowerOfTwo=false
+/processorParam:MakeSquare=false
+/processorParam:TextureFormat=color
+/build:Backgrounds/Socially-Distant-Bg-wallpapers-light-distorted.jpg
+
+#begin Backgrounds/Socially-Distant-Bg-wallpapers-light-normal.jpg
+/importer:TextureImporter
+/processor:TextureProcessor
+/processorParam:ColorKeyColor=255,0,255,255
+/processorParam:ColorKeyEnabled=false
+/processorParam:GenerateMipmaps=false
+/processorParam:PremultiplyAlpha=false
+/processorParam:ResizeToPowerOfTwo=false
+/processorParam:MakeSquare=false
+/processorParam:TextureFormat=color
+/build:Backgrounds/Socially-Distant-Bg-wallpapers-light-normal.jpg
