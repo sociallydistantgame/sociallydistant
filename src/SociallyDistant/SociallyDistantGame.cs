@@ -134,9 +134,11 @@ internal sealed class SociallyDistantGame :
 			return playerInfoSubject.Subscribe(observer);
 		});
 
+		var contentPipeline = new ContentPipeline(this.Services);
+		
 		this.devTools = new DevToolsManager(this);
 		this.settingsManager = new SettingsManager();
-		this.contentManager = new ContentManager(this);
+		this.contentManager = new ContentManager(this, contentPipeline);
 		this.moduleManager = new ModuleManager(this);
 		this.worldManager = new WorldManager(this);
 		this.uriManager = new UriManager(this);
@@ -151,6 +153,8 @@ internal sealed class SociallyDistantGame :
 
 		graphicsManager.HardwareModeSwitch = false;
 		graphicsManager.PreparingDeviceSettings += OnGraphicsDeviceCreation;
+
+		Content = contentPipeline;
 	}
 
 	private void OnGraphicsDeviceCreation(object? sender, PreparingDeviceSettingsEventArgs e)

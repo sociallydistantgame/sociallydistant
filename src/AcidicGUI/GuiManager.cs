@@ -9,7 +9,7 @@ public sealed class GuiManager
 {
     private readonly IGuiContext context;
     private readonly Widget.TopLevelCollection topLevels;
-    private readonly GuiBatcher batcher;
+    private readonly GuiRenderer renderer;
     private readonly Queue<Widget> widgetsNeedingLayoutUpdate = new();
 
     private float screenWidth;
@@ -23,7 +23,7 @@ public sealed class GuiManager
     {
         this.context = context;
         this.topLevels = new Widget.TopLevelCollection(this);
-        this.batcher = new GuiBatcher(context);
+        this.renderer = new GuiRenderer(context);
     }
 
     public void UpdateLayout()
@@ -62,9 +62,7 @@ public sealed class GuiManager
         isRendering = true;
 
         foreach (Widget widget in topLevels)
-            widget.RenderInternal(batcher);
-        
-        batcher.RenderBatch();
+            widget.RenderInternal(renderer);
         
         isRendering = false;
     }

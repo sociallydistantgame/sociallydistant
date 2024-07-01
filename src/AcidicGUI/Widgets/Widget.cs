@@ -52,7 +52,7 @@ public abstract partial class Widget
         
     }
     
-    internal void RenderInternal(GuiBatcher batcher)
+    internal void RenderInternal(GuiRenderer renderer)
     {
         if (cachedGeometry == null)
         {
@@ -61,11 +61,11 @@ public abstract partial class Widget
             cachedGeometry = geometryHelper.ExportMesh();
         }
         
-        batcher.BatchGuiMesh(cachedGeometry.Value);
+        renderer.RenderGuiMesh(cachedGeometry.Value);
 
         foreach (Widget child in children)
         {
-            child.RenderInternal(batcher);
+            child.RenderInternal(renderer);
         }
     }
     

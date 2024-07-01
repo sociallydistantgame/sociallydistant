@@ -3,29 +3,20 @@ using Microsoft.Xna.Framework.Graphics;
 
 namespace AcidicGUI.Rendering;
 
-public sealed class GuiBatcher
+public sealed class GuiRenderer
 {
-    private readonly List<VertexPositionColorTexture> batchedVertices = new();
-    private readonly List<int> batchedIndices = new();
     private readonly IGuiContext context;
-
-    public GuiBatcher(IGuiContext context)
+    
+    public GuiRenderer(IGuiContext context)
     {
         this.context = context;
     }
     
-    public void BatchGuiMesh(GuiMesh mesh)
+    public void RenderGuiMesh(GuiMesh mesh)
     {
-        int baseIndex = batchedVertices.Count;
-        
-        batchedVertices.AddRange(mesh.Vertices);
-
-        foreach (var i in mesh.Indices)
-            batchedIndices.Add(i + baseIndex);
-    }
-
-    internal void RenderBatch()
-    {
-        context.Render(batchedVertices.ToArray(), batchedIndices.ToArray(), null);
+        foreach (GuiSubMesh subMesh in mesh.SubMeshes)
+        {
+            context.Render(subMesh.Vertices, subMesh.Indices, subMesh.Texture);
+        }
     }
 }

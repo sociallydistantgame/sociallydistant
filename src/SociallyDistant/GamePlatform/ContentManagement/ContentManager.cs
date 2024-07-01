@@ -14,12 +14,14 @@ namespace SociallyDistant.GamePlatform.ContentManagement
 		private readonly List<IContentGenerator> generators = new();
 		private readonly List<IGameContent> allContent = new List<IGameContent>();
 		private readonly List<IGameContentSource> contentSources = new List<IGameContentSource>();
+		private readonly ContentPipeline contentPipeline;
 
 		private bool hasLoadedSystemBundles;
 		
-		public ContentManager(IGameContext game)
+		public ContentManager(IGameContext game, ContentPipeline pipeline)
 		{
 			this.game = game;
+			this.contentPipeline = pipeline;
 		}
 		
 		/// <inheritdoc />
@@ -57,8 +59,6 @@ namespace SociallyDistant.GamePlatform.ContentManagement
 
 		public async Task RefreshContentDatabaseAsync()
 		{
-			await LoadSystemBundlesAsync();
-			
 			var builder = new ContentCollectionBuilder(this.allContent);
 			
 			// Run content generators. Make sure we offload this to another thread
@@ -76,46 +76,11 @@ namespace SociallyDistant.GamePlatform.ContentManagement
 			foreach (IGameContentSource source in contentSources)
 			{
 				// load system assets
-				/*foreach (AssetBundle systemBundle in loadedSystemBundles)
-				{
-					var loader = new AssetBundledContentFinder(systemBundle);
+					var loader = new XnaContentFinder(contentPipeline);
 					await source.LoadAllContent(builder, loader);
-				}*/
 			}
 
 			await this.game.ScriptSystem.RunHookAsync(CommonScriptHooks.AfterContentReload);
-		}
-
-		private async Task LoadSystemBundlesAsync()
-		{
-			/*if (hasLoadedSystemBundles)
-				return;
-		
-			if (!Directory.Exists(systemBundlesPath))
-				return;
-			
-			foreach (string bundleFile in Directory.EnumerateFiles(systemBundlesPath))
-			{
-				string manifestPath = $"{bundleFile}.manifest";
-				if (!File.Exists(manifestPath))
-					continue;
-				
-				Debug.Log($"Loading bundle: {Path.GetFileName(bundleFile)}");
-
-				try
-				{
-					AssetBundle bundle = await AssetBundle.LoadFromFileAsync(bundleFile);
-					loadedSystemBundles.Add(bundle);
-
-					Debug.Log($"Successfully loaded bundle: {bundle.name}");
-				}
-				catch (Exception ex)
-				{
-					Debug.LogException(ex);
-				}
-			}
-
-			hasLoadedSystemBundles = true;*/
 		}
 	}
 }

@@ -3,6 +3,7 @@ using SociallyDistant.Architecture;
 using SociallyDistant.Core.Core;
 using SociallyDistant.Core.OS.Devices;
 using SociallyDistant.Core.OS.FileSystems;
+using SociallyDistant.Core.OS.FileSystems.Host;
 using SociallyDistant.Core.OS.Network;
 using SociallyDistant.Core.Scripting;
 using SociallyDistant.GamePlatform;
