@@ -1,17 +1,30 @@
 using AcidicGUI.CustomProperties;
 using AcidicGUI.Rendering;
+using AcidicGUI.TextRendering;
+using AcidicGUI.VisualStyles;
 
 namespace AcidicGUI.Widgets;
 
-public abstract partial class Widget
+public abstract partial class Widget : IFontProvider
 {
     private readonly WidgetCollection children;
     private readonly Dictionary<Type, CustomPropertyObject> customProperties = new();
-    
+
+    private IVisualStyle? visualStyleOverride;
     private Widget? parent;
     private GuiManager? guiManager;
     private GuiMesh? cachedGeometry;
 
+    public IVisualStyle? VisualStyleOverride
+    {
+        get => visualStyleOverride;
+        set
+        {
+            visualStyleOverride = value;
+            InvalidateLayout();
+        }
+    }
+    
     public Widget? Parent
     {
         get => parent;
@@ -47,6 +60,17 @@ public abstract partial class Widget
         this.children = new WidgetCollection(this);
     }
 
+    public IVisualStyle GetVisualStyle()
+    {
+        if (visualStyleOverride != null)
+            return visualStyleOverride;
+
+        if (parent != null)
+            return parent.GetVisualStyle();
+
+        return GuiManager.GetVisualStyle();
+    }
+    
     protected virtual void RebuildGeometry(GeometryHelper geometry)
     {
         
@@ -56,7 +80,7 @@ public abstract partial class Widget
     {
         if (cachedGeometry == null)
         {
-            var geometryHelper = new GeometryHelper();
+            var geometryHelper = new GeometryHelper(renderer);
             RebuildGeometry(geometryHelper);
             cachedGeometry = geometryHelper.ExportMesh();
         }
@@ -80,5 +104,10 @@ public abstract partial class Widget
         }
 
         return (T)obj;
+    }
+
+    public Font GetFont(FontPreset presetFont)
+    {
+        return GuiManager.GetFont(presetFont);
     }
 }

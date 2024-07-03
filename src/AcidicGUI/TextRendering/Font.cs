@@ -1,33 +1,33 @@
-using FontStashSharp;
+using AcidicGUI.Rendering;
+using Microsoft.Xna.Framework;
+using Microsoft.Xna.Framework.Graphics;
 
 namespace AcidicGUI.TextRendering;
 
-public sealed class Font : IDisposable
+public abstract class Font : IDisposable
 {
-    private readonly FontSystem fontSystem = new();
+    private bool disposed = false;
 
-    private void AddTtfStreamInternal(Stream stream)
-    {
-        fontSystem.AddFont(stream);
-    }
+    public abstract Vector2 Measure(string text);
+    public abstract void Draw(GeometryHelper geometryHelper, Vector2 position, Color color, string text);
     
-    public static Font FromTtfFile(string filePath)
+    public static Font FromTtfFile(string filePath, int fontSize)
     {
         using var fileStream = File.OpenRead(filePath);
 
-        return FromTtfStream(fileStream);
+        return FromTtfStream(fileStream, fontSize);
     }
 
-    public static Font FromTtfBytes(byte[] ttfBytes)
+    public static Font FromTtfBytes(byte[] ttfBytes, int fontSize)
     {
         using var memory = new MemoryStream(ttfBytes);
 
-        return FromTtfStream(memory);
+        return FromTtfStream(memory, fontSize);
     }
 
-    public static Font FromTtfStream(Stream stream)
+    public static Font FromTtfStream(Stream stream, int fontSize)
     {
-        var font = new Font();
+        var font = new DynamicFont(fontSize);
 
         font.AddTtfStreamInternal(stream);
         
@@ -36,6 +36,15 @@ public sealed class Font : IDisposable
 
     public void Dispose()
     {
-        fontSystem.Dispose();
+        Dispose(!disposed);
+        disposed = true;
     }
+
+    public static implicit operator Font(SpriteFont spriteFont)
+    {
+        return new SimpleFont(spriteFont);
+    }
+    
+    protected virtual void Dispose(bool disposing) 
+    { }
 }

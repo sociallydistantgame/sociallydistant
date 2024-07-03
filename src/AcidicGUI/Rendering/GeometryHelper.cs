@@ -5,10 +5,16 @@ using Microsoft.Xna.Framework.Graphics;
 
 namespace AcidicGUI.Rendering;
 
-public class GeometryHelper
+public class GeometryHelper : IFontStashRenderer2
 {
     private readonly GuiMeshBuilder whiteMesh = new(null);
     private readonly Dictionary<Texture2D, GuiMeshBuilder> meshes = new();
+    private readonly GuiRenderer guiRenderer;
+
+    internal GeometryHelper(GuiRenderer guiRenderer)
+    {
+        this.guiRenderer = guiRenderer;
+    }
 
     public GuiMesh ExportMesh()
     {
@@ -26,7 +32,7 @@ public class GeometryHelper
         return new GuiMesh(meshList);
     }
 
-    private GuiMeshBuilder GetMeshBuilder(Texture2D? texture)
+    public GuiMeshBuilder GetMeshBuilder(Texture2D? texture)
     {
         if (texture == null)
             return whiteMesh;
@@ -276,4 +282,20 @@ public class GeometryHelper
             currentOuter = nextOuter;
         }
     }
+
+    public void DrawQuad(Texture2D texture, ref VertexPositionColorTexture topLeft, ref VertexPositionColorTexture topRight,
+        ref VertexPositionColorTexture bottomLeft, ref VertexPositionColorTexture bottomRight)
+    {
+        var mesh = GetMeshBuilder(texture);
+
+        int i1 = mesh.AddVertex(topLeft);
+        int i2 = mesh.AddVertex(topRight);
+        int i3 = mesh.AddVertex(bottomLeft);
+        int i4 = mesh.AddVertex(bottomRight);
+        
+        mesh.AddTriangle(i1, i2, i3);
+        mesh.AddTriangle(i3, i2, i4);
+    }
+
+    public GraphicsDevice GraphicsDevice => guiRenderer.GraphicsDevice;
 }

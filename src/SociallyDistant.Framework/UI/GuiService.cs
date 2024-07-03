@@ -2,6 +2,7 @@ using AcidicGUI;
 using AcidicGUI.CustomProperties;
 using AcidicGUI.Layout;
 using AcidicGUI.Rendering;
+using AcidicGUI.TextRendering;
 using AcidicGUI.Widgets;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
@@ -19,6 +20,8 @@ public sealed class GuiService :
     private readonly FlexPanel test = new();
     private readonly int[] screenQuad = new int[] { 0, 1, 2, 2, 1, 3 };
     private readonly VertexPositionColorTexture[] screenQuadVerts = new VertexPositionColorTexture[4];
+    private readonly TextWidget textWidget = new();
+    private Font? fallbackFont;
     private SpriteEffect? defaultEffect;
     private Texture2D? white = null;
     private RenderTarget2D? virtualScreen;
@@ -28,6 +31,12 @@ public sealed class GuiService :
         this.context = sociallyDistantContext;
         this.acidicGui = new GuiManager(this);
         this.acidicGui.TopLevels.Add(test);
+
+        test.ChildWidgets.Add(textWidget);
+
+        textWidget.HorizontalAlignment = HorizontalAlignment.Left;
+        textWidget.VerticalAlignment = VerticalAlignment.Top;
+        textWidget.Text = "Ritchie is the cutest human in existence.";
         
         test.Spacing = 6;
         test.Direction = Direction.Vertical;
@@ -60,6 +69,7 @@ public sealed class GuiService :
     
     public override void Update(GameTime gameTime)
     {
+        // Updates layout and input.
         acidicGui.UpdateLayout();
     }
 
@@ -67,14 +77,13 @@ public sealed class GuiService :
     {
         if (virtualScreen == null)
             return;
-        
+
+        // TODO: Render the entire game to a virtual screen so we can do background-blurs
         Game.GraphicsDevice.SetRenderTarget(virtualScreen);
         Game.GraphicsDevice.Clear(Color.Transparent);
-        
         acidicGui.Render();
-        
         Game.GraphicsDevice.SetRenderTarget(null);
-
+        
         Render(screenQuadVerts, screenQuad, virtualScreen);
     }
 
@@ -109,5 +118,13 @@ public sealed class GuiService :
         graphics.RasterizerState = RasterizerState.CullCounterClockwise;
         graphics.DrawUserIndexedPrimitives<VertexPositionColorTexture>(PrimitiveType.TriangleList, vertices, 0,
             vertices.Length, indices, 0, indices.Length / 3);
+    }
+
+    public Font GetFallbackFont()
+    {
+        if (fallbackFont == null)
+            fallbackFont = Game.Content.Load<SpriteFont>("/Core/UI/Fonts/Rajdhani");
+
+        return fallbackFont;
     }
 }

@@ -1,4 +1,3 @@
-using FontStashSharp.Interfaces;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 
@@ -31,6 +30,16 @@ public sealed class GuiMeshBuilder
         int index = vertices.Count;
         vertices.Add(vertex);
         return index;
+    }
+    
+    public int AddVertex(Vector3 position, Color color, Vector2 texCoord)
+    {
+        return AddVertex(new VertexPositionColorTexture(position, color, texCoord));
+    }
+    
+    public int AddVertex(Vector2 position, Color color, Vector2 texCoord)
+    {
+        return AddVertex(new VertexPositionColorTexture(new Vector3(position.X, position.Y, 0), color, texCoord));
     }
     
     public int AddVertex(Vector3 position, Color color)

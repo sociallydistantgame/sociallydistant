@@ -1,3 +1,5 @@
+using Microsoft.Xna.Framework;
+
 namespace AcidicGUI.Layout;
 
 public struct LayoutRect
@@ -10,6 +12,8 @@ public struct LayoutRect
     public float Right => Left + Width;
     public float Bottom => Top + Height;
 
+    public Vector2 TopLeft => new Vector2(Left, Top);
+    
     public LayoutRect(float left, float top, float width, float height)
     {
         Left = left;

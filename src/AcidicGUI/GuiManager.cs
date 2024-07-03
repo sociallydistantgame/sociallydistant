@@ -1,17 +1,22 @@
 ﻿using System.Runtime.CompilerServices;
 using AcidicGUI.Layout;
 using AcidicGUI.Rendering;
+using AcidicGUI.TextRendering;
+using AcidicGUI.VisualStyles;
 using AcidicGUI.Widgets;
+using Microsoft.Xna.Framework.Graphics;
 
 namespace AcidicGUI;
 
-public sealed class GuiManager
+public sealed class GuiManager : IFontProvider
 {
     private readonly IGuiContext context;
     private readonly Widget.TopLevelCollection topLevels;
     private readonly GuiRenderer renderer;
     private readonly Queue<Widget> widgetsNeedingLayoutUpdate = new();
+    private readonly FallbackVisualStyle fallbackVisualStyle = new FallbackVisualStyle();
 
+    private IVisualStyle? visualStyleOverride;
     private float screenWidth;
     private float screenHeight;
     private bool isRendering = false;
@@ -57,6 +62,14 @@ public sealed class GuiManager
         }
     }
 
+    public IVisualStyle GetVisualStyle()
+    {
+        if (fallbackVisualStyle.FallbackFont == null)
+            fallbackVisualStyle.FallbackFont = this.context.GetFallbackFont();
+        
+        return visualStyleOverride ?? fallbackVisualStyle;
+    }
+    
     public void Render()
     {
         isRendering = true;
@@ -70,5 +83,15 @@ public sealed class GuiManager
     internal void SubmitForLayoutUpdateInternal(Widget widget)
     {
         widgetsNeedingLayoutUpdate.Enqueue(widget);
+    }
+
+    public Font GetFont(FontPreset presetFont)
+    {
+        return GetVisualStyle().GetFont(presetFont);
+    }
+
+    internal GraphicsDevice GetGraphicsDeviceInternal()
+    {
+        return context.GraphicsDevice;
     }
 }

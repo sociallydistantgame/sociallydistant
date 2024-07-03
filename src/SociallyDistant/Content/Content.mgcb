@@ -52,3 +52,12 @@
 /processorParam:MakeSquare=false
 /processorParam:TextureFormat=color
 /build:Backgrounds/Socially-Distant-Bg-wallpapers-light-normal.jpg
+
+#begin UI/Fonts/Rajdhani.spritefont
+/importer:FontDescriptionImporter
+/processor:FontDescriptionProcessor
+/processorParam:Importer=FontDescriptionImporter
+/processorParam:Processor=FontDescriptionProcessor
+/processorParam:PremultiplyAlpha=True
+/processorParam:TextureFormat=Compressed
+/build:UI/Fonts/Rajdhani.spritefont

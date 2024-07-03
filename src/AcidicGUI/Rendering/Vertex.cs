@@ -19,4 +19,6 @@ public sealed class GuiRenderer
             context.Render(subMesh.Vertices, subMesh.Indices, subMesh.Texture);
         }
     }
+
+    public GraphicsDevice GraphicsDevice => context.GraphicsDevice;
 }

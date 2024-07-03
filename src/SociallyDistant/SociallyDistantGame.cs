@@ -153,7 +153,7 @@ internal sealed class SociallyDistantGame :
 
 		Components.Add(backdrop);
 		Components.Add(backdropUpdater);
-		//Components.Add(gui);
+		Components.Add(gui);
 		Components.Add(devTools);
 
 		IsMouseVisible = true;
@@ -342,6 +342,8 @@ internal sealed class SociallyDistantGame :
 			parameters.BackBufferWidth = mode.Width;
 			parameters.BackBufferHeight = mode.Height;
 		}
+
+		parameters.RenderTargetUsage = RenderTargetUsage.PreserveContents;
 
 		if (explicitApply)
 		{
