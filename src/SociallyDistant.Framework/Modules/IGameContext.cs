@@ -26,7 +26,9 @@ namespace SociallyDistant.Core.Modules
 		INotificationManager NotificationManager { get; }
 		
 		GameMode CurrentGameMode { get; }
-		
+
+		public IObservable<GameMode> GameModeObservable { get; }
+
 		ISocialService SocialService { get; }
 		
 		/// <summary>

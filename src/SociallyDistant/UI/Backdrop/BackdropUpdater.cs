@@ -1,56 +1,58 @@
 ﻿#nullable enable
-using System;
-using Core;
-using GamePlatform;
-using UnityEngine;
-using UnityExtensions;
-using UniRx;
+using System.Runtime.Loader;
+using Microsoft.Xna.Framework;
+using Microsoft.Xna.Framework.Graphics;
+using SociallyDistant.Core.Core;
+using SociallyDistant.Core.Modules;
 
-namespace UI.Backdrop
+namespace SociallyDistant.UI.Backdrop
 {
-	public class BackdropUpdater : MonoBehaviour
+	public class BackdropUpdater : GameComponent
 	{
-		[Header("Backdrops")]
+		private readonly IGameContext context;
 		
 		private Texture2D dayTime = null!;
-		
-		
 		private Texture2D nightTime = null!;
-		
-		
 		private Texture2D dayTimePanic = null!;
-		
-		
 		private Texture2D nightTimePanic = null!;
 		
 		private IWorldManager worldManager = null!;
-		private GameManager gameManager = null!;
 		private GameMode gameMode;
 		private bool isPanicking = false;
 		private bool isNightTime = false;
 		private BackdropController backdrop = null!;
 		private IDisposable? gameModeObserver;
-		
-		private void Awake()
+
+		public override void Initialize()
 		{
-			gameManager = GameManager.Instance;
-			worldManager = gameManager.WorldManager;
-			
+			base.Initialize();
+
+			worldManager = context.WorldManager;
+
 			this.MustGetComponent(out backdrop);
-		}
-		
-		private void Start()
-		{
-			gameModeObserver = gameManager.GameModeObservable.Subscribe(OnGameModeChanged);
-		}
-		
-		private void OnDestroy()
-		{
-			gameModeObserver?.Dispose();
+
+			gameModeObserver = context.GameModeObservable.Subscribe(OnGameModeChanged);
+			
+			dayTime = Game.Content.Load<Texture2D>("/Core/Backgrounds/Socially-Distant-Bg-wallpapers-light-normal");
+			dayTimePanic = Game.Content.Load<Texture2D>("/Core/Backgrounds/Socially-Distant-Bg-wallpapers-light-distorted");
+			nightTime = Game.Content.Load<Texture2D>("/Core/Backgrounds/Socially-Distant-Bg-wallpapers-dark-normal");
+			nightTimePanic = Game.Content.Load<Texture2D>("/Core/Backgrounds/Socially-Distant-Bg-wallpapers-dark-distorted");
 		}
 
-		private void Update()
+		protected override void Dispose(bool disposing)
 		{
+			if (disposing)
+			{
+				gameModeObserver?.Dispose();
+			}
+			
+			base.Dispose(disposing);
+		}
+		
+		public override void Update(GameTime gameTime)
+		{
+			base.Update(gameTime);
+			
 			if (gameMode != GameMode.OnDesktop && gameMode != GameMode.InMission)
 			{
 				if (isNightTime && !isPanicking)
@@ -90,12 +92,17 @@ namespace UI.Backdrop
 				texture = night ? nightTime : dayTime;
 			}
 
-			this.backdrop.SetBackdrop(new BackdropSettings(Color.white, texture));
+			this.backdrop.SetBackdrop(new BackdropSettings(Color.White, texture));
 		}
 
 		private void OnGameModeChanged(GameMode newGameMode)
 		{
 			gameMode = newGameMode;
+		}
+
+		internal BackdropUpdater(SociallyDistantGame game) : base(game)
+		{
+			context = game;
 		}
 	}
 }

@@ -1,7 +1,8 @@
-﻿#nullable enable
-using UnityEngine;
+﻿using Microsoft.Xna.Framework;
+using Microsoft.Xna.Framework.Graphics;
 
-namespace UI.Backdrop
+#nullable enable
+namespace SociallyDistant.UI.Backdrop
 {
 	public class BackdropSettings
 	{
@@ -21,6 +22,6 @@ namespace UI.Backdrop
 			
 		}
 
-		public static BackdropSettings Default => new (Color.black);
+		public static BackdropSettings Default => new (Color.Black);
 	}
 }

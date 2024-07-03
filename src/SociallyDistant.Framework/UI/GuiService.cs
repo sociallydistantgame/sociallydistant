@@ -31,21 +31,6 @@ public sealed class GuiService :
         
         test.Spacing = 6;
         test.Direction = Direction.Vertical;
-        
-        for (var i = 0; i < 6; i++)
-        {
-            var box = new Box();
-
-            box.MinimumSize = new Vector2(100, 30);
-
-            if (i % 2 == 0)
-            {
-                box.GetCustomProperties<FlexPanelProperties>()
-                    .Mode = FlexMode.Proportional;
-            }
-            
-            this.test.ChildWidgets.Add(box);
-        }
     }
 
     public void SetVirtualScreenSize(int width, int height)
@@ -82,9 +67,6 @@ public sealed class GuiService :
     {
         if (virtualScreen == null)
             return;
-
-        Game.GraphicsDevice.BlendState = BlendState.AlphaBlend;
-        Game.GraphicsDevice.RasterizerState = RasterizerState.CullCounterClockwise;
         
         Game.GraphicsDevice.SetRenderTarget(virtualScreen);
         Game.GraphicsDevice.Clear(Color.Transparent);
@@ -123,6 +105,8 @@ public sealed class GuiService :
         defaultEffect.Techniques[0].Passes[0].Apply();
         graphics.Textures[0] = texture ?? white;
         graphics.SamplerStates[0] = SamplerState.LinearClamp;
+        graphics.BlendState = BlendState.AlphaBlend;
+        graphics.RasterizerState = RasterizerState.CullCounterClockwise;
         graphics.DrawUserIndexedPrimitives<VertexPositionColorTexture>(PrimitiveType.TriangleList, vertices, 0,
             vertices.Length, indices, 0, indices.Length / 3);
     }

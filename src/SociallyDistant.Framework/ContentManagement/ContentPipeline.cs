@@ -31,6 +31,9 @@ public sealed class ContentPipeline : Microsoft.Xna.Framework.Content.ContentMan
         if (!Directory.Exists(hostDirectory))
             throw new DirectoryNotFoundException($"The given path does not exist: {hostDirectory}");
 
+        if (!vfs.DirectoryExists(mountPoint))
+            vfs.CreateDirectory(mountPoint);
+        
         var jail = new HostJail(hostDirectory);
 
         vfs.Mount(mountPoint, jail);
@@ -40,7 +43,7 @@ public sealed class ContentPipeline : Microsoft.Xna.Framework.Content.ContentMan
     
     protected override Stream OpenStream(string assetName)
     {
-        return vfs.OpenRead(assetName);
+        return vfs.OpenRead(assetName + ".xnb");
     }
 
     private void DiscoverAssets(string directory)
@@ -62,6 +65,9 @@ public sealed class ContentPipeline : Microsoft.Xna.Framework.Content.ContentMan
             using var stream = vfs.OpenRead(file);
             using var xnbReader = new XnbContentIdentifier(stream);
 
+            // strip the .xnb extension in the file name
+            string friendlyName = file.Substring(0, file.LastIndexOf(".", StringComparison.Ordinal));
+
             Type[] containedTypes = xnbReader.IdentifyContainedTypes();
 
             if (containedTypes.Length == 0)
@@ -73,7 +79,7 @@ public sealed class ContentPipeline : Microsoft.Xna.Framework.Content.ContentMan
 
             foreach (Type type in containedTypes)
             {
-                AddDiscoveredAsset(file, type);
+                AddDiscoveredAsset(friendlyName, type);
             }
         }
         catch (Exception ex)

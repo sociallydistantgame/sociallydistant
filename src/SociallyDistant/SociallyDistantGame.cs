@@ -24,6 +24,7 @@ using SociallyDistant.GamePlatform;
 using SociallyDistant.GamePlatform.ContentManagement;
 using SociallyDistant.GameplaySystems.Social;
 using SociallyDistant.Modding;
+using SociallyDistant.UI.Backdrop;
 
 namespace SociallyDistant;
 
@@ -55,6 +56,8 @@ internal sealed class SociallyDistantGame :
 	private readonly ScriptSystem scriptSystem;
     private readonly VertexPositionColorTexture[] virtualScreenVertices = new VertexPositionColorTexture[4];
     private readonly int[] virtualScreenIndices = new[] { 0, 1, 2, 2, 1, 3 };
+    private readonly BackdropController backdrop;
+    private readonly BackdropUpdater backdropUpdater;
 
 	private Task initializeTask;
 	private PlayerInfo playerInfo = new();
@@ -135,7 +138,9 @@ internal sealed class SociallyDistantGame :
 		});
 
 		var contentPipeline = new ContentPipeline(this.Services);
-		
+
+		this.backdrop = new BackdropController(this);
+		this.backdropUpdater = new BackdropUpdater(this);
 		this.devTools = new DevToolsManager(this);
 		this.settingsManager = new SettingsManager();
 		this.contentManager = new ContentManager(this, contentPipeline);
@@ -146,7 +151,9 @@ internal sealed class SociallyDistantGame :
 		this.socialService = new SocialService();
 		this.gui = new GuiService(this);
 
-		Components.Add(gui);
+		Components.Add(backdrop);
+		Components.Add(backdropUpdater);
+		//Components.Add(gui);
 		Components.Add(devTools);
 
 		IsMouseVisible = true;
@@ -155,6 +162,8 @@ internal sealed class SociallyDistantGame :
 		graphicsManager.PreparingDeviceSettings += OnGraphicsDeviceCreation;
 
 		Content = contentPipeline;
+
+		contentPipeline.AddDirectoryContentSource("/Core", Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "Content"));
 	}
 
 	private void OnGraphicsDeviceCreation(object? sender, PreparingDeviceSettingsEventArgs e)
