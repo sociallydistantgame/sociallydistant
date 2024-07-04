@@ -16,7 +16,7 @@ public sealed class GuiRenderer
     {
         foreach (GuiSubMesh subMesh in mesh.SubMeshes)
         {
-            context.Render(subMesh.Vertices, subMesh.Indices, subMesh.Texture);
+            context.Render(subMesh.Vertices, subMesh.Indices, subMesh.Texture, mesh.ClipRect);
         }
     }
 

@@ -1,3 +1,4 @@
+using AcidicGUI.Layout;
 using Microsoft.Xna.Framework.Graphics;
 
 namespace AcidicGUI.Rendering;
@@ -19,9 +20,11 @@ public struct GuiSubMesh
 public struct GuiMesh
 {
     public readonly GuiSubMesh[] SubMeshes;
+    public readonly LayoutRect? ClipRect;
 
-    public GuiMesh(GuiSubMesh[] subMeshes)
+    public GuiMesh(GuiSubMesh[] subMeshes, LayoutRect? clipRect)
     {
         this.SubMeshes = subMeshes;
+        this.ClipRect = clipRect;
     }
 }

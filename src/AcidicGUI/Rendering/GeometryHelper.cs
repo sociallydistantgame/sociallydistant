@@ -12,12 +12,14 @@ public class GeometryHelper : IFontStashRenderer2
     private readonly GuiRenderer guiRenderer;
     private readonly bool desaturate;
     private readonly float opacity;
+    private readonly LayoutRect? clipRect;
 
-    internal GeometryHelper(GuiRenderer guiRenderer, float opacity, bool desaturate)
+    internal GeometryHelper(GuiRenderer guiRenderer, float opacity, bool desaturate, LayoutRect? clipRect)
     {
         this.opacity = opacity;
         this.desaturate = desaturate;
         this.guiRenderer = guiRenderer;
+        this.clipRect = clipRect;
         
         whiteMesh = new GuiMeshBuilder(null, opacity, desaturate);
     }
@@ -35,7 +37,7 @@ public class GeometryHelper : IFontStashRenderer2
             i++;
         }
 
-        return new GuiMesh(meshList);
+        return new GuiMesh(meshList, clipRect);
     }
 
     public GuiMeshBuilder GetMeshBuilder(Texture2D? texture)

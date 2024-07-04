@@ -6,6 +6,7 @@ using AcidicGUI.TextRendering;
 using AcidicGUI.Widgets;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
+using Microsoft.Xna.Framework.Input;
 using SociallyDistant.Core.Modules;
 
 namespace SociallyDistant.Core.UI;
@@ -24,6 +25,8 @@ public sealed class GuiService :
     private SpriteEffect? defaultEffect;
     private Texture2D? white = null;
     private RenderTarget2D? virtualScreen;
+    private RasterizerState? scissor;
+    private RasterizerState? noScissor;
 
     public GuiService(IGameContext sociallyDistantContext) : base(sociallyDistantContext.GameInstance)
     {
@@ -39,6 +42,7 @@ public sealed class GuiService :
 
         for (var i = 0; i < 48; i++)
         {
+            var button = new Button();
             var text = new TextWidget();
 
             text.Text = $"Ritchie {i + 1}";
@@ -46,7 +50,8 @@ public sealed class GuiService :
             text.VerticalAlignment = VerticalAlignment.Middle;
             text.WordWrapping = true;
 
-            test.ChildWidgets.Add(text);
+            button.Content = text;
+            test.ChildWidgets.Add(button);
         }
     }
 
@@ -77,8 +82,13 @@ public sealed class GuiService :
     
     public override void Update(GameTime gameTime)
     {
-        // Updates layout and input.
+        // Handles layout updates
         acidicGui.UpdateLayout();
+        
+        // Mouse
+        var mouse = Mouse.GetState(Game.Window);
+        
+        acidicGui.SetMousePosition(mouse.Position);
     }
 
     public override void Draw(GameTime gameTime)
@@ -98,7 +108,7 @@ public sealed class GuiService :
     public float PhysicalScreenWidget => virtualScreen?.Width ?? Game.GraphicsDevice.Viewport.Width;
     public float PhysicalScreenHeight => virtualScreen?.Height ?? Game.GraphicsDevice.Viewport.Height;
     
-    public void Render(VertexPositionColorTexture[] vertices, int[] indices, Texture2D? texture)
+    public void Render(VertexPositionColorTexture[] vertices, int[] indices, Texture2D? texture, LayoutRect? clipRect = null)
     {
         if (defaultEffect == null)
         {
@@ -123,9 +133,34 @@ public sealed class GuiService :
         graphics.Textures[0] = texture ?? white;
         graphics.SamplerStates[0] = SamplerState.LinearClamp;
         graphics.BlendState = BlendState.AlphaBlend;
-        graphics.RasterizerState = RasterizerState.CullCounterClockwise;
+        graphics.RasterizerState = GetRasterizerState(clipRect);
+        graphics.ScissorRectangle = clipRect.GetValueOrDefault();
         graphics.DrawUserIndexedPrimitives<VertexPositionColorTexture>(PrimitiveType.TriangleList, vertices, 0,
             vertices.Length, indices, 0, indices.Length / 3);
+    }
+
+    private RasterizerState GetRasterizerState(LayoutRect? clipRect)
+    {
+        scissor ??= new RasterizerState()
+        {
+            CullMode = CullMode.CullCounterClockwiseFace,
+            ScissorTestEnable = true
+        };
+        noScissor ??= new RasterizerState()
+        {
+            CullMode = CullMode.CullCounterClockwiseFace,
+            ScissorTestEnable = false
+        };
+        
+        
+        if (clipRect != null)
+        {
+            return scissor;
+        }
+        else
+        {
+            return noScissor;
+        }
     }
 
     public Font GetFallbackFont()

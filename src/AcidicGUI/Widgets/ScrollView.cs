@@ -24,6 +24,7 @@ public sealed class ScrollView : ContainerWidget
     public ScrollView()
     {
         LayoutRoot = this;
+        ClippingMode = ClippingMode.Clip;
     }
     
     protected override Vector2 GetContentSize(Vector2 availableSize)

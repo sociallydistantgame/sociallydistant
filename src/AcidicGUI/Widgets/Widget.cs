@@ -1,4 +1,5 @@
 using AcidicGUI.CustomProperties;
+using AcidicGUI.Layout;
 using AcidicGUI.Rendering;
 using AcidicGUI.TextRendering;
 using AcidicGUI.VisualStyles;
@@ -17,7 +18,30 @@ public abstract partial class Widget : IFontProvider
     private GuiMesh? cachedGeometry;
     private float renderOpacity = 1;
     private bool enabled = true;
+    private ClippingMode clippingMode;
 
+    public LayoutRect ClippedContentArea
+    {
+        get
+        {
+            LayoutRect? clipRect = GetClippingRectangle();
+            if (clipRect == null)
+                return ContentArea;
+
+            return LayoutRect.GetIntersection(clipRect.Value, ContentArea);
+        }
+    }
+    
+    public ClippingMode ClippingMode
+    {
+        get => clippingMode;
+        set
+        {
+            clippingMode = value;
+            InvalidateGeometry(true);
+        }
+    }
+    
     public bool Enabled
     {
         get => enabled;
@@ -133,12 +157,36 @@ public abstract partial class Widget : IFontProvider
     {
         GetVisualStyle().DrawWidgetBackground(this, geometry);
     }
+
+    private LayoutRect? GetClippingRectangle()
+    {
+        if (clippingMode == ClippingMode.Inherit || clippingMode == ClippingMode.DoNotClip)
+        {
+            // Toplevels do not clip if clipping mode is set to inherit.
+            if (parent == null)
+                return null;
+
+            return parent.GetClippingRectangle();
+        }
+        
+        // get the parent clipping rectangle so we can clamp ours within.
+        LayoutRect? parentRect = parent?.GetClippingRectangle();
+
+        LayoutRect ourRect = ContentArea;
+
+        if (parentRect != null)
+        {
+            ourRect = LayoutRect.GetIntersection(ourRect, parentRect.Value);
+        }
+
+        return ourRect;
+    }
     
     internal void RenderInternal(GuiRenderer renderer)
     {
         if (cachedGeometry == null)
         {
-            var geometryHelper = new GeometryHelper(renderer, ComputedOpacity, !HierarchyEnabled);
+            var geometryHelper = new GeometryHelper(renderer, ComputedOpacity, !HierarchyEnabled, GetClippingRectangle());
             RebuildGeometry(geometryHelper);
             cachedGeometry = geometryHelper.ExportMesh();
         }

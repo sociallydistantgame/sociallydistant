@@ -4,6 +4,59 @@ namespace AcidicGUI.Widgets;
 
 public partial class Widget
 {
+    public bool ContainsChild(Widget? widget)
+    {
+        if (widget == null)
+            return false;
+
+        return widget.BelongsToParent(this);
+    }
+
+    public bool BelongsToParent(Widget widget)
+    {
+        Widget? p = this;
+
+        while (p != null)
+        {
+            if (p == widget)
+                return true;
+
+            p = p.Parent;
+        }
+
+        return false;
+    }
+    
+    internal IEnumerable<Widget> CollapseChildren(bool reverse, bool includeDisabled)
+    {
+        if (reverse)
+        {
+            for (var i = children.Count - 1; i >= 0; i--)
+            {
+                if (!children[i].enabled && !includeDisabled)
+                    continue;
+                
+                foreach (Widget child in children[i].CollapseChildren(reverse, includeDisabled))
+                    yield return child;
+                
+                yield return children[i];
+            }
+        }
+        else
+        {
+            for (var i = 0; i < children.Count; i++)
+            {
+                if (!children[i].enabled && !includeDisabled)
+                    continue;
+                
+                foreach (Widget child in children[i].CollapseChildren(reverse, includeDisabled))
+                    yield return child;
+                
+                yield return children[i];
+            }
+        }
+    }
+    
     internal sealed class WidgetCollection : IOrderedCollection<Widget>
     {
         private readonly Widget parent;
