@@ -171,7 +171,14 @@ public sealed class GuiManager : IFontProvider
 
     internal void SubmitForLayoutUpdateInternal(Widget widget)
     {
-        widgetsNeedingLayoutUpdate.Enqueue(widget);
+        if (widget.Parent != null)
+        {
+            widget.UpdateLayout(context, widget.ContentArea);
+        }
+        else
+        {
+            widget.UpdateLayout(context, new LayoutRect(0, 0, screenWidth, screenHeight));
+        }
     }
 
     public Font GetFont(FontPreset presetFont)
@@ -268,6 +275,9 @@ public sealed class GuiManager : IFontProvider
                 Bubble<IMouseUpHandler, MouseButtonEvent>(hoveredWidget, e, x => x.OnMouseUp);
             }
 
+            if (!e.FocusWanted)
+                SetFocusedWidget(null);
+
         }
     }
     
@@ -329,6 +339,9 @@ public sealed class GuiManager : IFontProvider
 
     private void HandleMouseScroll(MouseScrollEvent e)
     {
+        if (e.ScrollDelta == 0)
+            return;
+        
         if (hoveredWidget == null)
             return;
 

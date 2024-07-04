@@ -54,7 +54,8 @@ public sealed class GuiService :
             var button = new Button();
             var text = new TextWidget();
 
-            text.Text = $"Ritchie {i + 1}";
+            text.Text =
+                $"Ritchie {i + 1} - <color=green>This text should be green</color> and <highlight=red>this text should be highlighted red</highlight>";
             text.HorizontalAlignment = HorizontalAlignment.Stretch;
             text.VerticalAlignment = VerticalAlignment.Middle;
             text.WordWrapping = true;
@@ -185,7 +186,6 @@ public sealed class GuiService :
             CullMode = CullMode.CullCounterClockwiseFace,
             ScissorTestEnable = false
         };
-        
         
         if (clipRect != null)
         {

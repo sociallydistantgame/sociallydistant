@@ -7,7 +7,8 @@ namespace AcidicGUI.Widgets;
 
 public sealed class ScrollView : 
     ContainerWidget,
-    IMouseScrollHandler
+    IMouseScrollHandler,
+    IGainFocusHandler
 {
     private float spacing;
     private float innerSize;
@@ -112,5 +113,26 @@ public sealed class ScrollView :
         
         pageOffset = Math.Clamp(pageOffset + e.ScrollDelta, 0, innerSize - ContentArea.Height);
         InvalidateLayout();
+    }
+
+    public void OnFocusGained(FocusEvent e)
+    {
+        if (e.FocusedWidget == null)
+            return;
+
+        LayoutRect widgetRect = e.FocusedWidget.ContentArea;
+
+        if (widgetRect.Top < ContentArea.Top)
+        {
+            float distance = ContentArea.Top - widgetRect.Top;
+            pageOffset = Math.Max(pageOffset - distance, 0);
+            InvalidateLayout();
+        }
+        else if (widgetRect.Bottom > ContentArea.Bottom)
+        {
+            float distance = ContentArea.Bottom - widgetRect.Bottom;
+            pageOffset = Math.Min(pageOffset + distance, innerSize - ContentArea.Height);
+            InvalidateLayout();
+        }
     }
 }

@@ -46,8 +46,8 @@ public class TextWidget : Widget
         set
         {
             useMarkup = value;
-            InvalidateLayout();
             RebuildText();
+            InvalidateLayout();
         }
     }
     
@@ -57,8 +57,8 @@ public class TextWidget : Widget
         set
         {
             text = value;
-            InvalidateLayout();
             RebuildText();
+            InvalidateLayout();
         }
     }
     
@@ -68,8 +68,8 @@ public class TextWidget : Widget
         set
         {
             font = value;
-            InvalidateLayout();
             InvalidateMeasurements();
+            InvalidateLayout();
         }
     }
 
@@ -214,27 +214,95 @@ public class TextWidget : Widget
         
         return lines.ToArray();
     }
+
+    private bool ParseMarkup(ReadOnlySpan<char> chars, int start, ref MarkupData markupData)
+    {
+        if (start < 0)
+            return false;
+
+        if (start >= chars.Length)
+            return false;
+
+        if (chars[start] != '<')
+            return false;
+
+        var end = start;
+        
+        for (var i = start; i <= chars.Length; i++)
+        {
+            if (i == chars.Length)
+                return false;
+
+            if (chars[i] == '>')
+            {
+                end = i + 1;
+                break;
+            }
+        }
+
+        var tag = chars.Slice(start, end - start);
+        var tagWithoutAngles = tag.Slice(1, tag.Length - 2).ToString();
+
+        markupData.Length = tag.Length;
+        return ParseTag(tagWithoutAngles, ref markupData);
+    }
+
+    private bool ParseTag(string tag, ref MarkupData markupData)
+    {
+        var beforeEquals = tag;
+        var afterEquals = string.Empty;
+
+        var equalsIndex = tag.LastIndexOf("=", StringComparison.Ordinal);
+
+        if (equalsIndex != -1)
+        {
+            beforeEquals = tag.Substring(0, equalsIndex);
+            afterEquals = tag.Substring(equalsIndex + 1);
+        }
+
+        switch (beforeEquals)
+        {
+            case "color":
+            {
+                if (ColorHelpers.ParseColor(afterEquals, out Color color))
+                {
+                    markupData.ForegroundOverride = color;
+                    return true;
+                }
+
+                break;
+            }
+            case "/color":
+            {
+                markupData.ForegroundOverride = null;
+                return true;
+            }
+            case "highlight":
+            {
+                if (ColorHelpers.ParseColor(afterEquals, out Color color))
+                {
+                    markupData.BackgroundColor = color;
+                    return true;
+                }
+
+                break;
+            }
+            case "/highlight":
+            {
+                markupData.BackgroundColor = Color.Transparent;
+                return true;
+            }
+            
+        }
+
+        return false;
+    }
     
     private void RebuildText()
     {
-        if (useMarkup)
-        {
-            RebuildTextWithMarkup();
-        }
-        else
-        {
-            RebuildTextWithoutMarkup();
-        }
-    }
-
-    private void RebuildTextWithMarkup()
-    {
-        // TODO: Do this.
-        RebuildTextWithoutMarkup();
-    }
-
-    private void RebuildTextWithoutMarkup()
-    {
+        var markupData = new MarkupData();
+        var newMarkupData = new MarkupData();
+        
         var sourceStart = 0;
         
         textElements.Clear();
@@ -254,7 +322,9 @@ public class TextWidget : Widget
                     {
                         Text = stringBuilder.ToString().TrimEnd(),
                         SourceStart = sourceStart,
-                        SourceEnd = i
+                        SourceEnd = i,
+                        ColorOverride = markupData.ForegroundOverride,
+                        Highlight = markupData.BackgroundColor
                     });
                     sourceStart = i;
                 }
@@ -265,6 +335,30 @@ public class TextWidget : Widget
 
             switch (character.Value)
             {
+                case '<' when this.useMarkup:
+                {
+                    if (!ParseMarkup(chars, i, ref newMarkupData))
+                    {
+                        goto default;
+                        break;
+                    }
+
+                    textElements.Add(new TextElement
+                    {
+                        Text = stringBuilder.ToString(),
+                        SourceStart = sourceStart,
+                        SourceEnd = i,
+                        ColorOverride = markupData.ForegroundOverride,
+                        Highlight = markupData.BackgroundColor
+                    });
+
+                    markupData = newMarkupData;
+                    
+                    stringBuilder.Length = 0;
+                    sourceStart = i;
+                    i += markupData.Length-1;
+                    break;
+                }
                 case '\r':
                     continue;
                 case '\n':
@@ -273,7 +367,9 @@ public class TextWidget : Widget
                     {
                         Text = stringBuilder.ToString().TrimEnd(),
                         SourceStart = sourceStart,
-                        SourceEnd = i
+                        SourceEnd = i,
+                        ColorOverride = markupData.ForegroundOverride,
+                        Highlight = markupData.BackgroundColor
                     });
 
                     stringBuilder.Length = 0;
@@ -284,7 +380,9 @@ public class TextWidget : Widget
                         Text = stringBuilder.ToString(),
                         IsNewLine = true,
                         SourceStart = sourceStart,
-                        SourceEnd = i + 1
+                        SourceEnd = i + 1,
+                        ColorOverride = markupData.ForegroundOverride,
+                        Highlight = markupData.BackgroundColor
                     });
 
                     sourceStart = i + 1;
@@ -300,7 +398,9 @@ public class TextWidget : Widget
                         {
                             Text = stringBuilder.ToString(),
                             SourceStart = sourceStart,
-                            SourceEnd = i + 1
+                            SourceEnd = i + 1,
+                            ColorOverride = markupData.ForegroundOverride,
+                            Highlight = markupData.BackgroundColor
                         });
 
                         sourceStart = i + 1;
@@ -479,6 +579,13 @@ public class TextWidget : Widget
             lineMeasurement.X,
             lineMeasurement.Y
         );
+    }
+
+    private struct MarkupData
+    {
+        public int Length;
+        public Color BackgroundColor;
+        public Color? ForegroundOverride;
     }
     
     private class TextElement
