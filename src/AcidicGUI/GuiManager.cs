@@ -31,11 +31,13 @@ public sealed class GuiManager : IFontProvider
     public bool IsRendering => isRendering;
     public IOrderedCollection<Widget> TopLevels => topLevels;
     
-    public GuiManager(IGuiContext context)
+    public GuiManager(IGuiContext context, IVisualStyle? globalStyle = null)
     {
         this.context = context;
         this.topLevels = new Widget.TopLevelCollection(this);
         this.renderer = new GuiRenderer(context);
+
+        this.visualStyleOverride = globalStyle;
     }
 
     public bool IsFocused(Widget widget)

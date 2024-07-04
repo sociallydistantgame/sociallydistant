@@ -8,6 +8,7 @@ using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework.Input;
 using SociallyDistant.Core.Modules;
+using SociallyDistant.Core.UI.VisualStyles;
 
 namespace SociallyDistant.Core.UI;
 
@@ -21,6 +22,7 @@ public sealed class GuiService :
     private readonly ScrollView test = new();
     private readonly int[] screenQuad = new int[] { 0, 1, 2, 2, 1, 3 };
     private readonly VertexPositionColorTexture[] screenQuadVerts = new VertexPositionColorTexture[4];
+    private readonly SociallyDistantVisualStyle visualStyle;
     private Font? fallbackFont;
     private SpriteEffect? defaultEffect;
     private Texture2D? white = null;
@@ -30,8 +32,9 @@ public sealed class GuiService :
 
     public GuiService(IGameContext sociallyDistantContext) : base(sociallyDistantContext.GameInstance)
     {
+        visualStyle = new SociallyDistantVisualStyle(sociallyDistantContext);
         this.context = sociallyDistantContext;
-        this.acidicGui = new GuiManager(this);
+        this.acidicGui = new GuiManager(this, visualStyle);
         this.acidicGui.TopLevels.Add(test);
         
         test.HorizontalAlignment = HorizontalAlignment.Center;
@@ -40,7 +43,13 @@ public sealed class GuiService :
         test.Spacing = 6;
         test.Padding = 12;
 
-        for (var i = 0; i < 48; i++)
+        var inputField = new InputField();
+        inputField.WordWrapped = true;
+        inputField.MultiLine = true;
+        
+        test.ChildWidgets.Add(inputField);
+        
+        for (var i = 0; i < 36; i++)
         {
             var button = new Button();
             var text = new TextWidget();
@@ -83,6 +92,7 @@ public sealed class GuiService :
     public override void Initialize()
     {
         base.Initialize();
+        visualStyle.LoadContent();
         
         Game.Window.KeyDown += HandleKeyDown;
         Game.Window.KeyUp += HandleKeyUp;

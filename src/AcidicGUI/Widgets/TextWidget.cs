@@ -177,9 +177,8 @@ public class TextWidget : Widget
         {
             if (i == textElements.Count-1)
             {
-                textElements[i].Text = textElements[i].Text.TrimEnd();
                 textElements[i].MeasuredSize = (textElements[i].FontOverride ?? font).GetFont(this)
-                    .Measure(textElements[i].Text);
+                    .Measure(textElements[i].Text.TrimEnd());
             }
             
             var measurement = textElements[i].MeasuredSize.GetValueOrDefault();
@@ -191,9 +190,8 @@ public class TextWidget : Widget
                 if (i > 0)
                 {
                     offset.X -= textElements[i - 1].MeasuredSize!.Value.X;
-                    textElements[i - 1].Text = textElements[i - 1].Text.TrimEnd();
                     textElements[i - 1].MeasuredSize = (textElements[i - 1].FontOverride ?? font).GetFont(this)
-                        .Measure(textElements[i - 1].Text);
+                        .Measure(textElements[i - 1].Text.TrimEnd());
                     offset.X += textElements[i - 1].MeasuredSize!.Value.X;
                 }
 
@@ -274,13 +272,22 @@ public class TextWidget : Widget
                     textElements.Add(new TextElement
                     {
                         Text = stringBuilder.ToString().TrimEnd(),
-                        IsNewLine = true,
                         SourceStart = sourceStart,
                         SourceEnd = i
                     });
 
                     stringBuilder.Length = 0;
                     sourceStart = i;
+                    
+                    textElements.Add(new TextElement
+                    {
+                        Text = stringBuilder.ToString(),
+                        IsNewLine = true,
+                        SourceStart = sourceStart,
+                        SourceEnd = i + 1
+                    });
+
+                    sourceStart = i + 1;
                     break;
                 }
                 default:
@@ -293,10 +300,10 @@ public class TextWidget : Widget
                         {
                             Text = stringBuilder.ToString(),
                             SourceStart = sourceStart,
-                            SourceEnd = i
+                            SourceEnd = i + 1
                         });
 
-                        sourceStart = i;
+                        sourceStart = i + 1;
                         stringBuilder.Length = 0;
                     }
                     break;
@@ -305,6 +312,96 @@ public class TextWidget : Widget
         }
     }
 
+    public int GetLineCount()
+    {
+        return GetLineAtIndex(text.Length) + 1;
+    }
+
+    public int GetLineLength(int line)
+    {
+        var lineStart = GetLineStartElement(line);
+        var length = 0;
+
+        for (var i = lineStart; i < textElements.Count; i++)
+        {
+            if (textElements[i].IsNewLine)
+                break;
+
+            length += (textElements[i].SourceEnd - textElements[i].SourceStart);
+        }
+
+        return length;
+    }
+    
+    public int GetLineStart(int line)
+    {
+        var lineStartElement = GetLineStartElement(line);
+        return textElements[lineStartElement].SourceStart;
+    }
+    
+    public int GetLineAtIndex(int characterIndex)
+    {
+        int line = 0;
+        var wasNewLine = false;
+        foreach (TextElement element in textElements)
+        {
+            if (element.SourceStart >= characterIndex)
+                break;
+
+            if (wasNewLine)
+            {
+                line++;
+                wasNewLine = false;
+            }
+
+            if (element.IsNewLine)
+                wasNewLine = true;
+        }
+     
+        if (wasNewLine)
+        {
+            line++;
+            wasNewLine = false;
+        }
+        
+        return line;
+    }
+    
+    public int GetLineStartElement(int line)
+    {
+        var currentLine = 0;
+        var i = 0;
+        var lineStartElement = 0;
+        var wasNewLine = false;
+        foreach (TextElement element in textElements)
+        {
+            if (currentLine == line)
+                return lineStartElement;
+
+            if (wasNewLine)
+            {
+                currentLine++;
+                lineStartElement = i;
+                wasNewLine = false;
+            }
+
+            if (element.IsNewLine)
+                wasNewLine = true;
+
+            i++;
+        }
+     
+        if (wasNewLine)
+        {
+            currentLine++;
+            wasNewLine = false;
+            lineStartElement = textElements.Count - i;
+        }
+        
+        return lineStartElement;
+    }
+
+    
     private void InvalidateMeasurements()
     {
         for (var i = 0; i < textElements.Count; i++)
@@ -326,34 +423,62 @@ public class TextWidget : Widget
         }
     }
 
-    public Vector2 GetPositionOfCharacter(int characterIndex)
+    public LayoutRect GetPositionOfCharacter(int characterIndex)
     {
         if (characterIndex < 0 || characterIndex > text.Length)
             throw new ArgumentOutOfRangeException(nameof(characterIndex));
-
+        
         var i = 0;
         foreach (TextElement element in textElements)
         {
             if (characterIndex < element.SourceStart)
                 break;
 
-            if (i == textElements.Count - 1 || characterIndex < element.SourceEnd)
+            if (i == textElements.Count - 1 || characterIndex <= element.SourceEnd)
             {
-                if (i == element.SourceStart)
-                    return element.Position;
+                var fontInstance = (element.FontOverride ?? font).GetFont(this);
+                
+                if (characterIndex == element.SourceStart)
+                {
+                    string singleChar = element.Text.Substring(0, Math.Min(1, element.Text.Length));
+                    Vector2 charMeasure = fontInstance.Measure(singleChar);
+
+                    return new LayoutRect(
+                        element.Position.X,
+                        element.Position.Y,
+                        charMeasure.X,
+                        charMeasure.Y
+                    );
+                }
 
                 string textToMeasure =
-                    element.Text.Substring(0, Math.Max(element.Text.Length, i - element.SourceStart));
+                    element.Text.Substring(0, Math.Min(element.Text.Length, characterIndex - element.SourceStart));
+                
+                Vector2 measurement = fontInstance.Measure(textToMeasure);
 
-                Vector2 measurement = (element.FontOverride ?? font).GetFont(this).Measure(textToMeasure);
+                string charAfterMeasure =
+                    element.Text.Substring(textToMeasure.Length, Math.Min(1, element.Text.Length - textToMeasure.Length));
 
-                return new Vector2(element.Position.X + measurement.X, element.Position.Y);
+                var singleCharMeasure = fontInstance.Measure(charAfterMeasure);
+
+                return new LayoutRect(
+                    element.Position.X + measurement.X,
+                    element.Position.Y,
+                    singleCharMeasure.X,
+                    singleCharMeasure.Y
+                );
             }
             
             i++;
         }
-
-        return Vector2.Zero;
+        
+        Vector2 lineMeasurement = font.GetFont(this).Measure(text);
+        return new LayoutRect(
+            ContentArea.Left,
+            ContentArea.Top,
+            lineMeasurement.X,
+            lineMeasurement.Y
+        );
     }
     
     private class TextElement

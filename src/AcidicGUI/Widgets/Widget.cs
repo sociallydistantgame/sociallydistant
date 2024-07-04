@@ -211,6 +211,16 @@ public abstract partial class Widget : IFontProvider
             child.RenderInternal(renderer);
         }
     }
+
+    public T GetCustomProperty<T>() where T : struct
+    {
+        return GetCustomProperties<StructProperty<T>>().Value;
+    }
+
+    public void SetCustomProperty<T>(T newValue) where T : struct
+    {
+        GetCustomProperties<StructProperty<T>>().Value = newValue;
+    }
     
     public T GetCustomProperties<T>() where T : CustomPropertyObject
     {

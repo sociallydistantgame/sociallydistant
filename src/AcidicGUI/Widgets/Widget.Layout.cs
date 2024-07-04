@@ -97,6 +97,11 @@ public partial class Widget
         }
     }
 
+    public void InvalidateOwnLayout()
+    {
+        InvalidateLayoutInternal();
+    }
+    
     public void InvalidateLayout()
     {
         LayoutRoot.InvalidateLayoutInternal();

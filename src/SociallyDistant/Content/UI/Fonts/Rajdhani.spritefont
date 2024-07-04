@@ -6,11 +6,15 @@
     <Spacing>0</Spacing>
     <UseKerning>true</UseKerning>
     <Style>Regular</Style>
-    <!-- <DefaultCharacter>*</DefaultCharacter> -->
+    <DefaultCharacter>�</DefaultCharacter>
     <CharacterRegions>
       <CharacterRegion>
         <Start>&#32;</Start>
         <End>&#126;</End>
+      </CharacterRegion>
+      <CharacterRegion>
+        <Start>�</Start>
+        <End>�</End>
       </CharacterRegion>
     </CharacterRegions>
   </Asset>

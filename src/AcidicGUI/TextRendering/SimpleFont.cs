@@ -18,10 +18,14 @@ internal sealed class SimpleFont : Font
     {
         this.spriteFont = font;
         this.glyphCount = font.Glyphs.Length;
+        this.spriteFont.DefaultCharacter ??= '\ufffd';
     }
 
     public override Vector2 Measure(string text)
     {
+        if (string.IsNullOrEmpty(text))
+            return new Vector2(0, spriteFont.LineSpacing);
+        
         return spriteFont.MeasureString(text);
     }
 
