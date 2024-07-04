@@ -1,10 +1,13 @@
+using AcidicGUI.Events;
 using AcidicGUI.Layout;
 using AcidicGUI.Rendering;
 using Microsoft.Xna.Framework;
 
 namespace AcidicGUI.Widgets;
 
-public sealed class ScrollView : ContainerWidget
+public sealed class ScrollView : 
+    ContainerWidget,
+    IMouseScrollHandler
 {
     private float spacing;
     private float innerSize;
@@ -101,5 +104,13 @@ public sealed class ScrollView : ContainerWidget
                 ContentArea.Height
             ), pageOffset, innerSize);
         }
+    }
+
+    public void OnMouseScroll(MouseScrollEvent e)
+    {
+        e.Handle();
+        
+        pageOffset = Math.Clamp(pageOffset + e.ScrollDelta, 0, innerSize - ContentArea.Height);
+        InvalidateLayout();
     }
 }

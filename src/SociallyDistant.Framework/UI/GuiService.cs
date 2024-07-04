@@ -88,7 +88,7 @@ public sealed class GuiService :
         // Mouse
         var mouse = Mouse.GetState(Game.Window);
         
-        acidicGui.SetMousePosition(mouse.Position);
+        acidicGui.SetMouseState(mouse);
     }
 
     public override void Draw(GameTime gameTime)

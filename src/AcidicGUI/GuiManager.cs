@@ -7,6 +7,7 @@ using AcidicGUI.VisualStyles;
 using AcidicGUI.Widgets;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
+using Microsoft.Xna.Framework.Input;
 
 namespace AcidicGUI;
 
@@ -24,6 +25,7 @@ public sealed class GuiManager : IFontProvider
     private float screenHeight;
     private bool isRendering = false;
     private Widget? hoveredWidget;
+    private MouseState? previousMouseState;
 
     public bool IsRendering => isRendering;
     public IOrderedCollection<Widget> TopLevels => topLevels;
@@ -35,22 +37,15 @@ public sealed class GuiManager : IFontProvider
         this.renderer = new GuiRenderer(context);
     }
 
-    public void SetMousePosition(Point newPosition)
+    public void SetMouseState(MouseState state)
     {
-        // Translate to UI space before we do anything
-        Vector2 uiMousePos = new Vector2(
-            ((float)newPosition.X / context.GraphicsDevice.PresentationParameters.BackBufferWidth) *
-            context.PhysicalScreenWidget,
-            ((float)newPosition.Y / context.GraphicsDevice.PresentationParameters.BackBufferHeight) *
-            context.PhysicalScreenHeight
-        );
+        if (previousMouseState == null)
+            previousMouseState = state;
+        else if (previousMouseState.Value == state)
+            return;
 
-        Vector2 delta = uiMousePos - previousMousePosition;
-        previousMousePosition = uiMousePos;
-
-        var moveEvent = new MouseMoveEvent(uiMousePos, delta);
-
-        HandleMouseMovement(moveEvent);
+        HandleMouseEvents(previousMouseState.Value, state);
+        previousMouseState = state;
     }
     
     public void UpdateLayout()
@@ -134,6 +129,31 @@ public sealed class GuiManager : IFontProvider
         }
     }
 
+    private Vector2 TranslateMousePosition(Point mousePosition)
+    {
+        return new Vector2(
+            ((float)mousePosition.X / context.GraphicsDevice.PresentationParameters.BackBufferWidth) *
+            context.PhysicalScreenWidget,
+            ((float)mousePosition.Y / context.GraphicsDevice.PresentationParameters.BackBufferHeight) *
+            context.PhysicalScreenHeight
+        );
+    }
+    
+    private void HandleMouseEvents(MouseState previous, MouseState current)
+    {
+        var prevPosition = TranslateMousePosition(previous.Position);
+        var currPosition = TranslateMousePosition(current.Position);
+
+        var prevWheel = previous.ScrollWheelValue;
+        var currWheel = current.ScrollWheelValue;
+
+        var positionDelta = currPosition - prevPosition;
+        var wheelDelta = -(currWheel - prevWheel);
+
+        HandleMouseMovement(new MouseMoveEvent(currPosition, positionDelta));
+        HandleMouseScroll(new MouseScrollEvent(currPosition, wheelDelta));
+    }
+    
     private void Bubble<THandler, TEvent>(Widget widget, TEvent e, Func<THandler, Action<TEvent>> getHandler)
         where TEvent : GuiEvent
     {
@@ -185,5 +205,13 @@ public sealed class GuiManager : IFontProvider
         {
             Bubble<IMouseMoveHandler, MouseMoveEvent>(hoveredWidget, e, x => x.OnMouseMove);
         }
+    }
+
+    private void HandleMouseScroll(MouseScrollEvent e)
+    {
+        if (hoveredWidget == null)
+            return;
+
+        Bubble<IMouseScrollHandler, MouseScrollEvent>(hoveredWidget, e, x => x.OnMouseScroll);
     }
 }
