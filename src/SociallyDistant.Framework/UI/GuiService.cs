@@ -17,7 +17,7 @@ public sealed class GuiService :
     private readonly IGameContext context;
     private readonly GuiManager acidicGui;
     private readonly IGuiContext guiContext;
-    private readonly WrapPanel test = new();
+    private readonly ScrollView test = new();
     private readonly int[] screenQuad = new int[] { 0, 1, 2, 2, 1, 3 };
     private readonly VertexPositionColorTexture[] screenQuadVerts = new VertexPositionColorTexture[4];
     private Font? fallbackFont;
@@ -30,22 +30,19 @@ public sealed class GuiService :
         this.context = sociallyDistantContext;
         this.acidicGui = new GuiManager(this);
         this.acidicGui.TopLevels.Add(test);
-
-        test.Direction = Direction.Horizontal;
+        
         test.HorizontalAlignment = HorizontalAlignment.Center;
         test.VerticalAlignment = VerticalAlignment.Middle;
-        test.MaximumSize = new Vector2(1280, 0);
-        test.SpacingX = 6;
-        test.SpacingY = 6;
+        test.MaximumSize = new Vector2(1280, 720);
+        test.Spacing = 6;
         test.Padding = 12;
 
-        for (var i = 0; i < 36; i++)
+        for (var i = 0; i < 48; i++)
         {
             var text = new TextWidget();
 
             text.Text = $"Ritchie {i + 1}";
-            text.TextAlignment = TextAlignment.Center;
-            text.HorizontalAlignment = HorizontalAlignment.Center;
+            text.HorizontalAlignment = HorizontalAlignment.Stretch;
             text.VerticalAlignment = VerticalAlignment.Middle;
             text.WordWrapping = true;
 

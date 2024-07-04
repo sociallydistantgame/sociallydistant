@@ -3,29 +3,6 @@ using AcidicGUI.Rendering;
 
 namespace AcidicGUI.Widgets;
 
-public sealed class Box : Widget
+public sealed class Box : ContentWidget
 {
-    private Widget? boxChild;
-
-    public Widget? Content
-    {
-        get => boxChild;
-        set
-        {
-            if (boxChild != null)
-                this.Children.Remove(boxChild);
-
-            boxChild = value;
-            
-            if (boxChild != null)
-                Children.Add(boxChild);
-        }
-    }
-
-    protected override void RebuildGeometry(GeometryHelper geometry)
-    {
-        //geometry.AddRoundedRectangle(ContentArea, 6f, Color.Red);
-        geometry.AddRoundedRectangleOutline(ContentArea, 36,  24, Color.Cyan);
-        
-    }
 }

@@ -131,7 +131,7 @@ public abstract partial class Widget : IFontProvider
     
     protected virtual void RebuildGeometry(GeometryHelper geometry)
     {
-        
+        GetVisualStyle().DrawWidgetBackground(this, geometry);
     }
     
     internal void RenderInternal(GuiRenderer renderer)
