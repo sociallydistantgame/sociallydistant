@@ -17,10 +17,9 @@ public sealed class GuiService :
     private readonly IGameContext context;
     private readonly GuiManager acidicGui;
     private readonly IGuiContext guiContext;
-    private readonly FlexPanel test = new();
+    private readonly WrapPanel test = new();
     private readonly int[] screenQuad = new int[] { 0, 1, 2, 2, 1, 3 };
     private readonly VertexPositionColorTexture[] screenQuadVerts = new VertexPositionColorTexture[4];
-    private readonly TextWidget textWidget = new();
     private Font? fallbackFont;
     private SpriteEffect? defaultEffect;
     private Texture2D? white = null;
@@ -32,16 +31,26 @@ public sealed class GuiService :
         this.acidicGui = new GuiManager(this);
         this.acidicGui.TopLevels.Add(test);
 
-        test.ChildWidgets.Add(textWidget);
-
+        test.Direction = Direction.Horizontal;
         test.HorizontalAlignment = HorizontalAlignment.Center;
         test.VerticalAlignment = VerticalAlignment.Middle;
-        textWidget.Text = "Ritchie is the cutest human in existence.";
-        test.MaximumSize = new Vector2(100, 0);
-        textWidget.WordWrapping = true;
-        textWidget.TextAlignment = TextAlignment.Center;
-        test.Spacing = 6;
-        test.Direction = Direction.Vertical;
+        test.MaximumSize = new Vector2(1280, 0);
+        test.SpacingX = 6;
+        test.SpacingY = 6;
+        test.Padding = 12;
+
+        for (var i = 0; i < 36; i++)
+        {
+            var text = new TextWidget();
+
+            text.Text = $"Ritchie {i + 1}";
+            text.TextAlignment = TextAlignment.Center;
+            text.HorizontalAlignment = HorizontalAlignment.Center;
+            text.VerticalAlignment = VerticalAlignment.Middle;
+            text.WordWrapping = true;
+
+            test.ChildWidgets.Add(text);
+        }
     }
 
     public void SetVirtualScreenSize(int width, int height)

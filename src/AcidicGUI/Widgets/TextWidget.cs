@@ -352,6 +352,8 @@ public class TextWidget : Widget
             
             i++;
         }
+
+        return Vector2.Zero;
     }
     
     private class TextElement
