@@ -20,6 +20,19 @@ public abstract partial class Widget : IFontProvider
     private bool enabled = true;
     private ClippingMode clippingMode;
 
+    public bool IsFocused
+    {
+        get
+        {
+            if (GuiManager == null)
+                return false;
+
+            return GuiManager.IsFocused(this);
+        }
+    }
+
+    public bool IsChildFocused => IsFocused || children.Any(x => x.IsChildFocused);
+    
     public LayoutRect ClippedContentArea
     {
         get
@@ -215,5 +228,13 @@ public abstract partial class Widget : IFontProvider
     public Font GetFont(FontPreset presetFont)
     {
         return GuiManager.GetFont(presetFont);
+    }
+
+    public void GiveFocus()
+    {
+        if (GuiManager == null)
+            return;
+        
+        GuiManager.SetFocusedWidget(this);
     }
 }

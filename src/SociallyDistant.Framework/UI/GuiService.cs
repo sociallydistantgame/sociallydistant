@@ -79,7 +79,31 @@ public sealed class GuiService :
         screenQuadVerts[3].Color = Color.White;
         screenQuadVerts[3].TextureCoordinate = new Vector2(1, 1);
     }
-    
+
+    public override void Initialize()
+    {
+        base.Initialize();
+        
+        Game.Window.KeyDown += HandleKeyDown;
+        Game.Window.KeyUp += HandleKeyUp;
+        Game.Window.TextInput += HandleTextInput;
+    }
+
+    private void HandleTextInput(object? sender, TextInputEventArgs e)
+    {
+        acidicGui.SendCharacter(e.Key, e.Character);
+    }
+
+    private void HandleKeyUp(object? sender, InputKeyEventArgs e)
+    {
+        acidicGui.SendKey(e.Key, ButtonState.Released);
+    }
+
+    private void HandleKeyDown(object? sender, InputKeyEventArgs e)
+    {
+        acidicGui.SendKey(e.Key, ButtonState.Pressed);
+    }
+
     public override void Update(GameTime gameTime)
     {
         // Handles layout updates

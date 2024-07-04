@@ -18,13 +18,14 @@ public sealed class GuiManager : IFontProvider
     private readonly GuiRenderer renderer;
     private readonly Queue<Widget> widgetsNeedingLayoutUpdate = new();
     private readonly FallbackVisualStyle fallbackVisualStyle = new FallbackVisualStyle();
-
-    private Vector2 previousMousePosition = new Vector2(-1, -1);
+    
     private IVisualStyle? visualStyleOverride;
     private float screenWidth;
     private float screenHeight;
     private bool isRendering = false;
     private Widget? hoveredWidget;
+    private Widget? widgetBeingDragged;
+    private Widget? keyboardFocus;
     private MouseState? previousMouseState;
 
     public bool IsRendering => isRendering;
@@ -37,6 +38,75 @@ public sealed class GuiManager : IFontProvider
         this.renderer = new GuiRenderer(context);
     }
 
+    public bool IsFocused(Widget widget)
+    {
+        return widget == keyboardFocus;
+    }
+
+    public void SetFocusedWidget(Widget? widgetToFocus)
+    {
+        if (widgetToFocus == keyboardFocus)
+            return;
+        
+        var e = new FocusEvent(widgetToFocus);
+        
+        if (keyboardFocus != null)
+        {
+            Bubble<ILoseFocusHandler, FocusEvent>(keyboardFocus, e, x => x.OnFocusLost);
+        }
+
+        keyboardFocus = widgetToFocus;
+
+        if (keyboardFocus != null)
+        {
+            Bubble<IGainFocusHandler, FocusEvent>(keyboardFocus, e, x => x.OnFocusGained);
+        }
+    }
+    
+    public void SendCharacter(Keys key, char character)
+    {
+        var e = new KeyCharEvent(key, character);
+
+        if (hoveredWidget != null)
+        {
+            Bubble<IPreviewKeyCharHandler, KeyCharEvent>(hoveredWidget, e, x => x.OnPreviewKeyChar);
+        }
+        
+        if (keyboardFocus != null)
+        {
+            Bubble<IKeyCharHandler, KeyCharEvent>(keyboardFocus, e, x => x.OnKeyChar);
+        }
+    }
+    
+    public void SendKey(Keys key, ButtonState state)
+    {
+        var e = new KeyEvent(key);
+        
+        if (hoveredWidget != null)
+        {
+            if (state == ButtonState.Pressed)
+            {
+                Bubble<IPreviewKeyDownHandler, KeyEvent>(hoveredWidget, e, x => x.OnPreviewKeyDown);
+            }
+            else
+            {
+                Bubble<IPreviewKeyUpHandler, KeyEvent>(hoveredWidget, e, x => x.OnPreviewKeyUp);
+            }
+        }
+        
+        if (keyboardFocus != null)
+        {
+            if (state == ButtonState.Pressed)
+            {
+                Bubble<IKeyDownHandler, KeyEvent>(keyboardFocus, e, x => x.OnKeyDown);
+            }
+            else
+            {
+                Bubble<IKeyUpHandler, KeyEvent>(keyboardFocus, e, x => x.OnKeyUp);
+            }
+        }
+    }
+    
     public void SetMouseState(MouseState state)
     {
         if (previousMouseState == null)
@@ -152,6 +222,51 @@ public sealed class GuiManager : IFontProvider
 
         HandleMouseMovement(new MouseMoveEvent(currPosition, positionDelta));
         HandleMouseScroll(new MouseScrollEvent(currPosition, wheelDelta));
+
+        HandleMouseButton(MouseButton.Left, previous.LeftButton, current.LeftButton, currPosition, positionDelta);
+        HandleMouseButton(MouseButton.Middle, previous.MiddleButton, current.MiddleButton, currPosition, positionDelta);
+        HandleMouseButton(MouseButton.Right, previous.RightButton, current.RightButton, currPosition, positionDelta);
+    }
+
+    private void HandleMouseButton(MouseButton button, ButtonState previous, ButtonState current, Vector2 position, Vector2 delta)
+    {
+        var e = new MouseButtonEvent(position, delta, button, current);
+        
+        if (previous == current)
+        {
+            if (widgetBeingDragged == null)
+                return;
+
+            Bubble<IDragHandler, MouseButtonEvent>(widgetBeingDragged, e, x => x.OnDrag);
+        }
+        else if (previous == ButtonState.Released)
+        {
+            if (hoveredWidget == null)
+                return;
+            
+            Bubble<IMouseDownHandler, MouseButtonEvent>(hoveredWidget, e, x => x.OnMouseDown);
+
+            if (e.Handled)
+                return;
+
+            widgetBeingDragged = hoveredWidget;
+            Bubble<IDragStartHandler, MouseButtonEvent>(hoveredWidget, e, x => x.OnDragStart);
+        }
+        else if (previous == ButtonState.Pressed)
+        {
+            if (widgetBeingDragged != null)
+            {
+                Bubble<IDragEndHandler, MouseButtonEvent>(widgetBeingDragged, e, x => x.OnDragEnd);
+                widgetBeingDragged = null;
+            }
+            
+            if (hoveredWidget != null)
+            {
+                Bubble<IMouseClickHandler, MouseButtonEvent>(hoveredWidget, e, x => x.OnMouseClick);
+                Bubble<IMouseUpHandler, MouseButtonEvent>(hoveredWidget, e, x => x.OnMouseUp);
+            }
+
+        }
     }
     
     private void Bubble<THandler, TEvent>(Widget widget, TEvent e, Func<THandler, Action<TEvent>> getHandler)
@@ -166,6 +281,9 @@ public sealed class GuiManager : IFontProvider
                 getHandler(handler)(e);
             }
 
+            if (e.FocusWanted)
+                SetFocusedWidget(next);
+            
             next = next.Parent;
         }
     }
