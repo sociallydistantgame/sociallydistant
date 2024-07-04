@@ -30,7 +30,7 @@ public sealed class StackPanel : ContainerWidget
     
     public IOrderedCollection<Widget> ChildWidgets => Children;
 
-    protected override Vector2 GetContentSize()
+    protected override Vector2 GetContentSize(Vector2 availableSize)
     {
         Vector2 result = Vector2.Zero;
 
@@ -50,7 +50,7 @@ public sealed class StackPanel : ContainerWidget
         
         foreach (Widget child in Children)
         {
-            var childSize = child.GetCachedContentSize();
+            var childSize = child.GetCachedContentSize(availableSize);
 
             switch (direction)
             {
@@ -78,7 +78,7 @@ public sealed class StackPanel : ContainerWidget
 
         foreach (Widget child in Children)
         {
-            Vector2 childSize = child.GetCachedContentSize();
+            Vector2 childSize = child.GetCachedContentSize(availableSpace.Size);
 
             switch (direction)
             {

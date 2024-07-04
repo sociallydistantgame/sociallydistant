@@ -31,7 +31,7 @@ public class FlexPanel : ContainerWidget
         }
     }
 
-    protected override Vector2 GetContentSize()
+    protected override Vector2 GetContentSize(Vector2 availableSize)
     {
         var result = Vector2.Zero;
 
@@ -51,7 +51,7 @@ public class FlexPanel : ContainerWidget
 
         foreach (Widget child in Children)
         {
-            var childSize = child.GetCachedContentSize();
+            var childSize = child.GetCachedContentSize(availableSize);
 
             switch (direction)
             {
@@ -89,7 +89,7 @@ public class FlexPanel : ContainerWidget
         // Pass 1: Auto-sized elements
         foreach (Widget child in Children)
         {
-            var childSize = child.GetCachedContentSize();
+            var childSize = child.GetCachedContentSize(availableSpace.Size);
             var properties = child.GetCustomProperties<FlexPanelProperties>();
 
             settingsObjects[i] = properties;

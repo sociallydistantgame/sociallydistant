@@ -34,10 +34,12 @@ public sealed class GuiService :
 
         test.ChildWidgets.Add(textWidget);
 
-        textWidget.HorizontalAlignment = HorizontalAlignment.Left;
-        textWidget.VerticalAlignment = VerticalAlignment.Top;
+        test.HorizontalAlignment = HorizontalAlignment.Center;
+        test.VerticalAlignment = VerticalAlignment.Middle;
         textWidget.Text = "Ritchie is the cutest human in existence.";
-        
+        test.MaximumSize = new Vector2(100, 0);
+        textWidget.WordWrapping = true;
+        textWidget.TextAlignment = TextAlignment.Center;
         test.Spacing = 6;
         test.Direction = Direction.Vertical;
     }

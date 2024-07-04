@@ -13,6 +13,7 @@ public struct LayoutRect
     public float Bottom => Top + Height;
 
     public Vector2 TopLeft => new Vector2(Left, Top);
+    public Vector2 Size => new Vector2(Width, Height);
     
     public LayoutRect(float left, float top, float width, float height)
     {

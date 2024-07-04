@@ -8,16 +8,19 @@ public sealed class GuiMeshBuilder
     private readonly List<VertexPositionColorTexture> vertices = new();
     private readonly List<int> indices = new();
     private readonly Texture2D? texture;
+    private readonly float opacity;
+    private readonly bool desaturate;
 
-    public GuiMeshBuilder(Texture2D? texture)
+    public GuiMeshBuilder(Texture2D? texture, float opacity, bool desaturate)
     {
         this.texture = texture;
+        this.opacity = opacity;
+        this.desaturate = desaturate;
     }
 
     public VertexPositionColorTexture this[int index]
     {
         get => vertices[index];
-        set => vertices[index] = value;
     }
     
     public GuiSubMesh ExportSubMesh()
@@ -28,6 +31,12 @@ public sealed class GuiMeshBuilder
     public int AddVertex(VertexPositionColorTexture vertex)
     {
         int index = vertices.Count;
+
+        vertex.Color.A = (byte)(vertex.Color.A * opacity);
+
+        if (desaturate)
+            vertex.Color.A = (byte) (vertex.Color.A / 2);
+        
         vertices.Add(vertex);
         return index;
     }

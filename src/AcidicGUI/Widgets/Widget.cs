@@ -2,6 +2,7 @@ using AcidicGUI.CustomProperties;
 using AcidicGUI.Rendering;
 using AcidicGUI.TextRendering;
 using AcidicGUI.VisualStyles;
+using Microsoft.Xna.Framework;
 
 namespace AcidicGUI.Widgets;
 
@@ -14,7 +15,53 @@ public abstract partial class Widget : IFontProvider
     private Widget? parent;
     private GuiManager? guiManager;
     private GuiMesh? cachedGeometry;
+    private float renderOpacity = 1;
+    private bool enabled = true;
 
+    public bool Enabled
+    {
+        get => enabled;
+        set
+        {
+            enabled = value;
+            InvalidateGeometry(true);
+        }
+    }
+    
+    public float RenderOpacity
+    {
+        get => renderOpacity;
+        set
+        {
+            renderOpacity = MathHelper.Clamp(value, 0, 1);
+            this.InvalidateGeometry(true);
+        }
+    }
+
+    public bool HierarchyEnabled
+    {
+        get
+        {
+            // TODO: Caching caching caching!
+            if (Parent == null)
+                return enabled;
+
+            return Parent.HierarchyEnabled && enabled;
+        }
+    }
+    
+    public float ComputedOpacity
+    {
+        get
+        {
+            // TODO: Caching caching caching!
+            if (Parent == null)
+                return renderOpacity;
+
+            return Parent.ComputedOpacity * renderOpacity;
+        }
+    }
+    
     public IVisualStyle? VisualStyleOverride
     {
         get => visualStyleOverride;
@@ -60,6 +107,17 @@ public abstract partial class Widget : IFontProvider
         this.children = new WidgetCollection(this);
     }
 
+    public void InvalidateGeometry(bool invalidateChildren = false)
+    {
+        cachedGeometry = null;
+
+        if (invalidateChildren)
+        {
+            foreach (Widget child in children)
+                child.InvalidateGeometry(invalidateChildren);
+        }
+    }
+    
     public IVisualStyle GetVisualStyle()
     {
         if (visualStyleOverride != null)
@@ -80,7 +138,7 @@ public abstract partial class Widget : IFontProvider
     {
         if (cachedGeometry == null)
         {
-            var geometryHelper = new GeometryHelper(renderer);
+            var geometryHelper = new GeometryHelper(renderer, ComputedOpacity, !HierarchyEnabled);
             RebuildGeometry(geometryHelper);
             cachedGeometry = geometryHelper.ExportMesh();
         }

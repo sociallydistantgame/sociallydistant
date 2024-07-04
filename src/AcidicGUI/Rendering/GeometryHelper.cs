@@ -7,13 +7,19 @@ namespace AcidicGUI.Rendering;
 
 public class GeometryHelper : IFontStashRenderer2
 {
-    private readonly GuiMeshBuilder whiteMesh = new(null);
+    private readonly GuiMeshBuilder whiteMesh;
     private readonly Dictionary<Texture2D, GuiMeshBuilder> meshes = new();
     private readonly GuiRenderer guiRenderer;
+    private readonly bool desaturate;
+    private readonly float opacity;
 
-    internal GeometryHelper(GuiRenderer guiRenderer)
+    internal GeometryHelper(GuiRenderer guiRenderer, float opacity, bool desaturate)
     {
+        this.opacity = opacity;
+        this.desaturate = desaturate;
         this.guiRenderer = guiRenderer;
+        
+        whiteMesh = new GuiMeshBuilder(null, opacity, desaturate);
     }
 
     public GuiMesh ExportMesh()
@@ -39,7 +45,7 @@ public class GeometryHelper : IFontStashRenderer2
 
         if (!meshes.TryGetValue(texture, out GuiMeshBuilder? builder))
         {
-            builder = new GuiMeshBuilder(texture);
+            builder = new GuiMeshBuilder(texture, opacity, desaturate);
             meshes.Add(texture, builder);
         }
 
@@ -51,7 +57,7 @@ public class GeometryHelper : IFontStashRenderer2
         AddRoundedRectangle(rectangle, uniformRadius, uniformRadius, uniformRadius, uniformRadius, color, texture);
     }
 
-    private void AddQuad(LayoutRect rectangle, Color color, Texture2D? texture = null)
+    public void AddQuad(LayoutRect rectangle, Color color, Texture2D? texture = null)
     {
         var mesh = GetMeshBuilder(texture);
         

@@ -15,6 +15,7 @@ public partial class Widget
     private Padding margin;
     private Vector2 minimumSize;
     private Vector2 maximumSize;
+    private Vector2 previousAvailableSize;
 
     public Padding Margin
     {
@@ -108,7 +109,7 @@ public partial class Widget
         if (!layoutIsDirty)
             return;
 
-        var contentSize = GetCachedContentSize();
+        var contentSize = GetCachedContentSize(availableSpace.Size);
         
         var left = 0f;
         var top = 0f;
@@ -178,12 +179,20 @@ public partial class Widget
         layoutIsDirty = false;
     }
 
-    public Vector2 GetCachedContentSize()
+    public Vector2 GetCachedContentSize(Vector2 availableSize)
     {
+        if (MaximumSize.X > 0 && availableSize.X > MaximumSize.X)
+            availableSize.X = MaximumSize.X;
+        if (MaximumSize.Y > 0 && availableSize.Y > MaximumSize.Y)
+            availableSize.Y = MaximumSize.Y;
+
+        if (previousAvailableSize != availableSize)
+            cachedContentSize = null;
+        
         if (cachedContentSize != null)
             return cachedContentSize.Value;
-
-        Vector2 contentSize = GetContentSize();
+        
+        Vector2 contentSize = GetContentSize(availableSize);
         
         contentSize.X += margin.Horizontal;
         contentSize.Y += margin.Vertical;
@@ -216,13 +225,13 @@ public partial class Widget
             child.UpdateLayout(context, availableSpace);
     }
     
-    protected virtual Vector2 GetContentSize()
+    protected virtual Vector2 GetContentSize(Vector2 availableSize)
     {
         var result = Vector2.Zero;
         
         foreach (Widget child in children)
         {
-            Vector2 childSize = child.GetCachedContentSize();
+            Vector2 childSize = child.GetCachedContentSize(availableSize);
 
             result.X = MathF.Max(result.X, childSize.X);
             result.Y = MathF.Max(result.Y, childSize.Y);
