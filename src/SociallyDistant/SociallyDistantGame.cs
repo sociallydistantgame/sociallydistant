@@ -263,11 +263,18 @@ internal sealed class SociallyDistantGame :
 		Log.Logger = new LoggerConfiguration()
 			.WriteTo.Console()
 			.CreateLogger();
-		
-		using var game = new SociallyDistantGame();
+
+		AppDomain.CurrentDomain.UnhandledException += Fuck;
+
+		void Fuck(object sender, UnhandledExceptionEventArgs e)
+		{
+			Log.Error("Fuck. Game just crashed.");
+			Log.Fatal(e.ExceptionObject.ToString() ?? "Unknown exception details.");
+		}
 
 		try
 		{
+			using var game = new SociallyDistantGame();
 			game.Run();
 		}
 		finally
@@ -354,6 +361,10 @@ internal sealed class SociallyDistantGame :
 
 	private void OnGameSettingsChanged(ISettingsManager settings)
 	{
+		// Not yet.
+		if (GraphicsDevice == null)
+			return;
+		
 		var graphicsSettings = new GraphicsSettings(settings);
 		var parameters = GraphicsDevice.PresentationParameters;
 		

@@ -51,6 +51,8 @@ public sealed class InputField :
     {
         Children.Add(display);
         ClippingMode = ClippingMode.Clip;
+        
+        display.ShowMarkup = true;
     }
 
     protected override Vector2 GetContentSize(Vector2 availableSize)

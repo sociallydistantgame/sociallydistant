@@ -74,7 +74,7 @@ public sealed class ScrollView :
         }
 
         // Make sure we adjust the scroll page offset in case we've lost some inner height.
-        pageOffset = Math.Clamp(pageOffset, 0, innerSize - availableSpace.Height);
+        pageOffset = Math.Clamp(pageOffset, 0, Math.Max(innerSize - availableSpace.Height, 0));
         
         // Pass 2: Layout updates
         foreach (Widget child in Children)

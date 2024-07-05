@@ -18,8 +18,20 @@ public class TextWidget : Widget
     private string text = string.Empty;
     private bool useMarkup = true;
     private bool wordWrapping = false;
+    private bool showMarkup;
     private TextAlignment textAlignment;
 
+    public bool ShowMarkup
+    {
+        get => showMarkup;
+        set
+        {
+            showMarkup = value;
+            RebuildText();
+            InvalidateLayout();
+        }
+    }
+    
     public TextAlignment TextAlignment
     {
         get => textAlignment;
@@ -145,12 +157,12 @@ public class TextWidget : Widget
     {
         foreach (TextElement element in textElements)
         {
-            var fontInstance = (element.FontOverride ?? font).GetFont(this);
+            var fontInstance = (element.MarkupData.FontOverride ?? font).GetFont(this);
             
             // TODO: Color from a property or the Visual Style.
-            var color = (element.ColorOverride ?? Color.White);
+            var color = (element.MarkupData.ColorOverride ?? Color.White);
 
-            if (element.MeasuredSize.HasValue && element.Highlight.A > 0)
+            if (element.MeasuredSize.HasValue && element.MarkupData.Highlight.A > 0)
             {
                 var highlightRect = new LayoutRect(
                     element.Position.X,
@@ -159,10 +171,42 @@ public class TextWidget : Widget
                     element.MeasuredSize.Value.Y
                 );
 
-                geometry.AddQuad(highlightRect, element.Highlight);
+                geometry.AddQuad(highlightRect, element.MarkupData.Highlight);
             }
             
             fontInstance.Draw(geometry, element.Position, color, element.Text);
+
+            var strikeLine = 1;
+            var underLine = 2;
+
+            if (element.MarkupData.Underline)
+            {
+                geometry.AddQuad(new LayoutRect(
+                    element.Position.X,
+                    element.Position.Y + element.MeasuredSize!.Value.Y - underLine,
+                    element.MeasuredSize.Value.X,
+                    underLine
+                ), color);
+            }
+            else if (!string.IsNullOrWhiteSpace(element.MarkupData.Link))
+            {
+                geometry.AddQuad(new LayoutRect(
+                    element.Position.X,
+                    element.Position.Y + element.MeasuredSize!.Value.Y - strikeLine,
+                    element.MeasuredSize.Value.X,
+                    strikeLine
+                ), color);
+            }
+            
+            if (element.MarkupData.Strikethrough)
+            {
+                geometry.AddQuad(new LayoutRect(
+                    element.Position.X,
+                    element.Position.Y + ((element.MeasuredSize!.Value.Y - underLine)/2),
+                    element.MeasuredSize.Value.X,
+                    strikeLine
+                ), color);
+            }
         }
     }
 
@@ -177,7 +221,7 @@ public class TextWidget : Widget
         {
             if (i == textElements.Count-1)
             {
-                textElements[i].MeasuredSize = (textElements[i].FontOverride ?? font).GetFont(this)
+                textElements[i].MeasuredSize = (textElements[i].MarkupData.FontOverride ?? font).GetFont(this)
                     .Measure(textElements[i].Text.TrimEnd());
             }
             
@@ -190,7 +234,7 @@ public class TextWidget : Widget
                 if (i > 0)
                 {
                     offset.X -= textElements[i - 1].MeasuredSize!.Value.X;
-                    textElements[i - 1].MeasuredSize = (textElements[i - 1].FontOverride ?? font).GetFont(this)
+                    textElements[i - 1].MeasuredSize = (textElements[i - 1].MarkupData.FontOverride ?? font).GetFont(this)
                         .Measure(textElements[i - 1].Text.TrimEnd());
                     offset.X += textElements[i - 1].MeasuredSize!.Value.X;
                 }
@@ -215,6 +259,35 @@ public class TextWidget : Widget
         return lines.ToArray();
     }
 
+    public bool TryFindLink(Vector2 position, out string? linkId)
+    {
+        linkId = null;
+
+        foreach (TextElement element in textElements)
+        {
+            if (element.MeasuredSize == null)
+                continue;
+
+            if (string.IsNullOrWhiteSpace(element.MarkupData.Link))
+                continue;
+
+            LayoutRect rect = new LayoutRect(
+                element.Position.X,
+                element.Position.Y,
+                element.MeasuredSize.Value.X,
+                element.MeasuredSize.Value.Y
+            );
+
+            if (!rect.Contains(position))
+                continue;
+
+            linkId = element.MarkupData.Link;
+            return true;
+        }
+
+        return false;
+    }
+    
     private bool ParseMarkup(ReadOnlySpan<char> chars, int start, ref MarkupData markupData)
     {
         if (start < 0)
@@ -266,7 +339,7 @@ public class TextWidget : Widget
             {
                 if (ColorHelpers.ParseColor(afterEquals, out Color color))
                 {
-                    markupData.ForegroundOverride = color;
+                    markupData.ColorOverride = color;
                     return true;
                 }
 
@@ -274,14 +347,14 @@ public class TextWidget : Widget
             }
             case "/color":
             {
-                markupData.ForegroundOverride = null;
+                markupData.ColorOverride = null;
                 return true;
             }
             case "highlight":
             {
                 if (ColorHelpers.ParseColor(afterEquals, out Color color))
                 {
-                    markupData.BackgroundColor = color;
+                    markupData.Highlight = color;
                     return true;
                 }
 
@@ -289,10 +362,50 @@ public class TextWidget : Widget
             }
             case "/highlight":
             {
-                markupData.BackgroundColor = Color.Transparent;
+                markupData.Highlight = Color.Transparent;
                 return true;
             }
-            
+            case "b":
+                markupData.Bold = true;
+                return true;
+            case "/b":
+                markupData.Bold = false;
+                return true;
+            case "i":
+                markupData.Italic = true;
+                return true;
+            case "/i":
+                markupData.Italic = false;
+                return true;
+            case "u":
+                markupData.Underline = true;
+                return true;
+            case "/u":
+                markupData.Underline = false;
+                return true;
+            case "s":
+                markupData.Strikethrough = true;
+                return true;
+            case "/s":
+                markupData.Strikethrough = false;
+                return true;
+            case "selected":
+                markupData.Selected = true;
+                return true;
+            case "/selected":
+                markupData.Selected = false;
+                return true;
+            case "link":
+            {
+                if (string.IsNullOrWhiteSpace(afterEquals))
+                    return false;
+
+                markupData.Link = afterEquals;
+                return true;
+            }
+            case "/link":
+                markupData.Link = null;
+                return true;
         }
 
         return false;
@@ -323,9 +436,9 @@ public class TextWidget : Widget
                         Text = stringBuilder.ToString().TrimEnd(),
                         SourceStart = sourceStart,
                         SourceEnd = i,
-                        ColorOverride = markupData.ForegroundOverride,
-                        Highlight = markupData.BackgroundColor
+                        MarkupData = markupData
                     });
+                    markupData.Length = 0;
                     sourceStart = i;
                 }
 
@@ -348,15 +461,30 @@ public class TextWidget : Widget
                         Text = stringBuilder.ToString(),
                         SourceStart = sourceStart,
                         SourceEnd = i,
-                        ColorOverride = markupData.ForegroundOverride,
-                        Highlight = markupData.BackgroundColor
+                        MarkupData = markupData
                     });
 
+                    int markupLength = newMarkupData.Length;
+                    
+                    if (showMarkup)
+                    {
+                        textElements.Add(new TextElement
+                        {
+                            Text = chars.Slice(i, newMarkupData.Length).ToString(),
+                            SourceStart = i,
+                            SourceEnd = i + newMarkupData.Length,
+                            MarkupData = markupData
+                        });
+                        
+                        newMarkupData.Length = 0;
+                    }
+                    
                     markupData = newMarkupData;
                     
                     stringBuilder.Length = 0;
                     sourceStart = i;
-                    i += markupData.Length-1;
+                    
+                    i += markupLength - 1;
                     break;
                 }
                 case '\r':
@@ -368,10 +496,11 @@ public class TextWidget : Widget
                         Text = stringBuilder.ToString().TrimEnd(),
                         SourceStart = sourceStart,
                         SourceEnd = i,
-                        ColorOverride = markupData.ForegroundOverride,
-                        Highlight = markupData.BackgroundColor
+                        MarkupData = markupData
                     });
 
+                    markupData.Length = 0;
+                    
                     stringBuilder.Length = 0;
                     sourceStart = i;
                     
@@ -381,8 +510,7 @@ public class TextWidget : Widget
                         IsNewLine = true,
                         SourceStart = sourceStart,
                         SourceEnd = i + 1,
-                        ColorOverride = markupData.ForegroundOverride,
-                        Highlight = markupData.BackgroundColor
+                        MarkupData = markupData
                     });
 
                     sourceStart = i + 1;
@@ -399,10 +527,10 @@ public class TextWidget : Widget
                             Text = stringBuilder.ToString(),
                             SourceStart = sourceStart,
                             SourceEnd = i + 1,
-                            ColorOverride = markupData.ForegroundOverride,
-                            Highlight = markupData.BackgroundColor
+                            MarkupData = markupData
                         });
 
+                        markupData.Length = 0;
                         sourceStart = i + 1;
                         stringBuilder.Length = 0;
                     }
@@ -517,7 +645,7 @@ public class TextWidget : Widget
             if (textElements[i].MeasuredSize != null)
                 continue;
             
-            var fontInstance = (textElements[i].FontOverride ?? font).GetFont(this);
+            var fontInstance = (textElements[i].MarkupData.FontOverride ?? font).GetFont(this);
 
             textElements[i].MeasuredSize = fontInstance.Measure(textElements[i].Text);
         }
@@ -536,7 +664,7 @@ public class TextWidget : Widget
 
             if (i == textElements.Count - 1 || characterIndex <= element.SourceEnd)
             {
-                var fontInstance = (element.FontOverride ?? font).GetFont(this);
+                var fontInstance = (element.MarkupData.FontOverride ?? font).GetFont(this);
                 
                 if (characterIndex == element.SourceStart)
                 {
@@ -584,20 +712,25 @@ public class TextWidget : Widget
     private struct MarkupData
     {
         public int Length;
-        public Color BackgroundColor;
-        public Color? ForegroundOverride;
+        public Color? ColorOverride;
+        public Color Highlight;
+        public FontInfo? FontOverride;
+        public bool Bold;
+        public bool Italic;
+        public bool Underline;
+        public bool Strikethrough;
+        public bool Selected;
+        public string? Link;
     }
     
     private class TextElement
     {
         public string Text;
-        public Color? ColorOverride;
-        public Color Highlight;
-        public FontInfo? FontOverride;
         public Vector2 Position;
         public Vector2? MeasuredSize;
         public bool IsNewLine;
         public int SourceStart;
         public int SourceEnd;
+        public MarkupData MarkupData;
     }
 }
