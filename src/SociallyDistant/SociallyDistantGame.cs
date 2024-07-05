@@ -152,7 +152,7 @@ internal sealed class SociallyDistantGame :
 		this.gui = new GuiService(this);
 
 		Components.Add(backdrop);
-		//Components.Add(backdropUpdater);
+		Components.Add(backdropUpdater);
 		Components.Add(gui);
 		Components.Add(devTools);
 

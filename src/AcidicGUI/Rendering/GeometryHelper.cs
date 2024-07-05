@@ -64,9 +64,9 @@ public class GeometryHelper : IFontStashRenderer2
         var mesh = GetMeshBuilder(texture);
         
         int tl = mesh.AddVertex(new Vector2(rectangle.Left, rectangle.Top), color, new Vector2(0, 0));
-        int tr = mesh.AddVertex(new Vector2(rectangle.Right, rectangle.Top), color new Vector2(1, 0));
-        int bl = mesh.AddVertex(new Vector2(rectangle.Left, rectangle.Bottom), color new Vector2(0, 1));
-        int br = mesh.AddVertex(new Vector2(rectangle.Right, rectangle.Bottom), color new Vector2(1, 1));
+        int tr = mesh.AddVertex(new Vector2(rectangle.Right, rectangle.Top), color, new Vector2(1, 0));
+        int bl = mesh.AddVertex(new Vector2(rectangle.Left, rectangle.Bottom), color, new Vector2(0, 1));
+        int br = mesh.AddVertex(new Vector2(rectangle.Right, rectangle.Bottom), color, new Vector2(1, 1));
         
         mesh.AddQuad(tl, tr, bl, br);
     }
