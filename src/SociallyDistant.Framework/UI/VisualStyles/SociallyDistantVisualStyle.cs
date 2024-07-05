@@ -12,6 +12,7 @@ namespace SociallyDistant.Core.UI.VisualStyles;
 public class SociallyDistantVisualStyle : IVisualStyle
 {
     private readonly IGameContext game;
+    private readonly Color statusBarColor = new Color(0x01,0x22, 0x37, 0xff);
 
     private Font defaultFont = null!; 
 
@@ -74,8 +75,24 @@ public class SociallyDistantVisualStyle : IVisualStyle
     {
         if (widget is InputField inputField)
             DrawInputField(inputField, geometryHelper);
+        else
+        {
+            WidgetBackgrounds background = widget.GetCustomProperty<WidgetBackgrounds>();
+
+            switch (background)
+            {
+                case WidgetBackgrounds.StatusBar:
+                    DrawStatusBar(widget, geometryHelper);
+                    break;
+            }
+        }
     }
 
+    private void DrawStatusBar(Widget widget, GeometryHelper geometry)
+    {
+        geometry.AddQuad(widget.ContentArea, statusBarColor);
+    }
+    
     public void DrawScrollBar(Widget widget, GeometryHelper geometry, LayoutRect scrollBarArea, float scrollOffset,
         float scrollViewHeight)
     {
@@ -100,4 +117,10 @@ public enum InputFieldStyle
 {
     Default,
     Box
+}
+
+public enum WidgetBackgrounds
+{
+    None,
+    StatusBar
 }

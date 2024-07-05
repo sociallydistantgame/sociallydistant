@@ -29,6 +29,8 @@ public sealed class GuiService :
     private RasterizerState? scissor;
     private RasterizerState? noScissor;
 
+    public GuiManager GuiRoot => acidicGui;
+    
     public GuiService(IGameContext sociallyDistantContext) : base(sociallyDistantContext.GameInstance)
     {
         visualStyle = new SociallyDistantVisualStyle(sociallyDistantContext);
