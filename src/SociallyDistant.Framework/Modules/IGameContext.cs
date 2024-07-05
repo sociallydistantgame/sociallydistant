@@ -23,8 +23,6 @@ namespace SociallyDistant.Core.Modules
 		
 		TabbedToolCollection AvailableTools { get; }
 		
-		INotificationManager NotificationManager { get; }
-		
 		GameMode CurrentGameMode { get; }
 
 		public IObservable<GameMode> GameModeObservable { get; }
@@ -53,11 +51,6 @@ namespace SociallyDistant.Core.Modules
 		///		Gets an instance of the ContentManager.
 		/// </summary>
 		IContentManager ContentManager { get; }
-		
-		/// <summary>
-		///		Gets a reference to the Info Panel Service, which manages the state of the desktop's information panel widgets.
-		/// </summary>
-		IInfoPanelService InfoPanelService { get; }
 		
 		/// <summary>
 		///		Gets a reference to the world manager, which manages the state of the game's world.

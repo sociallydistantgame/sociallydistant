@@ -1,14 +1,9 @@
-#nullable enable
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using Core;
-using Core.WorldData.Data;
-using Shell.Common;
-using UniRx;
-using UnityEngine.Assertions;
+using System.Reactive.Subjects;
+using SociallyDistant.Core.Core;
+using SociallyDistant.Core.Core.WorldData.Data;
+using SociallyDistant.Core.Shell.Common;
 
-namespace UI.Shell
+namespace SociallyDistant.UI.Shell
 {
 	public sealed class NotificationGroup : 
 		INotificationGroup,
@@ -55,8 +50,6 @@ namespace UI.Shell
 
 		internal void CreateInternal(WorldNotificationData data)
 		{
-			Assert.IsTrue(data.GroupId==this.Name);
-			
 			correlations.Add(data.CorrelationId, unreadIds.Count);
 			unreadIds.Add(data.InstanceId);
 
@@ -65,8 +58,6 @@ namespace UI.Shell
 
 		internal void DeleteInternal(WorldNotificationData data)
 		{
-			Assert.IsTrue(data.GroupId==this.Name);
-
 			int index = correlations[data.CorrelationId];
 
 			correlations.Remove(data.CorrelationId);

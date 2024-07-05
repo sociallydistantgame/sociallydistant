@@ -81,10 +81,7 @@ internal sealed class SociallyDistantGame :
 
 	/// <inheritdoc />
 	public TabbedToolCollection AvailableTools => tabbedTools;
-
-	/// <inheritdoc />
-	public INotificationManager NotificationManager { get; }
-
+	
 	/// <inheritdoc />
 	public GameMode CurrentGameMode { get; private set; } = GameMode.Booting;
 
@@ -101,17 +98,14 @@ internal sealed class SociallyDistantGame :
 	public IKernel Kernel { get; }
 
 	/// <inheritdoc />
-	public IShellContext Shell { get; }
+	public IShellContext Shell => guiController;
 
 	/// <inheritdoc />
 	public Game GameInstance => this;
 
 	/// <inheritdoc />
 	public IContentManager ContentManager => contentManager;
-
-	/// <inheritdoc />
-	public IInfoPanelService InfoPanelService { get; }
-
+	
 	/// <inheritdoc />
 	public IWorldManager WorldManager => worldManager;
 

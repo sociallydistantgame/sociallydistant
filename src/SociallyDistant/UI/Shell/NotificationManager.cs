@@ -1,12 +1,8 @@
-#nullable enable
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using Core;
-using Core.WorldData.Data;
-using Shell.Common;
+using SociallyDistant.Core.Core;
+using SociallyDistant.Core.Core.WorldData.Data;
+using SociallyDistant.Core.Shell.Common;
 
-namespace UI.Shell
+namespace SociallyDistant.UI.Shell
 {
 	public sealed class NotificationManager : 
 		INotificationManager,

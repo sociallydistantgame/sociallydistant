@@ -33,7 +33,7 @@ namespace SociallyDistant.Architecture
 				if (string.IsNullOrWhiteSpace(notificationGroupId))
 					return null;
 
-				return SociallyDistantGame.Instance.NotificationManager.GetNotificationGroup(notificationGroupId);
+				return SociallyDistantGame.Instance.Shell.NotificationManager.GetNotificationGroup(notificationGroupId);
 			}
 		}
 	}
