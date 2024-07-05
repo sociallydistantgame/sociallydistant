@@ -9,6 +9,7 @@ using SociallyDistant.Core.Modules;
 using SociallyDistant.Core.Scripting;
 using SociallyDistant.Core.Scripting.GlobalCommands;
 using SociallyDistant.Core.Shell;
+using SociallyDistant.GamePlatform;
 using SociallyDistant.GameplaySystems.Chat;
 using SociallyDistant.GameplaySystems.Missions;
 using SociallyDistant.GameplaySystems.Networld;
@@ -56,6 +57,9 @@ namespace SociallyDistant
 			RegisterHooks();
 			RegisterGlobalCommands();
 
+			// Game data
+			Context.ContentManager.AddContentGenerator(new LocalGameDataSource());
+			
 			this.serviceGenerator = new NetworkServiceGenerator(Context.ModuleManager);
 			Context.ContentManager.AddContentGenerator(this.serviceGenerator);
 			
@@ -88,9 +92,6 @@ namespace SociallyDistant
 			
 			// Tool groups for the Dock.
 			Context.ContentManager.AddContentSource(toolGroupsSource);
-			
-			// Find Restitched save data. If we do, the player gets a little gift from the lead programmer of the game - who.......created this game as well? <3
-			// FindRestitchedDataAndRegisterRestitchedContent();
 		}
 
 		/// <inheritdoc />

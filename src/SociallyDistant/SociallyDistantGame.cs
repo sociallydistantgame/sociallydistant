@@ -1,8 +1,10 @@
 ﻿using System.Reactive.Linq;
 using System.Reactive.Subjects;
+using System.Text;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using Serilog;
+using SociallyDistant.Architecture;
 using SociallyDistant.Core;
 using SociallyDistant.Core.Config;
 using SociallyDistant.Core.Config.SystemConfigCategories;
@@ -10,10 +12,12 @@ using SociallyDistant.Core.ContentManagement;
 using SociallyDistant.Core.Core;
 using SociallyDistant.Core.Core.Config;
 using SociallyDistant.Core.Core.Scripting;
+using SociallyDistant.Core.Core.WorldData.Data;
 using SociallyDistant.Core.Modules;
 using SociallyDistant.Core.OS;
 using SociallyDistant.Core.OS.Network.MessageTransport;
 using SociallyDistant.Core.Scripting;
+using SociallyDistant.Core.Serialization.Binary;
 using SociallyDistant.Core.Shell;
 using SociallyDistant.Core.Shell.Common;
 using SociallyDistant.Core.Shell.InfoPanel;
@@ -24,6 +28,7 @@ using SociallyDistant.GamePlatform;
 using SociallyDistant.GamePlatform.ContentManagement;
 using SociallyDistant.GameplaySystems.Social;
 using SociallyDistant.Modding;
+using SociallyDistant.UI;
 using SociallyDistant.UI.Backdrop;
 
 namespace SociallyDistant;
@@ -54,19 +59,23 @@ internal sealed class SociallyDistantGame :
 	private readonly ContentManager contentManager;
 	private readonly SettingsManager settingsManager;
 	private readonly ScriptSystem scriptSystem;
-    private readonly VertexPositionColorTexture[] virtualScreenVertices = new VertexPositionColorTexture[4];
-    private readonly int[] virtualScreenIndices = new[] { 0, 1, 2, 2, 1, 3 };
-    private readonly BackdropController backdrop;
-    private readonly BackdropUpdater backdropUpdater;
+	private readonly VertexPositionColorTexture[] virtualScreenVertices = new VertexPositionColorTexture[4];
+	private readonly int[] virtualScreenIndices = new[] { 0, 1, 2, 2, 1, 3 };
+	private readonly BackdropController backdrop;
+	private readonly BackdropUpdater backdropUpdater;
+	private readonly GuiController guiController;
 
+	private bool areModulesLoaded;
 	private Task initializeTask;
 	private PlayerInfo playerInfo = new();
 	private bool initialized;
 	private RenderTarget2D? virtualScreen;
 	private SpriteEffect? virtualScreenShader;
+	private IGameData? currentGameData;
+	private PlayerInfo loadedPlayerInfo;
 
 	public bool IsGameActive => CurrentGameMode == GameMode.OnDesktop;
-	
+
 	/// <inheritdoc />
 	public IModuleManager ModuleManager => moduleManager;
 
@@ -77,7 +86,7 @@ internal sealed class SociallyDistantGame :
 	public INotificationManager NotificationManager { get; }
 
 	/// <inheritdoc />
-	public GameMode CurrentGameMode { get; private set; } = GameMode.Loading;
+	public GameMode CurrentGameMode { get; private set; } = GameMode.Booting;
 
 	/// <inheritdoc />
 	public ISocialService SocialService => socialService;
@@ -96,7 +105,7 @@ internal sealed class SociallyDistantGame :
 
 	/// <inheritdoc />
 	public Game GameInstance => this;
-	
+
 	/// <inheritdoc />
 	public IContentManager ContentManager => contentManager;
 
@@ -115,22 +124,22 @@ internal sealed class SociallyDistantGame :
 	public IObservable<GameMode> GameModeObservable => gameModeObservable;
 
 	public IObservable<PlayerInfo> PlayerInfoObservable => playerInfoObservable;
-	
+
 	private SociallyDistantGame()
 	{
 		instance = this;
-		
+
 		timeData = Time.Initialize();
 		graphicsManager = new GraphicsDeviceManager(this);
 
 		tabbedTools = new TabbedToolCollection(this);
-		
+
 		gameModeObservable = Observable.Create<GameMode>((observer) =>
 		{
 			observer.OnNext(CurrentGameMode);
 			return gameModeSubject.Subscribe(observer);
 		});
-		
+
 		playerInfoObservable = Observable.Create<PlayerInfo>((observer) =>
 		{
 			observer.OnNext(playerInfo);
@@ -154,6 +163,9 @@ internal sealed class SociallyDistantGame :
 		Components.Add(backdrop);
 		Components.Add(backdropUpdater);
 		Components.Add(gui);
+		
+		this.guiController = new GuiController(this);
+		Components.Add(guiController);
 		Components.Add(devTools);
 
 		IsMouseVisible = true;
@@ -163,7 +175,8 @@ internal sealed class SociallyDistantGame :
 
 		Content = contentPipeline;
 
-		contentPipeline.AddDirectoryContentSource("/Core", Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "Content"));
+		contentPipeline.AddDirectoryContentSource("/Core",
+			Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "Content"));
 	}
 
 	private void OnGraphicsDeviceCreation(object? sender, PreparingDeviceSettingsEventArgs e)
@@ -173,7 +186,7 @@ internal sealed class SociallyDistantGame :
 		var graphicsSettings = new GraphicsSettings(settingsManager);
 
 		var presentationParameters = e.GraphicsDeviceInformation.PresentationParameters;
-		
+
 		ApplyGraphicsSettingsInternal(graphicsSettings, presentationParameters, false);
 	}
 
@@ -186,7 +199,7 @@ internal sealed class SociallyDistantGame :
 		graphicsManager.ApplyChanges();
 
 		ApplyVirtualDisplayMode(graphicsSettings);
-		
+
 		initializeTask = InitializeAsync();
 	}
 
@@ -198,29 +211,210 @@ internal sealed class SociallyDistantGame :
 
 	private async Task InitializeAsync()
 	{
-		await moduleManager.LocateAllGameModules();
+		scriptSystem.RegisterHookListener(CommonScriptHooks.AfterContentReload,
+			new UpdateAvailableToolsHook(contentManager, this.AvailableTools));
+
+		await WaitForModulesToLoad(true);
 		await contentManager.RefreshContentDatabaseAsync();
 
 		settingsManager.ObserveChanges(OnGameSettingsChanged);
+
+		await DoUserInitialization();
+	}
+
+	public async Task WaitForModulesToLoad(bool doReload)
+	{
+		if (areModulesLoaded && !doReload)
+			return;
+
+		areModulesLoaded = false;
+
+		await moduleManager.LocateAllGameModules();
+
+		areModulesLoaded = true;
+	}
+
+	private async Task DoUserInitialization()
+	{
+		InitializationFlow flow = GetInitializationFlow();
+
+		IGameData? saveToLoad = null;
+
+		if (flow == InitializationFlow.DebugWorld)
+		{
+			saveToLoad = new DebugGameData();
+		}
+		else if (flow == InitializationFlow.MostRecentSave)
+		{
+			saveToLoad = ContentManager.GetContentOfType<IGameData>()
+				.OrderByDescending(x => x.PlayerInfo.LastPlayed)
+				.FirstOrDefault();
+		}
+
+		if (saveToLoad != null)
+		{
+			await StartGame(saveToLoad);
+			return;
+		}
+
+		if (flow == InitializationFlow.MostRecentSave)
+			await StartCharacterCreator();
+		else 
+			await GoToLoginScreen();
+	}
+
+	public InitializationFlow GetInitializationFlow()
+	{
+		var modSettings = new ModdingSettings(settingsManager);
+		var uiSettings = new UiSettings(settingsManager);
+
+		if (modSettings.ModDebugMode)
+			return InitializationFlow.DebugWorld;
+
+		return uiSettings.LoadMostRecentSave ? InitializationFlow.MostRecentSave : InitializationFlow.LoginScreen;
+	}
+
+	/// <inheritdoc />
+	public async Task StartGame(IGameData gameToLoad)
+	{
+		await EndCurrentGame(true);
+
+		SetGameMode(GameMode.Loading);
+
+		try
+		{
+			this.loadedPlayerInfo = gameToLoad.PlayerInfo;
+			this.loadedPlayerInfo.LastPlayed = DateTime.UtcNow;
+
+			await gameToLoad.UpdatePlayerInfo(this.loadedPlayerInfo);
+
+			using var memory = new MemoryStream();
+			bool result = await gameToLoad.ExtractWorldData(memory);
+			if (!result)
+			{
+				// Couldn't extract a world, fail and bail.
+				await GoToLoginScreen();
+				return;
+			}
+
+			memory.Seek(0, SeekOrigin.Begin);
+
+			var world = Core.WorldManager.Instance;
+
+			await Task.Run(() =>
+			{
+				world.WipeWorld();
+
+				if (memory.Length > 0)
+				{
+					using var binaryReader = new BinaryReader(memory, Encoding.UTF8);
+					using var worldReader = new BinaryDataReader(binaryReader);
+
+					world.LoadWorld(worldReader);
+				}
+			});
+
+			while (globalSchedule.Count > 0)
+				await Task.Yield();
+
+			// Create player profile data if it's missing
+			WorldPlayerData playerData = world.World.PlayerData.Value;
+
+			WorldProfileData profile = default;
+			if (!world.World.Profiles.ContainsId(playerData.PlayerProfile))
+			{
+				profile.InstanceId = world.GetNextObjectId();
+				playerData.PlayerProfile = profile.InstanceId;
+
+				// Sync the profile data with the save's metadata
+				// We only sync the gender and full names.
+				profile.Gender = this.loadedPlayerInfo.PlayerGender;
+				profile.ChatName = this.loadedPlayerInfo.Name;
+
+				world.World.Profiles.Add(profile);
+				world.World.PlayerData.Value = playerData;
+			}
+
+			this.currentGameData = gameToLoad;
+
+			//await gameInitializationScript.ExecuteAsync(unityConsole);
+		}
+		catch (Exception ex)
+		{
+			this.guiController.ShowExceptionMessage(ex);
+
+			await EndCurrentGame(false);
+			await GoToLoginScreen();
+			return;
+		}
+
+		playerInfoSubject.OnNext(this.loadedPlayerInfo);
+		SetGameMode(GameMode.OnDesktop);
+	}
+
+	/// <inheritdoc />
+	public async Task StartCharacterCreator()
+	{
+		await EndCurrentGame(true);
+
+		SetGameMode(GameMode.CharacterCreator);
+	}
+
+	/// <inheritdoc />
+	public async Task GoToLoginScreen()
+	{
+		await EndCurrentGame(true);
+
+		SetGameMode(GameMode.AtLoginScreen);
 	}
 
 	/// <inheritdoc />
 	public async Task SaveCurrentGame(bool silent)
 	{
-		
+		if (currentGameData == null)
+			return;
+
+		await currentGameData.UpdatePlayerInfo(loadedPlayerInfo);
+		await currentGameData.SaveWorld(WorldManager);
+
+		if (silent)
+			return;
+
+		//await gameInitializationScript.ExecuteAsync();
 	}
 
 	/// <inheritdoc />
 	public async Task EndCurrentGame(bool save)
 	{
+		if (save)
+			await SaveCurrentGame(true);
+
+		// we do this to disable the simulation
+		SetGameMode(GameMode.Loading);
+
+		this.currentGameData = null;
+		this.loadedPlayerInfo = default;
+		this.playerInfoSubject.OnNext(this.loadedPlayerInfo);
+
+		worldManager.WipeWorld();
 	}
 
 	/// <inheritdoc />
-	public bool IsDebugWorld { get; }
+	public bool IsDebugWorld => currentGameData is DebugGameData;
+
+	private void SetGameMode(GameMode newGameMode)
+	{
+		CurrentGameMode = newGameMode;
+		this.gameModeSubject.OnNext(newGameMode);
+	}
 
 	/// <inheritdoc />
-	public void SetPlayerHostname(string hostname)
+	public async void SetPlayerHostname(string hostname)
 	{
+		this.loadedPlayerInfo.HostName = hostname;
+		this.playerInfoSubject.OnNext(this.loadedPlayerInfo);
+
+		await this.SaveCurrentGame(true);
 	}
 
 	/// <inheritdoc />
@@ -228,7 +422,7 @@ internal sealed class SociallyDistantGame :
 	{
 		// Run any scheduled actions
 		globalSchedule.RunPendingWork();
-		
+
 		// Report new timing data to the rest of the game so it can be accessed statically
 		timeData.Update(gameTime);
 
@@ -242,7 +436,7 @@ internal sealed class SociallyDistantGame :
 
 				Exit();
 			}
-			
+
 			initialized = true;
 		}
 
@@ -257,7 +451,7 @@ internal sealed class SociallyDistantGame :
 
 	public static SociallyDistantGame Instance => instance;
 	public static string GameDataPath => gameDataPath;
-	
+
 	public static void Main(string[] args)
 	{
 		Log.Logger = new LoggerConfiguration()
@@ -326,7 +520,7 @@ internal sealed class SociallyDistantGame :
 		displayMode = supportedModes.First();
 		return true;
 	}
-	
+
 	private void ApplyGraphicsSettingsInternal(GraphicsSettings settings, PresentationParameters parameters,
 		bool explicitApply)
 	{
@@ -345,7 +539,7 @@ internal sealed class SociallyDistantGame :
 				Log.Warning("Resolution stored in settings is missing or unsupported, so using default.");
 				settings.DisplayResolution = $"{mode.Width}x{mode.Height}";
 			}
-			
+
 			parameters.BackBufferWidth = mode.Width;
 			parameters.BackBufferHeight = mode.Height;
 		}
@@ -364,10 +558,39 @@ internal sealed class SociallyDistantGame :
 		// Not yet.
 		if (GraphicsDevice == null)
 			return;
-		
+
 		var graphicsSettings = new GraphicsSettings(settings);
 		var parameters = GraphicsDevice.PresentationParameters;
-		
+
 		ApplyGraphicsSettingsInternal(graphicsSettings, parameters, true);
+	}
+
+	private sealed class UpdateAvailableToolsHook : IHookListener
+	{
+		private readonly IContentManager contentManager;
+		private readonly TabbedToolCollection collection;
+		private readonly MainToolGroup? terminal;
+
+		public UpdateAvailableToolsHook(IContentManager contentManager, TabbedToolCollection collection)
+		{
+			this.contentManager = contentManager;
+			this.collection = collection;
+		}
+
+		/// <inheritdoc />
+		public async Task ReceiveHookAsync(IGameContext game)
+		{
+			collection.Clear();
+
+			if (terminal != null)
+				collection.Add(terminal);
+
+			foreach (ITabbedToolDefinition group in contentManager.GetContentOfType<ITabbedToolDefinition>())
+			{
+				collection.Add(group);
+			}
+
+			await game.ScriptSystem.RunHookAsync(CommonScriptHooks.BeforeUpdateShellTools);
+		}
 	}
 }

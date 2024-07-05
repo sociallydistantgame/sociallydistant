@@ -1,6 +1,7 @@
 ﻿#nullable enable
 using SociallyDistant.Architecture;
 using SociallyDistant.Core.Core;
+using SociallyDistant.Core.Modules;
 using SociallyDistant.Core.OS.Devices;
 using SociallyDistant.Core.OS.FileSystems;
 using SociallyDistant.Core.OS.FileSystems.Host;

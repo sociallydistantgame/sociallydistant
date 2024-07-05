@@ -20,7 +20,8 @@ namespace SociallyDistant.Core.OS.Network.MessageTransport
 	public class WorkQueue
 	{
 		private readonly ConcurrentQueue<PendingWork> workToDo = new ConcurrentQueue<PendingWork>();
-		
+
+		public int Count => workToDo.Count;
 		private int maximumWork = 256;
 
 		/// <summary>

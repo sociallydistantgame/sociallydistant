@@ -1,12 +1,11 @@
 ﻿#nullable enable
-using System.Diagnostics;
 using System.Globalization;
 using System.Text;
 using System.Xml;
 using Serilog;
 using SociallyDistant.Core.Core;
 
-namespace SociallyDistant.GamePlatform
+namespace SociallyDistant.Core.Modules
 {
 	public struct PlayerInfo
 	{

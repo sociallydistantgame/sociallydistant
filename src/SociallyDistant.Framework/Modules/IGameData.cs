@@ -3,7 +3,7 @@ using Microsoft.Xna.Framework.Graphics;
 using SociallyDistant.Core.ContentManagement;
 using SociallyDistant.Core.Core;
 
-namespace SociallyDistant.GamePlatform
+namespace SociallyDistant.Core.Modules
 {
 	/// <summary>
 	///		Interface for an object that can be loaded as a Socially Distant game session.

@@ -19,7 +19,6 @@ public sealed class GuiService :
     private readonly IGameContext context;
     private readonly GuiManager acidicGui;
     private readonly IGuiContext guiContext;
-    private readonly ScrollView test = new();
     private readonly int[] screenQuad = new int[] { 0, 1, 2, 2, 1, 3 };
     private readonly VertexPositionColorTexture[] screenQuadVerts = new VertexPositionColorTexture[4];
     private readonly SociallyDistantVisualStyle visualStyle;
@@ -35,34 +34,6 @@ public sealed class GuiService :
         visualStyle = new SociallyDistantVisualStyle(sociallyDistantContext);
         this.context = sociallyDistantContext;
         this.acidicGui = new GuiManager(this, visualStyle);
-        this.acidicGui.TopLevels.Add(test);
-        
-        test.HorizontalAlignment = HorizontalAlignment.Center;
-        test.VerticalAlignment = VerticalAlignment.Middle;
-        test.MaximumSize = new Vector2(1280, 720);
-        test.Spacing = 6;
-        test.Padding = 12;
-
-        var inputField = new InputField();
-        inputField.WordWrapped = true;
-        inputField.MultiLine = true;
-        
-        test.ChildWidgets.Add(inputField);
-        
-        for (var i = 0; i < 36; i++)
-        {
-            var button = new Button();
-            var text = new TextWidget();
-
-            text.Text =
-                $"Ritchie {i + 1} - <color=green>This text should be green</color> and <highlight=red>this text should be highlighted red</highlight>";
-            text.HorizontalAlignment = HorizontalAlignment.Stretch;
-            text.VerticalAlignment = VerticalAlignment.Middle;
-            text.WordWrapping = true;
-
-            button.Content = text;
-            test.ChildWidgets.Add(button);
-        }
     }
 
     public void SetVirtualScreenSize(int width, int height)

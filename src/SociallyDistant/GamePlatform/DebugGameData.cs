@@ -3,6 +3,7 @@ using System.Diagnostics;
 using Microsoft.Xna.Framework.Graphics;
 using Serilog;
 using SociallyDistant.Core.Core;
+using SociallyDistant.Core.Modules;
 
 namespace SociallyDistant.GamePlatform
 {

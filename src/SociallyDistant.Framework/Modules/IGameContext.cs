@@ -80,5 +80,9 @@ namespace SociallyDistant.Core.Modules
 		bool IsDebugWorld { get; }
 
 		void SetPlayerHostname(string hostname);
+
+		Task GoToLoginScreen();
+		Task StartCharacterCreator();
+		Task StartGame(IGameData gameData);
 	}
 }
