@@ -6,6 +6,8 @@ using AcidicGUI.Widgets;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using SociallyDistant.Core.Modules;
+using SociallyDistant.Core.Shell.Windowing;
+using SociallyDistant.Core.UI.Common;
 
 namespace SociallyDistant.Core.UI.VisualStyles;
 
@@ -14,7 +16,16 @@ public class SociallyDistantVisualStyle : IVisualStyle
     private readonly IGameContext game;
     private readonly Color mainBackground = new Color(0x11, 0x13, 0x15);
     private readonly Color statusBarColor = new Color(0x01,0x22, 0x37, 0xff);
+    private readonly Color accentPrimary = new Color(0x13, 0x85, 0xC3, 0xff);
 
+    // Tabs - Inactive
+    private readonly Color tabInactiveBackgroundDefault = new Color(0x44, 0x44, 0x44, 191);
+    private readonly Color tabInactiveBorderDefault = new Color(0x44, 0x44, 0x44);
+    
+    // Tabs - Active
+    private readonly Color tabActiveBackgroundDefault = new Color(0x16, 0x93, 0xD6, 190);
+    private readonly Color tabActiveBorderDefault = new Color(0x16, 0x93, 0xD6);
+    
     private Font iconFont;
     private Font defaultFont = null!;
 
@@ -79,11 +90,78 @@ public class SociallyDistantVisualStyle : IVisualStyle
             }
         }
     }
+
+    private void DrawWindowTab(Widget widget, IWindowTab tab, GeometryHelper geometry)
+    {
+        var thickness = 1;
+        var background = tabInactiveBackgroundDefault;
+        var border = tabInactiveBorderDefault;
+
+        if (tab.Active)
+        {
+            background = tabActiveBackgroundDefault;
+            border = tabActiveBorderDefault;
+        }
+
+        geometry.AddRoundedRectangle(
+            widget.ContentArea,
+            3,
+            3,
+            0,
+            0,
+            background
+        );
+        
+        geometry.AddRoundedRectangleOutline(
+            widget.ContentArea,
+            thickness,
+            3,
+            3,
+            0,
+            0,
+            border
+        );
+    }
+
+    private void DrawDecorativeBlock(DecorativeBlock widget, GeometryHelper geometry)
+    {
+        var color = (widget.BoxColor ?? accentPrimary);
+
+        if (widget.Opaque)
+        {
+            geometry.AddRoundedRectangle(
+                widget.ContentArea,
+                3,
+                color
+            );
+        }
+        else
+        {
+            geometry.AddRoundedRectangle(
+                widget.ContentArea,
+                3,
+                color * 0.5f
+            );
+
+            geometry.AddRoundedRectangleOutline(
+                widget.ContentArea,
+                2,
+                3,
+                color
+            );
+
+
+        }
+    }
     
     public void DrawWidgetBackground(Widget widget, GeometryHelper geometryHelper)
     {
         if (widget is InputField inputField)
             DrawInputField(inputField, geometryHelper);
+        else if (widget is IWindowTab tab)
+            DrawWindowTab(widget, tab, geometryHelper);
+        else if (widget is DecorativeBlock box)
+            DrawDecorativeBlock(box, geometryHelper);
         else
         {
             WidgetBackgrounds background = widget.GetCustomProperty<WidgetBackgrounds>();
@@ -93,8 +171,17 @@ public class SociallyDistantVisualStyle : IVisualStyle
                 case WidgetBackgrounds.StatusBar:
                     DrawStatusBar(widget, geometryHelper);
                     break;
+                case WidgetBackgrounds.Overlay:
+                    geometryHelper.AddQuad(widget.ContentArea, mainBackground * 0.67f);
+                    break;
                 case WidgetBackgrounds.Dock:
                     DrawDock(widget, geometryHelper);
+                    break;
+                case WidgetBackgrounds.WindowClient:
+                    geometryHelper.AddQuad(widget.ContentArea, mainBackground);
+                    break;
+                case WidgetBackgrounds.WindowBorder:
+                    geometryHelper.AddQuadOutline(widget.ContentArea, 1, accentPrimary);
                     break;
             }
         }
@@ -139,6 +226,9 @@ public enum InputFieldStyle
 public enum WidgetBackgrounds
 {
     None,
+    Overlay,
     StatusBar,
-    Dock
+    Dock,
+    WindowClient,
+    WindowBorder,
 }

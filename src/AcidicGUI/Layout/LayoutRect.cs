@@ -14,6 +14,7 @@ public struct LayoutRect
 
     public Vector2 TopLeft => new Vector2(Left, Top);
     public Vector2 Size => new Vector2(Width, Height);
+    public Vector2 Center => TopLeft + (Size / 2);
     
     public LayoutRect(float left, float top, float width, float height)
     {

@@ -1,5 +1,6 @@
 ﻿#nullable enable
 
+using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 
 namespace SociallyDistant.Core.Shell.Common
@@ -9,7 +10,7 @@ namespace SociallyDistant.Core.Shell.Common
 	{
 		public string textIcon;
 		public Texture2D? spriteIcon;
-		public ShellColor iconColor;
+		public Color? iconColor;
 		
 		public static implicit operator CompositeIcon(string unicodeTextIcon)
 		{
@@ -17,7 +18,7 @@ namespace SociallyDistant.Core.Shell.Common
 			{
 				textIcon = unicodeTextIcon,
 				spriteIcon = null,
-				iconColor = new ShellColor(1, 1, 1, 1)
+				iconColor = null
 			};
 		}
 	}

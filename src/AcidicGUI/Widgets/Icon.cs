@@ -6,7 +6,7 @@ namespace AcidicGUI.Widgets;
 
 public sealed class Icon : Widget
 {
-    private Color color = Color.White;
+    private Color? color;
     private string iconString = string.Empty;
     private int iconSize = 24;
 
@@ -30,7 +30,7 @@ public sealed class Icon : Widget
         }
     }
 
-    public Color Color
+    public Color? Color
     {
         get => color;
         set
@@ -59,6 +59,6 @@ public sealed class Icon : Widget
         if (font == null)
             return;
         
-        font.Draw(geometry, new Vector2(x, y), color, iconString, iconSize);
+        font.Draw(geometry, new Vector2(x, y), color ?? Microsoft.Xna.Framework.Color.White, iconString, iconSize);
     }
 }

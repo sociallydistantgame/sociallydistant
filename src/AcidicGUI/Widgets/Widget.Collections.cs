@@ -124,9 +124,15 @@ public partial class Widget
             if (item.Parent != this.parent)
                 throw new InvalidOperationException("The specified widget is not a member of this parent.");
 
-            item.parent = null;
-            this.parent.InvalidateLayout();
-            return children.Remove(item);
+            bool wasSuccess = children.Remove(item);
+
+            if (wasSuccess)
+            {
+                item.parent = null;
+                this.parent.InvalidateLayout();
+            }
+
+            return wasSuccess;
         }
 
         public int Count => children.Count;

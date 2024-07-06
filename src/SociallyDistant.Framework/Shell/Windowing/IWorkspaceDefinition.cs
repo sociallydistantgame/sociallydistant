@@ -5,6 +5,5 @@
 		IReadOnlyList < IWindow > WindowList { get; }
 
 		IFloatingGui CreateFloatingGui(string title);
-		IMessageDialog CreateMessageDialog(string title);
 	}
 }

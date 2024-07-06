@@ -2,6 +2,7 @@
 
 using SociallyDistant.Core.Shell.Common;
 using SociallyDistant.Core.Shell.InfoPanel;
+using SociallyDistant.Core.Shell.Windowing;
 
 namespace SociallyDistant.Core.Shell
 {
@@ -15,5 +16,7 @@ namespace SociallyDistant.Core.Shell
 		IInfoPanelService InfoPanelService { get; }
 		
 		Task ShowInfoDialog(string title, string message);
+		
+		IMessageDialog CreateMessageDialog(string title);
 	}
 }

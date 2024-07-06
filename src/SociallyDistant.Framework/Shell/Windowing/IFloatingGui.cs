@@ -3,6 +3,7 @@ using Microsoft.Xna.Framework;
 
 namespace SociallyDistant.Core.Shell.Windowing
 {
+	[Obsolete("IFloatingGui is being replaced with IWindowWithClient<T>.")]
 	public interface IFloatingGui : IWindow, IContentHolder
 	{
 		Vector2 MinimumSize { get; set; }

@@ -7,9 +7,12 @@ namespace AcidicGUI.Widgets;
 public sealed class Button : 
     ContentWidget,
     IMouseEnterHandler,
+    IMouseClickHandler,
     IMouseLeaveHandler
 {
     private bool hovered;
+
+    public event Action? Clicked;
     
     public void OnMouseEnter(MouseMoveEvent e)
     {
@@ -29,5 +32,14 @@ public sealed class Button :
         {
             geometry.AddQuad(ContentArea, Color.Red);
         }
+    }
+
+    public void OnMouseClick(MouseButtonEvent e)
+    {
+        if (e.Button != MouseButton.Left)
+            return;
+
+        e.Handle();
+        Clicked?.Invoke();
     }
 }

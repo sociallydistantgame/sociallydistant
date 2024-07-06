@@ -201,6 +201,9 @@ public partial class Widget
         
         contentSize.X += margin.Horizontal;
         contentSize.Y += margin.Vertical;
+        contentSize.X += padding.Horizontal;
+        contentSize.Y += padding.Vertical;
+        
         
         if (maximumSize.X > 0)
         {

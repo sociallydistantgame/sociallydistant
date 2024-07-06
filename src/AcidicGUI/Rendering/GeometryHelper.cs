@@ -59,6 +59,33 @@ public class GeometryHelper : IFontStashRenderer2
         AddRoundedRectangle(rectangle, uniformRadius, uniformRadius, uniformRadius, uniformRadius, color, texture);
     }
 
+    public void AddQuadOutline(LayoutRect rectangle, float thickness, Color color, Texture2D? texture = null)
+    {
+        float smallerHalf = Math.Min(rectangle.Width, rectangle.Height) / 2;
+        if (smallerHalf <= thickness)
+        {
+            AddQuad(rectangle, color, texture);
+            return;
+        }
+
+        var mesh = GetMeshBuilder(texture);
+
+        var tl = mesh.AddVertex(new Vector2(rectangle.Left, rectangle.Top), color);
+        var tr = mesh.AddVertex(new Vector2(rectangle.Right, rectangle.Top), color);
+        var bl = mesh.AddVertex(new Vector2(rectangle.Left, rectangle.Bottom), color);
+        var br = mesh.AddVertex(new Vector2(rectangle.Right, rectangle.Bottom), color);
+     
+        var tlInner = mesh.AddVertex(new Vector2(rectangle.Left + thickness, rectangle.Top + thickness), color);
+        var trInner = mesh.AddVertex(new Vector2(rectangle.Right - thickness, rectangle.Top + thickness), color);
+        var blInner = mesh.AddVertex(new Vector2(rectangle.Left + thickness, rectangle.Bottom - thickness), color);
+        var brInner = mesh.AddVertex(new Vector2(rectangle.Right - thickness, rectangle.Bottom - thickness), color);
+
+        mesh.AddQuad(tl, tr, tlInner, trInner);
+        mesh.AddQuad(tl, tlInner, bl, blInner);
+        mesh.AddQuad(trInner, tr, brInner, br);
+        mesh.AddQuad(blInner, brInner, bl, br);
+    }
+    
     public void AddQuad(LayoutRect rectangle, Color color, Texture2D? texture = null)
     {
         var mesh = GetMeshBuilder(texture);
