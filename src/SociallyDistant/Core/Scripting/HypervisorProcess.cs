@@ -60,13 +60,13 @@ namespace SociallyDistant.Core.Scripting
 		}
 		
 		/// <inheritdoc />
-		public async Task<ISystemProcess> Fork()
+		public ISystemProcess Fork()
 		{
-			return await ForkAsUser(user);
+			return ForkAsUser(user);
 		}
 
 		/// <inheritdoc />
-		public Task<ISystemProcess> ForkAsUser(IUser user)
+		public ISystemProcess ForkAsUser(IUser user)
 		{
 			var proc = new HypervisorProcess(idGenerator, user, this);
 
@@ -74,7 +74,7 @@ namespace SociallyDistant.Core.Scripting
 
 			proc.Killed += HandleKilled;
 
-			return Task.FromResult<ISystemProcess>(proc);
+			return proc;
 			
 			void HandleKilled(ISystemProcess killed)
 			{

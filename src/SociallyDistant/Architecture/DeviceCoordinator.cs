@@ -1,16 +1,23 @@
 ﻿#nullable enable
 using System.Diagnostics;
+using Microsoft.Xna.Framework;
 using Serilog;
 using SociallyDistant.Core.OS.Devices;
 using SociallyDistant.Core.OS.Tasks;
 
 namespace SociallyDistant.Architecture
 {
-	public class DeviceCoordinator : ITaskManager
+	internal sealed class DeviceCoordinator : 
+		GameComponent ,
+		ITaskManager
 	{
 		private readonly Dictionary<IComputer, IInitProcess> computers = new Dictionary<IComputer, IInitProcess>();
 		private readonly List<ISystemProcess> processes = new List<ISystemProcess>();
 
+		internal DeviceCoordinator(SociallyDistantGame game) : base(game)
+		{
+		}
+		
 		/// <inheritdoc />
 		public IEnumerable<ISystemProcess> GetTasksForUser(IUser user)
 		{
@@ -30,13 +37,13 @@ namespace SociallyDistant.Architecture
 		}
 
 		/// <inheritdoc />
-		public IInitProcess SetUpComputer(IComputer computer, IShellScript loginScript)
+		public IInitProcess SetUpComputer(IComputer computer)
 		{
 			// Throw if the computer is already set up.
 			if (computers.ContainsKey(computer))
 				throw new InvalidOperationException("The specified computer has already been registered with the device coordinator.");
 
-			var initProcess = new DeviceCoordinatorProcess(this, computer, loginScript);
+			var initProcess = new DeviceCoordinatorProcess(this, computer);
 			this.computers.Add(computer, initProcess);
 
 			DeclareProcess(initProcess);
@@ -78,7 +85,7 @@ namespace SociallyDistant.Architecture
 			if (!this.computers.TryGetValue(user.Computer, out IInitProcess initProcess) || initProcess is not DeviceCoordinatorProcess deviceCoordinatorProcess)
 				throw new InvalidOperationException("Computer is being used but was not set up with DeviceCoordinator.");
 
-			ISystemProcess loginProcess = await deviceCoordinatorProcess.CreateLoginProcess(user);
+			ISystemProcess loginProcess = deviceCoordinatorProcess.CreateLoginProcess(user);
 
 			foreach (string key in loginProcess.Environment.Keys)
 				process.Environment[key] = loginProcess.Environment[key];

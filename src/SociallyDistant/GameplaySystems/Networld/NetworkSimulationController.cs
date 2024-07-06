@@ -2,6 +2,7 @@
 {
 	public sealed class NetworkSimulationController
 	{
+		
 		private CoreRouter coreRouter;
 		private readonly SimulationThread simulation;
 		private readonly Dictionary<InternetServiceProvider, InternetServiceNode> isps = new Dictionary<InternetServiceProvider, InternetServiceNode>();
@@ -77,4 +78,6 @@
 			simulation.StopSimulation();
 		}
 	}
+	
+	
 }

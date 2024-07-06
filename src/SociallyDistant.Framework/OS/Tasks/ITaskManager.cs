@@ -10,7 +10,7 @@ namespace SociallyDistant.Core.OS.Tasks
 		IEnumerable<ISystemProcess> GetTasksOnComputer(IComputer computer);
 		IEnumerable<ISystemProcess> GetChildProcesses(ISystemProcess parent);
 
-		IInitProcess SetUpComputer(IComputer computer, IShellScript loginScript);
+		IInitProcess SetUpComputer(IComputer computer);
 	}
 
 	public interface IShellScript

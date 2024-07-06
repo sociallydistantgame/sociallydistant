@@ -17,8 +17,9 @@ namespace SociallyDistant.OS.Devices
 {
 	public class PlayerComputer : IComputer
 	{
+		private readonly DeviceCoordinator deviceCoordinator;
 		private readonly SociallyDistantGame gameManager;
-		private readonly FileSystemTableAsset fstab;
+		private readonly IFileSystemTable fstab;
 		private readonly IUser su;
 		private readonly PlayerFileOverrider fileOverrider;
 		private readonly SettingsFileSystem settingsFileSystem;
@@ -27,7 +28,7 @@ namespace SociallyDistant.OS.Devices
 		private PlayerUser playerUser;
 		private PlayerFileSystem? playerFileSystem;
 		private LocalAreaNetwork playerLan;
-		private ISystemProcess? initProcess;
+		private IInitProcess initProcess;
 		private ISystemProcess? systemd;
 		private PlayerInfo playerInfo;
 
@@ -36,9 +37,12 @@ namespace SociallyDistant.OS.Devices
 		public PlayerUser PlayerUser => playerUser;
 		private OperatingSystemScript loginScript = null!;
 		private IDisposable playerInfoObserver;
+
+		public IInitProcess InitProcess => initProcess;
 		
-		internal PlayerComputer(SociallyDistantGame gameManager, LocalAreaNetwork playerLan, PlayerFileOverrider fileOverrider, OperatingSystemScript loginScript, FileSystemTableAsset fstab)
+		internal PlayerComputer(SociallyDistantGame gameManager, DeviceCoordinator deviceCoordinator, LocalAreaNetwork playerLan, PlayerFileOverrider fileOverrider, OperatingSystemScript loginScript, IFileSystemTable fstab)
 		{
+			this.deviceCoordinator = deviceCoordinator;
 			this.fstab = fstab;
 			this.loginScript = loginScript;
 			this.playerLan = playerLan;
@@ -54,6 +58,7 @@ namespace SociallyDistant.OS.Devices
 			this.AddUser(this.playerUser);
 
 			this.RebuildVfs();
+			this.SetupInitProcess();
 			
 			this.playerInfoObserver = gameManager.PlayerInfoObservable.Subscribe(OnPlayerInfoChanged);
 		}
@@ -137,7 +142,7 @@ namespace SociallyDistant.OS.Devices
 		/// <inheritdoc />
 		public async Task<ISystemProcess?> CreateDaemonProcess(string name)
 		{
-			ISystemProcess? result = await systemd?.Fork();
+			ISystemProcess? result = systemd?.Fork();
 			if (result != null)
 				result.Name = name;
 
@@ -150,13 +155,13 @@ namespace SociallyDistant.OS.Devices
 			this.usernameMap.Add(user.UserName, user.Id);
 		}
 
-		internal async Task SetInitProcess(ISystemProcess? initProcess)
+		private void SetupInitProcess()
 		{
 			if (this.initProcess != null)
 				throw new InvalidOperationException("You already fucking did this, ya dummy");
 
-			this.initProcess = initProcess;
-			this.systemd = await this.initProcess.Fork();
+			this.initProcess = deviceCoordinator.SetUpComputer(this);
+			this.systemd = this.initProcess.Fork();
 			systemd.Name = "systemd";
 
 		}

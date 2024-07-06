@@ -15,8 +15,8 @@ namespace SociallyDistant.Core.OS.Devices
 		
 		event Action<ISystemProcess>? Killed;
 
-		Task<ISystemProcess> Fork();
-		Task<ISystemProcess> ForkAsUser(IUser user);
+		ISystemProcess Fork();
+		ISystemProcess ForkAsUser(IUser user);
 
 		
 		void Kill(int exitCode = 0);

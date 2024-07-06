@@ -38,7 +38,7 @@ namespace SociallyDistant.Architecture
 		/// <inheritdoc />
 		public IEnvironmentVariableProvider Environment { get; }
 		
-		public SystemProcess(UniqueIntGenerator pidGenerator, DeviceCoordinator coordinator, ISystemProcess parent, IUser user)
+		internal SystemProcess(UniqueIntGenerator pidGenerator, DeviceCoordinator coordinator, ISystemProcess parent, IUser user)
 		{
 			this.pidGenerator = pidGenerator;
 			this.coordinator = coordinator;
@@ -53,21 +53,21 @@ namespace SociallyDistant.Architecture
 		}
 		
 		/// <inheritdoc />
-		public Task<ISystemProcess> Fork()
+		public ISystemProcess Fork()
 		{
-			return Task.FromResult<ISystemProcess>(new SystemProcess(
+			return new SystemProcess(
 				pidGenerator,
 				coordinator,
 				this,
 				User
-			));
+			);
 		}
 		
 		/// <inheritdoc />
-		public async Task<ISystemProcess> ForkAsUser(IUser user)
+		public ISystemProcess ForkAsUser(IUser user)
 		{
 			if (user == User)
-				return await Fork();
+				return Fork();
 			
 			// Prevent users not from the same computer from
 			// executing processes on it.
@@ -76,7 +76,7 @@ namespace SociallyDistant.Architecture
 
 			IUser previousUser = this.User;
 			this.User = user;
-			ISystemProcess forked = await Fork();
+			ISystemProcess forked = Fork();
 
 			this.User = previousUser;
 

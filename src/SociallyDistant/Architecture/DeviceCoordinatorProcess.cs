@@ -14,7 +14,6 @@ namespace SociallyDistant.Architecture
 		private readonly DeviceCoordinator coordinator;
 		private readonly UniqueIntGenerator pidGenerator = new UniqueIntGenerator();
 		private readonly SimpleEnvironmentVariableProvider environment = new SimpleEnvironmentVariableProvider();
-		private readonly IShellScript loginScript;
 		private bool isAlive = true;
 		private int exitCode;
 
@@ -45,12 +44,11 @@ namespace SociallyDistant.Architecture
 		/// <inheritdoc />
 		public IEnumerable<ISystemProcess> Children => coordinator.GetChildProcesses(this);
 
-		public DeviceCoordinatorProcess(DeviceCoordinator coordinator, IComputer computer, IShellScript loginScript)
+		internal DeviceCoordinatorProcess(DeviceCoordinator coordinator, IComputer computer)
 		{
 			this.Id = pidGenerator.GetNextValue();
 			Name = "init";
 			this.coordinator = coordinator;
-			this.loginScript = loginScript;
 			
 			// Find a root user, throw if we can't.
 			if (!computer.FindUserById(0, out IUser? root) || root == null)
@@ -63,13 +61,13 @@ namespace SociallyDistant.Architecture
 		}
 		
 		/// <inheritdoc />
-		public async Task<ISystemProcess> Fork()
+		public ISystemProcess Fork()
 		{
-			return await ForkAsUser(this.User);
+			return ForkAsUser(this.User);
 		}
 		
 		/// <inheritdoc />
-		public async Task<ISystemProcess> ForkAsUser(IUser user)
+		public ISystemProcess ForkAsUser(IUser user)
 		{
 			// Prevent users not from the same computer from
 			// executing processes on it.
@@ -77,26 +75,17 @@ namespace SociallyDistant.Architecture
 				throw new InvalidOperationException("An invalid attempt was made to execute a process on one computer by the user of another computer.");
 
 
-			ISystemProcess loginProcess = await CreateLoginProcess(user);
+			ISystemProcess loginProcess = CreateLoginProcess(user);
 
-			return await loginProcess.Fork();
+			return loginProcess.Fork();
 		}
 
 		/// <inheritdoc />
-		public async Task<ISystemProcess> CreateLoginProcess(IUser user)
+		public ISystemProcess CreateLoginProcess(IUser user)
 		{
 			if (!userProcesses.TryGetValue(user, out ISystemProcess userProcess))
 			{
 				userProcess = new LoginProcess(pidGenerator, coordinator, this, user);
-
-				if (loginScript == null)
-				{
-					Log.Warning("loginScript is null for this device, users won't get any default settings.");
-				}
-				else
-				{
-					await loginScript.Run(userProcess, Array.Empty<string>(), new UnityTextConsole());
-				}
 
 				this.userProcesses.Add(user, userProcess);			
 				

@@ -29,7 +29,7 @@ namespace SociallyDistant.Architecture
 		
 		public string WorkingDirectory { get; set; }
 		
-		public LoginProcess(UniqueIntGenerator pidGenerator, DeviceCoordinator coordinator, ISystemProcess parent, IUser loginUser)
+		internal LoginProcess(UniqueIntGenerator pidGenerator, DeviceCoordinator coordinator, ISystemProcess parent, IUser loginUser)
 		{
 			Id = pidGenerator.GetNextValue();
 			Name = "syslogin";
@@ -56,21 +56,21 @@ namespace SociallyDistant.Architecture
 		}
 
 		/// <inheritdoc />
-		public Task<ISystemProcess> Fork()
+		public ISystemProcess Fork()
 		{
-			return Task.FromResult<ISystemProcess>(new SystemProcess(
+			return new SystemProcess(
 				pidGenerator,
 				coordinator,
 				this,
 				User
-			));
+			);
 		}
 
 		/// <inheritdoc />
-		public async Task<ISystemProcess> ForkAsUser(IUser user)
+		public ISystemProcess ForkAsUser(IUser user)
 		{
 			if (user == User)
-				return await Fork();
+				return Fork();
 			
 			// Prevent users not from the same computer from
 			// executing processes on it.
@@ -79,7 +79,7 @@ namespace SociallyDistant.Architecture
 
 			IUser previousUser = this.User;
 			this.User = user;
-			ISystemProcess forked = await Fork();
+			ISystemProcess forked = Fork();
 
 			this.User = previousUser;
 			return forked;

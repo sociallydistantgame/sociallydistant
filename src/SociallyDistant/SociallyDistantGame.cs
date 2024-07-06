@@ -26,8 +26,10 @@ using SociallyDistant.Core.UI;
 using SociallyDistant.DevTools;
 using SociallyDistant.GamePlatform;
 using SociallyDistant.GamePlatform.ContentManagement;
+using SociallyDistant.GameplaySystems.Networld;
 using SociallyDistant.GameplaySystems.Social;
 using SociallyDistant.Modding;
+using SociallyDistant.Player;
 using SociallyDistant.UI;
 using SociallyDistant.UI.Backdrop;
 
@@ -56,8 +58,11 @@ internal sealed class SociallyDistantGame :
 	private readonly WorldManager worldManager;
 	private readonly SocialService socialService;
 	private readonly UriManager uriManager;
+	private readonly PlayerManager playerManager;
+	private readonly NetworkController network;
 	private readonly ContentManager contentManager;
 	private readonly SettingsManager settingsManager;
+	private readonly DeviceCoordinator deviceCoordinator;
 	private readonly ScriptSystem scriptSystem;
 	private readonly VertexPositionColorTexture[] virtualScreenVertices = new VertexPositionColorTexture[4];
 	private readonly int[] virtualScreenIndices = new[] { 0, 1, 2, 2, 1, 3 };
@@ -149,11 +154,15 @@ internal sealed class SociallyDistantGame :
 		this.contentManager = new ContentManager(this, contentPipeline);
 		this.moduleManager = new ModuleManager(this);
 		this.worldManager = new WorldManager(this);
+		this.network = new NetworkController(this);
 		this.uriManager = new UriManager(this);
 		this.scriptSystem = new ScriptSystem(this);
 		this.socialService = new SocialService();
 		this.gui = new GuiService(this);
+		this.deviceCoordinator = new DeviceCoordinator(this);
 
+		Components.Add(deviceCoordinator);
+		Components.Add(network);
 		Components.Add(backdrop);
 		Components.Add(backdropUpdater);
 		Components.Add(gui);
@@ -162,6 +171,10 @@ internal sealed class SociallyDistantGame :
 		Components.Add(guiController);
 		Components.Add(devTools);
 
+		var playerLan = network.Simulation.CreateLocalAreaNetwork();
+
+		this.playerManager = new PlayerManager(this, deviceCoordinator, playerLan);
+		
 		IsMouseVisible = true;
 
 		graphicsManager.HardwareModeSwitch = false;

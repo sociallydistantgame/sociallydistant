@@ -43,9 +43,9 @@ namespace SociallyDistant.GameplaySystems.NonPlayerComputers
 			this.su = new SuperUser(this);
 			RebuildVfs();
 			
-			this.initProcess = this.deviceCoordinator.SetUpComputer(this, null);
+			this.initProcess = this.deviceCoordinator.SetUpComputer(this);
 			this.initProcess.Environment["PS1"] = "[%u@%h %W]%$ ";
-			this.systemd = await this.initProcess.Fork();
+			this.systemd = this.initProcess.Fork();
 			this.systemd.Name = "systemd";
 			
 			// Apply environment variables to the system
@@ -111,7 +111,7 @@ namespace SociallyDistant.GameplaySystems.NonPlayerComputers
 		/// <inheritdoc />
 		public async Task<ISystemProcess?> CreateDaemonProcess(string name)
 		{
-			ISystemProcess? result = await systemd?.Fork();
+			ISystemProcess? result = systemd?.Fork();
 			if (result != null)
 				result.Name = name;
 			return result;

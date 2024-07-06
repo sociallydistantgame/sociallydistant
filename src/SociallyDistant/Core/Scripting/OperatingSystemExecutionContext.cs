@@ -144,7 +144,7 @@ namespace SociallyDistant.Core.Scripting
 				return null;
 
 			var consoleWrapper = new ConsoleWrapper(console);
-			ISystemProcess commandProcess = await process.Fork();
+			ISystemProcess commandProcess = process.Fork();
 
 			if (command.AdminRequired && commandProcess.User.PrivilegeLevel != PrivilegeLevel.Root)
 			{

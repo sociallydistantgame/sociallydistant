@@ -229,7 +229,7 @@ namespace SociallyDistant.OS.FileSystems
 			if (file == null)
 				throw new FileNotFoundException();
 
-			ISystemProcess fork = await parentProcess.Fork();
+			ISystemProcess fork = parentProcess.Fork();
 			if (!await file.TryExecute(fork, console, arguments))
 			{
 				fork.Kill();

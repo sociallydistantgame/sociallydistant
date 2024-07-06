@@ -14,12 +14,12 @@ namespace SociallyDistant.Core.OS.Devices
 		protected INetworkConnection? Network => Computer.Network;
 		public IVirtualFileSystem FileSystem => Computer.GetFileSystem(User);
 
-		public async Task<ISystemProcess> Fork(IUser? forkUser = null)
+		public ISystemProcess Fork(IUser? forkUser = null)
 		{
 			if (forkUser != null)
-				return await process.ForkAsUser(forkUser);
+				return process.ForkAsUser(forkUser);
 
-			return await process.Fork();
+			return process.Fork();
 		}
 		
 		public NetworkService(ISystemProcess process)

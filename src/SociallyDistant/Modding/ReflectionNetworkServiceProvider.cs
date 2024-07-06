@@ -24,7 +24,7 @@ namespace SociallyDistant.Modding
 
 			Task.Run(async () =>
 			{
-				fork = await initProcess.Fork();
+				fork = initProcess.Fork();
 			}).Wait();
 			
 			INetworkService service = (INetworkService) Activator.CreateInstance(type, fork!);
