@@ -8,7 +8,8 @@ namespace SociallyDistant.DevTools;
 public class DevToolsManager : DrawableGameComponent
 {
     private readonly DeveloperMenu devMenu;
-    
+
+    private KeyboardState? lastKeyboard;
     private ImGuiRenderer? guiRenderer;
     
     public DevToolsManager(Game game) : base(game)
@@ -33,9 +34,17 @@ public class DevToolsManager : DrawableGameComponent
     {
         var keyboard = Keyboard.GetState();
 
-        if (keyboard.IsKeyDown(Keys.OemTilde))
-            devMenu.ToggleVisible();
-        
+        if (keyboard != lastKeyboard)
+        {
+            if (keyboard.IsKeyDown(Keys.OemTilde))
+                devMenu.ToggleVisible();
+            if (keyboard.IsKeyDown(Keys.F9))
+                devMenu.ToggleGuiInspector();
+
+
+            lastKeyboard = keyboard;
+        }
+
         base.Update(gameTime);
     }
 

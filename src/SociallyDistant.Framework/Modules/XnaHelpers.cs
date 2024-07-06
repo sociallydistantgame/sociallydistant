@@ -4,11 +4,6 @@ namespace SociallyDistant.Core.Modules;
 
 public static class XnaHelpers
 {
-    public static void MustGetComponent<T>(this IGameContext context, out T requiredComponent) 
-    {
-        requiredComponent = MustGetComponent<T>(context);
-    }
-    
     public static void MustGetComponent<T>(this GameComponent context, out T requiredComponent) 
     {
         requiredComponent = MustGetComponent<T>(context);
@@ -19,11 +14,6 @@ public static class XnaHelpers
         requiredComponent = MustGetComponent<T>(context);
     }
     
-    public static T MustGetComponent<T>(this IGameContext game)
-    {
-        return MustGetComponent<T>(game.GameInstance);
-    }
-		
     public static T MustGetComponent<T>(this GameComponent component)
     {
         return MustGetComponent<T>(component.Game);

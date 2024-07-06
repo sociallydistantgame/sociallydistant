@@ -5,7 +5,10 @@ using ImGuiNET;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using MonoGame.ImGuiNet;
+using SociallyDistant.Core.Modules;
+using SociallyDistant.Core.UI;
 using SociallyDistant.DevTools.Social;
+using SociallyDistant.UI;
 
 namespace SociallyDistant.DevTools
 {
@@ -17,7 +20,9 @@ namespace SociallyDistant.DevTools
 		private readonly Stack<IDevMenu> menuStack = new Stack<IDevMenu>();
 		private IDevMenu? currentMenu;
 		private bool showDevTools;
+		private bool showGuiInspector;
 		private Vector2 scrollPosition;
+		private GuiService guiController;
 
 		internal DeveloperMenu()
 		{
@@ -26,6 +31,8 @@ namespace SociallyDistant.DevTools
 
 		internal void Initialize()
 		{
+			gameManager.MustGetComponent(out guiController);
+			
 			menus.Add(new SettingsDebugMenu());
 			menus.Add(new UriRunnerMenu(gameManager));
 			menus.Add(new GameManagerDebug(gameManager));
@@ -40,6 +47,11 @@ namespace SociallyDistant.DevTools
 			this.showDevTools = !showDevTools;
 		}
 
+		public void ToggleGuiInspector()
+		{
+			showGuiInspector = !showGuiInspector;
+		}
+		
 		public void PushMenu(IDevMenu menu)
 		{
 			if (this.currentMenu != null)
@@ -58,9 +70,12 @@ namespace SociallyDistant.DevTools
 
 		internal void OnGUI()
 		{
+			if (showGuiInspector && guiController != null)
+				GuiInspector.DoImgui(guiController);
+			
 			if (!showDevTools)
 				return;
-
+			
 			ImGui.Begin("Socially Distant Operator's Menu");
 
 			if (currentMenu != null)

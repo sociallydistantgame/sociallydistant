@@ -4,6 +4,14 @@ namespace AcidicGUI.Widgets;
 
 public partial class Widget
 {
+    public int ChildCount => Children.Count;
+    
+    public IEnumerable<Widget> EnumerateChildren()
+    {
+        foreach (Widget child in children)
+            yield return child;
+    }
+    
     public bool ContainsChild(Widget? widget)
     {
         if (widget == null)
@@ -85,6 +93,8 @@ public partial class Widget
 
             item.Parent = this.parent;
             this.children.Add(item);
+
+            this.parent.InvalidateLayout();
         }
 
         public void Clear()
@@ -92,9 +102,11 @@ public partial class Widget
             foreach (Widget item in children)
             {
                 item.Parent = null;
+                item.InvalidateLayout();
             }
 
             children.Clear();
+            this.parent.InvalidateLayout();
         }
 
         public bool Contains(Widget item)
@@ -113,6 +125,7 @@ public partial class Widget
                 throw new InvalidOperationException("The specified widget is not a member of this parent.");
 
             item.parent = null;
+            this.parent.InvalidateLayout();
             return children.Remove(item);
         }
 
@@ -147,6 +160,7 @@ public partial class Widget
         {
             Associate(item);
             topLevels.Add(item);
+            item.InvalidateLayout();
         }
 
         public void Clear()

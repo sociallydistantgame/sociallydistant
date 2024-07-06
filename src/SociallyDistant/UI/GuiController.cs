@@ -25,6 +25,8 @@ public class GuiController :
     private readonly StatusBar statusBar = new();
     private readonly Box mainBox = new();
     private readonly GuiService guiService;
+
+    private Desktop? desktop;
     
     public GuiController(IGameContext game) : base(game.GameInstance)
     {
@@ -48,7 +50,15 @@ public class GuiController :
 
     private void OnGameModeChanged(GameMode gameMode)
     {
-        
+        if (gameMode == GameMode.OnDesktop)
+        {
+            this.desktop = new Desktop();
+            this.mainBox.Content = desktop;
+        }
+        else
+        {
+            desktop?.Dispose();
+        }
     }
 
     public INotificationManager NotificationManager => notificationManager;
