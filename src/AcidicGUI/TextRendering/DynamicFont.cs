@@ -24,8 +24,8 @@ internal sealed class DynamicFont : Font
         return fontSystem.GetFont(fontSize).MeasureString(text);
     }
 
-    public override void Draw(GeometryHelper geometryHelper, Vector2 position, Color color, string text)
+    public override void Draw(GeometryHelper geometryHelper, Vector2 position, Color color, string text, int? fontSize)
     {
-        fontSystem.GetFont(fontSize).DrawText(geometryHelper, text, position, color);
+        fontSystem.GetFont(fontSize ?? this.fontSize).DrawText(geometryHelper, text, position, color);
     }
 }

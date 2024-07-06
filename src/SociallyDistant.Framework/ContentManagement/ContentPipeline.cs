@@ -25,7 +25,15 @@ public sealed class ContentPipeline : Microsoft.Xna.Framework.Content.ContentMan
         foreach (string asset in assets)
             yield return Load<T>(asset);
     }
-    
+
+    public override T Load<T>(string assetName)
+    {
+        if (typeof(T).IsAssignableFrom(typeof(Stream)))
+            return (T) (object) OpenStream(assetName);
+        
+        return base.Load<T>(assetName + ".xnb");
+    }
+
     public void AddDirectoryContentSource(string mountPoint, string hostDirectory)
     {
         if (!Directory.Exists(hostDirectory))
@@ -43,7 +51,7 @@ public sealed class ContentPipeline : Microsoft.Xna.Framework.Content.ContentMan
     
     protected override Stream OpenStream(string assetName)
     {
-        return vfs.OpenRead(assetName + ".xnb");
+        return vfs.OpenRead(assetName);
     }
 
     private void DiscoverAssets(string directory)

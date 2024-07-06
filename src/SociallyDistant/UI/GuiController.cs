@@ -5,10 +5,12 @@ using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using SociallyDistant.Core.Core;
 using SociallyDistant.Core.Modules;
+using SociallyDistant.Core.OS.Devices;
 using SociallyDistant.Core.Shell;
 using SociallyDistant.Core.Shell.Common;
 using SociallyDistant.Core.Shell.InfoPanel;
 using SociallyDistant.Core.UI;
+using SociallyDistant.Player;
 using SociallyDistant.UI.Common;
 using SociallyDistant.UI.InfoWidgets;
 using SociallyDistant.UI.Shell;
@@ -25,11 +27,19 @@ public class GuiController :
     private readonly StatusBar statusBar = new();
     private readonly Box mainBox = new();
     private readonly GuiService guiService;
+    private readonly PlayerManager playerManager;
+    private readonly DesktopController desktopController;
 
     private Desktop? desktop;
     
-    public GuiController(IGameContext game) : base(game.GameInstance)
+    public StatusBar StatusBar => statusBar;
+    
+    public GuiController(IGameContext game, PlayerManager playerManager) : base(game.GameInstance)
     {
+        this.playerManager = playerManager;
+
+        this.desktopController = new DesktopController(this, this.playerManager);
+        
         game.GameInstance.MustGetComponent(out guiService);
         game.GameModeObservable.Subscribe(OnGameModeChanged);
 
@@ -52,8 +62,10 @@ public class GuiController :
     {
         if (gameMode == GameMode.OnDesktop)
         {
-            this.desktop = new Desktop();
+            this.desktop = new Desktop(desktopController);
             this.mainBox.Content = desktop;
+
+            desktopController.Login();
         }
         else
         {
@@ -67,5 +79,29 @@ public class GuiController :
     public async Task ShowInfoDialog(string title, string message)
     {
         // TODO
+    }
+}
+
+internal sealed class DesktopController
+{
+    private readonly PlayerManager playerManager;
+    private readonly GuiController guiController;
+    
+    private IUser? loginUser;
+    private ISystemProcess loginProcess;
+    
+    
+    public DesktopController(GuiController gui, PlayerManager player)
+    {
+        this.guiController = gui;
+        this.playerManager = player;
+    }
+
+    public void Login()
+    {
+        loginUser = playerManager.PlayerUser;
+        loginProcess = playerManager.InitProcess.CreateLoginProcess(loginUser);
+
+        guiController.StatusBar.User = loginUser;
     }
 }

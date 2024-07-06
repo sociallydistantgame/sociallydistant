@@ -15,8 +15,11 @@ public class SociallyDistantVisualStyle : IVisualStyle
     private readonly Color mainBackground = new Color(0x11, 0x13, 0x15);
     private readonly Color statusBarColor = new Color(0x01,0x22, 0x37, 0xff);
 
-    private Font defaultFont = null!; 
+    private Font iconFont;
+    private Font defaultFont = null!;
 
+    public Font? IconFont => iconFont;
+    
     public SociallyDistantVisualStyle(IGameContext game)
     {
         this.game = game;
@@ -24,6 +27,11 @@ public class SociallyDistantVisualStyle : IVisualStyle
 
     internal void LoadContent()
     {
+        iconFont = Font.FromTtfStream(
+            game.GameInstance.Content.Load<Stream>("/Core/UI/Fonts/MaterialIcons-Regular.ttf"),
+            256
+        );
+        
         defaultFont = game.GameInstance.Content.Load<SpriteFont>("/Core/UI/Fonts/Rajdhani");
     }
     

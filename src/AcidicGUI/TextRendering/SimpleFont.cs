@@ -29,8 +29,10 @@ internal sealed class SimpleFont : Font
         return spriteFont.MeasureString(text);
     }
 
-    public override unsafe void Draw(GeometryHelper geometryHelper, Vector2 position, Color color, string text)
+    public override unsafe void Draw(GeometryHelper geometryHelper, Vector2 position, Color color, string text, int? fontSize)
     {
+        // TODO: Handle font sizes. Intention is to use scaling, even if it looks horrible.
+        
         // This is basically SpriteBatch.DrawString() but without the SpriteBatch part.
         var mesh = geometryHelper.GetMeshBuilder(spriteFont.Texture);
 

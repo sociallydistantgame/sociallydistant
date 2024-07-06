@@ -35,6 +35,8 @@ namespace SociallyDistant.Player
 			}
 		}
 
+		public IUser PlayerUser => this.computer.PlayerUser;
+		
 		public IInitProcess InitProcess => computer.InitProcess;
 		public IComputer Computer => computer;
 		public ISkillTree SkillTree => skillTree;

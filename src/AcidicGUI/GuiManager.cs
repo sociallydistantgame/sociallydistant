@@ -27,6 +27,7 @@ public sealed class GuiManager : IFontProvider
     private Widget? widgetBeingDragged;
     private Widget? keyboardFocus;
     private MouseState? previousMouseState;
+    private bool reachedFirstUpdate;
 
     public bool IsRendering => isRendering;
     public IOrderedCollection<Widget> TopLevels => topLevels;
@@ -122,6 +123,8 @@ public sealed class GuiManager : IFontProvider
     
     public void UpdateLayout()
     {
+        reachedFirstUpdate = true;
+        
         var mustRebuildLayout = false;
         var tolerance = 0.001f;
 
@@ -171,6 +174,9 @@ public sealed class GuiManager : IFontProvider
 
     internal void SubmitForLayoutUpdateInternal(Widget widget)
     {
+        if (!reachedFirstUpdate)
+            return;
+        
         if (widget.Parent != null)
         {
             widget.UpdateLayout(context, widget.ContentArea);

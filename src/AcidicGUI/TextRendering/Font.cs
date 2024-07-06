@@ -9,7 +9,7 @@ public abstract class Font : IDisposable
     private bool disposed = false;
 
     public abstract Vector2 Measure(string text);
-    public abstract void Draw(GeometryHelper geometryHelper, Vector2 position, Color color, string text);
+    public abstract void Draw(GeometryHelper geometryHelper, Vector2 position, Color color, string text, int? fontSize = null);
     
     public static Font FromTtfFile(string filePath, int fontSize)
     {

@@ -8,6 +8,7 @@ namespace AcidicGUI.VisualStyles;
 
 internal sealed class FallbackVisualStyle : IVisualStyle
 {
+    public Font? IconFont => null;
     public Font? FallbackFont { get; set; }
     
     public Font GetFont(FontPreset presetFont)

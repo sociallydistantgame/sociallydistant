@@ -7,6 +7,8 @@ namespace AcidicGUI.VisualStyles;
 
 public interface IVisualStyle : IFontProvider
 {
+    Font? IconFont { get; }
+    
     float ScrollBarSize { get; }
     
     void DrawWidgetBackground(Widget widget, GeometryHelper geometryHelper);

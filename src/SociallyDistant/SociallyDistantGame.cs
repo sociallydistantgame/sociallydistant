@@ -167,13 +167,14 @@ internal sealed class SociallyDistantGame :
 		Components.Add(backdropUpdater);
 		Components.Add(gui);
 		
-		this.guiController = new GuiController(this);
+		var playerLan = network.Simulation.CreateLocalAreaNetwork();
+		this.playerManager = new PlayerManager(this, deviceCoordinator, playerLan);
+		
+		this.guiController = new GuiController(this, playerManager);
 		Components.Add(guiController);
 		Components.Add(devTools);
 
-		var playerLan = network.Simulation.CreateLocalAreaNetwork();
 
-		this.playerManager = new PlayerManager(this, deviceCoordinator, playerLan);
 		
 		IsMouseVisible = true;
 
