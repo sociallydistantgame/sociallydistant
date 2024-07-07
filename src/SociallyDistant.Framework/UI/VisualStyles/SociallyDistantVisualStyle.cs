@@ -17,21 +17,21 @@ namespace SociallyDistant.Core.UI.VisualStyles;
 public class SociallyDistantVisualStyle : IVisualStyle
 {
     private readonly IGameContext game;
-    private readonly Color mainBackground = new Color(0x11, 0x13, 0x15);
-    private readonly Color statusBarColor = new Color(0x01,0x22, 0x37, 0xff);
-    private readonly Color accentPrimary = new Color(0x13, 0x85, 0xC3, 0xff);
-    private readonly Color accentEvil = new(0xDE, 0x17, 0x17);
-    private readonly Color accentWarning = new Color(0xE0, 0x86, 0x17);
-    private readonly Color accentSuccess = new Color(0x17, 0x82, 0x0E);
-    private readonly Color accentCyberspace = new Color(0x34, 0xB1, 0xFD);
 
-    // Tabs - Inactive
+    private readonly Color mainBackground               = new Color(0x11, 0x13, 0x15);
+    private readonly Color statusBarColor               = new Color(0x01, 0x22, 0x37, 0xff);
+    private readonly Color accentPrimary                = new Color(0x13, 0x85, 0xC3, 0xff);
+    private readonly Color accentEvil                   = new(0xDE, 0x17, 0x17);
+    private readonly Color accentWarning                = new Color(0xE0, 0x86, 0x17);
+    private readonly Color accentSuccess                = new Color(0x17, 0x82, 0x0E);
+    private readonly Color accentCyberspace             = new Color(0x34, 0xB1, 0xFD);
+    private readonly Color fieldBackground              = new Color(0x25, 0x28, 0x2B);
+    private readonly Color fieldStroke                  = new Color(0x60, 0x64, 0x67);
     private readonly Color tabInactiveBackgroundDefault = new Color(0x44, 0x44, 0x44, 191);
-    private readonly Color tabInactiveBorderDefault = new Color(0x44, 0x44, 0x44);
-    
-    // Tabs - Active
-    private readonly Color tabActiveBackgroundDefault = new Color(0x16, 0x93, 0xD6, 190);
-    private readonly Color tabActiveBorderDefault = new Color(0x16, 0x93, 0xD6);
+    private readonly Color tabInactiveBorderDefault     = new Color(0x44, 0x44, 0x44);
+    private readonly Color tabActiveBackgroundDefault   = new Color(0x16, 0x93, 0xD6, 190);
+    private readonly Color tabActiveBorderDefault       = new Color(0x16, 0x93, 0xD6);
+    private readonly Color sectionTextColor             = new(0x85, 0x85, 0x85);
     
     private Font iconFont;
     private IFontFamily defaultFont = null!;
@@ -222,6 +222,8 @@ public class SociallyDistantVisualStyle : IVisualStyle
                     var commonColor = widget.GetCustomProperty<CommonColor>();
                     return GetCommonColor(commonColor);
                 }
+                case WidgetForegrounds.SectionTitle:
+                    return sectionTextColor;
             }
         }
 
@@ -257,6 +259,10 @@ public class SociallyDistantVisualStyle : IVisualStyle
                 case WidgetBackgrounds.WindowBorder:
                     geometryHelper.AddQuadOutline(widget.ContentArea, 1,
                         GetCommonColor(widget.GetCustomProperty<CommonColor>()));
+                    break;
+                case WidgetBackgrounds.FormField:
+                    geometryHelper.AddRoundedRectangle(widget.ContentArea, 3, fieldBackground);
+                    geometryHelper.AddRoundedRectangleOutline(widget.ContentArea, 1, 3, fieldStroke);
                     break;
             }
         }
@@ -307,10 +313,12 @@ public enum WidgetBackgrounds
     Dock,
     WindowClient,
     WindowBorder,
+    FormField
 }
 
 public enum WidgetForegrounds
 {
     Default,
-    Common
+    Common,
+    SectionTitle
 }

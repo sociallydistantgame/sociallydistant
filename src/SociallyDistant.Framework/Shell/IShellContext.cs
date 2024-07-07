@@ -18,5 +18,7 @@ namespace SociallyDistant.Core.Shell
 		Task ShowInfoDialog(string title, string message);
 		
 		IMessageDialog CreateMessageDialog(string title);
+
+		void OpenSettings();
 	}
 }

@@ -10,8 +10,6 @@ namespace UI.SystemSettings
 	{
 		private ListItemWithHeader view = null!;
 		private SettingsCategoryModel? model;
-
-		public Action<SettingsCategoryModel>? ClickCallback;
 		
 		/// <inheritdoc />
 		public override void CollectViews()
@@ -21,15 +19,6 @@ namespace UI.SystemSettings
 			view.Activator.onClick.AddListener(OnListItemClick);
 
 			base.CollectViews();
-		}
-
-		public void SetModel(SettingsCategoryModel model)
-		{
-			this.model = model;
-			view.Value = model.Title;
-			this.view.IsActive = model.IsActive;
-			view.Title = model.MetaTitle;
-			view.ShowTitle = model.ShowTitleArea;
 		}
 
 		private void OnListItemClick()

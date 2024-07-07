@@ -8,8 +8,8 @@ internal sealed class DesktopController
 {
     private readonly PlayerManager playerManager;
     private readonly GuiController guiController;
-    private readonly ToolManager toolManager;
-    private readonly DockModel dockModel = new();
+    private readonly ToolManager   toolManager;
+    private readonly DockModel     dockModel = new();
     
     private IUser? loginUser;
     private ISystemProcess loginProcess;

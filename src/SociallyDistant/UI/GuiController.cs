@@ -15,6 +15,7 @@ using SociallyDistant.Core.UI;
 using SociallyDistant.Player;
 using SociallyDistant.UI.Common;
 using SociallyDistant.UI.InfoWidgets;
+using SociallyDistant.UI.Settings;
 using SociallyDistant.UI.Shell;
 using SociallyDistant.UI.Windowing;
 
@@ -23,23 +24,30 @@ namespace SociallyDistant.UI;
 public class GuiController : GameComponent,
     IShellContext
 {
+    private readonly IGameContext        context;
     private readonly NotificationManager notificationManager;
-    private readonly InfoPanelController infoPanel          = new();
-    private readonly FlexPanel           mainPanel          = new();
-    private readonly StatusBar           statusBar          = new();
+    private readonly InfoPanelController infoPanel = new();
+    private readonly FlexPanel           mainPanel = new();
+    private readonly StatusBar           statusBar;
     private readonly OverlayWidget       workArea           = new();
     private readonly Box                 mainBox            = new();
     private readonly FloatingWorkspace   floatingWindowArea = new();
     private readonly GuiService          guiService;
     private readonly PlayerManager       playerManager;
     private readonly DesktopController   desktopController;
+    private readonly TrayModel           trayModel = new();
 
-    private Desktop? desktop;
+    private SystemSettingsController? systemSettings;
+    private Desktop?                  desktop;
 
     public StatusBar StatusBar => statusBar;
 
     public GuiController(IGameContext game, PlayerManager playerManager) : base(game.GameInstance)
     {
+        this.context = game;
+        
+        statusBar = new StatusBar(trayModel);
+        
         this.playerManager = playerManager;
 
         this.desktopController = new DesktopController(this, this.playerManager);
@@ -86,6 +94,8 @@ public class GuiController : GameComponent,
 
     private void OnGameModeChanged(GameMode gameMode)
     {
+        trayModel.UpdateGameMode(gameMode);
+        
         if (gameMode == GameMode.OnDesktop)
         {
             this.desktop = new Desktop(desktopController);
@@ -135,6 +145,33 @@ public class GuiController : GameComponent,
 
         void HandleDialogClosed(IWindow obj)
         {
+            workArea.ChildWidgets.Remove(overlay);
+        }
+    }
+
+    public void OpenSettings()
+    {
+        if (systemSettings != null)
+            return;
+        
+        var overlay = CreateOverlayWorkspace();
+        var window = overlay.CreateWindow("System Settings");
+
+        window.Icon = MaterialIcons.Settings;
+
+        systemSettings = new SystemSettingsController(window, this.context);
+
+        window.SetClient(systemSettings);
+        
+        window.WindowClosed += HandleSettingsClosed;
+
+        void HandleSettingsClosed(IWindow obj)
+        {
+            window.WindowClosed -= HandleSettingsClosed;
+
+            systemSettings?.Dispose();
+            systemSettings = null;
+
             workArea.ChildWidgets.Remove(overlay);
         }
     }

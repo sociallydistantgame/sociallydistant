@@ -4,7 +4,7 @@ public abstract class ContentWidget : Widget
 {
     private Widget? boxChild;
     
-    public Widget? Content
+    public virtual Widget? Content
     {
         get => boxChild;
         set

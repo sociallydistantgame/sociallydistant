@@ -15,6 +15,7 @@ using SociallyDistant.GameplaySystems.Missions;
 using SociallyDistant.GameplaySystems.Networld;
 using SociallyDistant.GameplaySystems.WebPages;
 using SociallyDistant.Modding;
+using SociallyDistant.UI;
 
 namespace SociallyDistant
 {
@@ -59,6 +60,7 @@ namespace SociallyDistant
 
 			// Game data
 			Context.ContentManager.AddContentGenerator(new LocalGameDataSource());
+			Context.ContentManager.AddContentGenerator(new TrayActionGenerator(Context));
 			
 			this.serviceGenerator = new NetworkServiceGenerator(Context.ModuleManager);
 			Context.ContentManager.AddContentGenerator(this.serviceGenerator);

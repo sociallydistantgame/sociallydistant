@@ -37,18 +37,19 @@ public sealed class ScrollView :
 
         // Figure out (roughly) how tall the inner content is, so we know if we should display a scrollbar.
         // If we do, then we will need to arrange children with that in mind (so scrollbar doesn't overlap them)
+        float minimumX = 0;
         foreach (Widget child in Children)
         {
             var childAvailable = new Vector2(availableSize.X, 0);
             var childSize = child.GetCachedContentSize(childAvailable);
 
             innerSize += childSize.Y;
+            minimumX = Math.Max(minimumX, childSize.X);
         }
 
         showScrollBar = innerSize > availableSize.Y;
-
-        // The size we just calculated doesn't matter for our own measurement, we're a layout root and must take all the space the parent gives us.
-        return availableSize;
+        
+        return new Vector2(MathF.Min(minimumX, availableSize.X), MathF.Min(innerSize, availableSize.Y));
     }
 
     protected override void ArrangeChildren(IGuiContext context, LayoutRect availableSpace)
@@ -111,7 +112,7 @@ public sealed class ScrollView :
     {
         e.Handle();
         
-        pageOffset = Math.Clamp(pageOffset + e.ScrollDelta, 0, innerSize - ContentArea.Height);
+        pageOffset = Math.Clamp(pageOffset + e.ScrollDelta, 0, Math.Max(innerSize - ContentArea.Height, 0));
         InvalidateLayout();
     }
 
