@@ -13,12 +13,13 @@ public abstract partial class Widget : IFontFamilyProvider
     private readonly Dictionary<Type, CustomPropertyObject> customProperties = new();
 
     private IVisualStyle? visualStyleOverride;
-    private Widget? parent;
-    private GuiManager? guiManager;
-    private GuiMesh? cachedGeometry;
-    private float renderOpacity = 1;
-    private bool enabled = true;
-    private ClippingMode clippingMode;
+    private Widget?       parent;
+    private GuiManager?   guiManager;
+    private GuiMesh?      cachedGeometry;
+    private float         renderOpacity = 1;
+    private bool          enabled       = true;
+    private ClippingMode  clippingMode;
+    private LayoutRect    clipRect;
 
     public bool IsFocused
     {
@@ -32,18 +33,8 @@ public abstract partial class Widget : IFontFamilyProvider
     }
 
     public bool IsChildFocused => IsFocused || children.Any(x => x.IsChildFocused);
-    
-    public LayoutRect ClippedContentArea
-    {
-        get
-        {
-            LayoutRect? clipRect = GetClippingRectangle();
-            if (clipRect == null)
-                return ContentArea;
 
-            return LayoutRect.GetIntersection(clipRect.Value, ContentArea);
-        }
-    }
+    public LayoutRect ClippedContentArea => clipRect;
     
     public ClippingMode ClippingMode
     {
@@ -202,7 +193,7 @@ public abstract partial class Widget : IFontFamilyProvider
         
         if (cachedGeometry == null)
         {
-            var geometryHelper = new GeometryHelper(renderer, ComputedOpacity, !HierarchyEnabled, GetClippingRectangle());
+            var geometryHelper = new GeometryHelper(renderer, ComputedOpacity, !HierarchyEnabled, clipRect);
             RebuildGeometry(geometryHelper);
             cachedGeometry = geometryHelper.ExportMesh();
         }

@@ -137,6 +137,9 @@ public class TextWidget : Widget
             var measurement = textElements[i].MeasuredSize.GetValueOrDefault();
             var wrap = wordWrapping && (lineWidth + measurement.X > wrapWidth) && wrapWidth > 0;
             
+            lineWidth += measurement.X;
+            lineHeight = Math.Max(lineHeight, measurement.Y);
+            
             if (newline || wrap)
             {
                 result.X = Math.Max(result.X, lineWidth);
@@ -144,9 +147,6 @@ public class TextWidget : Widget
                 lineHeight = 0;
                 lineWidth = 0;
             }
-
-            lineWidth += measurement.X;
-            lineHeight = Math.Max(lineHeight, measurement.Y);
         }
         
         result.Y += lineHeight;
@@ -190,9 +190,16 @@ public class TextWidget : Widget
 
     protected override void RebuildGeometry(GeometryHelper geometry)
     {
+        FontInfo? lastOverride = null;
+        IFontFamily? family = null;
+        
         foreach (TextElement element in textElements)
         {
-            var fontInstance = (element.MarkupData.FontOverride ?? font).GetFont(this);
+            if (family == null || lastOverride != element.MarkupData.FontOverride)
+            {
+                family = (element.MarkupData.FontOverride ?? this.font).GetFont(this);
+                lastOverride = element.MarkupData.FontOverride;
+            }
             
             // TODO: Color from a property or the Visual Style.
             var color = (element.MarkupData.ColorOverride ?? TextColor) ?? GetVisualStyle().GetTextColor(this);
@@ -209,7 +216,7 @@ public class TextWidget : Widget
                 geometry.AddQuad(highlightRect, element.MarkupData.Highlight);
             }
 
-            fontInstance.Draw(geometry, element.Position, color, element.Text, element.MarkupData.FontSize ?? this.FontSize,
+            family.Draw(geometry, element.Position, color, element.Text, element.MarkupData.FontSize ?? this.FontSize,
                 element.MarkupData.Weight ?? FontWeight, element.MarkupData.Italic);
 
             var strikeLine = 1;
@@ -266,6 +273,9 @@ public class TextWidget : Widget
             var isNewLine = textElements[i].IsNewLine;
             var wrap = wordWrapping && (offset.X + measurement.X > availableSpace.Width);
 
+            offset.X += measurement.X;
+            lineHeight = Math.Max(lineHeight, measurement.Y);
+            
             if (isNewLine || wrap)
             {
                 if (i > 0)
@@ -289,9 +299,6 @@ public class TextWidget : Widget
                 lineHeight = measurement.Y;
                 textElements[i].IsNewLine = true;
             }
-
-            offset.X += measurement.X;
-            lineHeight = Math.Max(lineHeight, measurement.Y);
         }
 
         lines.Add((start, textElements.Count, offset.X));
@@ -694,14 +701,21 @@ public class TextWidget : Widget
     
     private void MeasureElements()
     {
+        FontInfo? lastOverride = null;
+        IFontFamily? family = null;
+        
         for (var i = 0; i < textElements.Count; i++)
         {
             if (textElements[i].MeasuredSize != null)
                 continue;
-            
-            var fontInstance = (textElements[i].MarkupData.FontOverride ?? font).GetFont(this);
 
-            textElements[i].MeasuredSize = fontInstance.Measure(textElements[i].Text,
+            if (family == null || lastOverride != textElements[i].MarkupData.FontOverride)
+            {
+                family = (textElements[i].MarkupData.FontOverride ?? this.font).GetFont(this);
+                lastOverride = textElements[i].MarkupData.FontOverride;
+            }
+
+            textElements[i].MeasuredSize = family.Measure(textElements[i].Text,
                 textElements[i].MarkupData.FontSize ?? FontSize, textElements[i].MarkupData.Weight ?? FontWeight,
                 textElements[i].MarkupData.Italic);
         }

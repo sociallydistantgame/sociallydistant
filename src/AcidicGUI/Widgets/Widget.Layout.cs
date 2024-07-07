@@ -198,10 +198,21 @@ public partial class Widget
         calculatedLayoutRect = new LayoutRect(left, top, width, height);
 
         ArrangeChildren(context, calculatedLayoutRect - margin);
+
+        CalculateClipRect();
         
         layoutIsDirty = false;
     }
 
+    private void CalculateClipRect()
+    {
+        LayoutRect? newClipRect = GetClippingRectangle();
+        if (newClipRect == null)
+            newClipRect = ContentArea;
+
+        clipRect = LayoutRect.GetIntersection(newClipRect.Value, ContentArea);
+    }
+    
     public Vector2 GetCachedContentSize(Vector2 availableSize)
     {
         if (MaximumSize.X > 0 && availableSize.X > MaximumSize.X)

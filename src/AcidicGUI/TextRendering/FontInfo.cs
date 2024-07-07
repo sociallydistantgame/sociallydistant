@@ -32,4 +32,24 @@ public struct FontInfo
 
         return familyProvider.GetFont(family);
     }
+
+    public static bool operator ==(FontInfo left, FontInfo right)
+    {
+        return (left.customFont == right.customFont && left.family == right.family);
+    }
+
+    public static bool operator !=(FontInfo left, FontInfo right)
+    {
+        return !(left == right);
+    }
+
+    public override bool Equals(object? obj)
+    {
+        return obj is FontInfo right && this == right;
+    }
+
+    public override int GetHashCode()
+    {
+        return HashCode.Combine(customFont, family);
+    }
 }
