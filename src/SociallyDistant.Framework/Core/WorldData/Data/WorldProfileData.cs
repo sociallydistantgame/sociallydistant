@@ -26,21 +26,21 @@ namespace SociallyDistant.Core.Core.WorldData.Data
 		public void Serialize(IWorldSerializer serializer)
 		{
 			string ignored = string.Empty;
-			
-			SerializationUtility.SerializeAtRevision(ref id, serializer, WorldRevision.ChatAndSocialMedia, default);
-			SerializationUtility.SerializeAtRevision(ref gender, serializer, WorldRevision.ChatAndSocialMedia, default);
-			SerializationUtility.SerializeAtRevision(ref avatarData, serializer, WorldRevision.ChatAndSocialMedia, default);
-			SerializationUtility.SerializeAtRevision(ref coverArtData, serializer, WorldRevision.ChatAndSocialMedia, default);
-			SerializationUtility.SerializeAtRevision(ref isSocialPrivate, serializer, WorldRevision.ChatAndSocialMedia, default);
-			SerializationUtility.SerializeAtRevision(ref chatUsername, serializer, WorldRevision.ChatAndSocialMedia, default);
-			SerializationUtility.SerializeAtRevision(ref ignored, serializer, WorldRevision.ChatAndSocialMedia, default);
-			SerializationUtility.SerializeAtRevision(ref ignored, serializer, WorldRevision.ChatAndSocialMedia, default);
-			SerializationUtility.SerializeAtRevision(ref chatName, serializer, WorldRevision.ChatAndSocialMedia, default);
-			SerializationUtility.SerializeAtRevision(ref ignored, serializer, WorldRevision.ChatAndSocialMedia, default);
-			SerializationUtility.SerializeAtRevision(ref ignored, serializer, WorldRevision.ChatAndSocialMedia, default);
-			SerializationUtility.SerializeAtRevision(ref socialBio, serializer, WorldRevision.ChatAndSocialMedia, default);
-			SerializationUtility.SerializeAtRevision(ref narrativeId, serializer, WorldRevision.NarrativeProfiles, default);
-			SerializationUtility.SerializeAtRevision(ref attributes, serializer, WorldRevision.CharacterAttributes, default);
+
+			SerializationUtility.SerializeAtRevision(ref id,              serializer, WorldRevision.ChatAndSocialMedia,  default);
+			SerializationUtility.SerializeAtRevision(ref gender,          serializer, WorldRevision.ChatAndSocialMedia,  default);
+			SerializationUtility.SerializeAtRevision(ref avatarData,      serializer, WorldRevision.ChatAndSocialMedia,  default);
+			SerializationUtility.SerializeAtRevision(ref coverArtData,    serializer, WorldRevision.ChatAndSocialMedia,  default);
+			SerializationUtility.SerializeAtRevision(ref isSocialPrivate, serializer, WorldRevision.ChatAndSocialMedia,  default);
+			SerializationUtility.SerializeAtRevision(ref chatUsername,    serializer, WorldRevision.ChatAndSocialMedia,  default);
+			SerializationUtility.SerializeAtRevision(ref ignored,         serializer, WorldRevision.ChatAndSocialMedia,  default);
+			SerializationUtility.SerializeAtRevision(ref ignored,         serializer, WorldRevision.ChatAndSocialMedia,  default);
+			SerializationUtility.SerializeAtRevision(ref chatName,        serializer, WorldRevision.ChatAndSocialMedia,  default);
+			SerializationUtility.SerializeAtRevision(ref ignored,         serializer, WorldRevision.ChatAndSocialMedia,  default);
+			SerializationUtility.SerializeAtRevision(ref ignored,         serializer, WorldRevision.ChatAndSocialMedia,  default);
+			SerializationUtility.SerializeAtRevision(ref socialBio,       serializer, WorldRevision.ChatAndSocialMedia,  default);
+			SerializationUtility.SerializeAtRevision(ref narrativeId,     serializer, WorldRevision.NarrativeProfiles,   default);
+			SerializationUtility.SerializeAtRevision(ref attributes,      serializer, WorldRevision.CharacterAttributes, default);
 		}
 
 		public CharacterAttributes Attributes
