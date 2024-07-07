@@ -1,6 +1,7 @@
 ﻿using System.Reactive.Linq;
 using System.Reactive.Subjects;
 using System.Text;
+using AcidicGUI;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using Serilog;
@@ -43,41 +44,42 @@ internal sealed class SociallyDistantGame :
 		Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData), "acidic light",
 			"Socially Distant");
 
-	private readonly GuiService gui;
-	private static readonly WorkQueue globalSchedule = new();
-	private static SociallyDistantGame instance = null!;
-	private readonly DevToolsManager devTools;
-	private readonly Subject<PlayerInfo> playerInfoSubject = new();
-	private readonly IObservable<PlayerInfo> playerInfoObservable;
-	private readonly TabbedToolCollection tabbedTools;
-	private readonly GraphicsDeviceManager graphicsManager;
-	private readonly TimeData timeData;
-	private readonly IObservable<GameMode> gameModeObservable;
-	private readonly Subject<GameMode> gameModeSubject = new();
-	private readonly ModuleManager moduleManager;
-	private readonly WorldManager worldManager;
-	private readonly SocialService socialService;
-	private readonly UriManager uriManager;
-	private readonly PlayerManager playerManager;
-	private readonly NetworkController network;
-	private readonly ContentManager contentManager;
-	private readonly SettingsManager settingsManager;
-	private readonly DeviceCoordinator deviceCoordinator;
-	private readonly ScriptSystem scriptSystem;
-	private readonly VertexPositionColorTexture[] virtualScreenVertices = new VertexPositionColorTexture[4];
-	private readonly int[] virtualScreenIndices = new[] { 0, 1, 2, 2, 1, 3 };
-	private readonly BackdropController backdrop;
-	private readonly BackdropUpdater backdropUpdater;
-	private readonly GuiController guiController;
+	private readonly        GuiSynchronizationContext    synchronizationContext = new();
+	private readonly        GuiService                   gui;
+	private static readonly WorkQueue                    globalSchedule = new();
+	private static          SociallyDistantGame          instance       = null!;
+	private readonly        DevToolsManager              devTools;
+	private readonly        Subject<PlayerInfo>          playerInfoSubject = new();
+	private readonly        IObservable<PlayerInfo>      playerInfoObservable;
+	private readonly        TabbedToolCollection         tabbedTools;
+	private readonly        GraphicsDeviceManager        graphicsManager;
+	private readonly        TimeData                     timeData;
+	private readonly        IObservable<GameMode>        gameModeObservable;
+	private readonly        Subject<GameMode>            gameModeSubject = new();
+	private readonly        ModuleManager                moduleManager;
+	private readonly        WorldManager                 worldManager;
+	private readonly        SocialService                socialService;
+	private readonly        UriManager                   uriManager;
+	private readonly        PlayerManager                playerManager;
+	private readonly        NetworkController            network;
+	private readonly        ContentManager               contentManager;
+	private readonly        SettingsManager              settingsManager;
+	private readonly        DeviceCoordinator            deviceCoordinator;
+	private readonly        ScriptSystem                 scriptSystem;
+	private readonly        VertexPositionColorTexture[] virtualScreenVertices = new VertexPositionColorTexture[4];
+	private readonly        int[]                        virtualScreenIndices  = new[] { 0, 1, 2, 2, 1, 3 };
+	private readonly        BackdropController           backdrop;
+	private readonly        BackdropUpdater              backdropUpdater;
+	private readonly        GuiController                guiController;
 
-	private bool areModulesLoaded;
-	private Task initializeTask;
-	private PlayerInfo playerInfo = new();
-	private bool initialized;
+	private bool            areModulesLoaded;
+	private Task            initializeTask;
+	private PlayerInfo      playerInfo = new();
+	private bool            initialized;
 	private RenderTarget2D? virtualScreen;
-	private SpriteEffect? virtualScreenShader;
-	private IGameData? currentGameData;
-	private PlayerInfo loadedPlayerInfo;
+	private SpriteEffect?   virtualScreenShader;
+	private IGameData?      currentGameData;
+	private PlayerInfo      loadedPlayerInfo;
 
 	public bool IsGameActive => CurrentGameMode == GameMode.OnDesktop;
 
@@ -166,16 +168,16 @@ internal sealed class SociallyDistantGame :
 		Components.Add(backdrop);
 		Components.Add(backdropUpdater);
 		Components.Add(gui);
-		
+
 		var playerLan = network.Simulation.CreateLocalAreaNetwork();
 		this.playerManager = new PlayerManager(this, deviceCoordinator, playerLan);
-		
+
 		this.guiController = new GuiController(this, playerManager);
 		Components.Add(guiController);
 		Components.Add(devTools);
 
 
-		
+
 		IsMouseVisible = true;
 
 		graphicsManager.HardwareModeSwitch = false;
@@ -183,8 +185,7 @@ internal sealed class SociallyDistantGame :
 
 		Content = contentPipeline;
 
-		contentPipeline.AddDirectoryContentSource("/Core",
-			Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "Content"));
+		contentPipeline.AddDirectoryContentSource("/Core", Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "Content"));
 	}
 
 	private void OnGraphicsDeviceCreation(object? sender, PreparingDeviceSettingsEventArgs e)
@@ -431,6 +432,9 @@ internal sealed class SociallyDistantGame :
 		// Run any scheduled actions
 		globalSchedule.RunPendingWork();
 
+		// Update the synchronization context
+		synchronizationContext.Update();
+		
 		// Report new timing data to the rest of the game so it can be accessed statically
 		timeData.Update(gameTime);
 

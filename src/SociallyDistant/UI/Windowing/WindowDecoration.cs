@@ -84,7 +84,7 @@ public class WindowDecoration : Widget
         borderBox.Content = clientBox;
 
         titleIcon.VerticalAlignment = VerticalAlignment.Bottom;
-        titleIcon.Padding = new Padding(0, 3);
+        titleIcon.Padding = new Padding(0, 1);
         
         borderBox.SetCustomProperty(WidgetBackgrounds.WindowBorder);
         clientBox.SetCustomProperty(WidgetBackgrounds.WindowClient);

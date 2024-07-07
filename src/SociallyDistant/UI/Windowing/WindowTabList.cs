@@ -74,6 +74,7 @@ public sealed class WindowTabList : Widget
             view.SetCustomProperty(color);
             view.Title = definition.Title;
             view.Active = definition.Active;
+            view.Closeable = definition.Closeable;
         }
     }
     

@@ -32,6 +32,17 @@ public sealed class WindowTab :
             InvalidateGeometry();
         }
     }
+
+    public bool Closeable
+    {
+        get => closeButton.Visibility == Visibility.Visible;
+        set
+        {
+            closeButton.Visibility = value
+                ? Visibility.Visible
+                : Visibility.Collapsed;
+        }
+    }
     
     public WindowTab()
     {
