@@ -1,10 +1,13 @@
 // https://github.com/vchelaru/FlatRedBall/blob/NetStandard/Engines/FlatRedBallXNA/FlatRedBall/Managers/SingleThreadSynchronizationContext.cs
+
+using System.Collections.Concurrent;
+
 namespace AcidicGUI;
 
 public class GuiSynchronizationContext : SynchronizationContext
 {
-    private readonly Queue<Action> _messagesToProcess = new Queue<Action>();
-    private readonly object        _syncHandle        = new object();
+    private readonly ConcurrentQueue<Action> _messagesToProcess = new ConcurrentQueue<Action>();
+    private readonly Queue<Action>           thisFrameQueue     = new Queue<Action>();
 
     public GuiSynchronizationContext()
     {
@@ -18,29 +21,17 @@ public class GuiSynchronizationContext : SynchronizationContext
 
     public override void Post(SendOrPostCallback codeToRun, object state)
     {
-        lock (_syncHandle)
+        _messagesToProcess.Enqueue(() =>
         {
-            _messagesToProcess.Enqueue(() =>
+            try
             {
-                try
-                {
-                    codeToRun(state);
-                }
-                catch (TaskCanceledException)
-                {
-                }
-            });
-            SignalContinue();
-        }
+                codeToRun(state);
+            }
+            catch (TaskCanceledException)
+            {
+            }
+        });
     }
-
-
-    private void SignalContinue()
-    {
-        Monitor.Pulse(_syncHandle);
-    }
-
-    Queue<Action> thisFrameQueue = new Queue<Action>();
 
     public void Update()
     {
@@ -59,12 +50,9 @@ public class GuiSynchronizationContext : SynchronizationContext
         // to empty the _messagesToProcess into thisFrameQueue, then run all tasks on this frame. Next
         // frame everything will repeat.
 
-        lock (_syncHandle)
+        while (_messagesToProcess.TryDequeue(out Action? next))
         {
-            while (_messagesToProcess.Count > 0)
-            {
-                thisFrameQueue.Enqueue(_messagesToProcess.Dequeue());
-            }
+            thisFrameQueue.Enqueue(next);
         }
 
         while (thisFrameQueue.Count > 0)
@@ -82,17 +70,8 @@ public class GuiSynchronizationContext : SynchronizationContext
         }
     }
 
-    public void UpdateDependencies()
-    {
-
-    }
-
     public void Clear()
     {
-        lock (_syncHandle)
-        {
-            _messagesToProcess.Clear();
-        }
-
+        _messagesToProcess.Clear();
     }
 }
