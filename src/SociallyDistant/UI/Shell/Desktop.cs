@@ -11,6 +11,8 @@ public class Desktop :
 {
     private readonly FlexPanel root = new();
     private readonly Dock dock = new();
+    private readonly Box toolsSlot = new();
+    private readonly Box infoSlot = new();
     private readonly DesktopController desktopController;
 
     internal Desktop(DesktopController desktopController)
@@ -23,9 +25,15 @@ public class Desktop :
         Children.Add(root);
 
         root.ChildWidgets.Add(dock);
+        root.ChildWidgets.Add(toolsSlot);
+        root.ChildWidgets.Add(infoSlot);
+
+        toolsSlot.Content = desktopController.ToolsRootWidget;
     }
     
     public void Dispose()
     {
+        toolsSlot.Content = null;
+        infoSlot.Content = null;
     }
 }

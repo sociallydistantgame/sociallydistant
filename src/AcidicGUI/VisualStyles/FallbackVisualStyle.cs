@@ -9,9 +9,9 @@ namespace AcidicGUI.VisualStyles;
 internal sealed class FallbackVisualStyle : IVisualStyle
 {
     public Font? IconFont => null;
-    public Font? FallbackFont { get; set; }
+    public IFontFamily? FallbackFont { get; set; }
     
-    public Font GetFont(FontPreset presetFont)
+    public IFontFamily GetFont(PresetFontFamily family)
     {
         if (FallbackFont == null)
             throw new InvalidOperationException("The font for the FallbackVisualStyle has not been set.");
@@ -20,6 +20,11 @@ internal sealed class FallbackVisualStyle : IVisualStyle
     }
 
     public float ScrollBarSize => 18;
+
+    public Color GetTextColor(Widget? widget = null)
+    {
+        return Color.White;
+    }
 
     public void DrawWidgetBackground(Widget widget, GeometryHelper geometryHelper)
     {

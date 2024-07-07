@@ -7,7 +7,6 @@ using Microsoft.Xna.Framework.Graphics;
 using Serilog;
 using SociallyDistant.Core.Core;
 using SociallyDistant.Core.Modules;
-using SociallyDistant.Core.OS.Devices;
 using SociallyDistant.Core.Shell;
 using SociallyDistant.Core.Shell.Common;
 using SociallyDistant.Core.Shell.InfoPanel;
@@ -82,6 +81,7 @@ public class GuiController :
         Log.Error(ex.ToString());
 
         dialog.Message = messageBuilder.ToString();
+        dialog.MessageType = MessageBoxType.Error;
         dialog.Buttons.Add("OK");
         
         return completionSource.Task;
@@ -140,29 +140,5 @@ public class GuiController :
         {
             workArea.ChildWidgets.Remove(overlay);
         }
-    }
-}
-
-internal sealed class DesktopController
-{
-    private readonly PlayerManager playerManager;
-    private readonly GuiController guiController;
-    
-    private IUser? loginUser;
-    private ISystemProcess loginProcess;
-    
-    
-    public DesktopController(GuiController gui, PlayerManager player)
-    {
-        this.guiController = gui;
-        this.playerManager = player;
-    }
-
-    public void Login()
-    {
-        loginUser = playerManager.PlayerUser;
-        loginProcess = playerManager.InitProcess.CreateLoginProcess(loginUser);
-
-        guiController.StatusBar.User = loginUser;
     }
 }

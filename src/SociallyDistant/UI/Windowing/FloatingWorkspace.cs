@@ -4,33 +4,8 @@ using AcidicGUI.Layout;
 using AcidicGUI.Widgets;
 using Microsoft.Xna.Framework;
 using SociallyDistant.Core.Shell.Windowing;
-using SociallyDistant.Core.UI.VisualStyles;
 
 namespace SociallyDistant.UI.Windowing;
-
-public class OverlayWorkspace :
-    Widget,
-    IClientWorkspaceDefinition<Window, Widget?>
-{
-    private readonly FloatingWorkspace workspace = new();
-
-    public OverlayWorkspace()
-    {
-        Children.Add(workspace);
-        this.SetCustomProperty(WidgetBackgrounds.Overlay);
-    }
-    
-    public Window CreateWindow(string title, Widget? client = default)
-    {
-        return workspace.CreateWindow(title, client);
-    }
-
-    public IReadOnlyList<IWindow> WindowList => workspace.WindowList;
-    public IFloatingGui CreateFloatingGui(string title)
-    {
-        throw new NotImplementedException();
-    }
-}
 
 public class FloatingWorkspace :
     Widget,
@@ -38,7 +13,18 @@ public class FloatingWorkspace :
     INotifyCloseWorkspace
 {
     private readonly List<WindowBase> windows = new();
+    private bool maximizeAll;
 
+    public bool MaximizeAll
+    {
+        get => maximizeAll;
+        set
+        {
+            maximizeAll = value;
+            InvalidateLayout();
+        }
+    }
+    
     public FloatingWorkspace()
     {
         LayoutRoot = this;
@@ -48,6 +34,8 @@ public class FloatingWorkspace :
     {
         var win = new Window(this);
 
+        win.Title = title;
+        
         win.SetClient(client);
         
         this.Children.Add(win);
@@ -85,8 +73,8 @@ public class FloatingWorkspace :
             var childSize = win.GetCachedContentSize(availableSpace.Size);
             var windowSettings = win.GetCustomProperties<WindowSettings>();
 
-            if (windowSettings.Maximized)
-            {
+            if (windowSettings.Maximized || maximizeAll)
+            { 
                 win.UpdateLayout(context, availableSpace);
             }
             else
@@ -104,6 +92,16 @@ public class FloatingWorkspace :
 
 
         }
+    }
+
+    public TabbedWindow CreateTabbedWindow()
+    {
+        var win = new TabbedWindow(this);
+        
+        windows.Add(win);
+        Children.Add(win);
+
+        return win;
     }
 }
 

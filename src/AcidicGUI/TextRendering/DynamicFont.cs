@@ -7,9 +7,16 @@ namespace AcidicGUI.TextRendering;
 internal sealed class DynamicFont : Font
 {
     private readonly FontSystem fontSystem = new();
-    private readonly int fontSize;
+    private readonly float fontSize;
 
-    internal DynamicFont(int fontSize)
+    static DynamicFont()
+    {
+        FontSystemDefaults.KernelWidth = 2;
+        FontSystemDefaults.KernelHeight = 2;
+        FontSystemDefaults.FontResolutionFactor = 2;
+    }
+    
+    internal DynamicFont(float fontSize)
     {
         this.fontSize = fontSize;
     }
@@ -19,13 +26,19 @@ internal sealed class DynamicFont : Font
         this.fontSystem.AddFont(stream);
     }
 
-    public override Vector2 Measure(string text)
+    public override Vector2 Measure(string text, int? fontSizePixels)
     {
-        return fontSystem.GetFont(fontSize).MeasureString(text);
+        if (string.IsNullOrEmpty(text))
+        {
+            return new Vector2(0,
+                fontSystem.GetFont(fontSizePixels ?? fontSize).LineHeight);
+        }
+        
+        return fontSystem.GetFont((fontSizePixels ?? this.fontSize) * 1.333f).MeasureString(text);
     }
 
-    public override void Draw(GeometryHelper geometryHelper, Vector2 position, Color color, string text, int? fontSize)
+    public override void Draw(GeometryHelper geometryHelper, Vector2 position, Color color, string text, int? fontSizePixels)
     {
-        fontSystem.GetFont(fontSize ?? this.fontSize).DrawText(geometryHelper, text, position, color);
+        fontSystem.GetFont((fontSizePixels ?? this.fontSize) * 1.333f).DrawText(geometryHelper, text, position, color);
     }
 }

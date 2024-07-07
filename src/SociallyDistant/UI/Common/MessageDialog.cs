@@ -1,6 +1,7 @@
 using System.Collections;
 using AcidicGUI.Layout;
 using AcidicGUI.Widgets;
+using Microsoft.Xna.Framework;
 using SociallyDistant.Core.Shell;
 using SociallyDistant.Core.Shell.Common;
 using SociallyDistant.Core.Shell.Windowing;
@@ -19,6 +20,7 @@ public sealed class MessageDialog : IMessageDialog
     private readonly ButtonList buttonList;
     private readonly List<TextButton> views = new();
 
+    private MessageBoxType messageType;
     private MessageDialogResult dismissResult = MessageDialogResult.Cancel;
     
     public MessageDialog(Window window)
@@ -32,10 +34,16 @@ public sealed class MessageDialog : IMessageDialog
         contentStack.ChildWidgets.Add(message);
         contentStack.ChildWidgets.Add(buttonsPanel);
 
+        message.WordWrapping = true;
+        message.UseMarkup = true;
+        message.MaximumSize = new Vector2(420, 0);
+        
         contentStack.Spacing = 6;
         buttonsPanel.SpacingX = 3;
         buttonsPanel.SpacingY = 3;
         buttonsPanel.Direction = Direction.Horizontal;
+
+        UpdateColors();
     }
 
     public bool CanClose
@@ -99,7 +107,16 @@ public sealed class MessageDialog : IMessageDialog
         set => message.Text = value;
     }
     public CommonColor Color { get; set; }
-    public MessageBoxType MessageType { get; set; }
+
+    public MessageBoxType MessageType
+    {
+        get => messageType;
+        set
+        {
+            messageType = value;
+            UpdateColors();
+        }
+    }
     public IList<MessageBoxButtonData> Buttons => buttonList;
     public Action<MessageDialogResult>? DismissCallback { get; set; }
 
@@ -107,6 +124,20 @@ public sealed class MessageDialog : IMessageDialog
     {
         dismissResult = result;
         Close();
+    }
+
+    private void UpdateColors()
+    {
+        infoBox.Color = messageType switch
+        {
+            MessageBoxType.Info => CommonColor.Blue,
+            MessageBoxType.Warning => CommonColor.Yellow,
+            MessageBoxType.Question => CommonColor.Cyan,
+            MessageBoxType.Error => CommonColor.Red,
+            _ => throw new ArgumentOutOfRangeException()
+        };
+
+        window.Color = infoBox.Color;
     }
     
     private void RefreshButtons()

@@ -1,4 +1,5 @@
 using AcidicGUI.Layout;
+using AcidicGUI.TextRendering;
 using AcidicGUI.Widgets;
 using SociallyDistant.Core.Shell;
 using SociallyDistant.Core.Shell.Windowing;
@@ -39,6 +40,8 @@ public sealed class WindowTab :
         stackPanel.ChildWidgets.Add(closeButton);
         closeButton.Content = closeIcon;
 
+        titleText.FontWeight = FontWeight.SemiBold;
+        
         closeIcon.IconSize = 18;
         closeIcon.IconString = MaterialIcons.Close;
 

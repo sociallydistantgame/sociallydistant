@@ -1,5 +1,6 @@
 using AcidicGUI.Layout;
 using AcidicGUI.Widgets;
+using SociallyDistant.Core.Shell;
 using SociallyDistant.Core.Shell.Windowing;
 
 namespace SociallyDistant.UI.Windowing;
@@ -10,7 +11,18 @@ public sealed class WindowTabList : Widget
     private readonly List<WindowTab> views = new();
     private readonly List<Definition> definitions = new();
 
+    private CommonColor color;
     private bool showNewTab = false;
+
+    public CommonColor Color
+    {
+        get => color;
+        set
+        {
+            color = value;
+            UpdateViews();
+        }
+    }
     
     public WindowTabList()
     {
@@ -59,6 +71,7 @@ public sealed class WindowTabList : Widget
             Definition definition = definitions[i];
             WindowTab view = views[i];
 
+            view.SetCustomProperty(color);
             view.Title = definition.Title;
             view.Active = definition.Active;
         }

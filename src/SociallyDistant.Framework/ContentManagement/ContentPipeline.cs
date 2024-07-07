@@ -1,3 +1,4 @@
+using System.Diagnostics;
 using System.Net;
 using Serilog;
 using SociallyDistant.Core.OS.FileSystems;
@@ -22,12 +23,14 @@ public sealed class ContentPipeline : Microsoft.Xna.Framework.Content.ContentMan
         if (!assetsByType.TryGetValue(typeof(T), out List<string>? assets))
             yield break;
 
+        Log.Information($"Loading all ${typeof(T).FullName} assets...");
         foreach (string asset in assets)
             yield return Load<T>(asset);
     }
 
     public override T Load<T>(string assetName)
     {
+        Log.Information($"Loading content: {assetName}");
         if (typeof(T).IsAssignableFrom(typeof(Stream)))
             return (T) (object) OpenStream(assetName);
         

@@ -15,6 +15,12 @@ public sealed class Window :
         tab.Active = true;
     }
 
+    public string Title
+    {
+        get => tab.Title;
+        set => tab.Title = value;
+    }
+    
     public Widget? Client => Decorations.Client;
     public void SetClient(Widget? newClient)
     {

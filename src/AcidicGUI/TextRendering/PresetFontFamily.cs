@@ -1,6 +1,6 @@
 namespace AcidicGUI.TextRendering;
 
-public enum FontPreset
+public enum PresetFontFamily
 {
     Default,
     Heading1,

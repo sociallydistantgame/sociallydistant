@@ -2,34 +2,34 @@ namespace AcidicGUI.TextRendering;
 
 public struct FontInfo
 {
-    private Font? customFont;
-    private FontPreset preset;
+    private IFontFamily? customFont;
+    private PresetFontFamily family;
 
-    private FontInfo(FontPreset preset, Font? customFont)
+    private FontInfo(PresetFontFamily family, IFontFamily? customFont)
     {
-        this.preset = preset;
+        this.family = family;
         this.customFont = customFont;
     }
     
-    public FontInfo(FontPreset preset) : this(preset, null)
+    public FontInfo(PresetFontFamily family) : this(family, null)
     { }
     
-    public FontInfo(Font customFont) : this(FontPreset.Custom, customFont)
+    public FontInfo(IFontFamily customFont) : this(PresetFontFamily.Custom, customFont)
     { }
 
-    public static implicit operator FontInfo(Font custom) => new(custom);
-    public static implicit operator FontInfo(FontPreset preset) => new(preset);
+    public static implicit operator FontInfo(FontFamily custom) => new(custom);
+    public static implicit operator FontInfo(PresetFontFamily family) => new(family);
     
-    public Font GetFont(IFontProvider provider)
+    public IFontFamily GetFont(IFontFamilyProvider familyProvider)
     {
-        if (preset == FontPreset.Custom)
+        if (family == PresetFontFamily.Custom)
         {
             if (customFont != null)
                 return customFont;
 
-            return provider.GetFont(FontPreset.Default);
+            return familyProvider.GetFont(PresetFontFamily.Default);
         }
 
-        return provider.GetFont(preset);
+        return familyProvider.GetFont(family);
     }
 }

@@ -1,4 +1,5 @@
-﻿using SociallyDistant.Core.Shell.Common;
+﻿using AcidicGUI.Widgets;
+using SociallyDistant.Core.Shell.Common;
 
 namespace SociallyDistant.Core.Shell.Windowing
 {
@@ -8,8 +9,6 @@ namespace SociallyDistant.Core.Shell.Windowing
 		IWindow Window { get; }
 		string Title { get; set; }
 		CompositeIcon Icon { get; set; }
-		IContent? Content { get; set; }
-		
-		IObservable<string> TitleObservable { get; } 
+		Widget? Content { get; set; }
 	}
 }

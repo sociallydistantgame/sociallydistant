@@ -1,7 +1,10 @@
 using AcidicGUI.Layout;
+using AcidicGUI.TextRendering;
 using AcidicGUI.Widgets;
 using Microsoft.Xna.Framework;
+using SociallyDistant.Core.Shell;
 using SociallyDistant.Core.UI.Common;
+using SociallyDistant.Core.UI.VisualStyles;
 
 namespace SociallyDistant.UI.Common;
 
@@ -13,6 +16,16 @@ public sealed class InfoBox : Widget
     private readonly TextWidget title = new();
     private readonly Box contentBox = new();
 
+    public CommonColor Color
+    {
+        get => decorativeBlock.GetCustomProperty<CommonColor>();
+        set
+        {
+            decorativeBlock.SetCustomProperty(value);
+            title.SetCustomProperty(value);
+        }
+    }
+    
     public string TitleText
     {
         get => title.Text;
@@ -33,6 +46,13 @@ public sealed class InfoBox : Widget
         contentStack.ChildWidgets.Add(title);
         contentStack.ChildWidgets.Add(contentBox);
 
+        title.WordWrapping = true;
+        title.UseMarkup = false;
+        title.MaximumSize = new Vector2(420, 0);
+        title.FontSize = 20;
+        title.FontWeight = FontWeight.Bold;
+        title.SetCustomProperty(WidgetForegrounds.Common);
+        
         root.Padding = 3;
         root.Spacing = 3;
         root.Direction = Direction.Horizontal;

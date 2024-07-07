@@ -23,7 +23,15 @@ public class WindowDecoration : Widget
     
     private WindowHints hints;
 
-    public WindowHints Hints => hints;
+    public WindowHints Hints
+    {
+        get => hints;
+        set
+        {
+            hints = value;
+            ApplyHints();
+        }
+    }
 
     public CompositeIcon Icon
     {
@@ -38,12 +46,24 @@ public class WindowDecoration : Widget
     }
 
     public WindowTabList Tabs => tabList;
+
+    public CommonColor Color
+    {
+        get => borderBox.GetCustomProperty<CommonColor>();
+        set
+        {
+            borderBox.SetCustomProperty(value);
+            tabList.Color = value;
+        }
+    }
     
     public WindowDecoration(WindowBase window)
     {
         this.window = window;
         this.dragSurface = new WindowDragSurface((window));
 
+        flexPanel.Spacing = -1;
+        
         Children.Add(flexPanel);
 
         flexPanel.ChildWidgets.Add(dragSurface);
@@ -68,7 +88,7 @@ public class WindowDecoration : Widget
         
         borderBox.SetCustomProperty(WidgetBackgrounds.WindowBorder);
         clientBox.SetCustomProperty(WidgetBackgrounds.WindowClient);
-        clientBox.GetCustomProperties<FlexPanelProperties>().Mode = FlexMode.Proportional;
+        borderBox.GetCustomProperties<FlexPanelProperties>().Mode = FlexMode.Proportional;
 
         tabList.VerticalAlignment = VerticalAlignment.Bottom;
         
@@ -76,12 +96,12 @@ public class WindowDecoration : Widget
         {
             textIcon = MaterialIcons.Window
         };
-    }
-}
 
-public interface ITabDefinition
-{
-    string Title { get; set; }
-    bool Closeable { get; set; }
-    bool Active { get; set; }
+        ApplyHints();
+    }
+
+    private void ApplyHints()
+    {
+        
+    }
 }

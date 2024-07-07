@@ -7,3 +7,10 @@ public enum HorizontalAlignment
     Center,
     Right
 }
+
+public enum Visibility
+{
+    Visible,
+    Hidden,
+    Collapsed
+}

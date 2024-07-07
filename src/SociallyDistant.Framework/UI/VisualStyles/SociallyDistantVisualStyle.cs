@@ -5,7 +5,10 @@ using AcidicGUI.VisualStyles;
 using AcidicGUI.Widgets;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
+using Serilog;
+using SociallyDistant.Core.Core;
 using SociallyDistant.Core.Modules;
+using SociallyDistant.Core.Shell;
 using SociallyDistant.Core.Shell.Windowing;
 using SociallyDistant.Core.UI.Common;
 
@@ -17,6 +20,10 @@ public class SociallyDistantVisualStyle : IVisualStyle
     private readonly Color mainBackground = new Color(0x11, 0x13, 0x15);
     private readonly Color statusBarColor = new Color(0x01,0x22, 0x37, 0xff);
     private readonly Color accentPrimary = new Color(0x13, 0x85, 0xC3, 0xff);
+    private readonly Color accentEvil = new(0xDE, 0x17, 0x17);
+    private readonly Color accentWarning = new Color(0xE0, 0x86, 0x17);
+    private readonly Color accentSuccess = new Color(0x17, 0x82, 0x0E);
+    private readonly Color accentCyberspace = new Color(0x34, 0xB1, 0xFD);
 
     // Tabs - Inactive
     private readonly Color tabInactiveBackgroundDefault = new Color(0x44, 0x44, 0x44, 191);
@@ -27,7 +34,7 @@ public class SociallyDistantVisualStyle : IVisualStyle
     private readonly Color tabActiveBorderDefault = new Color(0x16, 0x93, 0xD6);
     
     private Font iconFont;
-    private Font defaultFont = null!;
+    private IFontFamily defaultFont = null!;
 
     public Font? IconFont => iconFont;
     
@@ -42,13 +49,63 @@ public class SociallyDistantVisualStyle : IVisualStyle
             game.GameInstance.Content.Load<Stream>("/Core/UI/Fonts/MaterialIcons-Regular.ttf"),
             256
         );
+
+        defaultFont = LoadFont("/Core/UI/Fonts/Rajdhani");
+    }
+
+    private IFontFamily LoadFont(string basePath)
+    {
+        // We MUST load a regular font
+        var regularFont = LoadFontStream(basePath + "-Regular.ttf");
+        if (regularFont == null)
+            throw new Exception(
+                $"Could not load Regular variant for font {basePath}. Does {basePath}-Regular.tff exist in the Content File System?");
         
-        defaultFont = game.GameInstance.Content.Load<SpriteFont>("/Core/UI/Fonts/Rajdhani");
+        var family = new FontFamily(regularFont);
+
+        foreach (FontWeight weight in Enum.GetValues<FontWeight>())
+        {
+            Font? normal = LoadFontStream(basePath + $"-{weight}.ttf");
+            Font? italic = LoadFontStream(basePath + $"Italic-{weight}.ttf");
+            
+            family.SetFont(weight, false, normal);
+            family.SetFont(weight, true, italic);
+        }
+
+        return family;
+    }
+
+    private Font? LoadFontStream(string path)
+    {
+        try
+        {
+            using var stream = game.GameInstance.Content.Load<Stream>(path);
+            return Font.FromTtfStream(stream, 16);
+        }
+        catch (Exception ex)
+        {
+            Log.Warning($"Failed to load GUI font: {path} - {ex.Message}");
+            Log.Warning(ex.ToString());
+            return null;
+        }
     }
     
-    public Font GetFont(FontPreset presetFont)
+    public IFontFamily GetFont(PresetFontFamily familyPresetFont)
     {
         return defaultFont;
+    }
+
+    private Color GetCommonColor(CommonColor commonColor)
+    {
+        return commonColor switch
+        {
+            CommonColor.Cyan => accentCyberspace,
+            CommonColor.Yellow => accentWarning,
+            CommonColor.Red => accentEvil,
+            CommonColor.Green => accentSuccess,
+            CommonColor.Blue => accentPrimary,
+            _ => Color.White
+        };
     }
 
     public float ScrollBarSize => 18;
@@ -125,7 +182,7 @@ public class SociallyDistantVisualStyle : IVisualStyle
 
     private void DrawDecorativeBlock(DecorativeBlock widget, GeometryHelper geometry)
     {
-        var color = (widget.BoxColor ?? accentPrimary);
+        var color = (widget.BoxColor ?? GetCommonColor(widget.GetCustomProperty<CommonColor>()));
 
         if (widget.Opaque)
         {
@@ -153,7 +210,24 @@ public class SociallyDistantVisualStyle : IVisualStyle
 
         }
     }
-    
+
+    public Color GetTextColor(Widget? widget = null)
+    {
+        if (widget != null)
+        {
+            switch (widget.GetCustomProperty<WidgetForegrounds>())
+            {
+                case WidgetForegrounds.Common:
+                {
+                    var commonColor = widget.GetCustomProperty<CommonColor>();
+                    return GetCommonColor(commonColor);
+                }
+            }
+        }
+
+        return Color.White;
+    }
+
     public void DrawWidgetBackground(Widget widget, GeometryHelper geometryHelper)
     {
         if (widget is InputField inputField)
@@ -181,7 +255,8 @@ public class SociallyDistantVisualStyle : IVisualStyle
                     geometryHelper.AddQuad(widget.ContentArea, mainBackground);
                     break;
                 case WidgetBackgrounds.WindowBorder:
-                    geometryHelper.AddQuadOutline(widget.ContentArea, 1, accentPrimary);
+                    geometryHelper.AddQuadOutline(widget.ContentArea, 1,
+                        GetCommonColor(widget.GetCustomProperty<CommonColor>()));
                     break;
             }
         }
@@ -226,9 +301,16 @@ public enum InputFieldStyle
 public enum WidgetBackgrounds
 {
     None,
+    Common,
     Overlay,
     StatusBar,
     Dock,
     WindowClient,
     WindowBorder,
+}
+
+public enum WidgetForegrounds
+{
+    Default,
+    Common
 }

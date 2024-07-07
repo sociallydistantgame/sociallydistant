@@ -21,7 +21,7 @@ internal sealed class SimpleFont : Font
         this.spriteFont.DefaultCharacter ??= '\ufffd';
     }
 
-    public override Vector2 Measure(string text)
+    public override Vector2 Measure(string text, int? fontSize)
     {
         if (string.IsNullOrEmpty(text))
             return new Vector2(0, spriteFont.LineSpacing);

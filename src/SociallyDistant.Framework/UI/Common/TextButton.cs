@@ -1,4 +1,5 @@
 using AcidicGUI.Layout;
+using AcidicGUI.TextRendering;
 using AcidicGUI.Widgets;
 
 namespace SociallyDistant.Core.UI.Common;
@@ -27,6 +28,8 @@ public class TextButton : Widget
         textWidget.VerticalAlignment = VerticalAlignment.Middle;
         
         button.Clicked += HandleClicked;
+
+        this.textWidget.FontWeight = FontWeight.SemiBold;
     }
 
     private void HandleClicked()

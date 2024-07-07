@@ -1,4 +1,5 @@
 using AcidicGUI.Widgets;
+using SociallyDistant.Core.Shell;
 using SociallyDistant.Core.Shell.Common;
 using SociallyDistant.Core.Shell.Windowing;
 
@@ -42,6 +43,12 @@ public abstract class WindowBase :
         set => decoration.Icon = value;
     }
 
+    public CommonColor Color
+    {
+        get => decoration.Color;
+        set => decoration.Color = value;
+    }
+    
     public event Action<IWindow>? WindowClosed;
     public WindowHints Hints => decoration.Hints;
     public IWorkspaceDefinition Workspace => workspace;
@@ -53,6 +60,6 @@ public abstract class WindowBase :
 
     public void SetWindowHints(WindowHints hints)
     {
-        throw new NotImplementedException();
+        decoration.Hints = hints;
     }
 }

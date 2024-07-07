@@ -11,7 +11,7 @@ using Microsoft.Xna.Framework.Input;
 
 namespace AcidicGUI;
 
-public sealed class GuiManager : IFontProvider
+public sealed class GuiManager : IFontFamilyProvider
 {
     private readonly IGuiContext context;
     private readonly Widget.TopLevelCollection topLevels;
@@ -187,9 +187,9 @@ public sealed class GuiManager : IFontProvider
         }
     }
 
-    public Font GetFont(FontPreset presetFont)
+    public IFontFamily GetFont(PresetFontFamily family)
     {
-        return GetVisualStyle().GetFont(presetFont);
+        return GetVisualStyle().GetFont(family);
     }
 
     internal GraphicsDevice GetGraphicsDeviceInternal()

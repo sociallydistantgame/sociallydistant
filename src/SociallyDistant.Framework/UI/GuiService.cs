@@ -16,13 +16,20 @@ public sealed class GuiService :
     DrawableGameComponent,
     IGuiContext
 {
+    private readonly BlendState blendState = new BlendState
+    {
+        ColorSourceBlend = Blend.SourceAlpha,
+        ColorDestinationBlend = Blend.InverseSourceAlpha,
+        AlphaSourceBlend = Blend.One,
+        AlphaDestinationBlend = Blend.InverseSourceAlpha,
+    };
     private readonly IGameContext context;
     private readonly GuiManager acidicGui;
     private readonly IGuiContext guiContext;
     private readonly int[] screenQuad = new int[] { 0, 1, 2, 2, 1, 3 };
     private readonly VertexPositionColorTexture[] screenQuadVerts = new VertexPositionColorTexture[4];
     private readonly SociallyDistantVisualStyle visualStyle;
-    private Font? fallbackFont;
+    private IFontFamily? fallbackFont;
     private SpriteEffect? defaultEffect;
     private Texture2D? white = null;
     private RenderTarget2D? virtualScreen;
@@ -140,7 +147,7 @@ public sealed class GuiService :
         defaultEffect.Techniques[0].Passes[0].Apply();
         graphics.Textures[0] = texture ?? white;
         graphics.SamplerStates[0] = SamplerState.LinearClamp;
-        graphics.BlendState = BlendState.AlphaBlend;
+        graphics.BlendState = blendState;
         graphics.RasterizerState = GetRasterizerState(clipRect);
         graphics.ScissorRectangle = clipRect.GetValueOrDefault();
         graphics.DrawUserIndexedPrimitives<VertexPositionColorTexture>(PrimitiveType.TriangleList, vertices, 0,
@@ -170,10 +177,10 @@ public sealed class GuiService :
         }
     }
 
-    public Font GetFallbackFont()
+    public IFontFamily GetFallbackFont()
     {
         if (fallbackFont == null)
-            fallbackFont = Game.Content.Load<SpriteFont>("/Core/UI/Fonts/Rajdhani");
+            fallbackFont = new FontFamily(Game.Content.Load<SpriteFont>("/Core/UI/Fonts/Fallback"));
 
         return fallbackFont;
     }

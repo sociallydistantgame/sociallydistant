@@ -7,7 +7,7 @@ using Microsoft.Xna.Framework;
 
 namespace AcidicGUI.Widgets;
 
-public abstract partial class Widget : IFontProvider
+public abstract partial class Widget : IFontFamilyProvider
 {
     private readonly WidgetCollection children;
     private readonly Dictionary<Type, CustomPropertyObject> customProperties = new();
@@ -197,6 +197,9 @@ public abstract partial class Widget : IFontProvider
     
     internal void RenderInternal(GuiRenderer renderer)
     {
+        if (visibility != Visibility.Visible)
+            return;
+        
         if (cachedGeometry == null)
         {
             var geometryHelper = new GeometryHelper(renderer, ComputedOpacity, !HierarchyEnabled, GetClippingRectangle());
@@ -235,9 +238,9 @@ public abstract partial class Widget : IFontProvider
         return (T)obj;
     }
 
-    public Font GetFont(FontPreset presetFont)
+    public IFontFamily GetFont(PresetFontFamily family)
     {
-        return GuiManager.GetFont(presetFont);
+        return GuiManager.GetFont(family);
     }
 
     public void GiveFocus()

@@ -13,14 +13,49 @@ public class TextWidget : Widget
 {
     private readonly List<TextElement> textElements = new();
     private readonly StringBuilder stringBuilder = new();
-    
+
+    private Color? color;
     private FontInfo font;
     private string text = string.Empty;
-    private bool useMarkup = true;
+    private bool useMarkup = false;
     private bool wordWrapping = false;
     private bool showMarkup;
     private TextAlignment textAlignment;
+    private int? fontSize;
+    private FontWeight fontWeight = FontWeight.Normal;
 
+    public FontWeight FontWeight
+    {
+        get => fontWeight;
+        set
+        {
+            fontWeight = value;
+            InvalidateMeasurements();
+            InvalidateLayout();
+        }
+    }
+
+    public Color? TextColor
+    {
+        get => color;
+        set
+        {
+            color = value;
+            InvalidateGeometry();
+        }
+    }
+    
+    public int? FontSize
+    {
+        get => fontSize;
+        set
+        {
+            fontSize = value;
+            InvalidateMeasurements();
+            InvalidateLayout();
+        }
+    }
+    
     public bool ShowMarkup
     {
         get => showMarkup;
@@ -160,7 +195,7 @@ public class TextWidget : Widget
             var fontInstance = (element.MarkupData.FontOverride ?? font).GetFont(this);
             
             // TODO: Color from a property or the Visual Style.
-            var color = (element.MarkupData.ColorOverride ?? Color.White);
+            var color = (element.MarkupData.ColorOverride ?? TextColor) ?? GetVisualStyle().GetTextColor(this);
 
             if (element.MeasuredSize.HasValue && element.MarkupData.Highlight.A > 0)
             {
@@ -173,8 +208,9 @@ public class TextWidget : Widget
 
                 geometry.AddQuad(highlightRect, element.MarkupData.Highlight);
             }
-            
-            fontInstance.Draw(geometry, element.Position, color, element.Text);
+
+            fontInstance.Draw(geometry, element.Position, color, element.Text, element.MarkupData.FontSize ?? this.FontSize,
+                element.MarkupData.Weight ?? FontWeight, element.MarkupData.Italic);
 
             var strikeLine = 1;
             var underLine = 2;
@@ -222,7 +258,8 @@ public class TextWidget : Widget
             if (i == textElements.Count-1)
             {
                 textElements[i].MeasuredSize = (textElements[i].MarkupData.FontOverride ?? font).GetFont(this)
-                    .Measure(textElements[i].Text.TrimEnd());
+                    .Measure(textElements[i].Text.TrimEnd(), textElements[i].MarkupData.FontSize ?? FontSize,
+                        textElements[i].MarkupData.Weight ?? FontWeight, textElements[i].MarkupData.Italic);
             }
             
             var measurement = textElements[i].MeasuredSize.GetValueOrDefault();
@@ -234,8 +271,12 @@ public class TextWidget : Widget
                 if (i > 0)
                 {
                     offset.X -= textElements[i - 1].MeasuredSize!.Value.X;
-                    textElements[i - 1].MeasuredSize = (textElements[i - 1].MarkupData.FontOverride ?? font).GetFont(this)
-                        .Measure(textElements[i - 1].Text.TrimEnd());
+                    textElements[i - 1].MeasuredSize = (textElements[i - 1].MarkupData.FontOverride ?? font)
+                        .GetFont(this)
+                        .Measure(textElements[i - 1].Text.TrimEnd(),
+                            textElements[i - 1].MarkupData.FontSize ?? FontSize,
+                            textElements[i - 1].MarkupData.Weight ?? FontWeight,
+                            textElements[i - 1].MarkupData.Italic);
                     offset.X += textElements[i - 1].MeasuredSize!.Value.X;
                 }
 
@@ -335,6 +376,19 @@ public class TextWidget : Widget
 
         switch (beforeEquals)
         {
+            case "size":
+            {
+                if (!int.TryParse(afterEquals, out int size) || size < 0)
+                    return false;
+
+                markupData.FontSize = size;
+                return true;
+            }
+            case "/size":
+            {
+                markupData.FontSize = null;
+                return true;
+            }
             case "color":
             {
                 if (ColorHelpers.ParseColor(afterEquals, out Color color))
@@ -366,10 +420,10 @@ public class TextWidget : Widget
                 return true;
             }
             case "b":
-                markupData.Bold = true;
+                markupData.Weight = FontWeight.Bold;
                 return true;
             case "/b":
-                markupData.Bold = false;
+                markupData.Weight = null;
                 return true;
             case "i":
                 markupData.Italic = true;
@@ -647,7 +701,9 @@ public class TextWidget : Widget
             
             var fontInstance = (textElements[i].MarkupData.FontOverride ?? font).GetFont(this);
 
-            textElements[i].MeasuredSize = fontInstance.Measure(textElements[i].Text);
+            textElements[i].MeasuredSize = fontInstance.Measure(textElements[i].Text,
+                textElements[i].MarkupData.FontSize ?? FontSize, textElements[i].MarkupData.Weight ?? FontWeight,
+                textElements[i].MarkupData.Italic);
         }
     }
 
@@ -669,7 +725,7 @@ public class TextWidget : Widget
                 if (characterIndex == element.SourceStart)
                 {
                     string singleChar = element.Text.Substring(0, Math.Min(1, element.Text.Length));
-                    Vector2 charMeasure = fontInstance.Measure(singleChar);
+                    Vector2 charMeasure = fontInstance.Measure(singleChar, element.MarkupData.FontSize ?? FontSize, element.MarkupData.Weight ?? FontWeight, element.MarkupData.Italic);
 
                     return new LayoutRect(
                         element.Position.X,
@@ -682,12 +738,12 @@ public class TextWidget : Widget
                 string textToMeasure =
                     element.Text.Substring(0, Math.Min(element.Text.Length, characterIndex - element.SourceStart));
                 
-                Vector2 measurement = fontInstance.Measure(textToMeasure);
+                Vector2 measurement = fontInstance.Measure(textToMeasure, element.MarkupData.FontSize ?? FontSize, element.MarkupData.Weight ?? FontWeight, element.MarkupData.Italic);
 
                 string charAfterMeasure =
                     element.Text.Substring(textToMeasure.Length, Math.Min(1, element.Text.Length - textToMeasure.Length));
 
-                var singleCharMeasure = fontInstance.Measure(charAfterMeasure);
+                var singleCharMeasure = fontInstance.Measure(charAfterMeasure, element.MarkupData.FontSize ?? FontSize, element.MarkupData.Weight ?? FontWeight, element.MarkupData.Italic);
 
                 return new LayoutRect(
                     element.Position.X + measurement.X,
@@ -715,7 +771,8 @@ public class TextWidget : Widget
         public Color? ColorOverride;
         public Color Highlight;
         public FontInfo? FontOverride;
-        public bool Bold;
+        public FontWeight? Weight;
+        public int? FontSize;
         public bool Italic;
         public bool Underline;
         public bool Strikethrough;

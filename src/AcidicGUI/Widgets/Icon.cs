@@ -6,6 +6,7 @@ namespace AcidicGUI.Widgets;
 
 public sealed class Icon : Widget
 {
+    private Vector2 actualIconSize;
     private Color? color;
     private string iconString = string.Empty;
     private int iconSize = 24;
@@ -43,18 +44,18 @@ public sealed class Icon : Widget
     protected override Vector2 GetContentSize(Vector2 availableSize)
     {
         Font? iconFont = GetVisualStyle().IconFont;
-        if (iconFont == null)
+        if (iconFont == null || string.IsNullOrEmpty(iconString))
             return Vector2.Zero;
 
-        return new Vector2(iconSize, iconSize);
+        return actualIconSize = iconFont.Measure(iconString, iconSize);
     }
 
     protected override void RebuildGeometry(GeometryHelper geometry)
     {
         var font = GetVisualStyle().IconFont;
         
-        float x = ContentArea.Left + (ContentArea.Width - iconSize) / 2;
-        float y = ContentArea.Top + (ContentArea.Height - iconSize) / 2;
+        float x = ContentArea.Left + (ContentArea.Width - actualIconSize.X) / 2;
+        float y = ContentArea.Top + (ContentArea.Height - actualIconSize.Y) / 2;
 
         if (font == null)
             return;

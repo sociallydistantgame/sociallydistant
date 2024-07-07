@@ -3,8 +3,7 @@ namespace SociallyDistant.Core.Shell.Windowing
 {
 	public interface ITile : 
 		IWindow, 
-		ITabbedContent, 
-		IWorkspaceDefinition
+		ITabbedContent
 	{
 		bool ShowNewTab { get; set; }
 		

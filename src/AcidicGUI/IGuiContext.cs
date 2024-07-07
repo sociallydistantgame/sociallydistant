@@ -14,5 +14,5 @@ public interface IGuiContext
 
     void Render(VertexPositionColorTexture[] vertices, int[] indices, Texture2D? texture, LayoutRect? clipRect = null);
 
-    Font GetFallbackFont();
+    IFontFamily GetFallbackFont();
 }

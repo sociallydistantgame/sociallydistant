@@ -16,6 +16,17 @@ public partial class Widget
     private Vector2 minimumSize;
     private Vector2 maximumSize;
     private Vector2 previousAvailableSize;
+    private Visibility visibility;
+
+    public Visibility Visibility
+    {
+        get => visibility;
+        set
+        {
+            visibility = value;
+            InvalidateLayout();
+        }
+    }
 
     public Padding Margin
     {
@@ -114,6 +125,13 @@ public partial class Widget
         if (!layoutIsDirty)
             return;
 
+        if (visibility == Visibility.Collapsed)
+        {
+            this.calculatedLayoutRect = new LayoutRect(0, 0, 0, 0);
+            layoutIsDirty = false;
+            return;
+        }
+        
         var contentSize = GetCachedContentSize(availableSpace.Size);
         
         var left = 0f;
@@ -196,6 +214,12 @@ public partial class Widget
         
         if (cachedContentSize != null)
             return cachedContentSize.Value;
+
+        if (this.visibility == Visibility.Collapsed)
+        {
+            cachedContentSize = Vector2.Zero;
+            return cachedContentSize.Value;
+        }
         
         Vector2 contentSize = GetContentSize(availableSize);
         

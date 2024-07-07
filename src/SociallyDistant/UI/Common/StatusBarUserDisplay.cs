@@ -30,10 +30,12 @@ public sealed class StatusBarUserDisplay : Widget
     {
         text.UseMarkup = false;
         text.WordWrapping = false;
-        text.Font = FontPreset.Monospace;
+        text.Font = PresetFontFamily.Monospace;
+        text.VerticalAlignment = VerticalAlignment.Middle;
 
         avatar.IconSize = 21;
         avatar.IconString = MaterialIcons.AccountCircle;
+        avatar.VerticalAlignment = VerticalAlignment.Middle;
         
         stack.Direction = Direction.Horizontal;
         stack.Spacing = 3;
