@@ -9,11 +9,21 @@ public struct GuiSubMesh
     public readonly int[] Indices;
     public readonly Texture2D? Texture;
 
+    private bool isNewMesh = true;
+
+    public bool IsNew => isNewMesh;
+    
     public GuiSubMesh(VertexPositionColorTexture[] vertices, int[] indices, Texture2D? texture)
     {
         Vertices = vertices;
         Indices = indices;
         this.Texture = texture;
+        isNewMesh = true;
+    }
+
+    public void MarkAsOld()
+    {
+        isNewMesh = false;
     }
 }
 

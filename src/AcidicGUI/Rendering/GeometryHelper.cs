@@ -21,7 +21,7 @@ public class GeometryHelper : IFontStashRenderer2
         this.guiRenderer = guiRenderer;
         this.clipRect = clipRect;
         
-        whiteMesh = new GuiMeshBuilder(null, opacity, desaturate);
+        whiteMesh = new GuiMeshBuilder(null, guiRenderer.GetVertexCount(null), guiRenderer.Layer, opacity, desaturate);
     }
 
     public GuiMesh ExportMesh()
@@ -47,7 +47,7 @@ public class GeometryHelper : IFontStashRenderer2
 
         if (!meshes.TryGetValue(texture, out GuiMeshBuilder? builder))
         {
-            builder = new GuiMeshBuilder(texture, opacity, desaturate);
+            builder = new GuiMeshBuilder(texture, guiRenderer.GetVertexCount(texture), guiRenderer.Layer, opacity, desaturate);
             meshes.Add(texture, builder);
         }
 

@@ -199,7 +199,10 @@ public abstract partial class Widget : IFontFamilyProvider
         }
         
         renderer.RenderGuiMesh(cachedGeometry.Value);
+        renderer.RenderBatches();
 
+        renderer.PushLayer();
+        
         foreach (Widget child in children)
         {
             child.RenderInternal(renderer);

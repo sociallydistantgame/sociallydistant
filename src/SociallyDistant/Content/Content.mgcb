@@ -1,5 +1,5 @@
-/outputDir:bin/Debug/net8.0/
-/intermediateDir:obj/Debug/net8.0/
+/outputDir:bin/Release/net8.0/
+/intermediateDir:obj/Release/net8.0/
 /platform:DesktopGL
 /config:
 /profile:Reach

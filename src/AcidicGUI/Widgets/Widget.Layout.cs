@@ -5,18 +5,19 @@ namespace AcidicGUI.Widgets;
 
 public partial class Widget
 {
-    private Widget? layoutRoot;
-    private bool layoutIsDirty = true;
+    private Widget?             layoutRoot;
+    private bool                layoutIsDirty = true;
     private HorizontalAlignment horizontalAlignment;
-    private VerticalAlignment verticalAlignment;
-    private LayoutRect calculatedLayoutRect;
-    private Vector2? cachedContentSize;
-    private Padding padding;
-    private Padding margin;
-    private Vector2 minimumSize;
-    private Vector2 maximumSize;
-    private Vector2 previousAvailableSize;
-    private Visibility visibility;
+    private VerticalAlignment   verticalAlignment;
+    private LayoutRect          geometryRect;
+    private LayoutRect          calculatedLayoutRect;
+    private Vector2?            cachedContentSize;
+    private Padding             padding;
+    private Padding             margin;
+    private Vector2             minimumSize;
+    private Vector2             maximumSize;
+    private Vector2             previousAvailableSize;
+    private Visibility          visibility;
 
     public Visibility Visibility
     {
@@ -199,6 +200,12 @@ public partial class Widget
 
         ArrangeChildren(context, calculatedLayoutRect - margin);
 
+        if (geometryRect != calculatedLayoutRect)
+        {
+            InvalidateGeometry();
+            geometryRect = calculatedLayoutRect;
+        }
+        
         CalculateClipRect();
         
         layoutIsDirty = false;
@@ -290,6 +297,5 @@ public partial class Widget
         
         layoutIsDirty = true;
         cachedContentSize = null;
-        cachedGeometry = null;
     }
 }

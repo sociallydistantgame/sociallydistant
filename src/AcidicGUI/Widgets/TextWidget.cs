@@ -779,29 +779,29 @@ public class TextWidget : Widget
         );
     }
 
-    private struct MarkupData
+    private class MarkupData
     {
-        public int Length;
-        public Color? ColorOverride;
-        public Color Highlight;
-        public FontInfo? FontOverride;
+        public int         Length;
+        public Color?      ColorOverride;
+        public Color       Highlight;
+        public FontInfo?   FontOverride;
         public FontWeight? Weight;
-        public int? FontSize;
-        public bool Italic;
-        public bool Underline;
-        public bool Strikethrough;
-        public bool Selected;
-        public string? Link;
+        public int?        FontSize;
+        public bool        Italic;
+        public bool        Underline;
+        public bool        Strikethrough;
+        public bool        Selected;
+        public string?     Link;
     }
     
     private class TextElement
     {
-        public string Text;
-        public Vector2 Position;
-        public Vector2? MeasuredSize;
-        public bool IsNewLine;
-        public int SourceStart;
-        public int SourceEnd;
-        public MarkupData MarkupData;
+        public string     Text;
+        public Vector2    Position;
+        public Vector2?   MeasuredSize;
+        public bool       IsNewLine;
+        public int        SourceStart;
+        public int        SourceEnd;
+        public MarkupData MarkupData = new();
     }
 }

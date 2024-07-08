@@ -68,6 +68,26 @@ public struct LayoutRect
             return new LayoutRect(0, 0, 0, 0);
         }
     }
+
+    public static bool operator ==(LayoutRect left, LayoutRect right)
+    {
+        return (Math.Abs(left.Left - right.Left) < float.Epsilon) && (Math.Abs(left.Top - right.Top) < float.Epsilon) && (Math.Abs(left.Width - right.Width) < float.Epsilon) && (Math.Abs(left.Height - right.Height) < float.Epsilon);
+    }
+
+    public static bool operator !=(LayoutRect left, LayoutRect right)
+    {
+        return !(left == right);
+    }
+
+    public override bool Equals(object? obj)
+    {
+        return obj is LayoutRect right && this == right;
+    }
+
+    public override int GetHashCode()
+    {
+        return HashCode.Combine(Left, Top, Width, Height);
+    }
 }
 
 public enum ClippingMode

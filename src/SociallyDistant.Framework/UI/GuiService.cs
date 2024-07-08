@@ -154,6 +154,44 @@ public sealed class GuiService :
             vertices.Length, indices, 0, indices.Length / 3);
     }
 
+    public void Render(
+        VertexBuffer vertices,
+        IndexBuffer indices,
+        int offset,
+        int primitiveCount,
+        Texture2D? texture,
+        LayoutRect? clipRect = null
+    )
+    {
+        var device = Game.GraphicsDevice;
+        
+        if (defaultEffect == null)
+        {
+            defaultEffect = new SpriteEffect(Game.GraphicsDevice);
+        }
+
+        if (white == null)
+        {
+            white = new Texture2D(Game.GraphicsDevice, 1, 1);
+            white.SetData(new Color[] { Color.White });
+        }
+        
+        if (primitiveCount == 0)
+            return;
+        
+        defaultEffect.Techniques[0].Passes[0].Apply();
+        device.Textures[0] = texture ?? white;
+        device.SamplerStates[0] = SamplerState.LinearClamp;
+        device.BlendState = blendState;
+        device.RasterizerState = GetRasterizerState(clipRect);
+        device.DepthStencilState = DepthStencilState.DepthRead;
+        device.ScissorRectangle = clipRect.GetValueOrDefault();
+        
+        device.SetVertexBuffer(vertices);
+        device.Indices = indices;
+        device.DrawIndexedPrimitives(PrimitiveType.TriangleList, 0, offset, primitiveCount);
+    }
+
     private RasterizerState GetRasterizerState(LayoutRect? clipRect)
     {
         scissor ??= new RasterizerState()

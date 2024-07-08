@@ -30,6 +30,7 @@ public class GuiController : GameComponent,
     private readonly FlexPanel           mainPanel = new();
     private readonly StatusBar           statusBar;
     private readonly OverlayWidget       workArea           = new();
+    private readonly OverlayWidget       overlays           = new();
     private readonly Box                 mainBox            = new();
     private readonly FloatingWorkspace   floatingWindowArea = new();
     private readonly GuiService          guiService;
@@ -58,7 +59,8 @@ public class GuiController : GameComponent,
         notificationManager = new NotificationManager(game.WorldManager);
 
         guiService.GuiRoot.TopLevels.Add(mainPanel);
-
+        guiService.GuiRoot.TopLevels.Add(overlays);
+        
         mainPanel.ChildWidgets.Add(statusBar);
         mainPanel.ChildWidgets.Add(workArea);
 
@@ -127,7 +129,7 @@ public class GuiController : GameComponent,
     private OverlayWorkspace CreateOverlayWorkspace()
     {
         var workspace = new OverlayWorkspace();
-        this.workArea.ChildWidgets.Add(workspace);
+        this.overlays.ChildWidgets.Add(workspace);
         return workspace;
     }
 
@@ -172,7 +174,7 @@ public class GuiController : GameComponent,
             systemSettings?.Dispose();
             systemSettings = null;
 
-            workArea.ChildWidgets.Remove(overlay);
+            overlays.ChildWidgets.Remove(overlay);
         }
     }
 }

@@ -13,6 +13,7 @@ public interface IGuiContext
     GraphicsDevice GraphicsDevice { get; }
 
     void Render(VertexPositionColorTexture[] vertices, int[] indices, Texture2D? texture, LayoutRect? clipRect = null);
-
+    void Render(VertexBuffer vertices, IndexBuffer indices, int offset, int primitiveCount, Texture2D? texture, LayoutRect? clipRect = null);
+    
     IFontFamily GetFallbackFont();
 }

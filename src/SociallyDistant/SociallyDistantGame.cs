@@ -2,6 +2,7 @@
 using System.Reactive.Subjects;
 using System.Text;
 using AcidicGUI;
+using Microsoft.VisualBasic;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using Serilog;
@@ -132,6 +133,7 @@ internal sealed class SociallyDistantGame :
 
 		timeData = Time.Initialize();
 		graphicsManager = new GraphicsDeviceManager(this);
+		graphicsManager.GraphicsProfile = GraphicsProfile.HiDef;
 
 		tabbedTools = new TabbedToolCollection(this);
 

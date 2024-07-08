@@ -166,8 +166,12 @@ public sealed class GuiManager : IFontFamilyProvider
     {
         isRendering = true;
 
+        renderer.SetLayer(0);
+        
         foreach (Widget widget in topLevels)
             widget.RenderInternal(renderer);
+
+        renderer.RenderBatches();
         
         isRendering = false;
     }

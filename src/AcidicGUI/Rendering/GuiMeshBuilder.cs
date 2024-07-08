@@ -6,16 +6,20 @@ namespace AcidicGUI.Rendering;
 public sealed class GuiMeshBuilder
 {
     private readonly List<VertexPositionColorTexture> vertices = new();
-    private readonly List<int> indices = new();
-    private readonly Texture2D? texture;
-    private readonly float opacity;
-    private readonly bool desaturate;
+    private readonly List<int>                        indices  = new();
+    private readonly Texture2D?                       texture;
+    private readonly float                            opacity;
+    private readonly bool                             desaturate;
+    private readonly int                              baseVertex;
+    private readonly float                            layer;
 
-    public GuiMeshBuilder(Texture2D? texture, float opacity, bool desaturate)
+    public GuiMeshBuilder(Texture2D? texture, int baseVertex, int layer, float opacity, bool desaturate)
     {
         this.texture = texture;
         this.opacity = opacity;
         this.desaturate = desaturate;
+            //this.baseVertex = baseVertex;
+            //this.layer = layer * float.Epsilon;
     }
 
     public VertexPositionColorTexture this[int index]
@@ -32,6 +36,7 @@ public sealed class GuiMeshBuilder
     {
         int index = vertices.Count;
 
+        vertex.Position.Z = layer;
         vertex.Color.A = (byte)(vertex.Color.A * opacity);
 
         if (desaturate)
@@ -63,9 +68,9 @@ public sealed class GuiMeshBuilder
 
     public void AddTriangle(int a, int b, int c)
     {
-        indices.Add(a);
-        indices.Add(b);
-        indices.Add(c);
+        indices.Add(a + baseVertex);
+        indices.Add(b + baseVertex);
+        indices.Add(c + baseVertex);
     }
 
     public void AddQuad(int a, int b, int c, int d)
