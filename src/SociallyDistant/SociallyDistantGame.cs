@@ -216,6 +216,8 @@ internal sealed class SociallyDistantGame :
 
 	protected override void OnExiting(object sender, EventArgs args)
 	{
+		SetGameMode(GameMode.Loading);
+        
 		settingsManager.Save();
 		base.OnExiting(sender, args);
 	}
