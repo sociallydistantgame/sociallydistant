@@ -58,7 +58,7 @@ namespace SociallyDistant.GameplaySystems.Networld
 		}
 
 		/// <inheritdoc />
-		public async Task NetworkUpdate()
+		public void NetworkUpdate()
 		{
 			// Receive from the loopback interface.
 			Packet? loopbackPacket = null;

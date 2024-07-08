@@ -8,7 +8,7 @@ public class GuiSynchronizationContext : SynchronizationContext
 {
     private readonly ConcurrentQueue<Action> _messagesToProcess = new ConcurrentQueue<Action>();
     private readonly Queue<Action>           thisFrameQueue     = new Queue<Action>();
-
+    
     public GuiSynchronizationContext()
     {
         SynchronizationContext.SetSynchronizationContext(this);

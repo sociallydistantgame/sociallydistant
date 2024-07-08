@@ -27,24 +27,23 @@ namespace SociallyDistant.GameplaySystems.Networld
 		}
 
 		/// <inheritdoc />
-		public async Task NetworkUpdate()
+		public void NetworkUpdate()
 		{
-			// Update all devices
-			await Task.WhenAll(devices.Select(n => n.NetworkUpdate())
-				.Append(Task.Run(() =>
-				{
-					var continueREading = false;
-					do
-					{
-						continueREading = false;
+			foreach (DeviceNode device in devices)
+			{
+				device.NetworkUpdate();
+			}
+			
+			var continueREading = false;
+			do
+			{
+				continueREading = false;
 
-						// Read packets from all interfaces
-						continueREading |= ReadPackets(this.outboundInterface);
-						foreach (NetworkInterface iface in insideInterfaces)
-							continueREading |= ReadPackets(iface);
-					} while (continueREading);
-				}))
-			);
+				// Read packets from all interfaces
+				continueREading |= ReadPackets(this.outboundInterface);
+				foreach (NetworkInterface iface in insideInterfaces)
+					continueREading |= ReadPackets(iface);
+			} while (continueREading);
 		}
 
 		private void Dispatch(Packet packet)

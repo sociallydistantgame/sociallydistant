@@ -83,7 +83,7 @@ namespace SociallyDistant.GameplaySystems.Networld
 			Log.Information("The Internet is now down!");
 		}
 		
-		private async void RunSimulation()
+		private void RunSimulation()
 		{
 			var stopwatch = new Stopwatch();
             
@@ -96,7 +96,7 @@ namespace SociallyDistant.GameplaySystems.Networld
 				try
 				{
 					workQueue.RunPendingWork();
-					await coreRouter.NetworkUpdate();
+					coreRouter.NetworkUpdate();
 				}
 				catch (Exception ex)
 				{

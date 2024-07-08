@@ -23,22 +23,22 @@ namespace SociallyDistant.GameplaySystems.Networld
 		}
 
 		/// <inheritdoc />
-		public async Task NetworkUpdate()
+		public void NetworkUpdate()
 		{
-			await Task.WhenAll(localAreaNodes.Select(n => n.NetworkUpdate())
-				.Append(Task.Run(() =>
-				{
-					var continueReading = false;
+			foreach (LocalAreaNode node in localAreaNodes)
+			{
+				node.NetworkUpdate();
+			}
+			
+			var continueReading = false;
 
-					do
-					{
-						continueReading = false;
+			do
+			{
+				continueReading = false;
 
-						continueReading |= ReadCorePackets();
-						continueReading |= ReadNeighbours();
-					} while (continueReading);
-				}))
-			);
+				continueReading |= ReadCorePackets();
+				continueReading |= ReadNeighbours();
+			} while (continueReading);
 		}
 
 		private bool ReadCorePackets()

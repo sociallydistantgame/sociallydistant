@@ -32,18 +32,19 @@ namespace SociallyDistant.GameplaySystems.Networld
 					this.localSubnetTemplates.Add(subnet);
 			}
 		}
-		
+
 		/// <inheritdoc />
-		public async Task NetworkUpdate()
+		public void NetworkUpdate()
 		{
-			await Task.WhenAll(
-				localAreaNodes.Select<LocalAreaNode, Func<Task>>(x => x.NetworkUpdate)
-					.Union(neighbours.Select<InternetServiceNode, Func<Task>>(x => x.NetworkUpdate))
-						.Select(x => Task.Run(async () =>
-						{
-							await x();
-						}))
-					);
+			var larger = Math.Max(neighbours.Count, localAreaNodes.Count);
+			for (var i = 0; i < larger; i++)
+			{
+				if (i < localAreaNodes.Count)
+					localAreaNodes[i].NetworkUpdate();
+
+				if (i < neighbours.Count)
+					neighbours[i].NetworkUpdate();
+			}
 		}
 
 		/// <inheritdoc />
