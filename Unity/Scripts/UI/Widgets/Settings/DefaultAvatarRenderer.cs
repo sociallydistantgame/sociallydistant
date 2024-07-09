@@ -1,4 +1,4 @@
-#nullable enable
+Avatar#nullable enable
 using System;
 using ThisOtherThing.UI.Shapes;
 using UnityEngine;

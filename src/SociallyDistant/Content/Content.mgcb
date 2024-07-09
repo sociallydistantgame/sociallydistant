@@ -5,6 +5,15 @@
 /profile:Reach
 /compress:false
 
+#begin Shaders/CyanMagentaMap.fx
+/importer:EffectImporter
+/processor:EffectProcessor
+/processorParam:Importer=EffectImporter
+/processorParam:Processor=EffectProcessor
+/processorParam:DebugMode=Auto
+/processorParam:Defines=
+/build:Shaders/CyanMagentaMap.fx
+
 #begin Shaders/UI_Core.fx
 /importer:EffectImporter
 /processor:EffectProcessor
@@ -61,6 +70,18 @@
 /processorParam:MakeSquare=false
 /processorParam:TextureFormat=color
 /build:Backgrounds/Socially-Distant-Bg-wallpapers-light-normal.jpg
+
+#begin Textures/DefaultAvatarMap.png
+/importer:TextureImporter
+/processor:TextureProcessor
+/processorParam:ColorKeyColor=255,0,255,255
+/processorParam:ColorKeyEnabled=false
+/processorParam:GenerateMipmaps=false
+/processorParam:PremultiplyAlpha=false
+/processorParam:ResizeToPowerOfTwo=false
+/processorParam:MakeSquare=false
+/processorParam:TextureFormat=color
+/build:Textures/DefaultAvatarMap.png
 
 #begin UI/Fonts/Fallback.spritefont
 /importer:FontDescriptionImporter

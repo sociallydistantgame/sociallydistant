@@ -2,7 +2,6 @@
 using System.Reactive.Subjects;
 using System.Text;
 using AcidicGUI;
-using Microsoft.VisualBasic;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using Serilog;
@@ -127,7 +126,7 @@ internal sealed class SociallyDistantGame :
 
 	public IObservable<PlayerInfo> PlayerInfoObservable => playerInfoObservable;
 
-	private SociallyDistantGame()
+	internal SociallyDistantGame()
 	{
 		instance = this;
 
@@ -484,7 +483,7 @@ internal sealed class SociallyDistantGame :
 
 		try
 		{
-			using var game = new SociallyDistantGame();
+			using var game = new GameApplication();
 			game.Run();
 		}
 		finally

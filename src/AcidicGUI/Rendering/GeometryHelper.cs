@@ -57,7 +57,12 @@ public class GeometryHelper : IFontStashRenderer2
         AddRoundedRectangle(rectangle, uniformRadius, uniformRadius, uniformRadius, uniformRadius, color, texture);
     }
 
-    public void AddQuadOutline(LayoutRect rectangle, float thickness, Color color, Texture2D? texture = null)
+    public void AddQuadOutline(
+        LayoutRect rectangle,
+        float thickness,
+        Color color,
+        Texture2D? texture = null
+    )
     {
         float smallerHalf = Math.Min(rectangle.Width, rectangle.Height) / 2;
         if (smallerHalf <= thickness)
@@ -66,49 +71,58 @@ public class GeometryHelper : IFontStashRenderer2
             return;
         }
 
+        float texelWidth = 1f / (texture?.Width ?? 1f);
+        float texelHeight = 1f / (texture?.Height ?? 1f);
+
         var mesh = GetMeshBuilder(texture);
 
-        var tl = mesh.AddVertex(new Vector2(rectangle.Left, rectangle.Top), color);
-        var tr = mesh.AddVertex(new Vector2(rectangle.Right, rectangle.Top), color);
-        var bl = mesh.AddVertex(new Vector2(rectangle.Left, rectangle.Bottom), color);
-        var br = mesh.AddVertex(new Vector2(rectangle.Right, rectangle.Bottom), color);
-     
-        var tlInner = mesh.AddVertex(new Vector2(rectangle.Left + thickness, rectangle.Top + thickness), color);
-        var trInner = mesh.AddVertex(new Vector2(rectangle.Right - thickness, rectangle.Top + thickness), color);
-        var blInner = mesh.AddVertex(new Vector2(rectangle.Left + thickness, rectangle.Bottom - thickness), color);
-        var brInner = mesh.AddVertex(new Vector2(rectangle.Right - thickness, rectangle.Bottom - thickness), color);
+        var tl = mesh.AddVertex(new Vector2(rectangle.Left,                   rectangle.Top),                color, new Vector2(0,                          0));
+        var tr = mesh.AddVertex(new Vector2(rectangle.Right,                  rectangle.Top),                color, new Vector2(1,                          0));
+        var bl = mesh.AddVertex(new Vector2(rectangle.Left,                   rectangle.Bottom),             color, new Vector2(0,                          1));
+        var br = mesh.AddVertex(new Vector2(rectangle.Right,                  rectangle.Bottom),             color, new Vector2(1,                          1));
+        var tlInner = mesh.AddVertex(new Vector2(rectangle.Left + thickness,  rectangle.Top + thickness),    color, new Vector2(texelWidth * thickness,     texelHeight * thickness));
+        var trInner = mesh.AddVertex(new Vector2(rectangle.Right - thickness, rectangle.Top + thickness),    color, new Vector2(1 - texelWidth * thickness, texelHeight * thickness));
+        var blInner = mesh.AddVertex(new Vector2(rectangle.Left + thickness,  rectangle.Bottom - thickness), color, new Vector2(texelWidth * thickness,     1 - texelHeight * thickness));
+        var brInner = mesh.AddVertex(new Vector2(rectangle.Right - thickness, rectangle.Bottom - thickness), color, new Vector2(1 - texelWidth * thickness, 1 - texelHeight * thickness));
 
-        mesh.AddQuad(tl, tr, tlInner, trInner);
-        mesh.AddQuad(tl, tlInner, bl, blInner);
-        mesh.AddQuad(trInner, tr, brInner, br);
-        mesh.AddQuad(blInner, brInner, bl, br);
+        mesh.AddQuad(tl,      tr,      tlInner, trInner);
+        mesh.AddQuad(tl,      tlInner, bl,      blInner);
+        mesh.AddQuad(trInner, tr,      brInner, br);
+        mesh.AddQuad(blInner, brInner, bl,      br);
     }
-    
+
     public void AddQuad(LayoutRect rectangle, Color color, Texture2D? texture = null)
     {
         var mesh = GetMeshBuilder(texture);
-        
-        int tl = mesh.AddVertex(new Vector2(rectangle.Left, rectangle.Top), color, new Vector2(0, 0));
-        int tr = mesh.AddVertex(new Vector2(rectangle.Right, rectangle.Top), color, new Vector2(1, 0));
-        int bl = mesh.AddVertex(new Vector2(rectangle.Left, rectangle.Bottom), color, new Vector2(0, 1));
+
+        int tl = mesh.AddVertex(new Vector2(rectangle.Left,  rectangle.Top),    color, new Vector2(0, 0));
+        int tr = mesh.AddVertex(new Vector2(rectangle.Right, rectangle.Top),    color, new Vector2(1, 0));
+        int bl = mesh.AddVertex(new Vector2(rectangle.Left,  rectangle.Bottom), color, new Vector2(0, 1));
         int br = mesh.AddVertex(new Vector2(rectangle.Right, rectangle.Bottom), color, new Vector2(1, 1));
-        
+
         mesh.AddQuad(tl, tr, bl, br);
     }
-    
-    public void AddRoundedRectangle(LayoutRect rectangle, float radiusTopLeft, float radiusTopRight,
-        float radiusBottomLeft, float radiusBottomRight, Color color, Texture2D? texture = null)
+
+    public void AddRoundedRectangle(
+        LayoutRect rectangle,
+        float radiusTopLeft,
+        float radiusTopRight,
+        float radiusBottomLeft,
+        float radiusBottomRight,
+        Color color,
+        Texture2D? texture = null
+    )
     {
         var mesh = GetMeshBuilder(texture);
-        
+
         float halfWidth = rectangle.Width / 2;
         float halfHeight = rectangle.Height / 2;
 
         float smallerHalf = MathF.Min(halfWidth, halfHeight);
 
-        radiusTopLeft = MathHelper.Clamp(radiusTopLeft, 0, smallerHalf);
-        radiusBottomLeft = MathHelper.Clamp(radiusBottomLeft, 0, smallerHalf);
-        radiusTopRight = MathHelper.Clamp(radiusTopRight, 0, smallerHalf);
+        radiusTopLeft = MathHelper.Clamp(radiusTopLeft,         0, smallerHalf);
+        radiusBottomLeft = MathHelper.Clamp(radiusBottomLeft,   0, smallerHalf);
+        radiusTopRight = MathHelper.Clamp(radiusTopRight,       0, smallerHalf);
         radiusBottomRight = MathHelper.Clamp(radiusBottomRight, 0, smallerHalf);
 
         if (radiusTopLeft <= 0 && radiusTopRight <= 0 && radiusBottomLeft <= 0 && radiusBottomRight <= 0)
@@ -116,36 +130,43 @@ public class GeometryHelper : IFontStashRenderer2
             AddQuad(rectangle, color);
             return;
         }
-        
-        const int segments = 16;
 
-        int innerTL = mesh.AddVertex(new Vector2(rectangle.Left + radiusTopLeft, rectangle.Top + radiusTopLeft), color);
-        int innerTR = mesh.AddVertex(new Vector2(rectangle.Right - radiusTopRight, rectangle.Top + radiusTopRight), color);
-        int innerBL = mesh.AddVertex(new Vector2(rectangle.Left + radiusBottomLeft, rectangle.Bottom - radiusBottomLeft), color);
-        int innerBR = mesh.AddVertex(new Vector2(rectangle.Right - radiusBottomRight, rectangle.Bottom - radiusBottomRight), color);
+        float radiusTopLeftUV = radiusTopLeft / rectangle.Width;
+        float radiusTopRightUV = radiusTopRight / rectangle.Width;
+        float radiusBottomLeftUV = radiusBottomLeft / rectangle.Width;
+        float radiusBottomRightUV = radiusBottomRight / rectangle.Width;
+        
+        
+        float texelWidth = 1f /  (float)(texture?.Width ?? 1f);
+        float texelHeight = 1f / (float) (texture?.Height ?? 1f);
+        
+        int innerTL = mesh.AddVertex(new Vector2(rectangle.Left + radiusTopLeft,      rectangle.Top + radiusTopLeft),        color, new Vector2(radiusTopLeftUV,         radiusTopLeftUV));
+        int innerTR = mesh.AddVertex(new Vector2(rectangle.Right - radiusTopRight,    rectangle.Top + radiusTopRight),       color, new Vector2(1 - radiusTopRightUV,    radiusTopRightUV));
+        int innerBL = mesh.AddVertex(new Vector2(rectangle.Left + radiusBottomLeft,   rectangle.Bottom - radiusBottomLeft),  color, new Vector2(radiusBottomLeftUV,      1 - radiusBottomLeftUV));
+        int innerBR = mesh.AddVertex(new Vector2(rectangle.Right - radiusBottomRight, rectangle.Bottom - radiusBottomRight), color, new Vector2(1 - radiusBottomRightUV, 1 - radiusBottomRightUV));
 
-        int outerTL1 = mesh.AddVertex(new Vector2(rectangle.Left, rectangle.Top + radiusTopLeft), color);
-        int outerTL2 = mesh.AddVertex(new Vector2(rectangle.Left + radiusTopLeft, rectangle.Top), color);
-        int outerTR1 = mesh.AddVertex(new Vector2(rectangle.Right, rectangle.Top + radiusTopRight), color);
-        int outerTR2 = mesh.AddVertex(new Vector2(rectangle.Right - radiusTopRight, rectangle.Top), color);
-        int outerBL1 = mesh.AddVertex(new Vector2(rectangle.Left, rectangle.Bottom - radiusBottomLeft), color);
-        int outerBL2 = mesh.AddVertex(new Vector2(rectangle.Left + radiusBottomLeft, rectangle.Bottom), color);
-        int outerBR1 = mesh.AddVertex(new Vector2(rectangle.Right, rectangle.Bottom - radiusBottomRight), color);
-        int outerBR2 = mesh.AddVertex(new Vector2(rectangle.Right - radiusBottomRight, rectangle.Bottom), color);
-        
-        mesh.AddQuad(outerTL1, innerTL, outerBL1, innerBL);
-        mesh.AddQuad(outerTL2, outerTR2, innerTL, innerTR);
-        mesh.AddQuad(innerTR, outerTR1, innerBR, outerBR1);
-        mesh.AddQuad(innerBL, innerBR, outerBL2, outerBR2);
-        mesh.AddQuad(innerTL, innerTR, innerBL, innerBR);
-        
-        AddQuarterCircleAroundPivotVertices(mesh, innerTL, outerTL2, radiusTopLeft, -1, -1, true, color);
-        AddQuarterCircleAroundPivotVertices(mesh, innerTR, outerTR2, radiusTopRight, 1, -1, false, color);
-        AddQuarterCircleAroundPivotVertices(mesh, innerBL, outerBL2, radiusBottomLeft, -1, 1, false, color);
-        AddQuarterCircleAroundPivotVertices(mesh, innerBR, outerBR2, radiusBottomRight, 1, 1, true, color);
+        int outerTL1 = mesh.AddVertex(new Vector2(rectangle.Left,                      rectangle.Top + radiusTopLeft),        color, new Vector2(0,                       radiusTopLeftUV));
+        int outerTL2 = mesh.AddVertex(new Vector2(rectangle.Left + radiusTopLeft,      rectangle.Top),                        color, new Vector2(radiusTopLeftUV,         0));
+        int outerTR1 = mesh.AddVertex(new Vector2(rectangle.Right,                     rectangle.Top + radiusTopRight),       color, new Vector2(1,                       radiusTopRightUV));
+        int outerTR2 = mesh.AddVertex(new Vector2(rectangle.Right - radiusTopRight,    rectangle.Top),                        color, new Vector2(1 - radiusTopRightUV,    0));
+        int outerBL1 = mesh.AddVertex(new Vector2(rectangle.Left,                      rectangle.Bottom - radiusBottomLeft),  color, new Vector2(0,                       1 - radiusBottomLeftUV));
+        int outerBL2 = mesh.AddVertex(new Vector2(rectangle.Left + radiusBottomLeft,   rectangle.Bottom),                     color, new Vector2(radiusBottomLeftUV,      1));
+        int outerBR1 = mesh.AddVertex(new Vector2(rectangle.Right,                     rectangle.Bottom - radiusBottomRight), color, new Vector2(1,                       1 - radiusBottomRightUV));
+        int outerBR2 = mesh.AddVertex(new Vector2(rectangle.Right - radiusBottomRight, rectangle.Bottom),                     color, new Vector2(1 - radiusBottomRightUV, 1));
+
+        mesh.AddQuad(outerTL1, innerTL,  outerBL1, innerBL);
+        mesh.AddQuad(outerTL2, outerTR2, innerTL,  innerTR);
+        mesh.AddQuad(innerTR,  outerTR1, innerBR,  outerBR1);
+        mesh.AddQuad(innerBL,  innerBR,  outerBL2, outerBR2);
+        mesh.AddQuad(innerTL,  innerTR,  innerBL,  innerBR);
+
+        AddQuarterCircleAroundPivotVertices(mesh, innerTL, outerTL2, radiusTopLeft,     -1, -1, true,  color, radiusTopLeftUV,         radiusTopLeftUV,         radiusTopLeftUV);
+        AddQuarterCircleAroundPivotVertices(mesh, innerTR, outerTR2, radiusTopRight,    1,  -1, false, color, 1 - radiusTopRightUV,    radiusTopRightUV,        radiusTopRightUV);
+        AddQuarterCircleAroundPivotVertices(mesh, innerBL, outerBL2, radiusBottomLeft,  -1, 1,  false, color, radiusBottomLeftUV,      1 - radiusBottomLeftUV,  radiusBottomLeftUV);
+        AddQuarterCircleAroundPivotVertices(mesh, innerBR, outerBR2, radiusBottomRight, 1,  1,  true,  color, 1 - radiusBottomRightUV, 1 - radiusBottomRightUV, radiusBottomRightUV);
     }
 
-    private void AddQuarterCircleAroundPivotVertices(GuiMeshBuilder mesh, int pivotVertex, int extent, float radius, float directionH, float directionV, bool reverseWinding, Color color)
+    private void AddQuarterCircleAroundPivotVertices(GuiMeshBuilder mesh, int pivotVertex, int extent, float radius, float directionH, float directionV, bool reverseWinding, Color color, float uvX, float uvY, float texelRadius)
     {
         Vector3 center = mesh[pivotVertex].Position;
 
@@ -161,8 +182,13 @@ public class GeometryHelper : IFontStashRenderer2
             
             float x1 = x * (radius * directionH) + center.X;
             float y1 = y * (radius * directionV) + center.Y;
-            
-            int next = mesh.AddVertex(new Vector2(x1, y1), color);
+
+            float u = (x * (texelRadius * directionH)) + uvX;
+            float v = (y * (texelRadius * directionV)) + uvY;
+
+
+
+            int next = mesh.AddVertex(new Vector2(x1, y1), color, new Vector2(u, v));
 
             if (reverseWinding)
                 mesh.AddTriangle(pivotVertex, next, last);
