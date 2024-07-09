@@ -88,6 +88,16 @@ public sealed class GuiRenderer
         foreach (GuiBatch batch in batches.Values)
             batch.DrawBatch(effectOverride, opacity);
     }
+
+    public void Grab(RenderTarget2D destination)
+    {
+        context.Grab(destination);
+    }
+
+    public void Restore()
+    {
+        context.RestoreRenderState();
+    }
     
     public GraphicsDevice GraphicsDevice => context.GraphicsDevice;
 }

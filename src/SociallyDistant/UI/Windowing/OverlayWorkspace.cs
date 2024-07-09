@@ -1,5 +1,7 @@
 using AcidicGUI.Widgets;
+using SociallyDistant.Core.Modules;
 using SociallyDistant.Core.Shell.Windowing;
+using SociallyDistant.Core.UI.Effects;
 using SociallyDistant.Core.UI.VisualStyles;
 
 namespace SociallyDistant.UI.Windowing;
@@ -14,6 +16,7 @@ public class OverlayWorkspace :
     {
         Children.Add(workspace);
         this.SetCustomProperty(WidgetBackgrounds.Overlay);
+        this.RenderEffect = BackgroundBlurWidgetEffect.GetEffect(Application.Instance.Context);
     }
     
     public Window CreateWindow(string title, Widget? client = default)

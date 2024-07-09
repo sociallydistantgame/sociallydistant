@@ -50,7 +50,7 @@ public sealed class GuiService :
     public void SetVirtualScreenSize(int width, int height)
     {
         virtualScreen?.Dispose();
-        virtualScreen = new RenderTarget2D(Game.GraphicsDevice, width, height, false, SurfaceFormat.Rgba64, DepthFormat.Depth24Stencil8);
+        virtualScreen = new RenderTarget2D(Game.GraphicsDevice, width, height, false, SurfaceFormat.Color, DepthFormat.Depth24Stencil8, 4, RenderTargetUsage.PreserveContents);
 
         int physicalWidth = Game.GraphicsDevice.PresentationParameters.BackBufferWidth;
         int physicalHeight = Game.GraphicsDevice.PresentationParameters.BackBufferHeight;
@@ -110,16 +110,7 @@ public sealed class GuiService :
 
     public override void Draw(GameTime gameTime)
     {
-        if (virtualScreen == null)
-            return;
-
-        // TODO: Render the entire game to a virtual screen so we can do background-blurs
-        Game.GraphicsDevice.SetRenderTarget(virtualScreen);
-        Game.GraphicsDevice.Clear(Color.Transparent);
         acidicGui.Render();
-        Game.GraphicsDevice.SetRenderTarget(null);
-        
-        Render(screenQuadVerts, screenQuad, virtualScreen);
     }
 
     public float PhysicalScreenWidget => virtualScreen?.Width ?? Game.GraphicsDevice.Viewport.Width;
@@ -152,6 +143,7 @@ public sealed class GuiService :
         var graphics = Game.GraphicsDevice;
 
         defaultEffect.Use(0);
+        defaultEffect.UpdateOpacity(1);
         graphics.Textures[0] = texture ?? white;
         graphics.SamplerStates[0] = SamplerState.LinearClamp;
         graphics.BlendState = blendState;
@@ -206,7 +198,12 @@ public sealed class GuiService :
 
     public void Grab(RenderTarget2D destination)
     {
-        // TODO: Implement grabbing
+        context.VirtualScreen?.Blit(destination);
+    }
+
+    public void RestoreRenderState()
+    {
+        context.VirtualScreen?.Activate();
     }
 
     private RasterizerState GetRasterizerState(LayoutRect? clipRect)

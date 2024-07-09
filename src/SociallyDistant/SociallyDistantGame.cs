@@ -71,18 +71,20 @@ internal sealed class SociallyDistantGame :
 	private readonly        BackdropController           backdrop;
 	private readonly        BackdropUpdater              backdropUpdater;
 	private readonly        GuiController                guiController;
-
-	private bool            areModulesLoaded;
-	private Task            initializeTask;
-	private PlayerInfo      playerInfo = new();
-	private bool            initialized;
-	private RenderTarget2D? virtualScreen;
-	private SpriteEffect?   virtualScreenShader;
-	private IGameData?      currentGameData;
-	private PlayerInfo      loadedPlayerInfo;
+	private                 bool                         areModulesLoaded;
+	private                 Task                         initializeTask;
+	private                 PlayerInfo                   playerInfo = new();
+	private                 bool                         initialized;
+	private                 SpriteEffect?                virtualScreenShader;
+	private                 IGameData?                   currentGameData;
+	private                 PlayerInfo                   loadedPlayerInfo;
+	private                 VirtualScreen?               virtualScreen;
 
 	public bool IsGameActive => CurrentGameMode == GameMode.OnDesktop;
 
+	/// <inheritdoc />
+	public IVirtualScreen? VirtualScreen => virtualScreen;
+	
 	/// <inheritdoc />
 	public IModuleManager ModuleManager => moduleManager;
 
@@ -175,7 +177,6 @@ internal sealed class SociallyDistantGame :
 
 		this.guiController = new GuiController(this, playerManager);
 		Components.Add(guiController);
-		Components.Add(devTools);
 
 
 
@@ -204,6 +205,8 @@ internal sealed class SociallyDistantGame :
 	{
 		base.Initialize();
 
+		virtualScreen = new VirtualScreen(GraphicsDevice);
+		
 		var graphicsSettings = new GraphicsSettings(settingsManager);
 		graphicsManager.IsFullScreen = graphicsSettings.Fullscreen;
 		graphicsManager.ApplyChanges();
@@ -211,6 +214,7 @@ internal sealed class SociallyDistantGame :
 		ApplyVirtualDisplayMode(graphicsSettings);
 
 		initializeTask = InitializeAsync();
+		devTools.Initialize();
 	}
 
 	protected override void OnExiting(object sender, EventArgs args)
@@ -432,6 +436,8 @@ internal sealed class SociallyDistantGame :
 	/// <inheritdoc />
 	protected override void Update(GameTime gameTime)
 	{
+		virtualScreen?.Activate();
+        
 		// Run any scheduled actions
 		globalSchedule.RunPendingWork();
 
@@ -456,12 +462,19 @@ internal sealed class SociallyDistantGame :
 		}
 
 		base.Update(gameTime);
+		devTools.Update(gameTime);
 	}
 
 	protected override void Draw(GameTime gameTime)
 	{
 		GraphicsDevice.Clear(Color.Black);
 		base.Draw(gameTime);
+
+		virtualScreen?.Deactivate();
+		virtualScreen?.Blit();
+
+		// DevTools uses IMGUI, so do not render it to the virtual screen.
+		devTools.Draw(gameTime);
 	}
 
 	public static SociallyDistantGame Instance => instance;
@@ -505,7 +518,7 @@ internal sealed class SociallyDistantGame :
 			settings.DisplayResolution = $"{mode.Width}x{mode.Height}";
 		}
 
-		gui.SetVirtualScreenSize(mode.Width, mode.Height);
+		virtualScreen?.SetSize(mode.Width, mode.Height);
 	}
 
 	private bool TryParseResolution(string? resolution, out DisplayMode displayMode)

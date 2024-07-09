@@ -21,6 +21,8 @@ public interface IGuiContext
     /// </summary>
     /// <param name="destination"></param>
     void Grab(RenderTarget2D destination);
+
+    void RestoreRenderState();
     
     IFontFamily GetFallbackFont();
 }
