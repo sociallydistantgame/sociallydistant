@@ -1,5 +1,6 @@
 using System.Collections;
 using System.Numerics;
+using AcidicGUI.Effects;
 using Microsoft.Xna.Framework.Graphics;
 
 namespace AcidicGUI.Rendering;
@@ -80,12 +81,12 @@ public sealed class GuiRenderer
         whiteBatch.Submit(subMesh);
     }
 
-    public void RenderBatches()
+    public void RenderBatches(IEffect? effectOverride = null, float opacity = 1)
     {
-        whiteBatch?.DrawBatch();
+        whiteBatch?.DrawBatch(effectOverride, opacity);
         
         foreach (GuiBatch batch in batches.Values)
-            batch.DrawBatch();
+            batch.DrawBatch(effectOverride, opacity);
     }
     
     public GraphicsDevice GraphicsDevice => context.GraphicsDevice;
@@ -171,7 +172,7 @@ public sealed class GuiBatch
         cpuIndices.AddRange(subMesh.Indices);
     }
     
-    public void DrawBatch()
+    public void DrawBatch(IEffect? effectOverride, float opacity)
     {
         if (cpuIndices.Count == 0 || cpuVertices.Count == 0)
             return;
@@ -203,7 +204,7 @@ public sealed class GuiBatch
             dirty = false;
         }
 
-        context.Render(vertexBuffer, indexBuffer, 0, cpuIndices.Count / 3, texture, null);
+        context.Render(vertexBuffer, indexBuffer, 0, cpuIndices.Count / 3, texture, null, effectOverride, opacity);
         
         cpuVertices.Clear();
         cpuIndices.Clear();

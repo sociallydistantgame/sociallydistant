@@ -7,21 +7,19 @@ namespace AcidicGUI.Rendering;
 
 public class GeometryHelper : IFontStashRenderer2
 {
-    private readonly GuiMeshBuilder whiteMesh;
+    private readonly GuiMeshBuilder                        whiteMesh;
     private readonly Dictionary<Texture2D, GuiMeshBuilder> meshes = new();
-    private readonly GuiRenderer guiRenderer;
-    private readonly bool desaturate;
-    private readonly float opacity;
-    private readonly LayoutRect? clipRect;
+    private readonly GuiRenderer                           guiRenderer;
+    private readonly bool                                  desaturate;
+    private readonly LayoutRect?                           clipRect;
 
-    internal GeometryHelper(GuiRenderer guiRenderer, float opacity, bool desaturate, LayoutRect? clipRect)
+    internal GeometryHelper(GuiRenderer guiRenderer, bool desaturate, LayoutRect? clipRect)
     {
-        this.opacity = opacity;
         this.desaturate = desaturate;
         this.guiRenderer = guiRenderer;
         this.clipRect = clipRect;
         
-        whiteMesh = new GuiMeshBuilder(null, guiRenderer.GetVertexCount(null), guiRenderer.Layer, opacity, desaturate);
+        whiteMesh = new GuiMeshBuilder(null, guiRenderer.GetVertexCount(null), guiRenderer.Layer, desaturate);
     }
 
     public GuiMesh ExportMesh()
@@ -47,7 +45,7 @@ public class GeometryHelper : IFontStashRenderer2
 
         if (!meshes.TryGetValue(texture, out GuiMeshBuilder? builder))
         {
-            builder = new GuiMeshBuilder(texture, guiRenderer.GetVertexCount(texture), guiRenderer.Layer, opacity, desaturate);
+            builder = new GuiMeshBuilder(texture, guiRenderer.GetVertexCount(texture), guiRenderer.Layer, desaturate);
             meshes.Add(texture, builder);
         }
 

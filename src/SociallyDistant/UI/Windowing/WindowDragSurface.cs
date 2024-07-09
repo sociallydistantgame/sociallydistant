@@ -31,6 +31,9 @@ public sealed class WindowDragSurface :
 
     public void OnDrag(MouseButtonEvent e)
     {
+        if (e.Button != MouseButton.Left)
+            return;
+        
         if (!dragging)
             return;
 
@@ -46,6 +49,9 @@ public sealed class WindowDragSurface :
 
     public void OnDragEnd(MouseButtonEvent e)
     {
+        if (e.Button != MouseButton.Left)
+            return;
+        
         if (!dragging)
             return;
 

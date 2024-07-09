@@ -8,15 +8,13 @@ public sealed class GuiMeshBuilder
     private readonly List<VertexPositionColorTexture> vertices = new();
     private readonly List<int>                        indices  = new();
     private readonly Texture2D?                       texture;
-    private readonly float                            opacity;
     private readonly bool                             desaturate;
     private readonly int                              baseVertex;
     private readonly float                            layer;
 
-    public GuiMeshBuilder(Texture2D? texture, int baseVertex, int layer, float opacity, bool desaturate)
+    public GuiMeshBuilder(Texture2D? texture, int baseVertex, int layer, bool desaturate)
     {
         this.texture = texture;
-        this.opacity = opacity;
         this.desaturate = desaturate;
             //this.baseVertex = baseVertex;
             //this.layer = layer * float.Epsilon;
@@ -37,7 +35,6 @@ public sealed class GuiMeshBuilder
         int index = vertices.Count;
 
         vertex.Position.Z = layer;
-        vertex.Color.A = (byte)(vertex.Color.A * opacity);
 
         if (desaturate)
             vertex.Color.A = (byte) (vertex.Color.A / 2);

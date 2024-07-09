@@ -1,5 +1,6 @@
 using AcidicGUI;
 using AcidicGUI.CustomProperties;
+using AcidicGUI.Effects;
 using AcidicGUI.Layout;
 using AcidicGUI.Rendering;
 using AcidicGUI.TextRendering;
@@ -8,6 +9,7 @@ using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework.Input;
 using SociallyDistant.Core.Modules;
+using SociallyDistant.Core.UI.Effects;
 using SociallyDistant.Core.UI.VisualStyles;
 
 namespace SociallyDistant.Core.UI;
@@ -23,18 +25,18 @@ public sealed class GuiService :
         AlphaSourceBlend = Blend.One,
         AlphaDestinationBlend = Blend.InverseSourceAlpha,
     };
-    private readonly IGameContext context;
-    private readonly GuiManager acidicGui;
-    private readonly IGuiContext guiContext;
-    private readonly int[] screenQuad = new int[] { 0, 1, 2, 2, 1, 3 };
+    private readonly IGameContext                 context;
+    private readonly GuiManager                   acidicGui;
+    private readonly IGuiContext                  guiContext;
+    private readonly int[]                        screenQuad      = new int[] { 0, 1, 2, 2, 1, 3 };
     private readonly VertexPositionColorTexture[] screenQuadVerts = new VertexPositionColorTexture[4];
-    private readonly SociallyDistantVisualStyle visualStyle;
-    private IFontFamily? fallbackFont;
-    private SpriteEffect? defaultEffect;
-    private Texture2D? white = null;
-    private RenderTarget2D? virtualScreen;
-    private RasterizerState? scissor;
-    private RasterizerState? noScissor;
+    private readonly SociallyDistantVisualStyle   visualStyle;
+    private          IFontFamily?                 fallbackFont;
+    private          MonoGameEffect?              defaultEffect;
+    private          Texture2D?                   white = null;
+    private          RenderTarget2D?              virtualScreen;
+    private          RasterizerState?             scissor;
+    private          RasterizerState?             noScissor;
 
     public GuiManager GuiRoot => acidicGui;
     
@@ -122,12 +124,17 @@ public sealed class GuiService :
 
     public float PhysicalScreenWidget => virtualScreen?.Width ?? Game.GraphicsDevice.Viewport.Width;
     public float PhysicalScreenHeight => virtualScreen?.Height ?? Game.GraphicsDevice.Viewport.Height;
+
+    private MonoGameEffect LoadDefaultEffect()
+    {
+        return new MonoGameEffect(Game.Content.Load<Effect>("/Core/Shaders/UI_Core"));
+    }
     
     public void Render(VertexPositionColorTexture[] vertices, int[] indices, Texture2D? texture, LayoutRect? clipRect = null)
     {
         if (defaultEffect == null)
         {
-            defaultEffect = new SpriteEffect(Game.GraphicsDevice);
+            defaultEffect = LoadDefaultEffect();
         }
 
         if (white == null)
@@ -144,7 +151,7 @@ public sealed class GuiService :
         
         var graphics = Game.GraphicsDevice;
 
-        defaultEffect.Techniques[0].Passes[0].Apply();
+        defaultEffect.Use(0);
         graphics.Textures[0] = texture ?? white;
         graphics.SamplerStates[0] = SamplerState.LinearClamp;
         graphics.BlendState = blendState;
@@ -160,14 +167,16 @@ public sealed class GuiService :
         int offset,
         int primitiveCount,
         Texture2D? texture,
-        LayoutRect? clipRect = null
+        LayoutRect? clipRect = null,
+        IEffect? effectOverride = null,
+        float opacity = 1
     )
     {
         var device = Game.GraphicsDevice;
         
         if (defaultEffect == null)
         {
-            defaultEffect = new SpriteEffect(Game.GraphicsDevice);
+            defaultEffect = LoadDefaultEffect();
         }
 
         if (white == null)
@@ -178,8 +187,11 @@ public sealed class GuiService :
         
         if (primitiveCount == 0)
             return;
+
+        IEffect effectToUse = effectOverride ?? defaultEffect;
         
-        defaultEffect.Techniques[0].Passes[0].Apply();
+        effectToUse.Use(0);
+        effectToUse.UpdateOpacity(opacity);
         device.Textures[0] = texture ?? white;
         device.SamplerStates[0] = SamplerState.LinearClamp;
         device.BlendState = blendState;
@@ -190,6 +202,11 @@ public sealed class GuiService :
         device.SetVertexBuffer(vertices);
         device.Indices = indices;
         device.DrawIndexedPrimitives(PrimitiveType.TriangleList, 0, offset, primitiveCount);
+    }
+
+    public void Grab(RenderTarget2D destination)
+    {
+        // TODO: Implement grabbing
     }
 
     private RasterizerState GetRasterizerState(LayoutRect? clipRect)

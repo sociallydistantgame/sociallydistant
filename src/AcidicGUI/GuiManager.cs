@@ -253,7 +253,7 @@ public sealed class GuiManager : IFontFamilyProvider
         
         if (previous == current)
         {
-            if (widgetBeingDragged == null)
+            if (widgetBeingDragged == null || current == ButtonState.Released)
                 return;
 
             Bubble<IDragHandler, MouseButtonEvent>(widgetBeingDragged, e, x => x.OnDrag);

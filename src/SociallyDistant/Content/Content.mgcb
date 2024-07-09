@@ -5,6 +5,15 @@
 /profile:Reach
 /compress:false
 
+#begin Shaders/UI_Core.fx
+/importer:EffectImporter
+/processor:EffectProcessor
+/processorParam:Importer=EffectImporter
+/processorParam:Processor=EffectProcessor
+/processorParam:DebugMode=Auto
+/processorParam:Defines=
+/build:Shaders/UI_Core.fx
+
 #begin Backgrounds/Socially-Distant-Bg-wallpapers-dark-distorted.jpg
 /importer:TextureImporter
 /processor:TextureProcessor

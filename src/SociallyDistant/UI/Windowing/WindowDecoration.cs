@@ -12,14 +12,14 @@ namespace SociallyDistant.UI.Windowing;
 
 public class WindowDecoration : Widget
 {
-    private readonly FlexPanel flexPanel = new();
-    private readonly FlexPanel titleBar = new();
-    private readonly Box borderBox = new();
-    private readonly Box clientBox = new();
-    private readonly WindowBase window;
-    private readonly WindowDragSurface dragSurface;
+    private readonly FlexPanel           flexPanel = new();
+    private readonly FlexPanel           titleBar  = new();
+    private readonly Box                 borderBox = new();
+    private readonly Box                 clientBox = new();
+    private readonly WindowBase          window;
+    private readonly WindowDragSurface   dragSurface;
     private readonly CompositeIconWidget titleIcon = new();
-    private readonly WindowTabList tabList = new();
+    private readonly WindowTabList       tabList   = new();
     
     private WindowHints hints;
 

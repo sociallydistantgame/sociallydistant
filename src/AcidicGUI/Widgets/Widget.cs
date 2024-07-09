@@ -1,4 +1,5 @@
 using AcidicGUI.CustomProperties;
+using AcidicGUI.Effects;
 using AcidicGUI.Layout;
 using AcidicGUI.Rendering;
 using AcidicGUI.TextRendering;
@@ -12,15 +13,22 @@ public abstract partial class Widget : IFontFamilyProvider
     private readonly WidgetCollection children;
     private readonly Dictionary<Type, CustomPropertyObject> customProperties = new();
 
-    private IVisualStyle? visualStyleOverride;
-    private Widget?       parent;
-    private GuiManager?   guiManager;
-    private GuiMesh?      cachedGeometry;
-    private float         renderOpacity = 1;
-    private bool          enabled       = true;
-    private ClippingMode  clippingMode;
-    private LayoutRect    clipRect;
+    private IVisualStyle?  visualStyleOverride;
+    private Widget?        parent;
+    private GuiManager?    guiManager;
+    private GuiMesh?       cachedGeometry;
+    private float          renderOpacity = 1;
+    private bool           enabled       = true;
+    private ClippingMode   clippingMode;
+    private LayoutRect     clipRect;
+    private IWidgetEffect? effectOverride;
 
+    public IWidgetEffect? RenderEffect
+    {
+        get => effectOverride;
+        set => effectOverride = value;
+    }
+    
     public bool IsFocused
     {
         get
@@ -191,15 +199,19 @@ public abstract partial class Widget : IFontFamilyProvider
         if (visibility != Visibility.Visible)
             return;
         
+        effectOverride?.UpdateParameters(this, renderer);
+        
         if (cachedGeometry == null)
         {
-            var geometryHelper = new GeometryHelper(renderer, ComputedOpacity, !HierarchyEnabled, clipRect);
+            var geometryHelper = new GeometryHelper(renderer, !HierarchyEnabled, clipRect);
+            effectOverride?.BeforeRebuildGeometry(geometryHelper);
             RebuildGeometry(geometryHelper);
+            effectOverride?.AfterRebuildGeometry(geometryHelper);
             cachedGeometry = geometryHelper.ExportMesh();
         }
         
         renderer.RenderGuiMesh(cachedGeometry.Value);
-        renderer.RenderBatches();
+        renderer.RenderBatches(effectOverride, ComputedOpacity);
 
         renderer.PushLayer();
         
