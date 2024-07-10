@@ -10,6 +10,8 @@ public abstract class Font : IDisposable
 
     public abstract Vector2 Measure(string text, int? fontSize = null);
     public abstract void Draw(GeometryHelper geometryHelper, Vector2 position, Color color, string text, int? fontSize = null);
+
+    public abstract float GetLineHeight(int? fontSizePixels);
     
     public static Font FromTtfFile(string filePath, int fontSize)
     {

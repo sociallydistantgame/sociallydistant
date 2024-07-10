@@ -82,7 +82,7 @@ public class TerminalWidget : Widget,
         Vector2 charSize = fontFamily.Measure("#");
 
         this.characterWidth = charSize.X;
-        this.lineHeight = charSize.Y;
+        this.lineHeight = fontFamily.GetLineHeight();
 
         int availableColumns = (int)MathF.Floor(availableSize.X / characterWidth);
         int availableRows = (int)MathF.Floor(availableSize.Y / lineHeight);

@@ -9,6 +9,8 @@ internal sealed class DynamicFont : Font
     private readonly FontSystem fontSystem = new();
     private readonly float fontSize;
 
+    
+    
     static DynamicFont()
     {
         FontSystemDefaults.KernelWidth = 2;
@@ -31,7 +33,7 @@ internal sealed class DynamicFont : Font
         if (string.IsNullOrEmpty(text))
         {
             return new Vector2(0,
-                fontSystem.GetFont(fontSizePixels ?? fontSize).LineHeight);
+                fontSystem.GetFont((fontSizePixels ?? fontSize) * 1.333f).LineHeight);
         }
         
         return fontSystem.GetFont((fontSizePixels ?? this.fontSize) * 1.333f).MeasureString(text);
@@ -40,5 +42,10 @@ internal sealed class DynamicFont : Font
     public override void Draw(GeometryHelper geometryHelper, Vector2 position, Color color, string text, int? fontSizePixels)
     {
         fontSystem.GetFont((fontSizePixels ?? this.fontSize) * 1.333f).DrawText(geometryHelper, text, position, color);
+    }
+
+    public override float GetLineHeight(int? fontSizePixels)
+    {
+        return fontSystem.GetFont((fontSizePixels ?? fontSize) * 1.333f).LineHeight;
     }
 }

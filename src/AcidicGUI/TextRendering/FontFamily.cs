@@ -47,6 +47,11 @@ public sealed class FontFamily : IFontFamily
         return last ?? regularFont;
     }
 
+    public float GetLineHeight(int? fontSizePixels = null, FontWeight weight = FontWeight.Normal, bool preferItalic = false)
+    {
+        return GetFont(weight, preferItalic).GetLineHeight(fontSizePixels);
+    }
+
     public Vector2 Measure(string text, int? fontSize = null, FontWeight weight = FontWeight.Normal,
         bool preferItalic = false)
     {

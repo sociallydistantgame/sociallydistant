@@ -99,6 +99,11 @@ internal sealed class SimpleFont : Font
         }
     }
 
+    public override float GetLineHeight(int? fontSizePixels)
+    {
+        return spriteFont.LineSpacing;
+    }
+
     private unsafe int GetGlyphIndex(SpriteFont.Glyph* glyphs, char character)
     {
         if (!glyphIndices.TryGetValue(character, out int index))
