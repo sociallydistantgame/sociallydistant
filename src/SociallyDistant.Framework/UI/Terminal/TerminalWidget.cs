@@ -23,7 +23,8 @@ public class TerminalWidget : Widget,
     ILoseFocusHandler,
     IMouseDownHandler,
     IKeyDownHandler,
-    IKeyCharHandler
+    IKeyCharHandler,
+    IKeyUpHandler
 {
     private readonly WorkQueue                    workQueue         = new();
     private readonly WorkQueue                    emulatorWorkQueue = new WorkQueue();
@@ -54,6 +55,12 @@ public class TerminalWidget : Widget,
     private          int                          currentCursorY;
     private          TerminalColorPalette?        paletteOverride;
     private          float                        backgroundOpacity = 1;
+    private          bool                         controlDown;
+    private          bool                         altDown;
+    private          bool                         shiftDown;
+    private          bool                         rightControlDown;
+    private          bool                         rightAltDown;
+    private          bool                         rightShiftDown;
 
     public ITextConsole Console => console;
 
@@ -365,7 +372,47 @@ public class TerminalWidget : Widget,
 
     public void OnKeyDown(KeyEvent e)
     {
-        // TODO: Modifiers are not supported by the game engine.
-        simpleTerminal.Input.Raw(e.Key, false, false, false);
+        if (e.Key == Keys.LeftControl)
+            controlDown = true;
+
+        if (e.Key == Keys.RightControl)
+            rightControlDown = true;
+
+        if (e.Key == Keys.LeftShift)
+            shiftDown = true;
+
+        if (e.Key == Keys.RightShift)
+            rightShiftDown = true;
+
+        if (e.Key == Keys.LeftAlt)
+            altDown = true;
+
+        if (e.Key == Keys.RightAlt)
+            rightAltDown = true;
+        
+        
+        simpleTerminal.Input.Raw(e.Key, controlDown || rightControlDown, altDown || rightAltDown, shiftDown || rightShiftDown);
+    }
+
+    public void OnKeyUp(KeyEvent e)
+    {
+        if (e.Key == Keys.LeftControl)
+            controlDown = false;
+
+        if (e.Key == Keys.RightControl)
+            rightControlDown = false;
+
+        if (e.Key == Keys.LeftShift)
+            shiftDown = false;
+
+        if (e.Key == Keys.RightShift)
+            rightShiftDown = false;
+
+        if (e.Key == Keys.LeftAlt)
+            altDown = false;
+
+        if (e.Key == Keys.RightAlt)
+            rightAltDown = false;
+
     }
 }
