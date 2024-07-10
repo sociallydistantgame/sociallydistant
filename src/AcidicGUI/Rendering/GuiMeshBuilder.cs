@@ -5,19 +5,25 @@ namespace AcidicGUI.Rendering;
 
 public sealed class GuiMeshBuilder
 {
+    private readonly GeometryHelper                   geometry;
     private readonly List<VertexPositionColorTexture> vertices = new();
     private readonly List<int>                        indices  = new();
     private readonly Texture2D?                       texture;
     private readonly bool                             desaturate;
     private readonly int                              baseVertex;
-    private readonly float                            layer;
 
-    public GuiMeshBuilder(Texture2D? texture, int baseVertex, int layer, bool desaturate)
+    public void Clear()
     {
+        vertices.Clear();
+        indices.Clear();
+    }
+    
+    public GuiMeshBuilder(GeometryHelper geometry, Texture2D? texture, int baseVertex, bool desaturate)
+    {
+        this.geometry = geometry;
         this.texture = texture;
         this.desaturate = desaturate;
             //this.baseVertex = baseVertex;
-            //this.layer = layer * float.Epsilon;
     }
 
     public VertexPositionColorTexture this[int index]
@@ -34,7 +40,7 @@ public sealed class GuiMeshBuilder
     {
         int index = vertices.Count;
 
-        vertex.Position.Z = layer;
+        vertex.Position.Z = geometry.Layer;
 
         if (desaturate)
             vertex.Color.A = (byte) (vertex.Color.A / 2);

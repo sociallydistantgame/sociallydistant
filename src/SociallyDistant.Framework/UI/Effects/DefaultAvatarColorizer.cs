@@ -29,11 +29,11 @@ public sealed class DefaultAvatarColorizer : MonoGameEffect,
             : Color.Black.ToVector4();
     }
 
-    public void BeforeRebuildGeometry(GeometryHelper geometry)
+    public void BeforeRebuildGeometry(Widget widget, GuiRenderer renderer, bool isGeometryDirty)
     {
     }
 
-    public void AfterRebuildGeometry(GeometryHelper geometry)
+    public void AfterRebuildGeometry(Widget widget, GuiRenderer renderer)
     {
     }
 

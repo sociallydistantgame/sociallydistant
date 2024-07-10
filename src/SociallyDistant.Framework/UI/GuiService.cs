@@ -25,6 +25,8 @@ public sealed class GuiService :
         AlphaSourceBlend = Blend.One,
         AlphaDestinationBlend = Blend.InverseSourceAlpha,
     };
+
+    private readonly DepthStencilState            depthStencilState = DepthStencilState.None;
     private readonly IGameContext                 context;
     private readonly GuiManager                   acidicGui;
     private readonly IGuiContext                  guiContext;
@@ -106,6 +108,8 @@ public sealed class GuiService :
         var mouse = Mouse.GetState(Game.Window);
         
         acidicGui.SetMouseState(mouse);
+        
+        acidicGui.Update(Time.deltaTime);
     }
 
     public override void Draw(GameTime gameTime)
@@ -188,7 +192,7 @@ public sealed class GuiService :
         device.SamplerStates[0] = SamplerState.LinearClamp;
         device.BlendState = blendState;
         device.RasterizerState = GetRasterizerState(clipRect);
-        device.DepthStencilState = DepthStencilState.DepthRead;
+        device.DepthStencilState= depthStencilState;
         device.ScissorRectangle = clipRect.GetValueOrDefault();
         
         device.SetVertexBuffer(vertices);

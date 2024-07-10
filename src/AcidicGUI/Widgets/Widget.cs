@@ -201,18 +201,20 @@ public abstract partial class Widget : IFontFamilyProvider
         
         effectOverride?.UpdateParameters(this, renderer);
         
+        effectOverride?.BeforeRebuildGeometry(this, renderer, cachedGeometry == null);
+        
         if (cachedGeometry == null)
         {
             var geometryHelper = new GeometryHelper(renderer, !HierarchyEnabled, clipRect);
-            effectOverride?.BeforeRebuildGeometry(geometryHelper);
             RebuildGeometry(geometryHelper);
-            effectOverride?.AfterRebuildGeometry(geometryHelper);
             cachedGeometry = geometryHelper.ExportMesh();
         }
         
         renderer.RenderGuiMesh(cachedGeometry.Value);
         renderer.RenderBatches(effectOverride, ComputedOpacity);
 
+        effectOverride?.AfterRebuildGeometry(this, renderer);
+        
         renderer.PushLayer();
         
         foreach (Widget child in children)

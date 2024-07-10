@@ -65,7 +65,7 @@ public sealed class VirtualScreen : IVirtualScreen
         graphicsDevice.Textures[0] = virtualScreenTarget;
         graphicsDevice.SamplerStates[0] = SamplerState.AnisotropicClamp;
         graphicsDevice.BlendState = BlendState.AlphaBlend;
-        graphicsDevice.DepthStencilState = DepthStencilState.DepthRead;
+        graphicsDevice.DepthStencilState= DepthStencilState.None;
         graphicsDevice.RasterizerState = RasterizerState.CullNone;
         graphicsDevice.SetVertexBuffer(quadVerts);
         graphicsDevice.Indices = quad;

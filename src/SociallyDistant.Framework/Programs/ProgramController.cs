@@ -15,6 +15,7 @@ public abstract class ProgramController
     }
 
     protected IUser User => context.Process.User;
+    protected ISystemProcess Process => context.Process;
     
     protected ProgramController(ProgramContext context)
     {

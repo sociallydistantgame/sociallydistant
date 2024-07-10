@@ -49,7 +49,7 @@ public class MonoGameEffect :
         {
             lastViewport = viewport;
 
-            Matrix.CreateOrthographicOffCenter(0, viewport.Width, viewport.Height, 0, 0, -1, out transformMatrix);
+            Matrix.CreateOrthographicOffCenter(0, viewport.Width, viewport.Height, 0, -32768, 32768, out transformMatrix);
         }
 
         transformMatrixParameter.SetValue(transformMatrix);

@@ -7,7 +7,7 @@ public interface IWidgetEffect : IEffect
 {
     void UpdateParameters(Widget widget, GuiRenderer renderer);
 
-    void BeforeRebuildGeometry(GeometryHelper geometry);
-    void AfterRebuildGeometry(GeometryHelper geometry);
+    void BeforeRebuildGeometry(Widget widget, GuiRenderer renderer, bool isGeometryDirty);
+    void AfterRebuildGeometry(Widget widget, GuiRenderer renderer);
 }
 

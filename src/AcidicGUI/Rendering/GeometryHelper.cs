@@ -12,28 +12,41 @@ public class GeometryHelper : IFontStashRenderer2
     private readonly GuiRenderer                           guiRenderer;
     private readonly bool                                  desaturate;
     private readonly LayoutRect?                           clipRect;
+    private readonly List<GuiSubMesh>                      flushedMeshes = new();
 
-    internal GeometryHelper(GuiRenderer guiRenderer, bool desaturate, LayoutRect? clipRect)
+    public float Layer => guiRenderer.Layer;
+    
+    public GeometryHelper(GuiRenderer guiRenderer, bool desaturate, LayoutRect? clipRect)
     {
         this.desaturate = desaturate;
         this.guiRenderer = guiRenderer;
         this.clipRect = clipRect;
         
-        whiteMesh = new GuiMeshBuilder(null, guiRenderer.GetVertexCount(null), guiRenderer.Layer, desaturate);
+        whiteMesh = new GuiMeshBuilder(this, null, guiRenderer.GetVertexCount(null), desaturate);
     }
 
-    public GuiMesh ExportMesh()
+    public void PushLayer()
     {
-        var meshList = new GuiSubMesh[meshes.Count + 1];
+        guiRenderer.PushLayer();
+    }
 
-        meshList[0] = whiteMesh.ExportSubMesh();
+    private void Flush()
+    {
+        flushedMeshes.Add(whiteMesh.ExportSubMesh());
+        whiteMesh.Clear();
 
-        var i = 1;
         foreach (GuiMeshBuilder mesh in meshes.Values)
         {
-            meshList[i] = mesh.ExportSubMesh();
-            i++;
+            flushedMeshes.Add(mesh.ExportSubMesh());
+            mesh.Clear();
         }
+    }
+    
+    public GuiMesh ExportMesh()
+    {
+        Flush();
+
+        var meshList = flushedMeshes.ToArray();
 
         return new GuiMesh(meshList, clipRect);
     }
@@ -45,7 +58,7 @@ public class GeometryHelper : IFontStashRenderer2
 
         if (!meshes.TryGetValue(texture, out GuiMeshBuilder? builder))
         {
-            builder = new GuiMeshBuilder(texture, guiRenderer.GetVertexCount(texture), guiRenderer.Layer, desaturate);
+            builder = new GuiMeshBuilder(this, texture, guiRenderer.GetVertexCount(texture), desaturate);
             meshes.Add(texture, builder);
         }
 

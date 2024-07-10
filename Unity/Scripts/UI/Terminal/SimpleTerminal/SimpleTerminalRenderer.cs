@@ -95,35 +95,12 @@ namespace UI.Terminal.SimpleTerminal
 
 		[Header("Layout")]
 		
-		private VerticalLayoutGroup textAreaGroup = null!;
-
-		private readonly WorkQueue workQueue = new WorkQueue();
-		private readonly WorkQueue emulatorWorkQueue = new WorkQueue();
-		private readonly MultiCancellationTokenSource tokenSource = new MultiCancellationTokenSource();
-
-		private int clickCount;
-		private int mainThreadId;
 		private ThreadSafeTerminalRenderer terminalRenderer;
-		private float characterWidth;
-		private float lineHeight;
-		private int rowCount;
-		private int columnCount;
 		private LayoutElement layoutElement;
 		private float ww;
 		private float wh;
-		private SimpleTerminal simpleTerminal;
 		private RectTransform parentRectTransform;
 		private RectTransform rectTransform;
-		private TerminalOptions ptyOptions = new TerminalOptions();
-		private PseudoTerminal master;
-		private PseudoTerminal slave;
-		private ITextConsole console;
-		private Thread? emulatorThread;
-		private ManualResetEvent emulatorShutdownCompleted = new ManualResetEvent(false);
-		private volatile bool emulatorEnabled = false;
-		private float clickTime = 0;
-		private float clickDoubleTime = 0;
-		private Task? resizeTask;
 		
 		public RectTransform TextAreaTransform => textAreaGroup.transform as RectTransform;
 		public int DefaultRowCount => this.rowCount;
@@ -154,9 +131,6 @@ namespace UI.Terminal.SimpleTerminal
 
 		private void Awake()
 		{
-			workQueue.MaximumWorkPerUpdate = 1;
-			mainThreadId = Thread.CurrentThread.ManagedThreadId;
-			
 			this.MustGetComponent(out rectTransform);
 			this.MustGetComponent(out layoutElement);
 			this.MustGetComponent(out layoutElement);

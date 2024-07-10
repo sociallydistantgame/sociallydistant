@@ -1,3 +1,4 @@
+using AcidicGUI.CustomProperties;
 using AcidicGUI.Effects;
 using AcidicGUI.Rendering;
 using AcidicGUI.Widgets;
@@ -85,19 +86,30 @@ public sealed class BackgroundBlurWidgetEffect : IWidgetEffect,
         renderer.Restore();
     }
 
-    public void BeforeRebuildGeometry(GeometryHelper geometry)
+    public void BeforeRebuildGeometry(Widget widget, GuiRenderer renderer, bool isGeometryDirty)
     {
-        var mesh = geometry.GetMeshBuilder(blurTarget1);
+        var cache = widget.GetCustomProperties<CachedGeometry>();
+        if (cache.Geometry == null || isGeometryDirty)
+        {
+            var helper = new GeometryHelper(renderer, !widget.HierarchyEnabled, widget.ClippedContentArea);
+            var mesh = helper.GetMeshBuilder(blurTarget1);
 
-        int v1 = mesh.AddVertex(new Vector2(widgetPosition.X,                widgetPosition.Y),                Color.White, new Vector2(texelSize.X * widgetPosition.X,                  texelSize.Y * widgetPosition.Y));
-        int v2 = mesh.AddVertex(new Vector2(widgetPosition.X + widgetSize.X, widgetPosition.Y),                Color.White, new Vector2(texelSize.X * (widgetPosition.X + widgetSize.X), texelSize.Y * widgetPosition.Y));
-        int v3 = mesh.AddVertex(new Vector2(widgetPosition.X,                widgetPosition.Y + widgetSize.Y), Color.White, new Vector2(texelSize.X * widgetPosition.X,                  texelSize.Y * (widgetPosition.Y + widgetSize.Y)));
-        int v4 = mesh.AddVertex(new Vector2(widgetPosition.X + widgetSize.X, widgetPosition.Y + widgetSize.Y), Color.White, new Vector2(texelSize.X * (widgetPosition.X + widgetSize.X), texelSize.Y * (widgetPosition.Y + widgetSize.Y)));
+            int v1 = mesh.AddVertex(new Vector3(widgetPosition.X,                widgetPosition.Y,                0f), Color.White, new Vector2(texelSize.X * widgetPosition.X,                  texelSize.Y * widgetPosition.Y));
+            int v2 = mesh.AddVertex(new Vector3(widgetPosition.X + widgetSize.X, widgetPosition.Y,                0f), Color.White, new Vector2(texelSize.X * (widgetPosition.X + widgetSize.X), texelSize.Y * widgetPosition.Y));
+            int v3 = mesh.AddVertex(new Vector3(widgetPosition.X,                widgetPosition.Y + widgetSize.Y, 0f), Color.White, new Vector2(texelSize.X * widgetPosition.X,                  texelSize.Y * (widgetPosition.Y + widgetSize.Y)));
+            int v4 = mesh.AddVertex(new Vector3(widgetPosition.X + widgetSize.X, widgetPosition.Y + widgetSize.Y, 0f), Color.White, new Vector2(texelSize.X * (widgetPosition.X + widgetSize.X), texelSize.Y * (widgetPosition.Y + widgetSize.Y)));
 
-        mesh.AddQuad(v1, v2, v3, v4);
+            mesh.AddQuad(v1, v2, v3, v4);
+
+            cache.Geometry = helper.ExportMesh();
+        }
+
+        renderer.RenderGuiMesh(cache.Geometry.Value);
+        renderer.RenderBatches();
+        renderer.PushLayer();
     }
 
-    public void AfterRebuildGeometry(GeometryHelper geometry)
+    public void AfterRebuildGeometry(Widget widget, GuiRenderer renderer)
     {
     }
 
@@ -120,6 +132,7 @@ public sealed class BackgroundBlurWidgetEffect : IWidgetEffect,
         blurAmountParameter.SetValue(blurAmount);
         texelSizeParameter.SetValue(texelSize);
 
+        gaussianShader.GraphicsDevice.DepthStencilState = DepthStencilState.None;
         gaussianShader.GraphicsDevice.SamplerStates[0] = SamplerState.LinearClamp;
         gaussianShader.GraphicsDevice.RasterizerState = RasterizerState.CullNone;
         gaussianShader.GraphicsDevice.BlendState = BlendState.Opaque;
@@ -139,5 +152,20 @@ public sealed class BackgroundBlurWidgetEffect : IWidgetEffect,
         
         instance = new BackgroundBlurWidgetEffect(uiShader, blur);
         return instance;
+    }
+
+    private class CachedGeometry : CustomPropertyObject
+    {
+        private GuiMesh? geometry;
+
+        public GuiMesh? Geometry
+        {
+            get => geometry;
+            set => geometry = value;
+        }
+        
+        public CachedGeometry(Widget owner) : base(owner)
+        {
+        }
     }
 }

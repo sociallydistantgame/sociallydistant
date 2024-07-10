@@ -10,23 +10,23 @@ public sealed class GuiRenderer
     private          GuiBatch?                       whiteBatch;
     private readonly Dictionary<Texture2D, GuiBatch> batches = new();
     private readonly IGuiContext                     context;
-    private          int                             layer;
+    private          float                             layer;
     
     public GuiRenderer(IGuiContext context)
     {
         this.context = context;
     }
 
-    public int Layer => layer;
+    public float Layer => layer;
 
-    public void SetLayer(int newLayer)
+    public void SetLayer(float newLayer)
     {
         this.layer = newLayer;
     }
     
     public void PushLayer()
     {
-        layer++;
+        layer += 0.5f;
     }
 
     public void PopLayer()

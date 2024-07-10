@@ -33,8 +33,9 @@ public class SociallyDistantVisualStyle : IVisualStyle
     private readonly Color tabActiveBorderDefault       = new Color(0x16, 0x93, 0xD6);
     private readonly Color sectionTextColor             = new(0x85, 0x85, 0x85);
     
-    private Font iconFont;
+    private Font        iconFont;
     private IFontFamily defaultFont = null!;
+    private IFontFamily monospace   = null!;
 
     public Font? IconFont => iconFont;
     
@@ -51,6 +52,7 @@ public class SociallyDistantVisualStyle : IVisualStyle
         );
 
         defaultFont = LoadFont("/Core/UI/Fonts/Rajdhani");
+        monospace = LoadFont("/Core/UI/Fonts/Monospace/JetBrainsMono");
     }
 
     private IFontFamily LoadFont(string basePath)
@@ -66,7 +68,7 @@ public class SociallyDistantVisualStyle : IVisualStyle
         foreach (FontWeight weight in Enum.GetValues<FontWeight>())
         {
             Font? normal = LoadFontStream(basePath + $"-{weight}.ttf");
-            Font? italic = LoadFontStream(basePath + $"Italic-{weight}.ttf");
+            Font? italic = LoadFontStream(basePath + $"-{weight}Italic.ttf");
             
             family.SetFont(weight, false, normal);
             family.SetFont(weight, true, italic);
@@ -92,6 +94,9 @@ public class SociallyDistantVisualStyle : IVisualStyle
     
     public IFontFamily GetFont(PresetFontFamily familyPresetFont)
     {
+        if (familyPresetFont == PresetFontFamily.Monospace)
+            return monospace;
+        
         return defaultFont;
     }
 

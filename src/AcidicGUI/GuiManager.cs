@@ -154,6 +154,15 @@ public sealed class GuiManager : IFontFamilyProvider
         }
     }
 
+    public void Update(float deltaTime)
+    {
+        foreach (Widget widget in this.CollapseChildren())
+        {
+            if (widget is IUpdateHandler handler)
+                handler.Update(deltaTime);
+        }
+    }
+
     public IVisualStyle GetVisualStyle()
     {
         if (fallbackVisualStyle.FallbackFont == null)
@@ -166,7 +175,7 @@ public sealed class GuiManager : IFontFamilyProvider
     {
         isRendering = true;
 
-        renderer.SetLayer(0);
+        renderer.SetLayer(-32768);
         
         foreach (Widget widget in topLevels)
             widget.RenderInternal(renderer);
@@ -285,7 +294,7 @@ public sealed class GuiManager : IFontFamilyProvider
                 Bubble<IMouseUpHandler, MouseButtonEvent>(hoveredWidget, e, x => x.OnMouseUp);
             }
 
-            if (!e.FocusWanted)
+            if (!e.FocusWanted && hoveredWidget?.IsFocused == false)
                 SetFocusedWidget(null);
 
         }

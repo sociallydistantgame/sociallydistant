@@ -87,7 +87,6 @@ public class WindowDecoration : Widget
         titleIcon.Padding = new Padding(0, 1);
         
         borderBox.SetCustomProperty(WidgetBackgrounds.WindowBorder);
-        clientBox.SetCustomProperty(WidgetBackgrounds.WindowClient);
         borderBox.GetCustomProperties<FlexPanelProperties>().Mode = FlexMode.Proportional;
 
         tabList.VerticalAlignment = VerticalAlignment.Bottom;
@@ -102,6 +101,13 @@ public class WindowDecoration : Widget
 
     private void ApplyHints()
     {
-        
+        if (hints.ClientRendersWindowBackground)
+        {
+            clientBox.SetCustomProperty(WidgetBackgrounds.None);
+        }
+        else
+        {
+            clientBox.SetCustomProperty(WidgetBackgrounds.WindowClient);
+        }
     }
 }
