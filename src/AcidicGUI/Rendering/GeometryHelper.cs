@@ -106,6 +106,9 @@ public class GeometryHelper : IFontStashRenderer2
 
     public void AddQuad(LayoutRect rectangle, Color color, Texture2D? texture = null)
     {
+        if (color.A == 0)
+            return;
+        
         var mesh = GetMeshBuilder(texture);
 
         int tl = mesh.AddVertex(new Vector2(rectangle.Left,  rectangle.Top),    color, new Vector2(0, 0));

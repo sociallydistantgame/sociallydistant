@@ -28,6 +28,7 @@ public class TerminalWidget : Widget,
     private readonly WorkQueue                    workQueue         = new();
     private readonly WorkQueue                    emulatorWorkQueue = new WorkQueue();
     private readonly MultiCancellationTokenSource tokenSource       = new MultiCancellationTokenSource();
+    private readonly TerminalColorPalette         defaultPalette    = TerminalColorPalette.Default;
     private          int                          clickCount;
     private          int                          mainThreadId;
     private          float                        characterWidth;
@@ -51,8 +52,31 @@ public class TerminalWidget : Widget,
     private          bool                         focused;
     private          int                          currentCursorX;
     private          int                          currentCursorY;
+    private          TerminalColorPalette?        paletteOverride;
+    private          float                        backgroundOpacity = 1;
 
     public ITextConsole Console => console;
+
+    public TerminalColorPalette? ColorPalette
+    {
+        get => paletteOverride;
+        set
+        {
+            paletteOverride = value;
+            UpdateColors();
+        }
+    }
+
+    public float BackgroundOpacity
+    {
+        get => backgroundOpacity;
+        set
+        {
+            backgroundOpacity = MathHelper.Clamp(value, 0, 1);
+            InvalidateGeometry();
+        }
+
+    }
     
     public TerminalWidget()
     {
@@ -130,14 +154,18 @@ public class TerminalWidget : Widget,
             simpleTerminal.Resize(actualColumnCount, actualRowCount);
         }
     }
-
+    
     protected override void RebuildGeometry(GeometryHelper geometry)
     {
+        TerminalColorPalette palette = paletteOverride ?? defaultPalette;
         IFontFamily fontFamily = GetFont(PresetFontFamily.Monospace);
+ 
+        geometry.AddQuad(ContentArea, palette.DefaultBackground * backgroundOpacity);
+        
         for (var i = 0; i < cells.Length; i++)
         {
             ref RenderCell cell = ref cells[i];
-
+            
             int column = i % columnCount;
             int row = i / columnCount;
 
@@ -149,13 +177,84 @@ public class TerminalWidget : Widget,
             if (column == currentCursorX && row == currentCursorY && focused)
             {
                 (fg, bg) = (bg, fg);
+                fg.A = 0xff;
+            }
+
+            bool italic = cell.GlyphData.mode.HasFlag(GlyphAttribute.ATTR_ITALIC);
+            FontWeight weight = FontWeight.Normal;
+
+            if (cell.GlyphData.mode.HasFlag(GlyphAttribute.ATTR_BOLD))
+            {
+                weight = cell.GlyphData.mode.HasFlag(GlyphAttribute.ATTR_FAINT)
+                    ? FontWeight.Medium
+                    : FontWeight.Bold;
+            }
+            else
+            {
+                weight = cell.GlyphData.mode.HasFlag(GlyphAttribute.ATTR_FAINT)
+                    ? FontWeight.Light
+                    : FontWeight.Normal;
             }
             
             geometry.AddQuad(new LayoutRect(x, y, characterWidth, lineHeight), bg);
-            fontFamily.Draw(geometry, new Vector2(x, y), fg, cell.GlyphData.character.ToString());
+
+            if (cell.GlyphData.mode.HasFlag(GlyphAttribute.ATTR_INVISIBLE) || fg.A==0 || cell.GlyphData.character==' ')
+                continue;
+            
+            fontFamily.Draw(geometry, new Vector2(x, y), fg, cell.GlyphData.character.ToString(), null, weight, italic);
         }
     }
 
+    private Color GetColor(int index, Color? user)
+    {
+        TerminalColorPalette palette = paletteOverride ?? defaultPalette;
+        
+        if (user.HasValue)
+            return user.Value;
+
+        if (index < 16)
+            return palette.GetConsoleColor((ConsoleColor)index);
+
+        if (index == SimpleTerminal.defaultbg)
+            return palette.DefaultBackground;
+
+        if (index == SimpleTerminal.defaultfg)
+            return palette.DefaultForeground;
+
+        return Color.Transparent;
+    }
+    
+    private void UpdateColor(ref RenderCell cell)
+    {
+        int fgIndex = cell.GlyphData.fg;
+        int bgIndex = cell.GlyphData.bg;
+
+        var useTransparent = bgIndex == SimpleTerminal.defaultbg;
+        
+        if (cell.GlyphData.mode.HasFlag(GlyphAttribute.ATTR_REVERSE))
+        {
+            useTransparent = false;
+            (fgIndex, bgIndex) = (bgIndex, fgIndex);
+        }
+        
+        Color bg = GetColor(bgIndex, cell.GlyphData.bgRgb);
+        Color fg = GetColor(fgIndex, cell.GlyphData.fgRgb);
+
+        cell.Foreground = fg;
+        cell.Background = useTransparent
+            ? Color.Transparent
+            : bg;
+    }
+    
+    private void UpdateColors()
+    {
+        for (var i = 0; i < cells.Length; i++)
+        {
+            ref RenderCell cell = ref cells[i];
+            UpdateColor(ref cell);
+        }
+    }
+    
     public void DrawLine(
         SimpleTerminal term,
         ref Glyph[] glyphs,
@@ -168,8 +267,8 @@ public class TerminalWidget : Widget,
         {
             var i = y * columnCount + x;
             cells[i].GlyphData = glyphs[x];
-            cells[i].Background = Color.Black;
-            cells[i].Foreground = Color.White;
+
+            UpdateColor(ref cells[i]);
         }
 
         InvalidateGeometry();

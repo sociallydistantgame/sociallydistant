@@ -16,6 +16,9 @@ public sealed class TerminalProgramController : ProgramController
     {
         context.Window.Content = terminalWidget;
         context.Window.Window.SetWindowHints(new WindowHints { ClientRendersWindowBackground = true });
+
+        // TODO: Bind this to Interface Preferences.
+        terminalWidget.BackgroundOpacity = 0.75f;
     }
 
     protected override async void Main()

@@ -8,6 +8,6 @@ public struct Glyph
     public GlyphAttribute mode;
     public int            bg;
     public int            fg;
-    public Color          fgRgb;
-    public Color          bgRgb;
+    public Color?         fgRgb;
+    public Color?          bgRgb;
 }
