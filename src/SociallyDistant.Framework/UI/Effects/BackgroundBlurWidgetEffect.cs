@@ -11,19 +11,25 @@ namespace SociallyDistant.Core.UI.Effects;
 public sealed class BackgroundBlurWidgetEffect : IWidgetEffect,
     IDisposable
 {
+    // These constants are defined in the shader and must be changed in both places.
+    public const int MaximumBlurriness   = 16;
+    public const int MaxDistance = 3;
+    
     private static   BackgroundBlurWidgetEffect? instance;
     private readonly MonoGameEffect              defaultUiShader;
     private readonly Effect                      gaussianShader;
-    private          float                       blurAmount;
+    private          float                       blurriness;
     private          RenderTarget2D?             blurTarget1;
     private          RenderTarget2D?             blurTarget2;
     private readonly VertexBuffer                vertexBuffer;
     private readonly IndexBuffer                 indexBuffer;
-    private readonly EffectParameter             blurAmountParameter;
+    private readonly EffectParameter             blurrinessParameter;
     private readonly EffectParameter             texelSizeParameter;
+    private readonly EffectParameter             curveParameter;
     private          Vector2                     texelSize = new Vector2(0, 0);
     private          Vector2                     widgetPosition;
     private          Vector2                     widgetSize;
+    private          float[]                     curve = Array.Empty<float>();
 
     private readonly BlendState blendState = new BlendState
     {
@@ -35,12 +41,13 @@ public sealed class BackgroundBlurWidgetEffect : IWidgetEffect,
         this.defaultUiShader = DEFAULTuIsHADER;
         this.gaussianShader = BLUReFFECT;
 
-        blurAmountParameter = BLUReFFECT.Parameters["BlurAmount"];
+        blurrinessParameter = BLUReFFECT.Parameters["Blurriness"];
         texelSizeParameter = BLUReFFECT.Parameters["TexelSize"];
+        curveParameter = BLUReFFECT.Parameters["Curve"];
         
         vertexBuffer = new VertexBuffer(BLUReFFECT.GraphicsDevice, typeof(VertexPositionColorTexture), 4, BufferUsage.None);
         indexBuffer = new IndexBuffer(BLUReFFECT.GraphicsDevice, typeof(int), 6, BufferUsage.None);
-
+        
         vertexBuffer.SetData(new VertexPositionColorTexture[] { new VertexPositionColorTexture(new Vector3(-1, -1, 0), Color.White, new Vector2(0, 0)), new VertexPositionColorTexture(new Vector3(1, -1, 0), Color.White, new Vector2(1, 0)), new VertexPositionColorTexture(new Vector3(-1, 1, 0), Color.White, new Vector2(0, 1)), new VertexPositionColorTexture(new Vector3(1, 1, 0), Color.White, new Vector2(1, 1)) });
         indexBuffer.SetData(new int[] { 0, 1, 2, 2, 1, 3 });
     }
@@ -65,7 +72,8 @@ public sealed class BackgroundBlurWidgetEffect : IWidgetEffect,
     {
         var blurSettings = widget.GetCustomProperties<BackgroundBlurProperties>();
 
-        blurAmount = blurSettings.BlurAmount;
+        blurriness = blurSettings.Blurriness;
+        curve = blurSettings.ComputedCurve;
 
         Viewport viewport = renderer.GraphicsDevice.Viewport;
 
@@ -129,8 +137,9 @@ public sealed class BackgroundBlurWidgetEffect : IWidgetEffect,
 
         gaussianShader.Techniques[0].Passes[pass].Apply();
 
-        blurAmountParameter.SetValue(blurAmount);
-        texelSizeParameter.SetValue(texelSize);
+        blurrinessParameter?.SetValue(blurriness);
+        texelSizeParameter?.SetValue(texelSize);
+        curveParameter?.SetValue(curve);
 
         gaussianShader.GraphicsDevice.DepthStencilState = DepthStencilState.None;
         gaussianShader.GraphicsDevice.SamplerStates[0] = SamplerState.LinearClamp;

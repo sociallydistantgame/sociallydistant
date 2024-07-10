@@ -16,6 +16,12 @@
 	#define PS_SHADERMODEL ps_4_0_level_9_1
 #endif
 
+// These constants define the array length of the bell curve.
+// If you change them, you must also change the corresponding values in
+// BackgroundBlurWidgetEffect.cs.
+#define MAXIMUM_BLURRINESS 16
+#define MAX_DISTANCE 3
+
 struct VSOut {
     float4 position : SV_Position;
     float4 color : COLOR0;
@@ -25,11 +31,13 @@ struct VSOut {
 // Texture that's to be blurred.
 sampler2D MainTexture : register(s0);
 
-float2 TexelSize;
-float BlurAmount;
+float Curve[MAXIMUM_BLURRINESS * MAX_DISTANCE];
 
-#define BLURX(uv, weight, kernel) tex2D(MainTexture, float2(uv.x + TexelSize.x * kernel * BlurAmount, uv.y)) * weight
-#define BLURY(uv, weight, kernel) tex2D(MainTexture, float2(uv.x, uv.y + TexelSize.y * kernel * BlurAmount)) * weight
+float2 TexelSize;
+float Blurriness;
+
+#define BLURX(uv, weight, kernel) tex2D(MainTexture, float2(uv.x + TexelSize.x * kernel, uv.y)) * weight
+#define BLURY(uv, weight, kernel) tex2D(MainTexture, float2(uv.x, uv.y + TexelSize.y * kernel)) * weight
 
 VSOut VS(float4 position : SV_Position, float4 color : COLOR0, float2 texcoord : TEXCOORD0)
 {
@@ -42,34 +50,32 @@ VSOut VS(float4 position : SV_Position, float4 color : COLOR0, float2 texcoord :
 
 float4 HorizontalBlur(VSOut data) : COLOR0
 {
+    float sampleCount = ceil(min(MAXIMUM_BLURRINESS, Blurriness) * MAX_DISTANCE);
     float4 sum = float4(0,0,0,0);
-
-    sum += BLURX(data.texcoord, 0.05, -4.0);
-    sum += BLURX(data.texcoord, 0.09, -3.0);
-    sum += BLURX(data.texcoord, 0.12, -2.0);
-    sum += BLURX(data.texcoord, 0.15, -1.0);
-    sum += BLURX(data.texcoord, 0.18, 0.0);
-    sum += BLURX(data.texcoord, 0.15, +1.0);
-    sum += BLURX(data.texcoord, 0.12, +2.0);
-    sum += BLURX(data.texcoord, 0.09, +3.0);
-    sum += BLURX(data.texcoord, 0.05, +4.0);
+    
+    sum += BLURX(data.texcoord, Curve[0], 0);
+    
+    for (float i = 1; i <= sampleCount; i++)
+    {
+        sum += BLURX(data.texcoord, Curve[i], -i);
+        sum += BLURX(data.texcoord, Curve[i], i);
+    }
     
     return sum;
 }
 
 float4 VerticalBlur(VSOut data) : COLOR0
 {
+    float sampleCount = ceil(min(MAXIMUM_BLURRINESS, Blurriness) * MAX_DISTANCE);
     float4 sum = float4(0,0,0,0);
-
-    sum += BLURY(data.texcoord, 0.05, -4.0);
-    sum += BLURY(data.texcoord, 0.09, -3.0);
-    sum += BLURY(data.texcoord, 0.12, -2.0);
-    sum += BLURY(data.texcoord, 0.15, -1.0);
-    sum += BLURY(data.texcoord, 0.18, 0.0);
-    sum += BLURY(data.texcoord, 0.15, +1.0);
-    sum += BLURY(data.texcoord, 0.12, +2.0);
-    sum += BLURY(data.texcoord, 0.09, +3.0);
-    sum += BLURY(data.texcoord, 0.05, +4.0);
+    
+    sum += BLURY(data.texcoord, Curve[0], 0);
+    
+    for (float i = 1; i <= sampleCount; i++)
+    {
+        sum += BLURY(data.texcoord, Curve[i], -i);
+        sum += BLURY(data.texcoord, Curve[i], i);
+    }
     
     return sum;
 }
