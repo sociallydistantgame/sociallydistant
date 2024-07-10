@@ -24,7 +24,8 @@ public class TerminalWidget : Widget,
     IMouseDownHandler,
     IKeyDownHandler,
     IKeyCharHandler,
-    IKeyUpHandler
+    IKeyUpHandler,
+    IDragHandler
 {
     private readonly WorkQueue                    workQueue         = new();
     private readonly WorkQueue                    emulatorWorkQueue = new WorkQueue();
@@ -45,7 +46,7 @@ public class TerminalWidget : Widget,
     private          ManualResetEvent             emulatorShutdownCompleted = new ManualResetEvent(false);
     private volatile bool                         emulatorEnabled           = false;
     private          float                        clickTime                 = 0;
-    private          float                        clickDoubleTime           = 0;
+    private          float                        clickDoubleTime           = 0.15f;
     private          Task?                        resizeTask;
     private          int                          desiredColumnCount = 0;
     private          int                          desiredRowCount    = 0;
@@ -61,6 +62,7 @@ public class TerminalWidget : Widget,
     private          bool                         rightControlDown;
     private          bool                         rightAltDown;
     private          bool                         rightShiftDown;
+    private          float                        tripleClickTime = 0.3f;
 
     public ITextConsole Console => console;
 
@@ -179,9 +181,11 @@ public class TerminalWidget : Widget,
             float x = ContentArea.Left + column * characterWidth;
             float y = ContentArea.Top + row * lineHeight;
 
+            var isSelected = simpleTerminal.Selected(column, row);
+            
             var fg = cell.Foreground;
             var bg = cell.Background;
-            if (column == currentCursorX && row == currentCursorY && focused)
+            if (isSelected || column == currentCursorX && row == currentCursorY && focused)
             {
                 (fg, bg) = (bg, fg);
                 fg.A = 0xff;
@@ -298,8 +302,8 @@ public class TerminalWidget : Widget,
         out int row
     )
     {
-        column = (int)Math.Round((x - ContentArea.Left) / characterWidth);
-        row = (int)Math.Round((y - ContentArea.Top) / lineHeight);
+        column = (int)Math.Floor((x - ContentArea.Left) / characterWidth);
+        row = (int)Math.Floor((y - ContentArea.Top) / lineHeight);
     }
 
     public void AfterRender(int cursorX, int cursorY)
@@ -319,13 +323,12 @@ public class TerminalWidget : Widget,
 
     public string GetText()
     {
-        Log.Warning("Clipboard not supported yet.");
-        return string.Empty;
+        return Clipboard.GetText();
     }
 
     public void SetText(string text)
     {
-        Log.Warning("Clipboard not supported yet.");
+        Clipboard.SetText(text);
     }
 
     public void PlayTypingSound()
@@ -357,8 +360,56 @@ public class TerminalWidget : Widget,
 
     public void OnMouseDown(MouseButtonEvent e)
     {
-        // TODO: Actually send mouse events to simpleTerminal.
         e.RequestFocus();
+        
+        var clickMode = ClickMode.Single;
+        if (e.Button == AcidicGUI.Events.MouseButton.Left)
+        {
+            if (clickDoubleTime > 0)
+            {
+                if (Time.time - clickDoubleTime <= tripleClickTime)
+                    clickMode = ClickMode.Triple;
+
+                clickTime = 0;
+                clickDoubleTime = 0;
+            }
+            else if (clickTime > 0)
+            {
+                if (Time.time - clickTime <= tripleClickTime)
+                {
+                    clickDoubleTime = Time.time;
+                    clickMode = ClickMode.Double;
+                }
+
+                clickTime = 0;
+            }
+            else
+            {
+                clickDoubleTime = 0;
+                clickTime = Time.time;
+                clickMode = ClickMode.Single;
+            }
+        }
+        else
+        {
+            this.clickCount = 0;
+        }
+
+        float x = e.Position.X;
+        float y = e.Position.Y;
+
+        switch (e.Button)
+        {
+            case AcidicGUI.Events.MouseButton.Left:
+                simpleTerminal.MouseDown(MouseButton.Left, x, y, clickMode);
+                break;
+            case AcidicGUI.Events.MouseButton.Middle:
+                simpleTerminal.MouseDown(MouseButton.Middle, x, y, clickMode);
+                break;
+            case AcidicGUI.Events.MouseButton.Right:
+                simpleTerminal.MouseDown(MouseButton.Right, x, y, clickMode);
+                break;
+        }
     }
 
     public void OnKeyChar(KeyCharEvent e)
@@ -414,5 +465,13 @@ public class TerminalWidget : Widget,
         if (e.Key == Keys.RightAlt)
             rightAltDown = false;
 
+    }
+
+    public void OnDrag(MouseButtonEvent e)
+    {
+        float x = MathHelper.Clamp(e.Position.X, ContentArea.Left, ContentArea.Right);
+        float y = MathHelper.Clamp(e.Position.Y, ContentArea.Top,  ContentArea.Bottom);
+        
+        simpleTerminal.MouseMove(x, y);
     }
 }

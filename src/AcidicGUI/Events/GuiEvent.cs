@@ -13,6 +13,11 @@ public abstract class GuiEvent
         handled = true;
     }
 
+    internal void Unhandle()
+    {
+        handled = false;
+    }
+    
     public void RequestFocus()
     {
         Handle();

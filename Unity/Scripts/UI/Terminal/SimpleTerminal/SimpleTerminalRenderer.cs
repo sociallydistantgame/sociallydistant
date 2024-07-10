@@ -267,20 +267,6 @@ namespace UI.Terminal.SimpleTerminal
 			if (this.asciiBeep != null && audibleBell)
 				AudioManager.PlaySound(this.asciiBeep);
 		}
-		
-		private void TtyInit()
-		{
-			// Enforce CRLF
-			this.ptyOptions.LFlag = 0;
-
-			// Control codes
-			this.ptyOptions.C_cc[PtyConstants.VERASE] = (byte)'\b';
-
-			PseudoTerminal.CreatePair(out this.master, out this.slave, this.ptyOptions);
-
-			this.simpleTerminal.SetTty(new SociallyDistantTty(this.master));
-			this.console = new SimpleTerminalSession(this.simpleTerminal, this.slave, new RepeatableCancellationToken(tokenSource));
-		}
 
 		public ITextConsole StartSession()
 		{

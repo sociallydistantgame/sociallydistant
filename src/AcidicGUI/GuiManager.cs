@@ -275,7 +275,7 @@ public sealed class GuiManager : IFontFamilyProvider
             Bubble<IMouseDownHandler, MouseButtonEvent>(hoveredWidget, e, x => x.OnMouseDown);
 
             if (e.Handled)
-                return;
+                e.Unhandle();
 
             widgetBeingDragged = hoveredWidget;
             Bubble<IDragStartHandler, MouseButtonEvent>(hoveredWidget, e, x => x.OnDragStart);
@@ -313,8 +313,11 @@ public sealed class GuiManager : IFontFamilyProvider
             }
 
             if (e.FocusWanted)
+            {
                 SetFocusedWidget(next);
-            
+                break;
+            }
+
             next = next.Parent;
         }
     }
