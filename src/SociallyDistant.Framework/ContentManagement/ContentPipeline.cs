@@ -1,6 +1,10 @@
 using System.Diagnostics;
 using System.Net;
+using System.Reflection.Metadata.Ecma335;
+using Microsoft.Xna.Framework.Content;
 using Serilog;
+using SociallyDistant.Core.Core.Scripting;
+using SociallyDistant.Core.Modules;
 using SociallyDistant.Core.OS.FileSystems;
 using SociallyDistant.Core.OS.FileSystems.Host;
 
@@ -8,11 +12,15 @@ namespace SociallyDistant.Core.ContentManagement;
 
 public sealed class ContentPipeline : Microsoft.Xna.Framework.Content.ContentManager
 {
-    private readonly IVirtualFileSystem vfs;
-    private readonly Dictionary<Type, List<string>> assetsByType = new();
+    private readonly IVirtualFileSystem                   vfs;
+    private readonly Dictionary<Type, List<string>>       assetsByType = new();
+    private readonly ShellScriptLoader                    scriptLoader;
+    private readonly Dictionary<string, ShellScriptAsset> scripts      = new();
     
-    public ContentPipeline(IServiceProvider serviceProvider) : base(serviceProvider, "/")
+    public ContentPipeline(IGameContext serviceProvider) : base(serviceProvider.GameInstance.Services, "/")
     {
+        this.scriptLoader = new ShellScriptLoader(serviceProvider);
+        
         var memoryFileSystem = new InMemoryFileSystem();
 
         this.vfs = new PipelineFileSystem(memoryFileSystem);
@@ -20,6 +28,15 @@ public sealed class ContentPipeline : Microsoft.Xna.Framework.Content.ContentMan
 
     public IEnumerable<T> LoadAll<T>()
     {
+        if (typeof(T).IsAssignableTo(typeof(ShellScriptAsset)))
+        {
+            foreach (ShellScriptAsset script in scripts.Values)
+            {
+                if (script is T typedScript)
+                    yield return typedScript;
+            }
+        }
+        
         if (!assetsByType.TryGetValue(typeof(T), out List<string>? assets))
             yield break;
 
@@ -30,6 +47,17 @@ public sealed class ContentPipeline : Microsoft.Xna.Framework.Content.ContentMan
 
     public override T Load<T>(string assetName)
     {
+        if (typeof(T).IsAssignableTo(typeof(ShellScriptAsset)))
+        {
+            if (!scripts.TryGetValue(assetName, out ShellScriptAsset? script))
+                throw new ContentLoadException($"The asset '{assetName}' is not a valid sdsh script or doesn't exist.");
+
+            if (script is not T typedScript)
+                throw new ContentLoadException($"The sdsh script at '{assetName}' is of type {script.GetType().FullName}' which is not assignable to the requested type '{typeof(T).FullName}'");
+
+            return typedScript;
+        }
+        
         Log.Information($"Loading content: {assetName}");
         if (typeof(T).IsAssignableFrom(typeof(Stream)))
             return (T) (object) OpenStream(assetName);
@@ -68,6 +96,15 @@ public sealed class ContentPipeline : Microsoft.Xna.Framework.Content.ContentMan
 
     private void DiscoverAssetType(string file)
     {
+        if (file.ToLower().EndsWith(".sh"))
+        {
+            using var stream = vfs.OpenRead(file);
+            if (!scriptLoader.TryLoadScript(stream, out ShellScriptAsset? script))
+                return;
+
+            scripts.Add(file.Substring(0, file.LastIndexOf(".", StringComparison.Ordinal)), script);
+        }
+        
         if (!file.ToLower().EndsWith(".xnb"))
             return;
 

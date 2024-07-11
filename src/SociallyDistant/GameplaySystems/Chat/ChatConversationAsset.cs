@@ -9,113 +9,52 @@ using SociallyDistant.GamePlatform;
 
 namespace SociallyDistant.GameplaySystems.Chat
 {
-	public class ChatConversationAsset : 
+	public sealed class ChatConversationAsset : ShellScriptAsset,
 		IChatConversation,
 		ICachedScript
 	{
-		
-		private string scriptText = string.Empty;
+		private readonly string                            scriptText;
+		private readonly string                            id;
+		private readonly List<string>                      actorIds = new();
+		private readonly ChatScriptType                    scriptType;
+		private readonly string                            guildId = string.Empty;
+		private readonly ChatStartType                     startType;
+		private readonly string                            startMessage = string.Empty;
+		private readonly bool                              repeatable   = true;
+		private readonly string                            channelId    = string.Empty;
+		private readonly List<ConversationScriptCondition> conditions   = new();
+		private readonly ScriptConditionMode               policy;
+		private readonly int                               policyParameter;
+		private          ShellInstruction?                 scriptTree;
 
-		
-		private string id = string.Empty;
-
-		
-		private List<string> actorIds = new();
-
-		
-		private ChatScriptType scriptType;
-
-		
-		private string guildId = string.Empty;
-		
-		
-		private ChatStartType startType;
-
-		
-		private string startMessage = string.Empty;
-
-		
-		private bool repeatable = true;
-
-		
-		private string channelId = string.Empty;
-
-		
-		private List<ConversationScriptCondition> conditions = new();
-
-		
-		private ScriptConditionMode policy;
-
-		
-		private int policyParameter;
-
-		[NonSerialized]
-		private ShellInstruction? scriptTree;
-
-		/// <inheritdoc />
-		public string Id
+		internal ChatConversationAsset(string id, string text)
 		{
-			get => id;
-			#if UNITY_EDITOR
-			set => id = value;
-#endif
+			this.id = id;
+			this.scriptText = text;
 		}
 
+		/// <inheritdoc />
+		public string Id => id;
+		
 		/// <inheritdoc />
 		public IEnumerable<string> ActorIds => actorIds;
 
 		/// <inheritdoc />
-		public ChatScriptType Type
-		{
-			get => scriptType;
-#if UNITY_EDITOR
-			set => scriptType = value;
-#endif
-		}
+		public ChatScriptType Type => scriptType;
 
 
-		public ScriptConditionMode ConditionsMode
-		{
-			get => policy;
-#if UNITY_EDITOR
-			set => policy = value;
-#endif
-		}
+		public ScriptConditionMode ConditionsMode => policy;
 
-		public int ConditionModeParameter
-		{
-			get => policyParameter;
-#if UNITY_EDITOR
-			set => policyParameter = value;
-#endif
-		}
+		public int ConditionModeParameter => policyParameter;
 
 		/// <inheritdoc />
-		public string ChannelId
-		{
-			get => channelId;
-			#if UNITY_EDITOR
-			set => this.channelId = value;
-#endif
-		}
+		public string ChannelId => channelId;
 
 		/// <inheritdoc />
-		public string GuildId
-		{
-			get => guildId;
-#if UNITY_EDITOR
-			set => guildId = value;
-#endif
-		}
+		public string GuildId => guildId;
 
 		/// <inheritdoc />
-		public ChatStartType StartType
-		{
-			get => startType;
-#if UNITY_EDITOR
-			set => startType =  value;
-#endif
-		}
+		public ChatStartType StartType => startType;
 
 		/// <inheritdoc />
 		public bool CheckConditions(IWorldManager world, ISocialService socialService)
@@ -176,31 +115,11 @@ namespace SociallyDistant.GameplaySystems.Chat
 		}
 
 		/// <inheritdoc />
-		public bool IsRepeatable
-		{
-			get  => repeatable;
-#if UNITY_EDITOR
-			set => repeatable = value;
-#endif
-		}
+		public bool IsRepeatable => repeatable;
 
 		/// <inheritdoc />
-		public string StartMessage
-		{
-			get => startMessage;
-#if UNITY_EDITOR
-			set => startMessage = value;
-#endif
-		}
+		public string StartMessage => startMessage;
 		
-		#if UNITY_EDITOR
-
-		public string ScriptText
-		{
-			get => scriptText;
-			set => scriptText = value;
-		}
-
 		public void AddActor(string narrativeId)
 		{
 			if (this.actorIds.Contains(narrativeId))
@@ -214,7 +133,6 @@ namespace SociallyDistant.GameplaySystems.Chat
 			conditions.Add(condition);
 		}
 		
-		#endif
 		/// <inheritdoc />
 		public async Task RebuildScriptTree()
 		{

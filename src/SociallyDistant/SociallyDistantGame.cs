@@ -149,7 +149,7 @@ internal sealed class SociallyDistantGame :
 			return playerInfoSubject.Subscribe(observer);
 		});
 
-		var contentPipeline = new ContentPipeline(this.Services);
+		var contentPipeline = new ContentPipeline(this);
 
 		this.backdrop = new BackdropController(this);
 		this.backdropUpdater = new BackdropUpdater(this);

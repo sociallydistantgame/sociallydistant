@@ -95,8 +95,4 @@
     </None>
   </ItemGroup>
 
-  <ItemGroup>
-    <Folder Include="Content\Scripts\" />
-  </ItemGroup>
-
 </Project>
