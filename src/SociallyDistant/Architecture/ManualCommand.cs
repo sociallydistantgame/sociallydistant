@@ -1,6 +1,10 @@
 ﻿#nullable enable
+using SociallyDistant.Core.Modules;
+using SociallyDistant.Core.OS.Tasks;
+
 namespace SociallyDistant.Architecture
 {
+	[Command("man")]
 	public class ManualCommand : ScriptableCommand
 	{
 		
@@ -11,6 +15,10 @@ namespace SociallyDistant.Architecture
 		{
 			System.Diagnostics.Process.Start(manualUrl);
 			return Task.CompletedTask;
+		}
+
+		public ManualCommand(IGameContext gameContext) : base(gameContext)
+		{
 		}
 	}
 }

@@ -1,4 +1,5 @@
 ﻿#nullable enable
+using System.Runtime.CompilerServices;
 using SociallyDistant.Core.Core.Systems;
 using SociallyDistant.Core.OS.Devices;
 
@@ -6,10 +7,11 @@ namespace SociallyDistant.Architecture
 {
 	public class SystemProcess : ISystemProcess
 	{
-		private readonly UniqueIntGenerator pidGenerator;
-		private readonly DeviceCoordinator coordinator;
-		private bool isAlive = true;
-		private int exitCode;
+		private readonly UniqueIntGenerator        pidGenerator;
+		private readonly DeviceCoordinator         coordinator;
+		private readonly TaskCompletionSource<int> exitCodeSource = new();
+		private          bool                      isAlive        = true;
+		private          int                       exitCode;
 
 		/// <inheritdoc />
 		public int ExitCode => exitCode;
@@ -100,6 +102,12 @@ namespace SociallyDistant.Architecture
 			this.exitCode = exitCode;
 			isAlive = false;
 			Killed?.Invoke(this);
+			exitCodeSource.SetResult(exitCode);
+		}
+
+		public TaskAwaiter<int> GetAwaiter()
+		{
+			return exitCodeSource.Task.GetAwaiter();
 		}
 	}
 }

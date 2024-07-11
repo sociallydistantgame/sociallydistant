@@ -16,7 +16,7 @@ namespace SociallyDistant.Player
 		IKernel
 	{
 		private readonly DeviceCoordinator deviceCoordinator;
-		private readonly IGameContext game;
+		private readonly SociallyDistantGame game;
 		private readonly LocalAreaNetwork playerLan;
 		private readonly PlayerComputer computer;
 		private readonly PlayerFileOverrider fileOverrider;
@@ -47,6 +47,14 @@ namespace SociallyDistant.Player
 			this.playerLan = playerNetwork;
 			this.fileOverrider = new PlayerFileOverrider();
 			this.computer = new PlayerComputer(game, deviceCoordinator, playerLan, fileOverrider, null, this);
+		}
+
+		internal async Task PrepareEnvironment()
+		{
+			// Pretend you're a Linux kernel.
+			// This method is /sbin/init.
+			var playerInitialization = new PlayerInitialization(this, game);
+			await playerInitialization.InitializeSystem();
 		}
 	}
 }

@@ -56,13 +56,9 @@ namespace SociallyDistant.Core.Scripting
 			ISystemProcess? commandProcess = await FindProgram(this.process, console, name, args);
 			if (commandProcess == null)
 				return null;
-			
-			// special case for commands that kill the process IMMEDIATELY
-			// on the same frame this was called
-			if (commandProcess != null && !commandProcess.IsAlive)
-				return commandProcess.ExitCode;
 
-			return await WaitForProcessKill(commandProcess);
+			// Yes. You can await in-game OS processes.
+			return await commandProcess;
 		}
 
 		private Task<int?> WaitForProcessKill(ISystemProcess process)

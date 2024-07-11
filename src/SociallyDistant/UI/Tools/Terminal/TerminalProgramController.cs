@@ -25,8 +25,6 @@ public sealed class TerminalProgramController : ProgramController
     {
         var context = new OperatingSystemExecutionContext(this.Process);
         var shell = new InteractiveShell(context);
-
-        Process.Environment["PS1"] = "Ritchie is the cutest human in existence >>> ";
         
         shell.HandleExceptionsGracefully = true;
         shell.Setup(terminalWidget.Console);

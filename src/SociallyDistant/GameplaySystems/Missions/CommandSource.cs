@@ -9,7 +9,7 @@ namespace SociallyDistant.GameplaySystems.Missions
 		/// <inheritdoc />
 		public async Task LoadAllContent(ContentCollectionBuilder builder, IContentFinder finder)
 		{
-			foreach (ScriptableCommandBase asset in await finder.FindContentOfType<ScriptableCommandBase>())
+			foreach (CommandAsset asset in await finder.FindContentOfType<CommandAsset>())
 				builder.AddContent(asset);
 		}
 	}

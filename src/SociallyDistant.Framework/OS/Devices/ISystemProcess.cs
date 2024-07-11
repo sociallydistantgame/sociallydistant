@@ -1,4 +1,6 @@
 ﻿#nullable enable
+using System.Runtime.CompilerServices;
+
 namespace SociallyDistant.Core.OS.Devices
 {
 	public interface ISystemProcess
@@ -20,5 +22,7 @@ namespace SociallyDistant.Core.OS.Devices
 
 		
 		void Kill(int exitCode = 0);
+
+		TaskAwaiter<int> GetAwaiter();
 	}
 }

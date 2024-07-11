@@ -365,6 +365,10 @@ internal sealed class SociallyDistantGame :
 		}
 
 		playerInfoSubject.OnNext(this.loadedPlayerInfo);
+
+		CurrentSaveDataDirectory = gameToLoad.LocalFilePath;
+		
+		await playerManager.PrepareEnvironment();
 		SetGameMode(GameMode.OnDesktop);
 	}
 

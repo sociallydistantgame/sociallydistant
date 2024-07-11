@@ -1,5 +1,6 @@
 ﻿#nullable enable
 using System.Diagnostics;
+using System.Runtime.CompilerServices;
 using Serilog;
 using SociallyDistant.Core.Core.Systems;
 using SociallyDistant.Core.OS.Devices;
@@ -11,11 +12,12 @@ namespace SociallyDistant.Architecture
 	public class DeviceCoordinatorProcess : IInitProcess
 	{
 		private readonly Dictionary<IUser, ISystemProcess> userProcesses = new Dictionary<IUser, ISystemProcess>();
-		private readonly DeviceCoordinator coordinator;
-		private readonly UniqueIntGenerator pidGenerator = new UniqueIntGenerator();
-		private readonly SimpleEnvironmentVariableProvider environment = new SimpleEnvironmentVariableProvider();
-		private bool isAlive = true;
-		private int exitCode;
+		private readonly DeviceCoordinator                 coordinator;
+		private readonly UniqueIntGenerator                pidGenerator   = new UniqueIntGenerator();
+		private readonly SimpleEnvironmentVariableProvider environment    = new SimpleEnvironmentVariableProvider();
+		private readonly TaskCompletionSource<int>         exitCodeSource = new();
+		private          bool                              isAlive        = true;
+		private          int                               exitCode;
 
 		/// <inheritdoc />
 		public bool IsAlive => isAlive;
@@ -107,6 +109,12 @@ namespace SociallyDistant.Architecture
 			this.exitCode = exitCode;
 			isAlive = false;
 			Killed?.Invoke(this);
+			exitCodeSource.SetResult(exitCode);
+		}
+
+		public TaskAwaiter<int> GetAwaiter()
+		{
+			return exitCodeSource.Task.GetAwaiter();
 		}
 	}
 }

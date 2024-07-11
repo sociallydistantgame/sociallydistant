@@ -1,3 +1,4 @@
+using System.Diagnostics;
 using System.Text;
 using AcidicGUI.CustomProperties;
 using AcidicGUI.Layout;
@@ -7,6 +8,7 @@ using Microsoft.Xna.Framework.Graphics;
 using Serilog;
 using SociallyDistant.Core.Core;
 using SociallyDistant.Core.Modules;
+using SociallyDistant.Core.OS.Devices;
 using SociallyDistant.Core.Shell;
 using SociallyDistant.Core.Shell.Common;
 using SociallyDistant.Core.Shell.InfoPanel;
@@ -90,6 +92,7 @@ public class GuiController : GameComponent,
         dialog.Message = messageBuilder.ToString();
         dialog.MessageType = MessageBoxType.Error;
         dialog.Buttons.Add("OK");
+        dialog.DismissCallback = completionSource.SetResult;
 
         return completionSource.Task;
     }
@@ -109,6 +112,20 @@ public class GuiController : GameComponent,
         {
             desktop?.Dispose();
         }
+    }
+
+    public bool OpenProgram(
+        IProgram programToOpen,
+        string[] arguments,
+        ISystemProcess programProcess,
+        ITextConsole console
+    )
+    {
+        var window = this.floatingWindowArea.CreateWindow(programToOpen.WindowTitle);
+
+        programToOpen.InstantiateIntoWindow(programProcess, window.ContentPanel, console, arguments);
+
+        return true;
     }
 
     public INotificationManager NotificationManager => notificationManager;
@@ -147,7 +164,7 @@ public class GuiController : GameComponent,
 
         void HandleDialogClosed(IWindow obj)
         {
-            workArea.ChildWidgets.Remove(overlay);
+            overlays.ChildWidgets.Remove(overlay);
         }
     }
 

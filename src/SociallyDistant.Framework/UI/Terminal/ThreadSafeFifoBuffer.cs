@@ -2,7 +2,7 @@ using System.Collections.Concurrent;
 
 namespace SociallyDistant.Core.UI.Terminal;
 
-internal class ThreadSafeFifoBuffer : Stream
+public class ThreadSafeFifoBuffer : Stream
 {
     private readonly ConcurrentQueue<byte[]> queuedData = new ConcurrentQueue<byte[]>();
         

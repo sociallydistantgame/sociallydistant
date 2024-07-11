@@ -1,12 +1,12 @@
-﻿using SociallyDistant.Core.OS.Devices;
+﻿using SociallyDistant.Core.Core;
+using SociallyDistant.Core.OS.Devices;
 using SociallyDistant.Core.Shell.Common;
 using SociallyDistant.Core.Shell.Windowing;
 
 namespace SociallyDistant.Core.Shell
 {
-	public interface IProgram
+	public interface IProgram : INamedAsset
 	{
-		string BinaryName { get; }
 		string WindowTitle { get; }
 		CompositeIcon Icon { get; }
 		

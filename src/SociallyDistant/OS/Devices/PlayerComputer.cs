@@ -26,7 +26,7 @@ namespace SociallyDistant.OS.Devices
 		private Dictionary<int, IUser> users = new Dictionary<int, IUser>();
 		private Dictionary<string, int> usernameMap = new Dictionary<string, int>();
 		private PlayerUser playerUser;
-		private PlayerFileSystem? playerFileSystem;
+		private RootFileSystem? playerFileSystem;
 		private LocalAreaNetwork playerLan;
 		private IInitProcess initProcess;
 		private ISystemProcess? systemd;
@@ -78,10 +78,7 @@ namespace SociallyDistant.OS.Devices
 		public void RebuildVfs()
 		{
 			IFileSystem playerHome = GetHomeMount();
-			this.playerFileSystem = new PlayerFileSystem(this);
-
-			GetFileSystem(su)
-				.Mount(playerUser.Home, playerHome);
+			this.playerFileSystem = new RootFileSystem(this.gameManager, this, true);
 			
 			// Allows access to game settings and player settings via the filesystem and thus the shell
 			GetFileSystem(su)

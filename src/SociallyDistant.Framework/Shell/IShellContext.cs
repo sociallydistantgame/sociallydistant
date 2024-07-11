@@ -1,5 +1,6 @@
 ﻿#nullable enable
 
+using SociallyDistant.Core.OS.Devices;
 using SociallyDistant.Core.Shell.Common;
 using SociallyDistant.Core.Shell.InfoPanel;
 using SociallyDistant.Core.Shell.Windowing;
@@ -8,6 +9,13 @@ namespace SociallyDistant.Core.Shell
 {
 	public interface IShellContext
 	{
+		bool OpenProgram(
+			IProgram programToOpen,
+			string[] arguments,
+			ISystemProcess programProcess,
+			ITextConsole console
+		);
+		
 		INotificationManager NotificationManager { get; }
 		
 		/// <summary>
@@ -20,5 +28,7 @@ namespace SociallyDistant.Core.Shell
 		IMessageDialog CreateMessageDialog(string title);
 
 		void OpenSettings();
+
+		Task ShowExceptionMessage(Exception ex);
 	}
 }

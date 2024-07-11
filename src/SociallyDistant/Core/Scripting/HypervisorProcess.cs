@@ -1,4 +1,5 @@
 ﻿#nullable enable
+using System.Runtime.CompilerServices;
 using SociallyDistant.Architecture;
 using SociallyDistant.Core.Core.Systems;
 using SociallyDistant.Core.OS.Devices;
@@ -7,14 +8,15 @@ namespace SociallyDistant.Core.Scripting
 {
 	public sealed class HypervisorProcess : ISystemProcess
 	{
-		private readonly int id;
+		private readonly int                          id;
 		private readonly IEnvironmentVariableProvider environment = new SimpleEnvironmentVariableProvider();
-		private readonly UniqueIntGenerator idGenerator;
-		private readonly ISystemProcess? parent;
-		private readonly List<ISystemProcess> children = new List<ISystemProcess>();
-        private readonly IUser user;
-		private bool alive = true;
-		private int exitCode;
+		private readonly UniqueIntGenerator           idGenerator;
+		private readonly ISystemProcess?              parent;
+		private readonly List<ISystemProcess>         children = new List<ISystemProcess>();
+        private readonly IUser                        user;
+        private readonly TaskCompletionSource<int>    exitCodeSource = new();
+		private          bool                         alive          = true;
+		private          int                          exitCode;
 
 		/// <inheritdoc />
 		public int ExitCode => exitCode;
@@ -96,6 +98,12 @@ namespace SociallyDistant.Core.Scripting
 			idGenerator.DeclareUnused(id);
 			alive = false;
 			Killed?.Invoke(this);
+			exitCodeSource.SetResult(exitCode);
+		}
+
+		public TaskAwaiter<int> GetAwaiter()
+		{
+			return exitCodeSource.Task.GetAwaiter();
 		}
 	}
 }

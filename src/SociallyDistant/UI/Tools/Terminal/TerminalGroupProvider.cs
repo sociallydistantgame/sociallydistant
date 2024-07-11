@@ -24,7 +24,7 @@ internal class TerminalTool : ITabbedToolDefinition
 
 internal sealed class TerminalProgram : IProgram
 {
-    public string BinaryName => "terminal";
+    public string Name => "terminal";
     public string WindowTitle => "Terminal";
     public CompositeIcon Icon { get; } = MaterialIcons.Terminal;
 

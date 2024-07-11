@@ -7,8 +7,8 @@ namespace SociallyDistant.UI.Windowing;
 
 public sealed class WindowTabList : Widget
 {
-    private readonly WrapPanel wrapPanel = new();
-    private readonly List<WindowTab> views = new();
+    private readonly WrapPanel        wrapPanel   = new();
+    private readonly List<WindowTab>  views       = new();
     private readonly List<Definition> definitions = new();
 
     private CommonColor color;

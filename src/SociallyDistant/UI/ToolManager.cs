@@ -139,10 +139,10 @@ public sealed class ToolManager
 	
 	public void SwitchTools(string toolId)
 	{
-		if (this.currentTool != null && this.currentTool.Definition.Program.BinaryName == toolId)
+		if (this.currentTool != null && this.currentTool.Definition.Program.Name == toolId)
 			return;
 			
-		TabbedTool? tool = tools.FirstOrDefault(x => x.Definition.Program.BinaryName == toolId);
+		TabbedTool? tool = tools.FirstOrDefault(x => x.Definition.Program.Name == toolId);
 		if (tool == null)
 			throw new InvalidOperationException($"Tool not found: {toolId}");
 			

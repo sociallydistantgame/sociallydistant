@@ -5,7 +5,11 @@ public abstract class Application
     private static Application? current;
 
     public abstract IGameContext Context { get; }
-		
+
+    public string Name => "Socially Distant";
+    public string Version => "24.07-indev";
+    public string EngineVersion => "24.07";
+    
     public Application()
     {
         if (current != null)
