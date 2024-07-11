@@ -2,6 +2,7 @@
 using System.Diagnostics;
 using System.Runtime.CompilerServices;
 using Serilog;
+using SociallyDistant.Core.Core.Scripting;
 using SociallyDistant.Core.Core.Systems;
 using SociallyDistant.Core.OS.Devices;
 using SociallyDistant.Core.OS.Tasks;

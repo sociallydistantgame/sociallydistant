@@ -5,21 +5,10 @@ using SociallyDistant.Core.OS.Network;
 
 namespace SociallyDistant.Core.OS.Devices
 {
-	[AttributeUsage(AttributeTargets.Class, AllowMultiple = false)]
-	public sealed class NetworkServiceAttribute : Attribute
-	{
-		private readonly string id;
-
-		public string Id => id;
-		
-		public NetworkServiceAttribute(string id)
-		{
-			this.id = id;
-		}
-	}
-	
 	public interface IComputer
 	{
+		bool IsPlayer { get; }
+		
 		string Name { get; }
 		bool FindUserById(int id, out IUser? user);
 		bool FindUserByName(string username, out IUser? user);

@@ -5,7 +5,6 @@ using SociallyDistant.Core.Modules;
 using SociallyDistant.Core.OS.Devices;
 using SociallyDistant.Core.OS.FileSystems;
 using SociallyDistant.Core.OS.Network;
-using SociallyDistant.Core.Scripting;
 using SociallyDistant.GameplaySystems.NonPlayerComputers;
 using SociallyDistant.Player;
 

@@ -3,7 +3,6 @@ using System.Reactive.Subjects;
 using SociallyDistant.Core.Core;
 using SociallyDistant.Core.Core.Scripting;
 using SociallyDistant.Core.Modules;
-using SociallyDistant.Core.Scripting;
 using SociallyDistant.Core.UI.Shell;
 
 namespace SociallyDistant.UI;

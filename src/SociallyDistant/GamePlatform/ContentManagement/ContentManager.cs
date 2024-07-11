@@ -3,8 +3,8 @@
 using System.Diagnostics;
 using System.Net.Mime;
 using SociallyDistant.Core.ContentManagement;
+using SociallyDistant.Core.Core.Scripting;
 using SociallyDistant.Core.Modules;
-using SociallyDistant.Core.Scripting;
 
 namespace SociallyDistant.GamePlatform.ContentManagement
 {

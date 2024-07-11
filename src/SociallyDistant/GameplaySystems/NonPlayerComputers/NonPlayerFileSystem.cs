@@ -1,8 +1,8 @@
 ﻿#nullable enable
 using SociallyDistant.Core.Core;
 using SociallyDistant.Core.OS.FileSystems;
+using SociallyDistant.Core.OS.FileSystems.Immutable;
 using SociallyDistant.OS.FileSystems;
-using SociallyDistant.OS.FileSystems.Immutable;
 
 namespace SociallyDistant.GameplaySystems.NonPlayerComputers
 {

@@ -1,8 +1,8 @@
 using AcidicGUI.Layout;
 using AcidicGUI.Widgets;
 using Microsoft.Xna.Framework;
+using SociallyDistant.Core.Core.Scripting;
 using SociallyDistant.Core.Programs;
-using SociallyDistant.Core.Scripting;
 using SociallyDistant.Core.Shell.Windowing;
 using SociallyDistant.Core.UI.Terminal;
 

@@ -30,7 +30,9 @@ namespace SociallyDistant.GameplaySystems.NonPlayerComputers
 		private ISystemProcess systemd;
 		private IWorldManager world = null!;
 		private ServiceManager? serviceManager;
-		
+
+		public bool IsPlayer => false;
+
 		/// <inheritdoc />
 		public string Name => worldData.HostName;
 

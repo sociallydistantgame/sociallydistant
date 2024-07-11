@@ -2,10 +2,9 @@
 using SociallyDistant.Architecture;
 using SociallyDistant.Core.Core;
 using SociallyDistant.Core.Core.Scripting;
+using SociallyDistant.Core.Core.Scripting.Instructions;
+using SociallyDistant.Core.Core.Scripting.Parsing;
 using SociallyDistant.Core.Missions;
-using SociallyDistant.Core.Scripting;
-using SociallyDistant.Core.Scripting.Instructions;
-using SociallyDistant.Core.Scripting.Parsing;
 using SociallyDistant.Core.Social;
 using SociallyDistant.GamePlatform;
 

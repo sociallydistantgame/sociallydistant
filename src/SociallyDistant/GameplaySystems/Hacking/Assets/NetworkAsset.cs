@@ -2,11 +2,10 @@
 
 using SociallyDistant.Core.Core;
 using SociallyDistant.Core.Core.Scripting;
+using SociallyDistant.Core.Core.Scripting.Instructions;
+using SociallyDistant.Core.Core.Scripting.Parsing;
 using SociallyDistant.Core.Core.WorldData.Data;
 using SociallyDistant.Core.OS.Network;
-using SociallyDistant.Core.Scripting;
-using SociallyDistant.Core.Scripting.Instructions;
-using SociallyDistant.Core.Scripting.Parsing;
 using SociallyDistant.GamePlatform;
 
 namespace SociallyDistant.GameplaySystems.Hacking.Assets

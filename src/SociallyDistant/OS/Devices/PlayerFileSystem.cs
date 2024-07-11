@@ -2,8 +2,8 @@
 using SociallyDistant.Core.OS.Devices;
 using SociallyDistant.Core.OS.FileSystems;
 using SociallyDistant.Core.OS.FileSystems.Host;
+using SociallyDistant.Core.OS.FileSystems.Immutable;
 using SociallyDistant.OS.FileSystems;
-using SociallyDistant.OS.FileSystems.Immutable;
 
 namespace SociallyDistant.OS.Devices
 {

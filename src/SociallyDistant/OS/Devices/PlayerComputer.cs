@@ -1,16 +1,15 @@
 ﻿#nullable enable
 using SociallyDistant.Architecture;
 using SociallyDistant.Core.Core;
+using SociallyDistant.Core.Core.Scripting;
 using SociallyDistant.Core.Modules;
 using SociallyDistant.Core.OS.Devices;
 using SociallyDistant.Core.OS.FileSystems;
 using SociallyDistant.Core.OS.FileSystems.Host;
 using SociallyDistant.Core.OS.Network;
-using SociallyDistant.Core.Scripting;
 using SociallyDistant.GamePlatform;
 using SociallyDistant.GameplaySystems.Networld;
 using SociallyDistant.OS.FileSystems;
-using SociallyDistant.OS.FileSystems.Host;
 using SociallyDistant.Player;
 
 namespace SociallyDistant.OS.Devices
@@ -31,6 +30,8 @@ namespace SociallyDistant.OS.Devices
 		private IInitProcess initProcess;
 		private ISystemProcess? systemd;
 		private PlayerInfo playerInfo;
+
+		public bool IsPlayer => true;
 
 		/// <inheritdoc />
 		public string Name { get; private set; } = "localhost";

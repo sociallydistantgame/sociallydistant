@@ -17,7 +17,6 @@ using SociallyDistant.Core.Core.WorldData.Data;
 using SociallyDistant.Core.Modules;
 using SociallyDistant.Core.OS;
 using SociallyDistant.Core.OS.Network.MessageTransport;
-using SociallyDistant.Core.Scripting;
 using SociallyDistant.Core.Serialization.Binary;
 using SociallyDistant.Core.Shell;
 using SociallyDistant.Core.Shell.Common;

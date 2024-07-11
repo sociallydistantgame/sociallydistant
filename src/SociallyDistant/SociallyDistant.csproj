@@ -11,6 +11,7 @@
   
   <!-- Asset importer overrides -->
   <Import Project=".\Content\ContentOverrides.targets" />
+  <Import Project=".\CheckSdshScripts.targets" />
   
   <ItemGroup>
     <ProjectReference Include="..\..\vendor\MonoGame.ImGuiNet\MonoGame.ImGuiNet\Monogame.ImGuiNet.csproj" />
@@ -92,6 +93,10 @@
     <None Update="Content\fortunes.txt">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
+  </ItemGroup>
+
+  <ItemGroup>
+    <Folder Include="Content\Scripts\" />
   </ItemGroup>
 
 </Project>

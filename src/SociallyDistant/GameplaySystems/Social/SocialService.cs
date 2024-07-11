@@ -4,7 +4,6 @@ using SociallyDistant.Core.Core;
 using SociallyDistant.Core.Core.Scripting;
 using SociallyDistant.Core.Core.WorldData.Data;
 using SociallyDistant.Core.Modules;
-using SociallyDistant.Core.Scripting;
 using SociallyDistant.Core.Social;
 using SociallyDistant.Player;
 
