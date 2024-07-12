@@ -46,8 +46,14 @@ public sealed class StatusBarUserDisplay : Widget
     private void UpdateWidgets()
     {
         if (user == null)
+        {
+            this.Visibility = Visibility.Collapsed;
             text.Text = string.Empty;
+        }
         else
+        {
+            this.Visibility = Visibility.Visible;
             text.Text = $"{user.UserName}@{user.Computer.Name}";
+        }
     }
 }

@@ -6,6 +6,12 @@ namespace SociallyDistant.Core.Shell.Windowing
 		public string Text;
 		public Action? ClickHandler;
 		public MessageDialogResult Result;
+
+		public MessageBoxButtonData(string text, MessageDialogResult result)
+		{
+			this.Text = text;
+			this.Result = result;
+		}
 		
 		public static implicit operator MessageBoxButtonData(string text)
 		{

@@ -110,6 +110,7 @@ public class GuiController : GameComponent,
         }
         else
         {
+            desktopController.Logout();
             desktop?.Dispose();
         }
     }

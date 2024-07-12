@@ -96,6 +96,9 @@ namespace SociallyDistant.Architecture
 			foreach (ISystemProcess child in Children.ToArray())
 				child.Kill();
 
+			if (!this.isAlive)
+				return;
+			
 			this.exitCode = exitCode;
 			isAlive = false;
 			Killed?.Invoke(this);

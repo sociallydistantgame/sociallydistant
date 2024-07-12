@@ -201,8 +201,7 @@ public class TextWidget : Widget
                 lastOverride = element.MarkupData.FontOverride;
             }
             
-            // TODO: Color from a property or the Visual Style.
-            var color = (element.MarkupData.ColorOverride ?? TextColor) ?? GetVisualStyle().GetTextColor(this);
+            var renderColor = (element.MarkupData.ColorOverride ?? TextColor) ?? GetVisualStyle().GetTextColor(this);
 
             if (element.MeasuredSize.HasValue && element.MarkupData.Highlight.A > 0)
             {
@@ -216,7 +215,7 @@ public class TextWidget : Widget
                 geometry.AddQuad(highlightRect, element.MarkupData.Highlight);
             }
 
-            family.Draw(geometry, element.Position, color, element.Text, element.MarkupData.FontSize ?? this.FontSize,
+            family.Draw(geometry, element.Position, renderColor, element.Text, element.MarkupData.FontSize ?? this.FontSize,
                 element.MarkupData.Weight ?? FontWeight, element.MarkupData.Italic);
 
             var strikeLine = 1;
@@ -229,7 +228,7 @@ public class TextWidget : Widget
                     element.Position.Y + element.MeasuredSize!.Value.Y - underLine,
                     element.MeasuredSize.Value.X,
                     underLine
-                ), color);
+                ), renderColor);
             }
             else if (!string.IsNullOrWhiteSpace(element.MarkupData.Link))
             {
@@ -238,7 +237,7 @@ public class TextWidget : Widget
                     element.Position.Y + element.MeasuredSize!.Value.Y - strikeLine,
                     element.MeasuredSize.Value.X,
                     strikeLine
-                ), color);
+                ), renderColor);
             }
             
             if (element.MarkupData.Strikethrough)
@@ -248,7 +247,7 @@ public class TextWidget : Widget
                     element.Position.Y + ((element.MeasuredSize!.Value.Y - underLine)/2),
                     element.MeasuredSize.Value.X,
                     strikeLine
-                ), color);
+                ), renderColor);
             }
         }
     }

@@ -28,6 +28,16 @@ internal sealed class DesktopController
     {
         return loginProcess.Fork();
     }
+
+    public void Logout()
+    {
+        loginProcess?.Kill();
+        loginUser = null;
+
+        guiController.StatusBar.User = null;
+        
+        
+    }
     
     public void Login()
     {
