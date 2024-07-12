@@ -51,7 +51,8 @@ public class SociallyDistantVisualStyle : IVisualStyle
     public Vector2 ToggleSize => new Vector2(20, 20);
     public Vector2 SwitchSize => new Vector2(40, 22);
     public Font? IconFont => iconFont;
-    
+    public Padding DropdownButtonPadding { get; } = new Padding(1, 1, 29, 1);
+
     public SociallyDistantVisualStyle(IGameContext game)
     {
         this.game = game;

@@ -1,5 +1,6 @@
 ﻿#nullable enable
 
+using Microsoft.Xna.Framework.Graphics;
 using SociallyDistant.Core.Core.Config;
 
 namespace SociallyDistant.Core.Config.SystemConfigCategories
@@ -45,7 +46,7 @@ namespace SociallyDistant.Core.Config.SystemConfigCategories
 
 		private string[] GetAvailableResolutions()
 		{
-			return Array.Empty<string>();
+			return GraphicsAdapter.DefaultAdapter.SupportedDisplayModes.OrderByDescending(x => x.Width * x.Height).Where(x => x.Height > 720).Select(x => $"{x.Width}x{x.Height}").Distinct().ToArray();
 		}
 		
 		/// <inheritdoc />

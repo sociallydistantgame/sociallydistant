@@ -12,6 +12,7 @@ internal sealed class FallbackVisualStyle : IVisualStyle
     public Vector2 ToggleSize => new Vector2(18, 18);
     public Vector2 SwitchSize => ToggleSize;
     public Font? IconFont => null;
+    public Padding DropdownButtonPadding { get; } = 3;
     public IFontFamily? FallbackFont { get; set; }
     
     public IFontFamily GetFont(PresetFontFamily family)

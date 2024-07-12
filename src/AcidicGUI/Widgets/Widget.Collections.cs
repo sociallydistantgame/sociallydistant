@@ -197,7 +197,7 @@ public partial class Widget
 
         private bool TryDisassociate(Widget item)
         {
-            if (item.GuiManager != guiManager)
+            if (item.guiManager != guiManager)
                 return false;
 
             if (item.Parent != null)
@@ -219,7 +219,7 @@ public partial class Widget
                 throw new InvalidOperationException(
                     "The given widget is already associated with a parent, and cannot be added as a top-level. Please remove it from its parent first.");
 
-            if (item.GuiManager != null)
+            if (item.guiManager != null)
                 throw new InvalidOperationException("The given widget is already a top-level of another GuiManager.");
 
             item.guiManager = this.guiManager;

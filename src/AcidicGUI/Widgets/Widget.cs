@@ -125,7 +125,7 @@ public abstract partial class Widget : IFontFamilyProvider
         }
     }
     
-    public GuiManager? GuiManager
+    public virtual GuiManager? GuiManager
     {
         get
         {

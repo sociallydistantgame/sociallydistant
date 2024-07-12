@@ -11,6 +11,7 @@ public interface IVisualStyle : IFontFamilyProvider
     Vector2 ToggleSize { get; }
     Vector2 SwitchSize { get; }
     Font? IconFont { get; }
+    Padding DropdownButtonPadding { get; }
     
     float ScrollBarSize { get; }
 

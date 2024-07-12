@@ -2,15 +2,15 @@ namespace AcidicGUI.Layout;
 
 public struct Padding
 {
-    public float Left;
-    public float Top;
-    public float Right;
-    public float Bottom;
+    public int Left;
+    public int Top;
+    public int Right;
+    public int Bottom;
 
-    public float Vertical => Top + Bottom;
-    public float Horizontal => Left + Right;
+    public int Vertical => Top + Bottom;
+    public int Horizontal => Left + Right;
 
-    public Padding(float left, float top, float right, float bottom)
+    public Padding(int left, int top, int right, int bottom)
     {
         Left = left;
         Top = top;
@@ -18,12 +18,32 @@ public struct Padding
         Bottom = bottom;
     }
 
-    public Padding(float horizontal, float vertical) : this(horizontal, vertical, horizontal, vertical)
+    public Padding(int horizontal, int vertical) : this(horizontal, vertical, horizontal, vertical)
     { }
     
-    public Padding(float uniform) : this(uniform, uniform)
+    public Padding(int uniform) : this(uniform, uniform)
     { }
     
-    public static implicit operator Padding(float uniform)
+    public static implicit operator Padding(int uniform)
         => new Padding(uniform);
+
+    public static bool operator ==(Padding left, Padding right)
+    {
+        return left.Left == right.Left && left.Top == right.Top && left.Right == right.Right && left.Bottom == right.Bottom;
+    }
+
+    public static bool operator !=(Padding left, Padding right)
+    {
+        return !(left == right);
+    }
+
+    public override bool Equals(object? obj)
+    {
+        return obj is Padding right && this == right;
+    }
+
+    public override int GetHashCode()
+    {
+        return HashCode.Combine(Left, Top, Bottom, Right);
+    }
 }
