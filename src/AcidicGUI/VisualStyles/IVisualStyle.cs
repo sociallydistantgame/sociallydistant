@@ -8,14 +8,30 @@ namespace AcidicGUI.VisualStyles;
 
 public interface IVisualStyle : IFontFamilyProvider
 {
+    Vector2 ToggleSize { get; }
     Font? IconFont { get; }
     
     float ScrollBarSize { get; }
 
     Color GetTextColor(Widget? widget = null);
-    
+
     void DrawWidgetBackground(Widget widget, GeometryHelper geometryHelper);
 
-    void DrawScrollBar(Widget widget, GeometryHelper geometry, LayoutRect scrollBarArea, float scrollOffset,
-        float scrollViewHeight);
+    void DrawScrollBar(
+        Widget widget,
+        GeometryHelper geometry,
+        LayoutRect scrollBarArea,
+        float scrollOffset,
+        float scrollViewHeight
+    );
+
+    void DrawToggle(
+        Toggle toggle,
+        GeometryHelper geometry,
+        LayoutRect rect,
+        bool isHovered,
+        bool isPressed,
+        bool isFocused,
+        bool isChecked
+    );
 }

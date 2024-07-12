@@ -1,3 +1,4 @@
+using System.Collections.Immutable;
 using AcidicGUI.Layout;
 using AcidicGUI.Rendering;
 using AcidicGUI.TextRendering;
@@ -8,6 +9,7 @@ namespace AcidicGUI.VisualStyles;
 
 internal sealed class FallbackVisualStyle : IVisualStyle
 {
+    public Vector2 ToggleSize => new Vector2(18, 18);
     public Font? IconFont => null;
     public IFontFamily? FallbackFont { get; set; }
     
@@ -31,22 +33,50 @@ internal sealed class FallbackVisualStyle : IVisualStyle
         // stub
     }
 
-    public void DrawScrollBar(Widget widget, GeometryHelper geometry, LayoutRect scrollBarArea, float scrollOffset,
-        float scrollViewHeight)
+    public void DrawScrollBar(
+        Widget widget,
+        GeometryHelper geometry,
+        LayoutRect scrollBarArea,
+        float scrollOffset,
+        float scrollViewHeight
+    )
     {
         float barHeight = scrollBarArea.Height / scrollViewHeight * scrollBarArea.Height;
         float barOffset = (scrollOffset / scrollViewHeight) * scrollBarArea.Height;
 
         geometry.AddQuad(scrollBarArea, Color.Gray);
-        
-        geometry.AddQuad(
-            new LayoutRect(
-                scrollBarArea.Left,
-                scrollBarArea.Top + barOffset,
-                scrollBarArea.Width,
-                barHeight
-            ),
-            Color.White
-        );
+
+        geometry.AddQuad(new LayoutRect(scrollBarArea.Left, scrollBarArea.Top + barOffset, scrollBarArea.Width, barHeight), Color.White);
+    }
+
+    public void DrawToggle(
+        Toggle toggle,
+        GeometryHelper geometry,
+        LayoutRect rect,
+        bool isHovered,
+        bool isPressed,
+        bool isFocused,
+        bool isChecked
+    )
+    {
+        geometry.AddQuad(rect, Color.SlateGray);
+
+        if (isPressed)
+        {
+            geometry.AddQuad(rect, Color.White * 0.15f);
+        }
+        else if (isHovered)
+        {
+            geometry.AddQuad(rect, Color.White * 0.25f);
+        }
+
+        geometry.AddQuadOutline(rect, 1, isFocused
+            ? Color.White
+            : Color.LightGray);
+
+        if (isChecked)
+        {
+            geometry.AddQuad(new LayoutRect(rect.Left + 3, rect.Top + 3, rect.Width - 6, rect.Height - 6), Color.White);
+        }
     }
 }

@@ -18,25 +18,37 @@ public class SociallyDistantVisualStyle : IVisualStyle
 {
     private readonly IGameContext game;
 
-    private readonly Color mainBackground               = new Color(0x11, 0x13, 0x15);
-    private readonly Color statusBarColor               = new Color(0x01, 0x22, 0x37, 0xff);
-    private readonly Color accentPrimary                = new Color(0x13, 0x85, 0xC3, 0xff);
-    private readonly Color accentEvil                   = new(0xDE, 0x17, 0x17);
-    private readonly Color accentWarning                = new Color(0xE0, 0x86, 0x17);
-    private readonly Color accentSuccess                = new Color(0x17, 0x82, 0x0E);
-    private readonly Color accentCyberspace             = new Color(0x34, 0xB1, 0xFD);
-    private readonly Color fieldBackground              = new Color(0x25, 0x28, 0x2B);
-    private readonly Color fieldStroke                  = new Color(0x60, 0x64, 0x67);
-    private readonly Color tabInactiveBackgroundDefault = new Color(0x44, 0x44, 0x44, 191);
-    private readonly Color tabInactiveBorderDefault     = new Color(0x44, 0x44, 0x44);
-    private readonly Color tabActiveBackgroundDefault   = new Color(0x16, 0x93, 0xD6, 190);
-    private readonly Color tabActiveBorderDefault       = new Color(0x16, 0x93, 0xD6);
-    private readonly Color sectionTextColor             = new(0x85, 0x85, 0x85);
-    
+    private readonly Color mainBackground                  = new Color(0x11, 0x13, 0x15);
+    private readonly Color statusBarColor                  = new Color(0x01, 0x22, 0x37, 0xff);
+    private readonly Color accentPrimary                   = new Color(0x13, 0x85, 0xC3, 0xff);
+    private readonly Color accentEvil                      = new(0xDE, 0x17, 0x17);
+    private readonly Color accentWarning                   = new Color(0xE0, 0x86, 0x17);
+    private readonly Color accentSuccess                   = new Color(0x17, 0x82, 0x0E);
+    private readonly Color accentCyberspace                = new Color(0x34, 0xB1, 0xFD);
+    private readonly Color fieldBackground                 = new Color(0x25, 0x28, 0x2B);
+    private readonly Color fieldStroke                     = new Color(0x60, 0x64, 0x67);
+    private readonly Color tabInactiveBackgroundDefault    = new Color(0x44, 0x44, 0x44, 191);
+    private readonly Color tabInactiveBorderDefault        = new Color(0x44, 0x44, 0x44);
+    private readonly Color tabActiveBackgroundDefault      = new Color(0x16, 0x93, 0xD6, 190);
+    private readonly Color tabActiveBorderDefault          = new Color(0x16, 0x93, 0xD6);
+    private readonly Color sectionTextColor                = new(0x85, 0x85, 0x85);
+    private readonly Color inputInactiveBorderColor        = new Color(0x54, 0x57, 0x5A);
+    private readonly Color inputInactiveHoveredBorderColor = new Color(0x6F, 0x74, 0x77);
+    private readonly Color inputActiveBorderColor          = new Color(0x19, 0xA1, 0xEA);
+    private readonly Color inputActiveHoveredBorderColor   = new Color(0x80, 0xC3, 0xFD);
+    private readonly Color inputInactiveBackground         = new Color(0x19, 0x1C, 0x1D);
+    private readonly Color inputInactiveHoveredBackground  = new Color(0x2C, 0x2F, 0x32);
+    private readonly Color inputInactivePressedBackground  = new Color(0x1F, 0x22, 0x25);
+    private readonly Color inputActiveBackground           = new Color(0x13, 0x85, 0xC3);
+    private readonly Color inputActiveHoveredBackground    = new Color(0x19, 0xA1, 0xEA);
+    private readonly Color inputActivePressedBackground    = new Color(0x13, 0x85, 0xC3);
+
     private Font        iconFont;
     private IFontFamily defaultFont = null!;
     private IFontFamily monospace   = null!;
+    private Texture2D?  checkboxEmblem;
 
+    public Vector2 ToggleSize => new Vector2(20, 20);
     public Font? IconFont => iconFont;
     
     public SociallyDistantVisualStyle(IGameContext game)
@@ -46,6 +58,8 @@ public class SociallyDistantVisualStyle : IVisualStyle
 
     internal void LoadContent()
     {
+        checkboxEmblem = game.GameInstance.Content.Load<Texture2D>("/Core/UI/Textures/checkbox_emblem");
+        
         iconFont = Font.FromTtfStream(
             game.GameInstance.Content.Load<Stream>("/Core/UI/Fonts/MaterialIcons-Regular.ttf"),
             256
@@ -77,6 +91,62 @@ public class SociallyDistantVisualStyle : IVisualStyle
         return family;
     }
 
+    private (float borderThickness, Color borderColor, Color backgroundColor) GetInputColor(
+        bool isHovered,
+        bool isPressed,
+        bool isFocused,
+        bool isChecked
+    )
+    {
+        float thickness = isFocused
+            ? 2
+            : 1;
+
+        Color background = default;
+        Color foreground = default;
+
+        if (isChecked)
+        {
+            foreground = (isHovered || isPressed)
+                ? inputActiveHoveredBorderColor
+                : inputActiveBorderColor;
+            
+            if (isHovered && isPressed)
+            {
+                background = inputActivePressedBackground;
+            }
+            else if (isHovered)
+            {
+                background = inputActiveHoveredBackground;
+            }
+            else
+            {
+                background = inputActiveBackground;
+            }
+        }
+        else
+        {
+            foreground = (isHovered || isPressed)
+                ? inputInactiveHoveredBorderColor
+                : inputInactiveBorderColor;
+
+            if (isHovered && isPressed)
+            {
+                background = inputInactivePressedBackground;
+            }
+            else if (isHovered)
+            {
+                background = inputInactiveHoveredBackground;
+            }
+            else
+            {
+                background = inputInactiveBackground;
+            }
+        }
+
+        return (thickness, foreground, background);
+    }
+    
     private Font? LoadFontStream(string path)
     {
         try
@@ -300,6 +370,28 @@ public class SociallyDistantVisualStyle : IVisualStyle
             ),
             Color.White
         );
+    }
+
+    public void DrawToggle(
+        Toggle toggle,
+        GeometryHelper geometry,
+        LayoutRect rect,
+        bool isHovered,
+        bool isPressed,
+        bool isFocused,
+        bool isChecked
+    )
+    {
+        (float borderThickness, Color borderColor, Color backgroundColor) = GetInputColor(isHovered, isPressed, isFocused, isChecked);
+
+        geometry.AddRoundedRectangle(rect, 3, backgroundColor);
+        geometry.AddRoundedRectangleOutline(rect, borderThickness, 3, borderColor);
+
+        if (isChecked && checkboxEmblem != null)
+        {
+            var emblemRect = new LayoutRect(rect.Left + ((rect.Width - checkboxEmblem.Width) / 2), rect.Top + ((rect.Height - checkboxEmblem.Height) / 2), checkboxEmblem.Width, checkboxEmblem.Height);
+            geometry.AddQuad(emblemRect, Color.White, checkboxEmblem);
+        }
     }
 }
 
