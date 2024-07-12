@@ -1,6 +1,7 @@
 ﻿#nullable enable
 using System.Diagnostics;
 using System.Reactive.Subjects;
+using Microsoft.Xna.Framework;
 using Serilog;
 using SociallyDistant.Core;
 using SociallyDistant.Core.Chat;
@@ -12,7 +13,7 @@ using SociallyDistant.Core.WorldData;
 
 namespace SociallyDistant.GameplaySystems.Chat
 {
-	public sealed class ConversationManager
+	public sealed class ConversationManager : GameComponent
 	{
 		private static readonly Singleton<ConversationManager> singleton = new();
 		
@@ -27,39 +28,44 @@ namespace SociallyDistant.GameplaySystems.Chat
 		private readonly Subject<ChatBoxRequest> chatBoxRequestSubject = new();
 		private readonly Dictionary<ObjectId, List<IBranchDefinition>> initialInteractionsByChannel = new();
 
-		private WorldManager worldManagerHolder = null!;
-		private ISocialService socialService = null!;
 		private SociallyDistantGame gameManagerHolder = null!;
-		private ChatBoxRequest? pendingChatBoxRequest;
-		private Task? saveTask = null!;
-		private IHookListener updateDatabaseHook = null!;
+		private ChatBoxRequest?     pendingChatBoxRequest;
+		private Task?               saveTask           = null!;
+		private IHookListener       updateDatabaseHook = null!;
 
+		private ISocialService SocialService => gameManagerHolder.SocialService;
+		private WorldManager WorldManagerHolder => WorldManager.Instance;
+		
 		public IEnumerable<string> AllConversationIds => conversationsById.Keys;
 		public IEnumerable<string> ActiveConversations => activeConversations.Keys;
 		
-		private void Awake()
+		internal ConversationManager(SociallyDistantGame game) : base(game)
 		{
 			singleton.SetInstance(this);
-			
-			gameManagerHolder = SociallyDistantGame.Instance;
-			socialService = gameManagerHolder.SocialService;
-			worldManagerHolder = WorldManager.Instance;
+
+			gameManagerHolder = game;
 			
 			updateDatabaseHook = new UpdateChatDatabaseHook(this);
 		}
 
-		private void Start()
+		public override void Initialize()
 		{
+			base.Initialize();
 			gameManagerHolder.ScriptSystem.RegisterHookListener(CommonScriptHooks.AfterWorldStateUpdate, updateDatabaseHook);
 		}
 
-		private void OnDestroy()
+		protected override void Dispose(bool disposing)
 		{
+			base.Dispose(disposing);
+			
+			if (!disposing)
+				return;
+			
 			gameManagerHolder.ScriptSystem.UnregisterHookListener(CommonScriptHooks.AfterWorldStateUpdate, updateDatabaseHook);
 			singleton.SetInstance(null);
 		}
 
-		private void Update()
+		public override void Update(GameTime gameTime)
 		{
 			if (saveTask != null)
 			{
@@ -72,7 +78,7 @@ namespace SociallyDistant.GameplaySystems.Chat
 			var mustSave = false;
 			if (completedConversations.Count > 0)
 			{
-				ProtectedWorldState protectedState = worldManagerHolder.World.ProtectedWorldData.Value;
+				ProtectedWorldState protectedState = WorldManagerHolder.World.ProtectedWorldData.Value;
 
 				var interactionList = new List<string>();
 				protectedState.CompletedInteractions ??= new List<string>();
@@ -94,7 +100,7 @@ namespace SociallyDistant.GameplaySystems.Chat
 
 				protectedState.CompletedInteractions = interactionList;
 				
-				worldManagerHolder.World.ProtectedWorldData.Value = protectedState;
+				WorldManagerHolder.World.ProtectedWorldData.Value = protectedState;
 			}
 
 			if (mustSave)
@@ -164,7 +170,7 @@ namespace SociallyDistant.GameplaySystems.Chat
 
 			IChatConversation conversation = allConversations[conversationIndex];
 
-			INarrativeThread thread = socialService.GetNarrativeThread(conversation.Type switch
+			INarrativeThread thread = SocialService.GetNarrativeThread(conversation.Type switch
 			{
 				ChatScriptType.Dm => NarrativeThread.DirectMessage,
 				ChatScriptType.Group => NarrativeThread.DirectMessageGroup,
@@ -172,7 +178,7 @@ namespace SociallyDistant.GameplaySystems.Chat
 			}, conversation.GuildId, conversation.ChannelId, true, conversation.ActorIds.ToArray());
 			
 			var tokenSource = new CancellationTokenSource();
-			var controller = new ConversationScriptController(this, worldManagerHolder, socialService, conversation, thread);
+			var controller = new ConversationScriptController(this, WorldManagerHolder, SocialService, conversation, thread);
 			Task task = conversation.StartConversation(tokenSource.Token, controller);
 
 			this.activeConversations[conversationId] = new ActiveConversation(tokenSource, task);
@@ -235,16 +241,16 @@ namespace SociallyDistant.GameplaySystems.Chat
 				if (conversation.StartType != ChatStartType.Auto)
 					continue;
 
-				if (!conversation.CheckConditions(worldManagerHolder, socialService))
+				if (!conversation.CheckConditions(WorldManagerHolder, SocialService))
 					continue;
 				
 				if (string.IsNullOrWhiteSpace(conversation.StartMessage))
 					continue;
 
-				if (!conversation.IsRepeatable && worldManagerHolder.World.IsInteractionCompleted(conversation.Id))
+				if (!conversation.IsRepeatable && WorldManagerHolder.World.IsInteractionCompleted(conversation.Id))
 					continue;
 				
-				INarrativeThread? thread = socialService.GetNarrativeThread(conversation.Type switch
+				INarrativeThread? thread = SocialService.GetNarrativeThread(conversation.Type switch
 				{
 					ChatScriptType.Dm => NarrativeThread.DirectMessage,
 					ChatScriptType.Group => NarrativeThread.DirectMessageGroup,
@@ -254,7 +260,7 @@ namespace SociallyDistant.GameplaySystems.Chat
 				if (thread == null)
 					continue;
 				
-				IProfile target = socialService.GetNarrativeProfile(conversation.ActorIds.First());
+				IProfile target = SocialService.GetNarrativeProfile(conversation.ActorIds.First());
 
 				var interaction = new InitialInteraction(this, target, conversation.Id, conversation.StartMessage);
 

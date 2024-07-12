@@ -1,18 +1,22 @@
 ﻿#nullable enable
 
+using Microsoft.Xna.Framework;
 using SociallyDistant.Core.Core;
 using SociallyDistant.Core.Core.Scripting;
 using SociallyDistant.Core.Core.WorldData.Data;
 using SociallyDistant.Core.Modules;
 using SociallyDistant.Core.Social;
+using SociallyDistant.GameplaySystems.Chat;
 using SociallyDistant.Player;
 
 namespace SociallyDistant.GameplaySystems.Social
 {
-	public class SocialService : ISocialService
+	public class SocialService : GameComponent, 
+		ISocialService
 	{
 		private readonly CharacterUpdateHook characterUpdateHook = new();
-
+		private readonly ConversationManager conversationManager;
+		
 		private Dictionary<ObjectId, Profile> profiles = new Dictionary<ObjectId, Profile>();
 		private ObjectId playerProfileId;
 		private EmptyProfile unloadedPlayerProfile = new EmptyProfile();
@@ -21,10 +25,11 @@ namespace SociallyDistant.GameplaySystems.Social
 		private ChatChannelManager channelManager;
 		private MessageManager messageManager;
 		private SocialPostManager socialPostManager;
-		private IWorldManager worldManager = null!;
 		private IGameContext game;
 		private NewsManager newsManager;
 
+		private IWorldManager WorldManager => game.WorldManager;
+		
 		/// <inheritdoc />
 		public IProfile PlayerProfile
 		{
@@ -37,36 +42,50 @@ namespace SociallyDistant.GameplaySystems.Social
 			}
 		}
 
-		private void Awake()
+		internal SocialService(SociallyDistantGame game) : base(game)
 		{
-			game = SociallyDistantGame.Instance;
-			worldManager = game.WorldManager; 
-		}
-
-		private void Start()
-		{
-			game.ScriptSystem.RegisterHookListener(CommonScriptHooks.AfterWorldStateUpdate, characterUpdateHook);
-			messageManager = new MessageManager(worldManager, this);
-			channelManager = new ChatChannelManager(this, this.worldManager, messageManager);
-			memberManager = new ChatMemberManager(this, worldManager);
-			masterGuildList = new GuildList(channelManager, memberManager, worldManager);
-			socialPostManager = new SocialPostManager(this, worldManager);
-
-			worldManager.Callbacks.AddModifyCallback<WorldPlayerData>(OnPlayerDataUpdated);
-
-			worldManager.Callbacks.AddCreateCallback<WorldProfileData>(OnProfileCreated);
-			worldManager.Callbacks.AddModifyCallback<WorldProfileData>(OnProfileModified);
-			worldManager.Callbacks.AddDeleteCallback<WorldProfileData>(OnProfileDeleted);
-			newsManager = new NewsManager(this, worldManager, game.ContentManager);
-		}
-
-		private void Update()
-		{
-			newsManager.Update();
+			this.game = game;
+			this.conversationManager = new ConversationManager(game);
 		}
 		
-		private void OnDestroy()
+		
+		public override void Initialize()
 		{
+			base.Initialize();
+
+			conversationManager.Initialize();
+			
+			game.ScriptSystem.RegisterHookListener(CommonScriptHooks.AfterWorldStateUpdate, characterUpdateHook);
+			messageManager = new MessageManager(WorldManager, this);
+			channelManager = new ChatChannelManager(this, this.WorldManager, messageManager);
+			memberManager = new ChatMemberManager(this, WorldManager);
+			masterGuildList = new GuildList(channelManager, memberManager, WorldManager);
+			socialPostManager = new SocialPostManager(this, WorldManager);
+
+			WorldManager.Callbacks.AddModifyCallback<WorldPlayerData>(OnPlayerDataUpdated);
+
+			WorldManager.Callbacks.AddCreateCallback<WorldProfileData>(OnProfileCreated);
+			WorldManager.Callbacks.AddModifyCallback<WorldProfileData>(OnProfileModified);
+			WorldManager.Callbacks.AddDeleteCallback<WorldProfileData>(OnProfileDeleted);
+			newsManager = new NewsManager(this, WorldManager, game.ContentManager);
+		}
+
+		public override void Update(GameTime gameTime)
+		{
+			base.Update(gameTime);
+			conversationManager.Update(gameTime);
+			newsManager.Update();
+		}
+
+		protected override void Dispose(bool disposing)
+		{
+			base.Dispose(disposing);
+
+			if (!disposing)
+				return;
+
+			conversationManager.Dispose();
+			
 			game.ScriptSystem.UnregisterHookListener(CommonScriptHooks.AfterWorldStateUpdate, characterUpdateHook);
 			socialPostManager.Dispose();
 			masterGuildList.Dispose();
@@ -110,7 +129,7 @@ namespace SociallyDistant.GameplaySystems.Social
 		/// <inheritdoc />
 		public IEnumerable<IProfile> GetFriends(IProfile user)
 		{
-			foreach (WorldRelationshipData relationship in worldManager.World.Relationships)
+			foreach (WorldRelationshipData relationship in WorldManager.World.Relationships)
 			{
 				if (relationship.Type != RelationshipType.Friend)
 					continue;
@@ -130,7 +149,7 @@ namespace SociallyDistant.GameplaySystems.Social
 		/// <inheritdoc />
 		public IEnumerable<IProfile> GetFollowers(IProfile user)
 		{
-			foreach (WorldRelationshipData relationship in worldManager.World.Relationships)
+			foreach (WorldRelationshipData relationship in WorldManager.World.Relationships)
 			{
 				if (relationship.Target != user.ProfileId)
 					continue;
@@ -148,7 +167,7 @@ namespace SociallyDistant.GameplaySystems.Social
 		/// <inheritdoc />
 		public IEnumerable<IProfile> GetFollowing(IProfile user)
 		{
-			foreach (WorldRelationshipData relationship in worldManager.World.Relationships)
+			foreach (WorldRelationshipData relationship in WorldManager.World.Relationships)
 			{
 				if (relationship.Source != user.ProfileId)
 					continue;
@@ -166,7 +185,7 @@ namespace SociallyDistant.GameplaySystems.Social
 		/// <inheritdoc />
 		public IEnumerable<IProfile> GetBlockedProfiles(IProfile user)
 		{
-			foreach (WorldRelationshipData relationship in worldManager.World.Relationships)
+			foreach (WorldRelationshipData relationship in WorldManager.World.Relationships)
 			{
 				if (relationship.Source != user.ProfileId)
 					continue;
@@ -203,7 +222,7 @@ namespace SociallyDistant.GameplaySystems.Social
 				IEnumerable<IChatChannel> channels = channelManager.GetDirectMessageChannels();
 				foreach (IChatChannel channel in channels)
 				{
-					WorldMemberData[] members = worldManager.World.Members.Where(x => x.GroupId == channel.Id && x.GroupType == MemberGroupType.GroupDirectMessage).ToArray();
+					WorldMemberData[] members = WorldManager.World.Members.Where(x => x.GroupId == channel.Id && x.GroupType == MemberGroupType.GroupDirectMessage).ToArray();
 					if (members.Length != 2)
 						continue;
 
@@ -217,25 +236,25 @@ namespace SociallyDistant.GameplaySystems.Social
 				{
 					var newChannel = new WorldChannelData
 					{
-						InstanceId = worldManager.GetNextObjectId(),
+						InstanceId = WorldManager.GetNextObjectId(),
 						ChannelType = MessageChannelType.DirectMessage,
 						Name = $"__DMChannel__",
 						Description = "This is a DM channel"
 					};
 
-					worldManager.World.Channels.Add(newChannel);
+					WorldManager.World.Channels.Add(newChannel);
 
-					worldManager.World.Members.Add(new WorldMemberData()
+					WorldManager.World.Members.Add(new WorldMemberData()
 					{
-						InstanceId = worldManager.GetNextObjectId(),
+						InstanceId = WorldManager.GetNextObjectId(),
 						GroupId = newChannel.InstanceId,
 						GroupType = MemberGroupType.GroupDirectMessage,
 						ProfileId = user.ProfileId
 					});
 
-					worldManager.World.Members.Add(new WorldMemberData()
+					WorldManager.World.Members.Add(new WorldMemberData()
 					{
-						InstanceId = worldManager.GetNextObjectId(),
+						InstanceId = WorldManager.GetNextObjectId(),
 						GroupId = newChannel.InstanceId,
 						GroupType = MemberGroupType.GroupDirectMessage,
 						ProfileId = friend.ProfileId
@@ -244,7 +263,7 @@ namespace SociallyDistant.GameplaySystems.Social
 			}
 
 			// Now, find all world member data for DM channels where the member is the user we're searching for.
-			foreach (WorldMemberData memberData in worldManager.World.Members)
+			foreach (WorldMemberData memberData in WorldManager.World.Members)
 			{
 				if (memberData.GroupType != MemberGroupType.GroupDirectMessage)
 					continue;
@@ -302,7 +321,7 @@ namespace SociallyDistant.GameplaySystems.Social
 			if (narrativeIdentifier == "player")
 				return PlayerProfile;
 
-			WorldProfileData profileDAta = worldManager!.World.Profiles.GetNarrativeObject(narrativeIdentifier);
+			WorldProfileData profileDAta = WorldManager!.World.Profiles.GetNarrativeObject(narrativeIdentifier);
 
 			var modify = false;
 			if (string.IsNullOrWhiteSpace(profileDAta.ChatUsername))
@@ -318,7 +337,7 @@ namespace SociallyDistant.GameplaySystems.Social
 			}
 
 			if (modify)
-				worldManager.World.Profiles.Modify(profileDAta);
+				WorldManager.World.Profiles.Modify(profileDAta);
 
 			return profiles[profileDAta.InstanceId];
 		}
@@ -333,7 +352,7 @@ namespace SociallyDistant.GameplaySystems.Social
 				else return null;
 			}
 
-			IWorld world = worldManager.World;
+			IWorld world = WorldManager.World;
 
 			IProfile[] nonPlayerProfiles = nonPlayerActors.Select(GetNarrativeProfile).ToArray();
 			IProfile playerProfile = this.PlayerProfile;
@@ -363,7 +382,7 @@ namespace SociallyDistant.GameplaySystems.Social
 
 					if (threadData.InstanceId.IsInvalid)
 					{
-						threadData.InstanceId = worldManager.GetNextObjectId();
+						threadData.InstanceId = WorldManager.GetNextObjectId();
 						threadData.ChannelType = MessageChannelType.DirectMessage;
 
 						world.Channels.Add(threadData);
@@ -372,7 +391,7 @@ namespace SociallyDistant.GameplaySystems.Social
 						{
 							world.Members.Add(new WorldMemberData
 							{
-								InstanceId = worldManager.GetNextObjectId(),
+								InstanceId = WorldManager.GetNextObjectId(),
 								GroupId = threadData.InstanceId,
 								ProfileId = profileId,
 								GroupType = MemberGroupType.GroupDirectMessage
@@ -380,7 +399,7 @@ namespace SociallyDistant.GameplaySystems.Social
 						}
 					}
 
-					return new NarrativeThreadController(worldManager, this.PlayerProfile, threadData.InstanceId);
+					return new NarrativeThreadController(WorldManager, this.PlayerProfile, threadData.InstanceId);
 				}
 				case NarrativeThread.Channel:
 				{
@@ -403,7 +422,7 @@ namespace SociallyDistant.GameplaySystems.Social
 
 						world.Members.Add(new WorldMemberData()
 						{
-							InstanceId = worldManager.GetNextObjectId(),
+							InstanceId = WorldManager.GetNextObjectId(),
 							GroupId = guild.Id,
 							ProfileId = playerProfile.ProfileId,
 							GroupType = MemberGroupType.Guild
@@ -416,7 +435,7 @@ namespace SociallyDistant.GameplaySystems.Social
 						if (!guild.HasMember(npcProfile))
 							world.Members.Add(new WorldMemberData()
 							{
-								InstanceId = worldManager.GetNextObjectId(),
+								InstanceId = WorldManager.GetNextObjectId(),
 								GroupId = guild.Id,
 								ProfileId = npcProfile.ProfileId,
 								GroupType = MemberGroupType.Guild
@@ -427,7 +446,7 @@ namespace SociallyDistant.GameplaySystems.Social
 					// It'll also be created if it doesn't exist.
 					IChatChannel channel = guild.GetNarrativeChannel(channelId);
 
-					return new NarrativeThreadController(worldManager, this.PlayerProfile, channel.Id);
+					return new NarrativeThreadController(WorldManager, this.PlayerProfile, channel.Id);
 				}
 				default:
 				{

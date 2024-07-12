@@ -161,13 +161,14 @@ internal sealed class SociallyDistantGame :
 		this.network = new NetworkController(this);
 		this.uriManager = new UriManager(this);
 		this.scriptSystem = new ScriptSystem(this);
-		this.socialService = new SocialService();
+		this.socialService = new SocialService(this);
 		this.gui = new GuiService(this);
 		this.deviceCoordinator = new DeviceCoordinator(this);
 
 		Components.Add(deviceCoordinator);
 		Components.Add(network);
 		Components.Add(backdrop);
+		Components.Add(socialService);
 		Components.Add(backdropUpdater);
 		Components.Add(gui);
 
@@ -366,9 +367,16 @@ internal sealed class SociallyDistantGame :
 		playerInfoSubject.OnNext(this.loadedPlayerInfo);
 
 		CurrentSaveDataDirectory = gameToLoad.LocalFilePath;
-		
+
+		await DoWorldUpdate();
 		await playerManager.PrepareEnvironment();
 		SetGameMode(GameMode.OnDesktop);
+	}
+
+	private async Task DoWorldUpdate()
+	{
+		await scriptSystem.RunHookAsync(CommonScriptHooks.BeforeWorldStateUpdate);
+		await scriptSystem.RunHookAsync(CommonScriptHooks.AfterWorldStateUpdate);
 	}
 
 	/// <inheritdoc />
