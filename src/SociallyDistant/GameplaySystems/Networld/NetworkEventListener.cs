@@ -1,5 +1,6 @@
 ﻿#nullable enable
 using System.Diagnostics;
+using Microsoft.Xna.Framework;
 using Serilog;
 using SociallyDistant.Core.Core;
 using SociallyDistant.Core.Core.WorldData.Data;
@@ -8,49 +9,63 @@ using SociallyDistant.Player;
 
 namespace SociallyDistant.GameplaySystems.Networld
 {
-	public class NetworkEventListener
+	public class NetworkEventListener : GameComponent
 	{
-		private readonly Dictionary<ObjectId, InternetServiceProvider> isps = new Dictionary<ObjectId, InternetServiceProvider>();
-		private readonly Dictionary<ObjectId, LocalAreaNetwork> lans = new Dictionary<ObjectId, LocalAreaNetwork>();
-		private readonly Dictionary<ObjectId, ForwardingTableEntry> portForwardEntries = new Dictionary<ObjectId, ForwardingTableEntry>();
-		private NonPlayerComputerEventListener npcComputers = null!;
-		private IWorldManager world = null!;
+		private readonly SociallyDistantGame                           game;
+		private readonly Dictionary<ObjectId, InternetServiceProvider> isps               = new Dictionary<ObjectId, InternetServiceProvider>();
+		private readonly Dictionary<ObjectId, LocalAreaNetwork>        lans               = new Dictionary<ObjectId, LocalAreaNetwork>();
+		private readonly Dictionary<ObjectId, ForwardingTableEntry>    portForwardEntries = new Dictionary<ObjectId, ForwardingTableEntry>();
+		private readonly NonPlayerComputerEventListener                npcComputers;
 
-		
-		private void Awake()
+		private IWorldManager World => game.WorldManager;
+		private NetworkSimulationController Simulation => game.Simulation;
+
+		internal NetworkEventListener(SociallyDistantGame game) : base(game)
 		{
-			world = SociallyDistantGame.Instance.WorldManager;
+			this.game = game;
+			this.npcComputers = new NonPlayerComputerEventListener(game);
 		}
 
-		private void Start()
+		public override void Initialize()
 		{
+			npcComputers.Initialize();
 			InstallEvents();
 		}
 
-		private void OnDestroy()
+		public override void Update(GameTime gameTime)
 		{
+			base.Update(gameTime);
+			npcComputers.Update(gameTime);
+		}
+
+		protected override void Dispose(bool disposing)
+		{
+			if (!disposing)
+				return;
+
+			npcComputers.Dispose();
 			UninstallEvents();
 		}
 
 		private void InstallEvents()
 		{
-			world.Callbacks.AddCreateCallback<WorldInternetServiceProviderData>(OnCreateIsp);
-			world.Callbacks.AddDeleteCallback<WorldInternetServiceProviderData>(OnDeleteIsp);
-			world.Callbacks.AddModifyCallback<WorldInternetServiceProviderData>(OnModifyIsp);
+			World.Callbacks.AddCreateCallback<WorldInternetServiceProviderData>(OnCreateIsp);
+			World.Callbacks.AddDeleteCallback<WorldInternetServiceProviderData>(OnDeleteIsp);
+			World.Callbacks.AddModifyCallback<WorldInternetServiceProviderData>(OnModifyIsp);
 			
-			world.Callbacks.AddCreateCallback<WorldLocalNetworkData>(OnCreateLAN);
-			world.Callbacks.AddDeleteCallback<WorldLocalNetworkData>(OnDeleteLan);
-			world.Callbacks.AddModifyCallback<WorldLocalNetworkData>(OnModifyLan);
+			World.Callbacks.AddCreateCallback<WorldLocalNetworkData>(OnCreateLAN);
+			World.Callbacks.AddDeleteCallback<WorldLocalNetworkData>(OnDeleteLan);
+			World.Callbacks.AddModifyCallback<WorldLocalNetworkData>(OnModifyLan);
 			
-			world.Callbacks.AddCreateCallback<WorldNetworkConnection>(OnCreateConnection);
-			world.Callbacks.AddDeleteCallback<WorldNetworkConnection>(OnDeleteConnection);
-			world.Callbacks.AddModifyCallback<WorldNetworkConnection>(OnModifyConnection);
+			World.Callbacks.AddCreateCallback<WorldNetworkConnection>(OnCreateConnection);
+			World.Callbacks.AddDeleteCallback<WorldNetworkConnection>(OnDeleteConnection);
+			World.Callbacks.AddModifyCallback<WorldNetworkConnection>(OnModifyConnection);
 			
-			world.Callbacks.AddModifyCallback<WorldPlayerData>(OnPlayerDataModified);
+			World.Callbacks.AddModifyCallback<WorldPlayerData>(OnPlayerDataModified);
 
-			world.Callbacks.AddCreateCallback<WorldPortForwardingRule>(OnCreatePortForwardingRule);
-			world.Callbacks.AddModifyCallback<WorldPortForwardingRule>(OnModifyPortForwardingRule);
-			world.Callbacks.AddDeleteCallback<WorldPortForwardingRule>(OnDeletePortForwardingRule);
+			World.Callbacks.AddCreateCallback<WorldPortForwardingRule>(OnCreatePortForwardingRule);
+			World.Callbacks.AddModifyCallback<WorldPortForwardingRule>(OnModifyPortForwardingRule);
+			World.Callbacks.AddDeleteCallback<WorldPortForwardingRule>(OnDeletePortForwardingRule);
 		}
 
 		
@@ -66,23 +81,23 @@ namespace SociallyDistant.GameplaySystems.Networld
 
 		private void UninstallEvents()
 		{
-			world.Callbacks.RemoveCreateCallback<WorldInternetServiceProviderData>(OnCreateIsp);
-			world.Callbacks.RemoveDeleteCallback<WorldInternetServiceProviderData>(OnDeleteIsp);
-			world.Callbacks.RemoveModifyCallback<WorldInternetServiceProviderData>(OnModifyIsp);
+			World.Callbacks.RemoveCreateCallback<WorldInternetServiceProviderData>(OnCreateIsp);
+			World.Callbacks.RemoveDeleteCallback<WorldInternetServiceProviderData>(OnDeleteIsp);
+			World.Callbacks.RemoveModifyCallback<WorldInternetServiceProviderData>(OnModifyIsp);
 			
-			world.Callbacks.RemoveCreateCallback<WorldLocalNetworkData>(OnCreateLAN);
-			world.Callbacks.RemoveDeleteCallback<WorldLocalNetworkData>(OnDeleteLan);
-			world.Callbacks.RemoveModifyCallback<WorldLocalNetworkData>(OnModifyLan);
+			World.Callbacks.RemoveCreateCallback<WorldLocalNetworkData>(OnCreateLAN);
+			World.Callbacks.RemoveDeleteCallback<WorldLocalNetworkData>(OnDeleteLan);
+			World.Callbacks.RemoveModifyCallback<WorldLocalNetworkData>(OnModifyLan);
 			
-			world.Callbacks.RemoveCreateCallback<WorldNetworkConnection>(OnCreateConnection);
-			world.Callbacks.RemoveDeleteCallback<WorldNetworkConnection>(OnDeleteConnection);
-			world.Callbacks.RemoveModifyCallback<WorldNetworkConnection>(OnModifyConnection);
+			World.Callbacks.RemoveCreateCallback<WorldNetworkConnection>(OnCreateConnection);
+			World.Callbacks.RemoveDeleteCallback<WorldNetworkConnection>(OnDeleteConnection);
+			World.Callbacks.RemoveModifyCallback<WorldNetworkConnection>(OnModifyConnection);
 			
-			world.Callbacks.RemoveModifyCallback<WorldPlayerData>(OnPlayerDataModified);
+			World.Callbacks.RemoveModifyCallback<WorldPlayerData>(OnPlayerDataModified);
 			
-			world.Callbacks.RemoveCreateCallback<WorldPortForwardingRule>(OnCreatePortForwardingRule);
-			world.Callbacks.RemoveModifyCallback<WorldPortForwardingRule>(OnModifyPortForwardingRule);
-			world.Callbacks.RemoveDeleteCallback<WorldPortForwardingRule>(OnDeletePortForwardingRule);
+			World.Callbacks.RemoveCreateCallback<WorldPortForwardingRule>(OnCreatePortForwardingRule);
+			World.Callbacks.RemoveModifyCallback<WorldPortForwardingRule>(OnModifyPortForwardingRule);
+			World.Callbacks.RemoveDeleteCallback<WorldPortForwardingRule>(OnDeletePortForwardingRule);
 		}
 
 		private void OnDeletePortForwardingRule(WorldPortForwardingRule subject)
@@ -212,8 +227,8 @@ namespace SociallyDistant.GameplaySystems.Networld
 		{
 			if (!lans.TryGetValue(subject.InstanceId, out LocalAreaNetwork lan))
 			{
-				//lan = simulation.CreateLocalAreaNetwork();
-				//lans.Add(subject.InstanceId, lan);
+				lan = Simulation.CreateLocalAreaNetwork();
+				lans.Add(subject.InstanceId, lan);
 			}
 
 			UpdateLAN(lan, subject);
@@ -233,8 +248,8 @@ namespace SociallyDistant.GameplaySystems.Networld
 		{
 			if (!isps.TryGetValue(subject.InstanceId, out InternetServiceProvider isp))
 			{
-				//isp = simulation.Value.CreateInternetServiceProvider(subject.CidrNetwork);
-				//isps.Add(subject.InstanceId, isp);
+				isp = Simulation.CreateInternetServiceProvider(subject.CidrNetwork);
+				isps.Add(subject.InstanceId, isp);
 			}
 
 			UpdateInstance(isp, subject);
@@ -243,7 +258,7 @@ namespace SociallyDistant.GameplaySystems.Networld
 		private void UpdateInstance(InternetServiceProvider isp, WorldInternetServiceProviderData data)
 		{
 			// During game load, this ensures we connect the player to the right ISP when the ISP is loaded.
-			WorldPlayerData player = this.world.World.PlayerData.Value;
+			WorldPlayerData player = this.World.World.PlayerData.Value;
 			if (player.PlayerInternetProvider == data.InstanceId)
 				this.OnPlayerDataModified(player, player);
 		}
@@ -264,10 +279,5 @@ namespace SociallyDistant.GameplaySystems.Networld
 			}
 			
 		}
-	}
-
-	public class MalwareState
-	{
-		
 	}
 }

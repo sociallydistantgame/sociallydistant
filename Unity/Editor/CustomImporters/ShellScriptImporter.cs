@@ -20,15 +20,7 @@ namespace Editor.CustomImporters
 {
 	[ScriptedImporter(1, ".sh")]
 	public class ShellScriptImporter : ScriptedImporter 
-	{
-		private UnityEngine.Object NpcImporter(string shebang, StringBuilder scriptText)
-		{
-			var asset = ScriptableObject.CreateInstance<NpcGeneratorScript>();
-			asset.NarrativeId = shebang.Trim();
-			asset.SetScriptText(scriptText.ToString());
-			return asset;
-		}
-		
+	{	
 		private UnityEngine.Object NetworkImporter(string shebang, StringBuilder scriptText)
 		{
 			var asset = ScriptableObject.CreateInstance<NetworkAsset>();
@@ -39,16 +31,6 @@ namespace Editor.CustomImporters
 			
 			asset.SetScriptText(scriptText.ToString());
 			return asset;
-		}
-		
-		private UnityEngine.Object ChatImporter(string shebang, StringBuilder scriptText)
-		{
-			var chat = ScriptableObject.CreateInstance<ChatConversationAsset>();
-			chat.Id = shebang;
-
-			chat.SetScriptText(scriptText.ToString());
-			
-			return chat;
 		}
 		
 		/// <inheritdoc />

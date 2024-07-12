@@ -1,32 +1,43 @@
 ﻿#nullable enable
 
+using Microsoft.Xna.Framework;
 using SociallyDistant.Core.Core;
 using SociallyDistant.Core.Core.WorldData.Data;
 using SociallyDistant.Core.OS.FileSystems;
 
 namespace SociallyDistant.GameplaySystems.NonPlayerComputers
 {
-	public class NonPlayerComputerEventListener
+	public class NonPlayerComputerEventListener : GameComponent
 	{
-		private NonPlayerComputer computerPrefab = null!;
-		
-		private readonly Dictionary<ObjectId, NonPlayerComputer> instances = new Dictionary<ObjectId, NonPlayerComputer>();
-		private readonly Dictionary<ObjectId, NpcFileOverrider> overriders = new Dictionary<ObjectId, NpcFileOverrider>();
-		
-		private IWorldManager world = null!;
-		
-		private void Awake()
+		private readonly SociallyDistantGame                     game;
+		private readonly Dictionary<ObjectId, NonPlayerComputer> instances  = new Dictionary<ObjectId, NonPlayerComputer>();
+		private readonly Dictionary<ObjectId, NpcFileOverrider>  overriders = new Dictionary<ObjectId, NpcFileOverrider>();
+
+		private IWorldManager World => game.WorldManager;
+
+		internal NonPlayerComputerEventListener(SociallyDistantGame game) : base(game)
 		{
-			world = SociallyDistantGame.Instance.WorldManager;
+			this.game = game;
 		}
 
-		private void Start()
+		public override void Initialize()
 		{
 			InstallEvents();
 		}
 
-		private void OnDestroy()
+		public override void Update(GameTime gameTime)
 		{
+			foreach (var computer in instances.Values)
+				computer.Update();
+			
+			base.Update(gameTime);
+		}
+
+		protected override void Dispose(bool disposing)
+		{
+			if (!disposing)
+				return;
+			
 			UninstallEvents();
 		}
 
@@ -37,16 +48,16 @@ namespace SociallyDistant.GameplaySystems.NonPlayerComputers
 		
 		private void InstallEvents()
 		{
-			this.world.Callbacks.AddCreateCallback<WorldComputerData>(OnCreateComputer);
-			this.world.Callbacks.AddModifyCallback<WorldComputerData>(OnModifyComputer);
-			this.world.Callbacks.AddDeleteCallback<WorldComputerData>(OnDeleteComputer);
+			this.World.Callbacks.AddCreateCallback<WorldComputerData>(OnCreateComputer);
+			this.World.Callbacks.AddModifyCallback<WorldComputerData>(OnModifyComputer);
+			this.World.Callbacks.AddDeleteCallback<WorldComputerData>(OnDeleteComputer);
 		}
 
 		private void UninstallEvents()
 		{
-			this.world.Callbacks.RemoveCreateCallback<WorldComputerData>(OnCreateComputer);
-			this.world.Callbacks.RemoveModifyCallback<WorldComputerData>(OnModifyComputer);
-			this.world.Callbacks.RemoveDeleteCallback<WorldComputerData>(OnDeleteComputer);
+			this.World.Callbacks.RemoveCreateCallback<WorldComputerData>(OnCreateComputer);
+			this.World.Callbacks.RemoveModifyCallback<WorldComputerData>(OnModifyComputer);
+			this.World.Callbacks.RemoveDeleteCallback<WorldComputerData>(OnDeleteComputer);
 		}
 		
 		private void OnDeleteComputer(WorldComputerData subject)
@@ -75,7 +86,8 @@ namespace SociallyDistant.GameplaySystems.NonPlayerComputers
 			
 			if (!instances.TryGetValue(subject.InstanceId, out NonPlayerComputer computer))
 			{
-				throw new Exception("No. Not yet. I need more weed before I implement this.");
+				computer = new NonPlayerComputer(game);
+				instances.Add(subject.InstanceId, computer);
 			}
 
 			computer.UpdateWorldData(subject);

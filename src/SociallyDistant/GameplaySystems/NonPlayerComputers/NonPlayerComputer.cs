@@ -13,52 +13,42 @@ namespace SociallyDistant.GameplaySystems.NonPlayerComputers
 {
 	public class NonPlayerComputer : IComputer
 	{
-		
-		private DeviceCoordinator deviceCoordinator = null!;
-		private EnvironmentVariablesAsset environmentVariables = null!;
+		private readonly SociallyDistantGame        game;
+		private readonly NonPlayerNetworkConnection networkConnection;
+		private readonly SuperUser                  su;
+		private readonly ISystemProcess             initProcess          = null!;
+		private readonly ISystemProcess             systemd;
+		private readonly ServiceManager             serviceManager;
 
-		
-		private FileSystemTableAsset fileSystemTable = null!;
+
 		
 		private WorldComputerData worldData;
-		private ISystemProcess initProcess = null!;
 		private LocalAreaNetwork? currentLan;
-		private NonPlayerNetworkConnection networkConnection;
-		private SuperUser su;
 		private NonPlayerFileSystem fs;
 		private NpcFileOverrider fileOverrider;
-		private ISystemProcess systemd;
-		private IWorldManager world = null!;
-		private ServiceManager? serviceManager;
 
+		private DeviceCoordinator DeviceCoordinator => game.DeviceCoordinator;
+		private IWorldManager World => game.WorldManager;
+		
 		public bool IsPlayer => false;
 
 		/// <inheritdoc />
 		public string Name => worldData.HostName;
 
-		private async void Awake()
+		internal NonPlayerComputer(SociallyDistantGame game)
 		{
-			networkConnection = new NonPlayerNetworkConnection(this);
-			
-			world = SociallyDistantGame.Instance.WorldManager;
-			
+			this.game = game;
+			this.networkConnection = new NonPlayerNetworkConnection(this);
 			this.su = new SuperUser(this);
-			RebuildVfs();
-			
-			this.initProcess = this.deviceCoordinator.SetUpComputer(this);
+			this.initProcess = this.DeviceCoordinator.SetUpComputer(this);
 			this.initProcess.Environment["PS1"] = "[%u@%h %W]%$ ";
+			this.initProcess.Environment["PATH"] = "/bin:/sbin:/usr/bin:/usr/sbin";
 			this.systemd = this.initProcess.Fork();
 			this.systemd.Name = "systemd";
-			
-			// Apply environment variables to the system
-			foreach (KeyValuePair<string, string> keyPair in environmentVariables)
-				initProcess.Environment[keyPair.Key] = keyPair.Value;
-
-			serviceManager = new ServiceManager(initProcess);
-			serviceManager.UpdateServices(worldData.Services);
+			this.serviceManager = new ServiceManager(initProcess);
 		}
 
-		private void Update()
+		public void Update()
 		{
 			serviceManager?.Update();
 		}
@@ -143,10 +133,7 @@ namespace SociallyDistant.GameplaySystems.NonPlayerComputers
 
 		private void RebuildVfs()
 		{
-			this.fs = new NonPlayerFileSystem(this, worldData.InstanceId, this.world);
-			
-			// Mount file systems from Unity
-			FileSystemTable.MountFileSystemsToComputer(this, this.fileSystemTable);
+			this.fs = new NonPlayerFileSystem(this, worldData.InstanceId, this.World);
 		}
 
 		public void SetFileOverrider(NpcFileOverrider overrider)

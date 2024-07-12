@@ -70,6 +70,7 @@ internal sealed class SociallyDistantGame :
 	private readonly        BackdropController           backdrop;
 	private readonly        BackdropUpdater              backdropUpdater;
 	private readonly        GuiController                guiController;
+	private readonly        NetworkEventListener         networkEventLIstener;
 	private                 bool                         areModulesLoaded;
 	private                 Task                         initializeTask;
 	private                 PlayerInfo                   playerInfo = new();
@@ -99,6 +100,8 @@ internal sealed class SociallyDistantGame :
 	/// <inheritdoc />
 	public string? CurrentSaveDataDirectory { get; private set; }
 
+	public DeviceCoordinator DeviceCoordinator => deviceCoordinator;
+	
 	/// <inheritdoc />
 	public IUriManager UriManager => uriManager;
 
@@ -127,6 +130,8 @@ internal sealed class SociallyDistantGame :
 
 	public IObservable<PlayerInfo> PlayerInfoObservable => playerInfoObservable;
 
+	public NetworkSimulationController Simulation => network.Simulation;
+	
 	internal SociallyDistantGame()
 	{
 		instance = this;
@@ -164,9 +169,11 @@ internal sealed class SociallyDistantGame :
 		this.socialService = new SocialService(this);
 		this.gui = new GuiService(this);
 		this.deviceCoordinator = new DeviceCoordinator(this);
+		this.networkEventLIstener = new NetworkEventListener(this);
 
 		Components.Add(deviceCoordinator);
 		Components.Add(network);
+		Components.Add(networkEventLIstener);
 		Components.Add(backdrop);
 		Components.Add(socialService);
 		Components.Add(backdropUpdater);
