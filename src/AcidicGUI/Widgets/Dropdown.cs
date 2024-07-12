@@ -2,6 +2,7 @@ using System.Collections;
 using AcidicGUI.Events;
 using AcidicGUI.Layout;
 using AcidicGUI.ListAdapters;
+using AcidicGUI.Rendering;
 using Microsoft.Xna.Framework;
 
 namespace AcidicGUI.Widgets;
@@ -67,6 +68,8 @@ public abstract class Dropdown<TItemType, TView> : Widget,
 
         Vector2 screen = new Vector2(context.PhysicalScreenWidget, context.PhysicalScreenHeight);
         Vector2 scrollViewSize = dropdownBox.GetCachedContentSize(screen);
+
+        scrollViewSize.X = Math.Max(scrollViewSize.X, availableSpace.Width);
 
         Vector2 origin = new Vector2(availableSpace.Left, availableSpace.Bottom);
 
@@ -220,7 +223,7 @@ public abstract class Dropdown<TItemType, TView> : Widget,
         public override void UpdateView(DropdownViewHolder<TItemType, TView> viewHolder)
         {
             var item = items[viewHolder.ItemIndex];
-            viewHolder.UpdateView(item);
+            viewHolder.UpdateView(item, viewHolder.ItemIndex == dropdown.SelectedIndex);
             
             viewHolder.Clicked = OnItemClicked;
         }
@@ -232,10 +235,33 @@ public abstract class Dropdown<TItemType, TView> : Widget,
     }
 
     private sealed class DropdownItemHolder : ContentWidget,
-        IMouseClickHandler
+        IMouseClickHandler,
+        IMouseEnterHandler,
+        IMouseLeaveHandler,
+        IMouseDownHandler,
+        IMouseUpHandler
     {
-        public Action? Callback { get; set; }
+        private bool hovered;
+        private bool pressed;
+        private bool active;
+
+        public bool IsActive
+        {
+            get => active;
+            set
+            {
+                active = value;
+                InvalidateGeometry();
+            }
+        }
         
+        public Action? Callback { get; set; }
+
+        protected override void RebuildGeometry(GeometryHelper geometry)
+        {
+            GetVisualStyle().DrawDropdownItemBackground(this, geometry, hovered, pressed, active);
+        }
+
         public void OnMouseClick(MouseButtonEvent e)
         {
             if (e.Button != MouseButton.Left)
@@ -243,6 +269,38 @@ public abstract class Dropdown<TItemType, TView> : Widget,
             
             e.RequestFocus();
             Callback?.Invoke();
+        }
+
+        public void OnMouseEnter(MouseMoveEvent e)
+        {
+            hovered = true;
+            InvalidateGeometry();
+        }
+
+        public void OnMouseLeave(MouseMoveEvent e)
+        {
+            hovered = false;
+            InvalidateGeometry();
+        }
+
+        public void OnMouseDown(MouseButtonEvent e)
+        {
+            if (e.Button != MouseButton.Left)
+                return;
+
+            e.Handle();
+            pressed = true;
+            InvalidateGeometry();
+        }
+
+        public void OnMouseUp(MouseButtonEvent e)
+        {
+            if (e.Button != MouseButton.Left)
+                return;
+
+            e.Handle();
+            pressed = false;
+            InvalidateGeometry();
         }
     }
     
@@ -262,8 +320,9 @@ public abstract class Dropdown<TItemType, TView> : Widget,
             holder.Callback = OnClick;
         }
 
-        public void UpdateView(TItemType data)
+        public void UpdateView(TItemType data, bool isActiveItem)
         {
+            holder.IsActive = isActiveItem;
             view.UpdateView(data);
         }
 
@@ -343,6 +402,11 @@ public abstract class Dropdown<TItemType, TView> : Widget,
         protected override void ArrangeChildren(IGuiContext context, LayoutRect availableSpace)
         {
             base.ArrangeChildren(context, dropdownArea);
+        }
+
+        protected override void RebuildGeometry(GeometryHelper geometry)
+        {
+            GetVisualStyle().DrawDropdownItemsBackground(geometry, DropdownArea);
         }
     }
 }

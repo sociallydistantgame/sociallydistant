@@ -46,4 +46,14 @@ public interface IVisualStyle : IFontFamilyProvider
         bool isFocused,
         bool isChecked
     );
+
+    void DrawDropdownItemsBackground(GeometryHelper geometry, LayoutRect rect);
+
+    void DrawDropdownItemBackground(
+        Widget widget,
+        GeometryHelper geometry,
+        bool hovered,
+        bool pressed,
+        bool selected
+    );
 }

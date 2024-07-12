@@ -421,6 +421,34 @@ public class SociallyDistantVisualStyle : IVisualStyle
 
         geometry.AddRoundedRectangle(nubRect, nubSize.X / 2, Color.White);
     }
+
+    public void DrawDropdownItemsBackground(GeometryHelper geometry, LayoutRect rect)
+    {
+        geometry.AddQuad(rect, mainBackground);
+        geometry.AddQuadOutline(rect, 1, fieldStroke);
+    }
+
+    public void DrawDropdownItemBackground(
+        Widget widget,
+        GeometryHelper geometry,
+        bool hovered,
+        bool pressed,
+        bool selected
+    )
+    {
+        if (selected)
+            geometry.AddQuad(widget.ContentArea, accentPrimary);
+
+        if (hovered)
+        {
+            geometry.AddQuad(widget.ContentArea, Color.White * 0.25f);
+        }
+
+        if (pressed)
+        {
+            geometry.AddQuad(widget.ContentArea, Color.Black * 0.25f);
+        }
+    }
 }
 
 public enum InputFieldStyle

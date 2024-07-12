@@ -94,4 +94,24 @@ internal sealed class FallbackVisualStyle : IVisualStyle
     {
         DrawToggle(toggle, geometry, rect, isHovered, isPressed, isFocused, isChecked);
     }
+
+    public void DrawDropdownItemsBackground(GeometryHelper geometry, LayoutRect rect)
+    {
+        geometry.AddQuad(rect, Color.DimGray);
+    }
+
+    public void DrawDropdownItemBackground(
+        Widget widget,
+        GeometryHelper geometry,
+        bool hovered,
+        bool pressed,
+        bool selected
+    )
+    {
+        if (selected)
+            geometry.AddQuad(widget.ContentArea, Color.LightGray);
+
+        if (hovered)
+            geometry.AddQuad(widget.ContentArea, Color.Gray * 0.25f);
+    }
 }
