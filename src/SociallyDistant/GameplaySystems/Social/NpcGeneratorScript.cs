@@ -8,31 +8,21 @@ using SociallyDistant.GamePlatform;
 
 namespace SociallyDistant.GameplaySystems.Social
 {
-	public sealed class NpcGeneratorScript :
+	public sealed class NpcGeneratorScript : ShellScriptAsset,
 		ICharacterGenerator
 	{
-		
-		private string narrativeId = string.Empty;
-		
-		
-		private string scriptText;
+		private readonly string            narrativeId = string.Empty;
+		private readonly string            scriptText;
+		private          ShellInstruction? script;
 
-		private ShellInstruction? script;
-
-		public string NarrativeId
+		public string NarrativeId => narrativeId;
+		
+		internal NpcGeneratorScript(string narrativeId, string scriptText)
 		{
-			get => narrativeId;
-#if UNITY_EDITOR
-			set => narrativeId = value;
-#endif
-		}
-
-#if UNITY_EDITOR
-		public void SetScriptText(string scriptText)
-		{
+			this.narrativeId = narrativeId;
 			this.scriptText = scriptText;
 		}
-#endif
+		
 		
 		/// <inheritdoc />
 		public async Task GenerateNpcs(IWorldManager world)
