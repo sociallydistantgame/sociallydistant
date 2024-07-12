@@ -715,9 +715,10 @@ public class TextWidget : Widget
                 lastOverride = textElements[i].MarkupData.FontOverride;
             }
 
-            textElements[i].MeasuredSize = family.Measure(textElements[i].Text,
-                textElements[i].MarkupData.FontSize ?? FontSize, textElements[i].MarkupData.Weight ?? FontWeight,
-                textElements[i].MarkupData.Italic);
+            Vector2 measurement = family.Measure(textElements[i].Text, textElements[i].MarkupData.FontSize ?? FontSize, textElements[i].MarkupData.Weight ?? FontWeight, textElements[i].MarkupData.Italic);
+            measurement.Y = family.GetLineHeight(textElements[i].MarkupData.FontSize ?? FontSize, textElements[i].MarkupData.Weight ?? FontWeight, textElements[i].MarkupData.Italic);
+
+            textElements[i].MeasuredSize = measurement;
         }
     }
 
