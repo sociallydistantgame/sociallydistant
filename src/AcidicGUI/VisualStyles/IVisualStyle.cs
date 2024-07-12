@@ -9,6 +9,7 @@ namespace AcidicGUI.VisualStyles;
 public interface IVisualStyle : IFontFamilyProvider
 {
     Vector2 ToggleSize { get; }
+    Vector2 SwitchSize { get; }
     Font? IconFont { get; }
     
     float ScrollBarSize { get; }
@@ -26,6 +27,16 @@ public interface IVisualStyle : IFontFamilyProvider
     );
 
     void DrawToggle(
+        Toggle toggle,
+        GeometryHelper geometry,
+        LayoutRect rect,
+        bool isHovered,
+        bool isPressed,
+        bool isFocused,
+        bool isChecked
+    );
+
+    void DrawToggleSwitch(
         Toggle toggle,
         GeometryHelper geometry,
         LayoutRect rect,

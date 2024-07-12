@@ -49,6 +49,7 @@ public class SociallyDistantVisualStyle : IVisualStyle
     private Texture2D?  checkboxEmblem;
 
     public Vector2 ToggleSize => new Vector2(20, 20);
+    public Vector2 SwitchSize => new Vector2(40, 22);
     public Font? IconFont => iconFont;
     
     public SociallyDistantVisualStyle(IGameContext game)
@@ -392,6 +393,32 @@ public class SociallyDistantVisualStyle : IVisualStyle
             var emblemRect = new LayoutRect(rect.Left + ((rect.Width - checkboxEmblem.Width) / 2), rect.Top + ((rect.Height - checkboxEmblem.Height) / 2), checkboxEmblem.Width, checkboxEmblem.Height);
             geometry.AddQuad(emblemRect, Color.White, checkboxEmblem);
         }
+    }
+
+    public void DrawToggleSwitch(
+        Toggle toggle,
+        GeometryHelper geometry,
+        LayoutRect rect,
+        bool isHovered,
+        bool isPressed,
+        bool isFocused,
+        bool isChecked
+    )
+    {
+        (float borderThickness, Color borderColor, Color backgroundColor) = GetInputColor(isHovered, isPressed, isFocused, isChecked);
+
+        geometry.AddRoundedRectangle(rect, rect.Height/2, backgroundColor);
+        geometry.AddRoundedRectangleOutline(rect, borderThickness, rect.Height/2, borderColor);
+
+        const float nubOffset = 4;
+        
+        Vector2 nubSize = new Vector2(16, 16);
+
+        LayoutRect nubRect = new LayoutRect(!isChecked
+            ? rect.Left + nubOffset
+            : rect.Right - nubSize.X - nubOffset, rect.Top + ((rect.Height - nubSize.Y) / 2), nubSize.X, nubSize.Y);
+
+        geometry.AddRoundedRectangle(nubRect, nubSize.X / 2, Color.White);
     }
 }
 

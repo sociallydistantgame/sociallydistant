@@ -10,6 +10,7 @@ namespace AcidicGUI.VisualStyles;
 internal sealed class FallbackVisualStyle : IVisualStyle
 {
     public Vector2 ToggleSize => new Vector2(18, 18);
+    public Vector2 SwitchSize => ToggleSize;
     public Font? IconFont => null;
     public IFontFamily? FallbackFont { get; set; }
     
@@ -78,5 +79,18 @@ internal sealed class FallbackVisualStyle : IVisualStyle
         {
             geometry.AddQuad(new LayoutRect(rect.Left + 3, rect.Top + 3, rect.Width - 6, rect.Height - 6), Color.White);
         }
+    }
+
+    public void DrawToggleSwitch(
+        Toggle toggle,
+        GeometryHelper geometry,
+        LayoutRect rect,
+        bool isHovered,
+        bool isPressed,
+        bool isFocused,
+        bool isChecked
+    )
+    {
+        DrawToggle(toggle, geometry, rect, isHovered, isPressed, isFocused, isChecked);
     }
 }

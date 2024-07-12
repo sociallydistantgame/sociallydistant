@@ -14,12 +14,23 @@ public sealed class Toggle : Widget,
     IMouseUpHandler,
     IMouseClickHandler
 {
+    private bool isSwitchVariant;
     private bool hovered;
     private bool pressed;
     private bool focused;
     private bool toggleValue;
 
     public event Action<bool>? OnValueChanged;
+
+    public bool UseSwitchVariant
+    {
+        get => isSwitchVariant;
+        set
+        {
+            isSwitchVariant = value;
+            InvalidateLayout();
+        }
+    }
     
     public bool ToggleValue
     {
@@ -39,15 +50,23 @@ public sealed class Toggle : Widget,
 
     protected override Vector2 GetContentSize(Vector2 availableSize)
     {
-        return GetVisualStyle().ToggleSize;
+        return isSwitchVariant
+            ? GetVisualStyle().SwitchSize
+            : GetVisualStyle().ToggleSize;
     }
 
     protected override void RebuildGeometry(GeometryHelper geometry)
     {
-        var size = GetVisualStyle().ToggleSize;
+        var size = isSwitchVariant
+            ? GetVisualStyle().SwitchSize
+            : GetVisualStyle().ToggleSize;
+        
         var rect = new LayoutRect(ContentArea.Left + ((ContentArea.Width - size.X) / 2), ContentArea.Top + ((ContentArea.Height - size.Y) / 2), size.X, size.Y);
 
-        GetVisualStyle().DrawToggle(this, geometry, rect, hovered, pressed, focused, toggleValue);
+        if (isSwitchVariant)
+            GetVisualStyle().DrawToggleSwitch(this, geometry, rect, hovered, pressed, focused, toggleValue);
+        else 
+            GetVisualStyle().DrawToggle(this, geometry, rect, hovered, pressed, focused, toggleValue);
     }
 
     public void OnMouseEnter(MouseMoveEvent e)

@@ -15,6 +15,7 @@ public sealed class SwitchWidgetController : RecyclableWidgetController
     {
         toggle = GetWidget<Toggle>();
 
+        toggle.UseSwitchVariant = true;
         toggle.ToggleValue = IsActive;
         toggle.OnValueChanged += HandleValueChanged;
         
