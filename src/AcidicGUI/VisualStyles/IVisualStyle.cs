@@ -8,6 +8,7 @@ namespace AcidicGUI.VisualStyles;
 
 public interface IVisualStyle : IFontFamilyProvider
 {
+    float SliderThickness { get; }
     Vector2 ToggleSize { get; }
     Vector2 SwitchSize { get; }
     Font? IconFont { get; }
@@ -55,5 +56,14 @@ public interface IVisualStyle : IFontFamilyProvider
         bool hovered,
         bool pressed,
         bool selected
+    );
+
+    void DrawSlider(
+        Slider widget,
+        GeometryHelper geometry,
+        bool isHovered,
+        bool isPressed,
+        bool isVertical,
+        float value
     );
 }

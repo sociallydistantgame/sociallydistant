@@ -48,6 +48,7 @@ public class SociallyDistantVisualStyle : IVisualStyle
     private IFontFamily monospace   = null!;
     private Texture2D?  checkboxEmblem;
 
+    public float SliderThickness => 18;
     public Vector2 ToggleSize => new Vector2(20, 20);
     public Vector2 SwitchSize => new Vector2(40, 22);
     public Font? IconFont => iconFont;
@@ -448,6 +449,60 @@ public class SociallyDistantVisualStyle : IVisualStyle
         {
             geometry.AddQuad(widget.ContentArea, Color.Black * 0.25f);
         }
+    }
+
+    public void DrawSlider(
+        Slider widget,
+        GeometryHelper geometry,
+        bool isHovered,
+        bool isPressed,
+        bool isVertical,
+        float value
+    )
+    {
+        (float thickness, Color border, Color background) = GetInputColor(isHovered, isPressed, false, true);
+
+
+        float halfThickness = SliderThickness / 2;
+        float eighthThickness = halfThickness / 2;
+
+        float nubOffsetX = 0;
+        float nubOffsetY = 0;
+        
+        if (isVertical)
+        {
+            float left = widget.ContentArea.Top + halfThickness;
+            float right = widget.ContentArea.Bottom - halfThickness;
+            float width = right - left;
+            float nubCenter = MathHelper.Lerp(right, left, value);
+            float fillWidth = nubCenter - left;
+            float top = widget.ContentArea.Left + ((widget.ContentArea.Width - eighthThickness) / 2);
+            
+            nubOffsetX = widget.ContentArea.Left + (widget.ContentArea.Width - SliderThickness) / 2;
+            nubOffsetY = nubCenter - halfThickness;
+            
+            geometry.AddRoundedRectangle(new LayoutRect(top, left,      eighthThickness, width),     eighthThickness/2,   inputInactiveBackground);
+            geometry.AddRoundedRectangle(new LayoutRect(top, nubCenter, eighthThickness, fillWidth), eighthThickness / 2, accentPrimary);
+        }
+        else 
+        {
+            float left = widget.ContentArea.Left + halfThickness;
+            float right = widget.ContentArea.Right - halfThickness;
+            float width = right - left;
+            float nubCenter = MathHelper.Lerp(left, right, value);
+            float fillWidth = nubCenter - left;
+            float top = widget.ContentArea.Top + ((widget.ContentArea.Height - eighthThickness) / 2);
+            
+            nubOffsetX = nubCenter - halfThickness;
+            nubOffsetY = widget.ContentArea.Top + (widget.ContentArea.Height - SliderThickness) / 2;
+            
+            geometry.AddRoundedRectangle(new LayoutRect(left, top, width,     eighthThickness), eighthThickness/2,   inputInactiveBackground);
+            geometry.AddRoundedRectangle(new LayoutRect(left, top, fillWidth, eighthThickness), eighthThickness / 2, accentPrimary);
+        }
+        
+        geometry.AddRoundedRectangle(new LayoutRect(nubOffsetX,        nubOffsetY, SliderThickness, SliderThickness), halfThickness, background);
+            
+        geometry.AddRoundedRectangleOutline(new LayoutRect(nubOffsetX, nubOffsetY, SliderThickness, SliderThickness), thickness, halfThickness, border);
     }
 }
 
