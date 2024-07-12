@@ -73,9 +73,11 @@ namespace SociallyDistant.GameplaySystems.Networld
 		{
 			if (isps.TryGetValue(subjectnew.PlayerInternetProvider, out InternetServiceProvider isp))
 			{
+				game.Player.ConnectToInternet(isp, subjectnew.PublicNetworkAddress);
 			}
 			else
 			{
+				game.Player.DisconnectFromInternet();
 			}
 		}
 

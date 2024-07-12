@@ -49,6 +49,19 @@ namespace SociallyDistant.Player
 			this.computer = new PlayerComputer(game, deviceCoordinator, playerLan, fileOverrider, null, this);
 		}
 
+		public void ConnectToInternet(InternetServiceProvider isp, uint address)
+		{
+			if (this.playerLan.InternetServiceProvider != null)
+				playerLan.DisconnectFromInternet();
+            
+			this.playerLan.ConnectToInternet(isp, address);
+		}
+
+		public void DisconnectFromInternet()
+		{
+			playerLan.DisconnectFromInternet();
+		}
+		
 		internal async Task PrepareEnvironment()
 		{
 			// Pretend you're a Linux kernel.

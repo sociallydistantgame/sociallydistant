@@ -22,6 +22,8 @@ namespace SociallyDistant.GamePlatform.ContentManagement
 		{
 			this.game = game;
 			this.contentPipeline = pipeline;
+
+			this.AddContentSource<HookScriptSource>();
 		}
 		
 		/// <inheritdoc />

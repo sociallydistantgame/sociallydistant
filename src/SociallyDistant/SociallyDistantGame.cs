@@ -100,6 +100,7 @@ internal sealed class SociallyDistantGame :
 	/// <inheritdoc />
 	public string? CurrentSaveDataDirectory { get; private set; }
 
+	public PlayerManager Player => playerManager;
 	public DeviceCoordinator DeviceCoordinator => deviceCoordinator;
 	
 	/// <inheritdoc />
@@ -361,22 +362,25 @@ internal sealed class SociallyDistantGame :
 			this.currentGameData = gameToLoad;
 
 			//await gameInitializationScript.ExecuteAsync(unityConsole);
+			playerInfoSubject.OnNext(this.loadedPlayerInfo);
+			
+			CurrentSaveDataDirectory = gameToLoad.LocalFilePath;
+			
+			await DoWorldUpdate();
+			await playerManager.PrepareEnvironment();
 		}
 		catch (Exception ex)
 		{
-			this.guiController.ShowExceptionMessage(ex);
+			await this.guiController.ShowExceptionMessage(ex);
 
 			await EndCurrentGame(false);
 			await GoToLoginScreen();
+
+			await guiController.ShowInfoDialog("Session ended", "You have been logged out of your session.");
+			
 			return;
 		}
-
-		playerInfoSubject.OnNext(this.loadedPlayerInfo);
-
-		CurrentSaveDataDirectory = gameToLoad.LocalFilePath;
-
-		await DoWorldUpdate();
-		await playerManager.PrepareEnvironment();
+		
 		SetGameMode(GameMode.OnDesktop);
 	}
 

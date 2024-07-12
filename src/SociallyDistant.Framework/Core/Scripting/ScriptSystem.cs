@@ -32,15 +32,25 @@ namespace SociallyDistant.Core.Core.Scripting
 		/// <inheritdoc />
 		public async Task RunHookAsync(string hookName)
 		{
-			if (!hooks.TryGetValue(hookName, out List<IHookListener> listeners))
+			var scripts = game.ContentManager.GetContentOfType<HookScript>().Where(x => x.HookId == hookName).ToArray();
+			
+			if (!hooks.TryGetValue(hookName, out List<IHookListener>? listeners) && scripts.Length==0)
 			{
 				Log.Warning($"Script hook {hookName} has no registered listeners.");
 				return;
 			}
 
-			foreach (IHookListener listener in listeners)
+			foreach (HookScript script in scripts)
 			{
-				await listener.ReceiveHookAsync(this.game);
+				await script.ReceiveHookAsync(game);
+			}
+			
+			if (listeners != null)
+			{
+				foreach (IHookListener listener in listeners)
+				{
+					await listener.ReceiveHookAsync(this.game);
+				}
 			}
 		}
 

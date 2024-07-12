@@ -1,4 +1,4 @@
-﻿#!WorldScript
+﻿#!hook BeforeWorldStateUpdate
 hookexec BeforeCreateCareerISPs
 
 # Spawn Internet Service Providers here.
@@ -40,9 +40,12 @@ function set_act1_isp() {
   exit 0
 }
 
-worldflag run-if-set DEBUG set_debug_isp
-worldflag run-if-set LIFEPATH_QUEST_COMPLETED set_act1_isp
-
+if worldflag DEBUG;
+then
+  set_debug_isp
+elif worldflag !LIFEPATH_QUEST_COMPLETE;
+  set_act1_isp
+fi
 
 
 
