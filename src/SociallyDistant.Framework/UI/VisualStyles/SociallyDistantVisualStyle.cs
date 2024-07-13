@@ -46,6 +46,7 @@ public class SociallyDistantVisualStyle : IVisualStyle
     private readonly Color buttonBorder                    = new Color(0x16, 0x93, 0xD6);
     private readonly Color buttonHoveredBackground         = new Color(0x0F, 0x73, 0xA9);
     private readonly Color buttonPressedBackground         = new Color(0x08, 0x53, 0x7B);
+    private readonly Color selectionColor                  = new(0x08, 0x53, 0x7B);
 
     private Font        iconFont;
     private IFontFamily defaultFont = null!;
@@ -337,11 +338,27 @@ public class SociallyDistantVisualStyle : IVisualStyle
             geometry.AddRoundedRectangleOutline(widget.ContentArea, 1, 3, border);
         }
     }
+
+    private void DrawListItem(ListItem listItem, GeometryHelper geometry)
+    {
+        var color = selectionColor;
+
+        if (listItem.IsActive)
+        {
+            geometry.AddRoundedRectangle(listItem.ContentArea, 3, color);
+        }
+        else if (listItem.IsHovered)
+        {
+            geometry.AddRoundedRectangle(listItem.ContentArea, 3, color * 0.5f);
+        }
+    }
     
     public void DrawWidgetBackground(Widget widget, GeometryHelper geometryHelper)
     {
         if (widget is InputField inputField)
             DrawInputField(inputField, geometryHelper);
+        else if (widget is ListItem listItem)
+            DrawListItem(listItem, geometryHelper);
         else if (widget is TextButton textButton)
             DrawTextButton(textButton, geometryHelper);
         else if (widget is IWindowTab tab)

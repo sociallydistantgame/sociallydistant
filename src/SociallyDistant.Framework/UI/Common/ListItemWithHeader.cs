@@ -50,5 +50,7 @@ public class ListItemWithHeader : Widget
         stackPanel.ChildWidgets.Add(title);
         stackPanel.ChildWidgets.Add(listItemWidget);
         listItemWidget.Content = value;
+
+        title.Padding = new Padding(12, 6, 12, 3);
     }
 }

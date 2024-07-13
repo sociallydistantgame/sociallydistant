@@ -122,6 +122,8 @@ public partial class Widget
         LayoutRoot.InvalidateLayoutInternal();
         
         GuiManager?.SubmitForLayoutUpdateInternal(LayoutRoot);
+
+        InvalidateGeometry();
     }
 
     public void UpdateLayout(IGuiContext context, LayoutRect availableSpace)

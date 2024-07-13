@@ -1,11 +1,13 @@
 using AcidicGUI.CustomProperties;
 using AcidicGUI.Layout;
 using AcidicGUI.ListAdapters;
+using AcidicGUI.TextRendering;
 using AcidicGUI.Widgets;
 using Microsoft.Xna.Framework;
 using SociallyDistant.Core.Core.Config;
 using SociallyDistant.Core.UI.Recycling;
 using SociallyDistant.Core.UI.Recycling.SettingsWidgets;
+using SociallyDistant.Core.UI.VisualStyles;
 
 namespace SociallyDistant.UI.Settings;
 
@@ -34,20 +36,19 @@ public sealed class SettingsCategoryView : Widget
 
         recyclables.MinimumSize = new Vector2(600, 460);
         recyclables.GetCustomProperties<FlexPanelProperties>().Mode = FlexMode.Proportional;
+
+        recyclables.Padding = 6;
+
+        this.titleText.FontWeight = FontWeight.Bold;
+        this.titleText.FontSize = 20;
+        titleText.SetCustomProperty(WidgetForegrounds.Common);
     }
     
     public void SetData(SystemSettingsController.SettingsCategoryModel model)
     {
-        if (model.ShowTitleArea)
-        {
-            headerArea.Visibility = Visibility.Visible;
-            titleText.Text = model.Title;
-        }
-        else
-        {
-            headerArea.Visibility = Visibility.Collapsed;
-        }
-
+        headerArea.Visibility = Visibility.Visible;
+        titleText.Text = model.Title;
+        
         if (model.Category != null)
         {
             recyclables.Visibility = Visibility.Visible;

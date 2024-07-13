@@ -14,15 +14,16 @@ public class TextWidget : Widget
     private readonly List<TextElement> textElements = new();
     private readonly StringBuilder stringBuilder = new();
 
-    private Color? color;
-    private FontInfo font;
-    private string text = string.Empty;
-    private bool useMarkup = false;
-    private bool wordWrapping = false;
-    private bool showMarkup;
+    private float         previousWrapWidth;
+    private Color?        color;
+    private FontInfo      font;
+    private string        text         = string.Empty;
+    private bool          useMarkup    = false;
+    private bool          wordWrapping = false;
+    private bool          showMarkup;
     private TextAlignment textAlignment;
-    private int? fontSize;
-    private FontWeight fontWeight = FontWeight.Normal;
+    private int?          fontSize;
+    private FontWeight    fontWeight = FontWeight.Normal;
 
     public FontWeight FontWeight
     {
@@ -123,7 +124,13 @@ public class TextWidget : Widget
     protected override Vector2 GetContentSize(Vector2 availableSize)
     {
         float wrapWidth = availableSize.X;
-        
+
+        if (Math.Abs(previousWrapWidth - wrapWidth) > 0.001f)
+        {
+            InvalidateMeasurements();
+            previousWrapWidth = wrapWidth;
+        }
+
         // Measure text elements
         MeasureElements();
 
@@ -157,6 +164,12 @@ public class TextWidget : Widget
 
     protected override void ArrangeChildren(IGuiContext context, LayoutRect availableSpace)
     {
+        if (Math.Abs(previousWrapWidth - availableSpace.Width) > 0.001f)
+        {
+            InvalidateMeasurements();
+            previousWrapWidth = availableSpace.Width;
+        }
+        
         // Break words and figure out where lines start and end.
         var lines = BreakWords(availableSpace);
 
@@ -274,10 +287,7 @@ public class TextWidget : Widget
             
             var measurement = textElements[i].MeasuredSize.GetValueOrDefault();
             var isNewLine = textElements[i].IsNewLine;
-            var wrap = wordWrapping && (offset.X + measurement.X > availableSpace.Width);
-
-            offset.X += measurement.X;
-            lineHeight = Math.Max(lineHeight, measurement.Y);
+            var wrap = wordWrapping && (offset.X + measurement.X > availableSpace.Width) && availableSpace.Width > 0;
             
             if (isNewLine || wrap)
             {
@@ -306,8 +316,12 @@ public class TextWidget : Widget
                 offset.Y += lineHeight;
                 
                 lineHeight = measurement.Y;
-                textElements[i].IsNewLine = true;
             }
+            
+            offset.X += measurement.X;
+            lineHeight = Math.Max(lineHeight, measurement.Y);
+            
+            textElements[i].IsWrapPoint = wrap;
         }
 
         lines.Add((start, textElements.Count, offset.X));
@@ -810,6 +824,7 @@ public class TextWidget : Widget
         public Vector2    Position;
         public Vector2?   MeasuredSize;
         public bool       IsNewLine;
+        public bool       IsWrapPoint;
         public int        SourceStart;
         public int        SourceEnd;
         public MarkupData MarkupData = new();
