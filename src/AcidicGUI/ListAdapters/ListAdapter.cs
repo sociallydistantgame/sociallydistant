@@ -18,8 +18,8 @@ public abstract class ListAdapter<TContainerWidget, TViewHolder> : Widget,
         Children.Add(containerWidget);
     }
 
-    public abstract TViewHolder CreateViewHolder(int itemIndex, Box rootWidget);
-    public abstract void UpdateView(TViewHolder viewHolder);
+    protected abstract TViewHolder CreateViewHolder(int itemIndex, Box rootWidget);
+    protected abstract void UpdateView(TViewHolder viewHolder);
 
     protected virtual void BeforeRemoveItem(TViewHolder viewHolder)
     { }

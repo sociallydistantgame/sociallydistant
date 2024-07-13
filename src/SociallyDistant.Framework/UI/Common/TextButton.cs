@@ -1,15 +1,28 @@
+using AcidicGUI.Events;
 using AcidicGUI.Layout;
 using AcidicGUI.TextRendering;
 using AcidicGUI.Widgets;
+using Microsoft.Xna.Framework;
 
 namespace SociallyDistant.Core.UI.Common;
 
-public class TextButton : Widget
+public class TextButton : Widget,
+    IMouseEnterHandler,
+    IMouseLeaveHandler,
+    IDragStartHandler,
+    IDragEndHandler,
+    IGainFocusHandler,
+    ILoseFocusHandler
 {
-    private readonly Button button = new();
+    private readonly Button     button     = new();
     private readonly TextWidget textWidget = new();
+    private          bool       isHovered;
+    private          bool       isPressed;
 
     public Action? ClickCallback { get; set; }
+
+    public bool IsHovered => isHovered;
+    public bool IsPressed => isPressed;
     
     public string Text
     {
@@ -22,18 +35,65 @@ public class TextButton : Widget
         Children.Add(button);
         button.Content = textWidget;
 
-        button.Margin = new Padding(15, 0);
+        textWidget.Padding = new Padding(15, 0);
         
-        textWidget.HorizontalAlignment = HorizontalAlignment.Center;
-        textWidget.VerticalAlignment = VerticalAlignment.Middle;
+        //textWidget.HorizontalAlignment = HorizontalAlignment.Center;
+        //textWidget.VerticalAlignment = VerticalAlignment.Middle;
         
         button.Clicked += HandleClicked;
-
+        
         this.textWidget.FontWeight = FontWeight.SemiBold;
     }
 
     private void HandleClicked()
     {
         ClickCallback?.Invoke();
+    }
+
+    protected override Vector2 GetContentSize(Vector2 availableSize)
+    {
+        return base.GetContentSize(availableSize);
+    }
+
+    public void OnMouseEnter(MouseMoveEvent e)
+    {
+        isHovered = true;
+        InvalidateGeometry();
+    }
+
+    public void OnMouseLeave(MouseMoveEvent e)
+    {
+        isHovered = false;
+        InvalidateGeometry();
+    }
+
+    public void OnDragStart(MouseButtonEvent e)
+    {
+        if (e.Button != MouseButton.Left)
+            return;
+
+        isPressed = true;
+        e.RequestFocus();
+        InvalidateGeometry();
+    }
+
+    public void OnDragEnd(MouseButtonEvent e)
+    {
+        if (e.Button != MouseButton.Left)
+            return;
+
+        isPressed = false;
+        e.Handle();
+        InvalidateGeometry();
+    }
+
+    public void OnFocusGained(FocusEvent e)
+    {
+        InvalidateGeometry();
+    }
+
+    public void OnFocusLost(FocusEvent e)
+    {
+        InvalidateGeometry();
     }
 }

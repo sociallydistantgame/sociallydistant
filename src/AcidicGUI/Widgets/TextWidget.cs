@@ -263,9 +263,13 @@ public class TextWidget : Widget
         {
             if (i == textElements.Count-1)
             {
-                textElements[i].MeasuredSize = (textElements[i].MarkupData.FontOverride ?? font).GetFont(this)
+                var family = (textElements[i].MarkupData.FontOverride ?? font).GetFont(this);
+                var newMeasurement = family
                     .Measure(textElements[i].Text.TrimEnd(), textElements[i].MarkupData.FontSize ?? FontSize,
                         textElements[i].MarkupData.Weight ?? FontWeight, textElements[i].MarkupData.Italic);
+                
+                newMeasurement.Y = family.GetLineHeight(textElements[i].MarkupData.FontSize ?? FontSize, textElements[i].MarkupData.Weight ?? FontWeight, textElements[i].MarkupData.Italic);
+                textElements[i].MeasuredSize = newMeasurement;
             }
             
             var measurement = textElements[i].MeasuredSize.GetValueOrDefault();
@@ -280,13 +284,19 @@ public class TextWidget : Widget
                 if (i > 0)
                 {
                     offset.X -= textElements[i - 1].MeasuredSize!.Value.X;
-                    textElements[i - 1].MeasuredSize = (textElements[i - 1].MarkupData.FontOverride ?? font)
-                        .GetFont(this)
+
+                    var newFamily = (textElements[i - 1].MarkupData.FontOverride ?? font).GetFont(this);
+                    
+                    var newMeasurement = newFamily
                         .Measure(textElements[i - 1].Text.TrimEnd(),
                             textElements[i - 1].MarkupData.FontSize ?? FontSize,
                             textElements[i - 1].MarkupData.Weight ?? FontWeight,
                             textElements[i - 1].MarkupData.Italic);
-                    offset.X += textElements[i - 1].MeasuredSize!.Value.X;
+
+                    newMeasurement.Y = newFamily.GetLineHeight(textElements[i-1].MarkupData.FontSize ?? FontSize, textElements[i-1].MarkupData.Weight ?? FontWeight, textElements[i-1].MarkupData.Italic);
+                    textElements[i - 1].MeasuredSize = newMeasurement;
+
+                    offset.X += newMeasurement.X;
                 }
 
                 lines.Add((start, i, offset.X));

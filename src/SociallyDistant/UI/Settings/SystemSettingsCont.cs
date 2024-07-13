@@ -25,12 +25,12 @@ public sealed class SettingsCategoriesList : ListAdapter<ScrollView, SettingsCat
         categories.SetItems(models);
     }
 
-    public override SettingsCategoriesViewHolder CreateViewHolder(int itemIndex, Box rootWidget)
+    protected override SettingsCategoriesViewHolder CreateViewHolder(int itemIndex, Box rootWidget)
     {
         return new SettingsCategoriesViewHolder(itemIndex, rootWidget);
     }
 
-    public override void UpdateView(SettingsCategoriesViewHolder viewHolder)
+    protected override void UpdateView(SettingsCategoriesViewHolder viewHolder)
     {
         var model = categories[viewHolder.ItemIndex];
         viewHolder.SetModel(model);

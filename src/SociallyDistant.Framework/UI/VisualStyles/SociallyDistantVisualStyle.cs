@@ -42,6 +42,10 @@ public class SociallyDistantVisualStyle : IVisualStyle
     private readonly Color inputActiveBackground           = new Color(0x13, 0x85, 0xC3);
     private readonly Color inputActiveHoveredBackground    = new Color(0x19, 0xA1, 0xEA);
     private readonly Color inputActivePressedBackground    = new Color(0x13, 0x85, 0xC3);
+    private readonly Color buttonBackground                = new Color(0x44, 0x44, 0x44);
+    private readonly Color buttonBorder                    = new Color(0x16, 0x93, 0xD6);
+    private readonly Color buttonHoveredBackground         = new Color(0x0F, 0x73, 0xA9);
+    private readonly Color buttonPressedBackground         = new Color(0x08, 0x53, 0x7B);
 
     private Font        iconFont;
     private IFontFamily defaultFont = null!;
@@ -308,10 +312,38 @@ public class SociallyDistantVisualStyle : IVisualStyle
         return Color.White;
     }
 
+    private void DrawTextButton(TextButton widget, GeometryHelper geometry)
+    {
+        var focused = widget.IsFocused;
+        var hovered = widget.IsHovered;
+        var pressed = widget.IsPressed;
+
+        var background = buttonBackground;
+        var border = buttonBorder;
+
+        if (hovered && pressed)
+        {
+            background = buttonPressedBackground;
+        }
+        else if (hovered)
+        {
+            background = buttonHoveredBackground;
+        }
+
+        geometry.AddRoundedRectangle(widget.ContentArea, 3, background);
+
+        if (hovered || pressed || focused)
+        {
+            geometry.AddRoundedRectangleOutline(widget.ContentArea, 1, 3, border);
+        }
+    }
+    
     public void DrawWidgetBackground(Widget widget, GeometryHelper geometryHelper)
     {
         if (widget is InputField inputField)
             DrawInputField(inputField, geometryHelper);
+        else if (widget is TextButton textButton)
+            DrawTextButton(textButton, geometryHelper);
         else if (widget is IWindowTab tab)
             DrawWindowTab(widget, tab, geometryHelper);
         else if (widget is DecorativeBlock box)

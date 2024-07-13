@@ -214,13 +214,13 @@ public abstract class Dropdown<TItemType, TView> : Widget,
         {
             this.items.SetItems(dropdown.itemCollection);
         }
-        
-        public override DropdownViewHolder<TItemType, TView> CreateViewHolder(int itemIndex, Box rootWidget)
+
+        protected override DropdownViewHolder<TItemType, TView> CreateViewHolder(int itemIndex, Box rootWidget)
         {
             return new DropdownViewHolder<TItemType, TView>(itemIndex, rootWidget);
         }
 
-        public override void UpdateView(DropdownViewHolder<TItemType, TView> viewHolder)
+        protected override void UpdateView(DropdownViewHolder<TItemType, TView> viewHolder)
         {
             var item = items[viewHolder.ItemIndex];
             viewHolder.UpdateView(item, viewHolder.ItemIndex == dropdown.SelectedIndex);

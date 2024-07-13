@@ -32,13 +32,13 @@ public sealed class RecyclableWidgetList<TContainerWidget> : ListAdapter<TContai
     {
         this.controllers.SetItems(widgets);
     }
-    
-    public override RecyclableViewHolder CreateViewHolder(int itemIndex, Box rootWidget)
+
+    protected override RecyclableViewHolder CreateViewHolder(int itemIndex, Box rootWidget)
     {
         return new RecyclableViewHolder(itemIndex, rootWidget);
     }
 
-    public override void UpdateView(RecyclableViewHolder viewHolder)
+    protected override void UpdateView(RecyclableViewHolder viewHolder)
     {
         var controller = controllers[viewHolder.ItemIndex];
 
