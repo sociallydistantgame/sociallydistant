@@ -90,11 +90,6 @@ public class WindowDecoration : Widget
         borderBox.GetCustomProperties<FlexPanelProperties>().Mode = FlexMode.Proportional;
 
         tabList.VerticalAlignment = VerticalAlignment.Bottom;
-        
-        Icon = new CompositeIcon()
-        {
-            textIcon = MaterialIcons.Window
-        };
 
         ApplyHints();
     }

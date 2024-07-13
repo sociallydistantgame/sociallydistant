@@ -9,8 +9,8 @@ namespace SociallyDistant.Core.UI.Common;
 public class TextButton : Widget,
     IMouseEnterHandler,
     IMouseLeaveHandler,
-    IDragStartHandler,
-    IDragEndHandler,
+    IMouseDownHandler,
+    IMouseUpHandler,
     IGainFocusHandler,
     ILoseFocusHandler
 {
@@ -63,11 +63,12 @@ public class TextButton : Widget,
 
     public void OnMouseLeave(MouseMoveEvent e)
     {
+        isPressed = false;
         isHovered = false;
         InvalidateGeometry();
     }
 
-    public void OnDragStart(MouseButtonEvent e)
+    public void OnMouseDown(MouseButtonEvent e)
     {
         if (e.Button != MouseButton.Left)
             return;
@@ -77,7 +78,7 @@ public class TextButton : Widget,
         InvalidateGeometry();
     }
 
-    public void OnDragEnd(MouseButtonEvent e)
+    public void OnMouseUp(MouseButtonEvent e)
     {
         if (e.Button != MouseButton.Left)
             return;

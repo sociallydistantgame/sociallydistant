@@ -35,22 +35,37 @@ public class FlexPanel : ContainerWidget
     {
         var result = Vector2.Zero;
 
+        var proportionals = new Widget[Children.Count];
+        var proportionalCount = 0;
+
         switch (direction)
         {
             case Direction.Horizontal:
             {
                 result.X = spacing * Children.Count;
+                availableSize.X = Math.Max(0, availableSize.X - result.X);
                 break;
             }
             case Direction.Vertical:
             {
                 result.Y = spacing * Children.Count;
+                availableSize.Y = Math.Max(0, availableSize.Y - result.Y);
                 break;
             }
         }
 
+        // Pass 1: Measure non-proportionals and figure out how much space we have for proprtionals
         foreach (Widget child in Children)
         {
+            var settings = child.GetCustomProperties<FlexPanelProperties>();
+
+            if (settings.Mode == FlexMode.Proportional)
+            {
+                proportionals[proportionalCount] = child;
+                proportionalCount++;
+                continue;
+            }
+            
             var childSize = child.GetCachedContentSize(availableSize);
 
             switch (direction)
@@ -58,15 +73,43 @@ public class FlexPanel : ContainerWidget
                 case Direction.Horizontal:
                 {
                     result.X += childSize.X;
+                    availableSize.X = Math.Max(0, availableSize.X - childSize.X);
                     result.Y = MathF.Max(result.Y, childSize.Y);
                     break;
                 }
                 case Direction.Vertical:
                 {
                     result.Y += childSize.Y;
+                    availableSize.Y = Math.Max(0, availableSize.Y - childSize.Y);
                     result.X = MathF.Max(result.X, childSize.X);
                     break;
                 }
+            }
+        }
+        
+        // Pass 2: Measure proportionals.
+        for (var i = 0; i < proportionalCount; i++)
+        {
+            Widget child = proportionals[i];
+            var settings = child.GetCustomProperties<FlexPanelProperties>();
+
+            if (direction == Direction.Horizontal)
+            {
+                float space = Math.Max(0, (availableSize.X / proportionalCount) * settings.Percentage);
+                var childSize = child.GetCachedContentSize(new Vector2(space, availableSize.Y));
+                
+                result.X += childSize.X;
+                availableSize.X = Math.Max(0, availableSize.X - childSize.X);
+                result.Y = MathF.Max(result.Y, childSize.Y);
+            }
+            else if (direction == Direction.Vertical)
+            {
+                float space = Math.Max(0, (availableSize.Y / proportionalCount) * settings.Percentage);
+                var childSize = child.GetCachedContentSize(new Vector2(availableSize.X, space));
+                
+                result.Y += childSize.Y;
+                availableSize.Y = Math.Max(0, availableSize.Y - childSize.Y);
+                result.X = MathF.Max(result.X, childSize.X);
             }
         }
         
