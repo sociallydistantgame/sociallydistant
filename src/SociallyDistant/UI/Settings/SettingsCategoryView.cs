@@ -1,6 +1,8 @@
+using AcidicGUI.CustomProperties;
 using AcidicGUI.Layout;
 using AcidicGUI.ListAdapters;
 using AcidicGUI.Widgets;
+using Microsoft.Xna.Framework;
 using SociallyDistant.Core.Core.Config;
 using SociallyDistant.Core.UI.Recycling;
 using SociallyDistant.Core.UI.Recycling.SettingsWidgets;
@@ -29,6 +31,9 @@ public sealed class SettingsCategoryView : Widget
         headerStack.ChildWidgets.Add(descriptionText);
 
         recyclables.Container.Spacing = 3;
+
+        recyclables.MinimumSize = new Vector2(600, 460);
+        recyclables.GetCustomProperties<FlexPanelProperties>().Mode = FlexMode.Proportional;
     }
     
     public void SetData(SystemSettingsController.SettingsCategoryModel model)

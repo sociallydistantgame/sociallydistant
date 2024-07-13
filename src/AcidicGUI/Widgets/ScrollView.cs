@@ -114,6 +114,7 @@ public sealed class ScrollView :
         
         pageOffset = Math.Clamp(pageOffset + e.ScrollDelta, 0, Math.Max(innerSize - ContentArea.Height, 0));
         InvalidateLayout();
+        InvalidateGeometry();
     }
 
     public void OnFocusGained(FocusEvent e)

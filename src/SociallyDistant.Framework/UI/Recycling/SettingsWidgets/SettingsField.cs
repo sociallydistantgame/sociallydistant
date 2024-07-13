@@ -53,23 +53,3 @@ public sealed class SettingsField : ContentWidget
         this.SetCustomProperty(WidgetBackgrounds.FormField);
     }
 }
-
-public sealed class SectionTitle : Widget
-{
-    private readonly TextWidget text = new();
-
-    public string Text
-    {
-        get => text.Text;
-        set => text.Text = value;
-    }
-
-    public SectionTitle()
-    {
-        Children.Add(text);
-        text.WordWrapping = true;
-        text.UseMarkup = false;
-
-        text.SetCustomProperty(WidgetForegrounds.SectionTitle);
-    }
-}

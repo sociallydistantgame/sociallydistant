@@ -1,6 +1,5 @@
 using AcidicGUI.CustomProperties;
 using AcidicGUI.Layout;
-using AcidicGUI.ListAdapters;
 using AcidicGUI.Widgets;
 using Microsoft.Xna.Framework;
 using SociallyDistant.Core.Core.Config;
@@ -8,41 +7,6 @@ using SociallyDistant.Core.Modules;
 using SociallyDistant.UI.Windowing;
 
 namespace SociallyDistant.UI.Settings;
-
-public sealed class SettingsCategoriesList : ListAdapter<ScrollView, SettingsCategoriesViewHolder>
-{
-    private readonly DataHelper<SystemSettingsController.SettingsCategoryModel> categories;
-
-    public event Action<SystemSettingsController.SettingsCategoryModel>? OnItemClicked;
-    
-    public SettingsCategoriesList()
-    {
-        categories = new DataHelper<SystemSettingsController.SettingsCategoryModel>(this);
-    }
-
-    public void SetItems(IReadOnlyList<SystemSettingsController.SettingsCategoryModel> models)
-    {
-        categories.SetItems(models);
-    }
-
-    protected override SettingsCategoriesViewHolder CreateViewHolder(int itemIndex, Box rootWidget)
-    {
-        return new SettingsCategoriesViewHolder(itemIndex, rootWidget);
-    }
-
-    protected override void UpdateView(SettingsCategoriesViewHolder viewHolder)
-    {
-        var model = categories[viewHolder.ItemIndex];
-        viewHolder.SetModel(model);
-        
-        viewHolder.ClickCallback = OnClick;
-    }
-
-    private void OnClick(SystemSettingsController.SettingsCategoryModel model)
-    {
-        this.OnItemClicked?.Invoke(model);
-    }
-}
 
 public class SystemSettingsController : 
     Widget,
@@ -63,12 +27,11 @@ public class SystemSettingsController :
     
     public SystemSettingsController(Window window, IGameContext game)
     {
-        MinimumSize = new Vector2(660, 380);
-        
         this.window = window;
         this.game = game;
 
         this.window.CanClose = true;
+        this.window.GetCustomProperties<WindowSettings>().Size = new Vector2(690, 480);
         
         Children.Add(root);
         root.Direction = Direction.Horizontal;

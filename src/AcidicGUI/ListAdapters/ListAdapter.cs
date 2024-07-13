@@ -1,3 +1,4 @@
+using AcidicGUI.Layout;
 using AcidicGUI.Widgets;
 
 namespace AcidicGUI.ListAdapters;
@@ -26,6 +27,10 @@ public abstract class ListAdapter<TContainerWidget, TViewHolder> : Widget,
     
     public void NotifyCountChanged(int newCount)
     {
+        // Doing this prevents children from getting layout updates until we make the
+        // container visible again.
+        this.containerWidget.Visibility = Visibility.Collapsed;
+        
         while (holderList.Count > newCount)
         {
             RemoveHolder(holderList[^1]);
@@ -46,6 +51,8 @@ public abstract class ListAdapter<TContainerWidget, TViewHolder> : Widget,
 
             UpdateView(holderList[i]);
         }
+        
+        this.containerWidget.Visibility = Visibility.Visible;
     }
 
     public void NotifyItemChanged(int index)

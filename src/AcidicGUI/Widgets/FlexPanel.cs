@@ -96,7 +96,7 @@ public class FlexPanel : ContainerWidget
             if (direction == Direction.Horizontal)
             {
                 float space = Math.Max(0, (availableSize.X / proportionalCount) * settings.Percentage);
-                var childSize = child.GetCachedContentSize(new Vector2(space, availableSize.Y));
+                var childSize = child.GetCachedContentSize(new Vector2(space, MathF.Max(availableSize.Y, result.Y)));
                 
                 result.X += childSize.X;
                 availableSize.X = Math.Max(0, availableSize.X - childSize.X);
@@ -105,7 +105,7 @@ public class FlexPanel : ContainerWidget
             else if (direction == Direction.Vertical)
             {
                 float space = Math.Max(0, (availableSize.Y / proportionalCount) * settings.Percentage);
-                var childSize = child.GetCachedContentSize(new Vector2(availableSize.X, space));
+                var childSize = child.GetCachedContentSize(new Vector2(MathF.Max(availableSize.X, result.X), space));
                 
                 result.Y += childSize.Y;
                 availableSize.Y = Math.Max(0, availableSize.Y - childSize.Y);
@@ -122,17 +122,32 @@ public class FlexPanel : ContainerWidget
         var originalSizes = new float[Children.Count];
         var settingsObjects = new FlexPanelProperties[Children.Count];
 
+        var availableSizeForMeasure = availableSpace.Size;
+        
         var availableSize = Direction == Direction.Horizontal
             ? availableSpace.Width - (spacing * originalSizes.Length)
             : availableSpace.Height - (spacing * originalSizes.Length);
 
+        if (direction == Direction.Vertical)
+        {
+            availableSizeForMeasure.Y = availableSize;
+        }
+        else
+        {
+            availableSizeForMeasure.X = availableSize;
+        }
+        
         var i = 0;
         var proportionalCount = Children.Count;
         
         // Pass 1: Auto-sized elements
         foreach (Widget child in Children)
         {
-            var childSize = child.GetCachedContentSize(availableSpace.Size);
+            availableSizeForMeasure.X = MathF.Max(0, availableSizeForMeasure.X);
+            availableSizeForMeasure.Y = MathF.Max(0, availableSizeForMeasure.Y);
+            
+            
+            var childSize = child.GetCachedContentSize(availableSizeForMeasure);
             var properties = child.GetCustomProperties<FlexPanelProperties>();
 
             settingsObjects[i] = properties;
@@ -155,6 +170,16 @@ public class FlexPanel : ContainerWidget
             {
                 resultSizes[i] = originalSizes[i];
                 availableSize -= originalSizes[i];
+                
+                if (direction == Direction.Vertical)
+                {
+                    availableSizeForMeasure.Y = availableSize;
+                }
+                else
+                {
+                    availableSizeForMeasure.X = availableSize;
+                }
+                
                 proportionalCount--;
             }
 

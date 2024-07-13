@@ -24,6 +24,9 @@ public partial class Widget
         get => visibility;
         set
         {
+            if (this.visibility == value)
+                return;
+            
             visibility = value;
             InvalidateLayout();
         }
@@ -144,26 +147,26 @@ public partial class Widget
         {
             case HorizontalAlignment.Stretch:
             {
-                left = availableSpace.Left + padding.Left;
-                width = availableSpace.Width - padding.Left - padding.Right;
+                left = availableSpace.Left;
+                width = availableSpace.Width;
                 break;
             }
             case HorizontalAlignment.Left:
             {
-                left = availableSpace.Left + padding.Left;
+                left = availableSpace.Left;
                 width = contentSize.X;
                 break;
             }
             case HorizontalAlignment.Center:
             {
                 width = contentSize.X;
-                left = availableSpace.Left + padding.Left + ((availableSpace.Width - (padding.Right + padding.Left) - width) / 2);
+                left = availableSpace.Left + (availableSpace.Width - width) / 2;
                 break;
             }
             case HorizontalAlignment.Right:
             {
                 width = contentSize.X;
-                left = availableSpace.Right - padding.Right - width;
+                left = availableSpace.Right - width;
                 break;
             }
         }
@@ -172,33 +175,43 @@ public partial class Widget
         {
             case VerticalAlignment.Stretch:
             {
-                top = availableSpace.Top + padding.Top;
-                height = availableSpace.Height - padding.Top - padding.Bottom;
+                top = availableSpace.Top;
+                height = availableSpace.Height;
                 break;
             }
             case VerticalAlignment.Top:
             {
-                top = availableSpace.Top + padding.Top;
+                top = availableSpace.Top;
                 height = contentSize.Y;
                 break;
             }
             case VerticalAlignment.Middle:
             {
                 height = contentSize.Y;
-                top = availableSpace.Top + padding.Top + ((availableSpace.Height - padding.Vertical - height) / 2);
+                top = availableSpace.Top + (availableSpace.Height - height) / 2;
                 break;
             }
             case VerticalAlignment.Bottom:
             {
                 height = contentSize.Y;
-                top = availableSpace.Bottom - padding.Bottom - height;
+                top = availableSpace.Bottom - height;
                 break;
             }
         }
 
+        left += padding.Left;
+        top += padding.Top;
+        width -= padding.Horizontal;
+        height -= padding.Vertical;
+        
         calculatedLayoutRect = new LayoutRect(left, top, width, height);
 
-        ArrangeChildren(context, calculatedLayoutRect - margin);
+        left += margin.Left;
+        top += margin.Top;
+        width -= margin.Horizontal;
+        height -= margin.Vertical;
+
+        ArrangeChildren(context, new LayoutRect(left, top, width, height));
 
         if (geometryRect != calculatedLayoutRect)
         {

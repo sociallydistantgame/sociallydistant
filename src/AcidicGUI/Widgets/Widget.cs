@@ -211,7 +211,7 @@ public abstract partial class Widget : IFontFamilyProvider
         }
         
         renderer.RenderGuiMesh(cachedGeometry.Value);
-        renderer.RenderBatches(effectOverride, ComputedOpacity);
+        renderer.RenderBatches(effectOverride, ComputedOpacity, clipRect);
 
         effectOverride?.AfterRebuildGeometry(this, renderer);
         

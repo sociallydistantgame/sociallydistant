@@ -70,8 +70,13 @@ public class FloatingWorkspace :
     {
         foreach (Widget win in Children)
         {
-            var childSize = win.GetCachedContentSize(availableSpace.Size);
             var windowSettings = win.GetCustomProperties<WindowSettings>();
+            var size = windowSettings.Size;
+
+            if (windowSettings.Maximized || maximizeAll)
+                size = availableSpace.Size;
+            
+            var childSize = win.GetCachedContentSize(size);
 
             if (windowSettings.Maximized || maximizeAll)
             { 
@@ -108,7 +113,8 @@ public class FloatingWorkspace :
 public sealed class WindowSettings : CustomPropertyObject
 {
     private Vector2 position;
-    private bool maximized;
+    private Vector2 size;
+    private bool    maximized;
 
     public bool Maximized
     {
@@ -116,6 +122,16 @@ public sealed class WindowSettings : CustomPropertyObject
         set
         {
             maximized = value;
+            Widget.InvalidateLayout();
+        }
+    }
+
+    public Vector2 Size
+    {
+        get => size;
+        set
+        {
+            size = value;
             Widget.InvalidateLayout();
         }
     }
