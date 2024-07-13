@@ -6,7 +6,8 @@ namespace AcidicGUI.Widgets;
 
 public sealed class Button : 
     ContentWidget,
-    IMouseClickHandler
+    IMouseClickHandler,
+    IMouseEnterHandler
 {
     public event Action? Clicked;
     
@@ -18,4 +19,7 @@ public sealed class Button :
         e.Handle();
         Clicked?.Invoke();
     }
+
+    public void OnMouseEnter(MouseMoveEvent e)
+    { }
 }

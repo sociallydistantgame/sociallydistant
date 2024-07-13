@@ -1,3 +1,4 @@
+using AcidicGUI.Events;
 using AcidicGUI.Widgets;
 using SociallyDistant.Core.Modules;
 using SociallyDistant.Core.Shell.Windowing;
@@ -8,7 +9,8 @@ namespace SociallyDistant.UI.Windowing;
 
 public class OverlayWorkspace :
     Widget,
-    IClientWorkspaceDefinition<Window, Widget?>
+    IClientWorkspaceDefinition<Window, Widget?>,
+    IMouseDownHandler
 {
     private readonly FloatingWorkspace workspace = new();
 
@@ -28,5 +30,10 @@ public class OverlayWorkspace :
     public IFloatingGui CreateFloatingGui(string title)
     {
         throw new NotImplementedException();
+    }
+
+    public void OnMouseDown(MouseButtonEvent e)
+    {
+        e.RequestFocus();
     }
 }

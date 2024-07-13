@@ -83,7 +83,6 @@ public class TextButton : Widget,
             return;
 
         isPressed = false;
-        e.Handle();
         InvalidateGeometry();
     }
 
