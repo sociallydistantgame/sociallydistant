@@ -20,8 +20,8 @@ public sealed class GuiManager : IFontFamilyProvider
     private readonly FallbackVisualStyle fallbackVisualStyle = new FallbackVisualStyle();
     
     private IVisualStyle? visualStyleOverride;
-    private float screenWidth;
-    private float screenHeight;
+    private int screenWidth;
+    private int screenHeight;
     private bool isRendering = false;
     private Widget? hoveredWidget;
     private Widget? widgetBeingDragged;
@@ -128,10 +128,10 @@ public sealed class GuiManager : IFontFamilyProvider
         var mustRebuildLayout = false;
         var tolerance = 0.001f;
 
-        if (MathF.Abs(screenWidth - context.PhysicalScreenWidget) >= tolerance
+        if (MathF.Abs(screenWidth - context.PhysicalScreenWidth) >= tolerance
             || MathF.Abs(screenHeight - context.PhysicalScreenHeight) >= tolerance)
         {
-            screenWidth = context.PhysicalScreenWidget;
+            screenWidth = context.PhysicalScreenWidth;
             screenHeight = context.PhysicalScreenHeight;
 
             mustRebuildLayout = true;
@@ -227,14 +227,14 @@ public sealed class GuiManager : IFontFamilyProvider
         }
     }
 
-    private Vector2 TranslateMousePosition(Point mousePosition)
+    private Point TranslateMousePosition(Point mousePosition)
     {
         return new Vector2(
             ((float)mousePosition.X / context.GraphicsDevice.PresentationParameters.BackBufferWidth) *
-            context.PhysicalScreenWidget,
+            context.PhysicalScreenWidth,
             ((float)mousePosition.Y / context.GraphicsDevice.PresentationParameters.BackBufferHeight) *
             context.PhysicalScreenHeight
-        );
+        ).ToPoint();
     }
     
     private void HandleMouseEvents(MouseState previous, MouseState current)
@@ -256,7 +256,7 @@ public sealed class GuiManager : IFontFamilyProvider
         HandleMouseButton(MouseButton.Right, previous.RightButton, current.RightButton, currPosition, positionDelta);
     }
 
-    private void HandleMouseButton(MouseButton button, ButtonState previous, ButtonState current, Vector2 position, Vector2 delta)
+    private void HandleMouseButton(MouseButton button, ButtonState previous, ButtonState current, Point position, Point delta)
     {
         var e = new MouseButtonEvent(position, delta, button, current);
         

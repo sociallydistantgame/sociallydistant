@@ -25,6 +25,8 @@ public sealed class MessageDialog : IMessageDialog
     
     public MessageDialog(Window window)
     {
+        window.GetCustomProperties<WindowSettings>().Size = new Point(420, 0);
+        
         buttonList = new ButtonList(this);
         
         this.window = window;
@@ -36,7 +38,7 @@ public sealed class MessageDialog : IMessageDialog
 
         message.WordWrapping = true;
         message.UseMarkup = true;
-        message.MaximumSize = new Vector2(420, 0);
+        message.MaximumSize = new Point(420, 0);
         
         contentStack.Spacing = 6;
         buttonsPanel.SpacingX = 3;

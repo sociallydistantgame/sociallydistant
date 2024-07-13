@@ -44,7 +44,7 @@ public class CompositeIconWidget : Widget
     
     private void UpdateIconSize()
     {
-        image.MaximumSize = new Vector2(iconSize, iconSize);
+        image.MaximumSize = new Point(iconSize, iconSize);
         image.MinimumSize = image.MaximumSize;
         textIcon.IconSize = iconSize;
     }

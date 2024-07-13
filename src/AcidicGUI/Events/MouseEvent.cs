@@ -4,9 +4,9 @@ namespace AcidicGUI.Events;
 
 public abstract class MouseEvent : GuiEvent
 {
-    public Vector2 Position { get; }
+    public Point Position { get; }
 
-    public MouseEvent(Vector2 position)
+    public MouseEvent(Point position)
     {
         this.Position = position;
     }

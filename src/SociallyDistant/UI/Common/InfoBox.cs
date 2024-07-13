@@ -1,3 +1,4 @@
+using AcidicGUI.CustomProperties;
 using AcidicGUI.Layout;
 using AcidicGUI.TextRendering;
 using AcidicGUI.Widgets;
@@ -10,11 +11,11 @@ namespace SociallyDistant.UI.Common;
 
 public sealed class InfoBox : Widget
 {
-    private readonly StackPanel root = new();
+    private readonly FlexPanel       root            = new();
     private readonly DecorativeBlock decorativeBlock = new();
-    private readonly StackPanel contentStack = new();
-    private readonly TextWidget title = new();
-    private readonly Box contentBox = new();
+    private readonly StackPanel      contentStack    = new();
+    private readonly TextWidget      title           = new();
+    private readonly Box             contentBox      = new();
 
     public CommonColor Color
     {
@@ -46,9 +47,11 @@ public sealed class InfoBox : Widget
         contentStack.ChildWidgets.Add(title);
         contentStack.ChildWidgets.Add(contentBox);
 
+        contentBox.GetCustomProperties<FlexPanelProperties>().Mode = FlexMode.Proportional;
+        
         title.WordWrapping = true;
         title.UseMarkup = false;
-        title.MaximumSize = new Vector2(420, 0);
+        title.MaximumSize = new Point(420, 0);
         title.FontSize = 20;
         title.FontWeight = FontWeight.Bold;
         title.SetCustomProperty(WidgetForegrounds.Common);
@@ -61,6 +64,6 @@ public sealed class InfoBox : Widget
         contentStack.Padding = new Padding(0, 3);
         contentStack.Direction = Direction.Vertical;
 
-        decorativeBlock.MinimumSize = new Vector2(18, 0);
+        decorativeBlock.MinimumSize = new Point(18, 0);
     }
 }

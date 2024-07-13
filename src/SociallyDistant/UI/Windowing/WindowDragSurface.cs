@@ -16,7 +16,7 @@ public sealed class WindowDragSurface :
     
     public WindowDragSurface(WindowBase window)
     {
-        MinimumSize = new Vector2(0, 24);
+        MinimumSize = new Point(0, 24);
         this.window = window;
     }
     

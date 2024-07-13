@@ -6,10 +6,10 @@ namespace AcidicGUI.Widgets;
 
 public sealed class Icon : Widget
 {
-    private Vector2 actualIconSize;
+    private Point  actualIconSize;
     private Color? color;
     private string iconString = string.Empty;
-    private int iconSize = 24;
+    private int    iconSize   = 24;
 
     public string IconString
     {
@@ -41,11 +41,11 @@ public sealed class Icon : Widget
         }
     }
 
-    protected override Vector2 GetContentSize(Vector2 availableSize)
+    protected override Point GetContentSize(Point availableSize)
     {
         Font? iconFont = GetVisualStyle().IconFont;
         if (iconFont == null || string.IsNullOrEmpty(iconString))
-            return Vector2.Zero;
+            return Point.Zero;
 
         return actualIconSize = iconFont.Measure(iconString, iconSize);
     }

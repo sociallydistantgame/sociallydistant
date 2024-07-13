@@ -8,13 +8,13 @@ namespace AcidicGUI.VisualStyles;
 
 public interface IVisualStyle : IFontFamilyProvider
 {
-    float SliderThickness { get; }
-    Vector2 ToggleSize { get; }
-    Vector2 SwitchSize { get; }
+    int SliderThickness { get; }
+    Point ToggleSize { get; }
+    Point SwitchSize { get; }
     Font? IconFont { get; }
     Padding DropdownButtonPadding { get; }
     
-    float ScrollBarSize { get; }
+    int ScrollBarSize { get; }
 
     Color GetTextColor(Widget? widget = null);
 
@@ -24,8 +24,8 @@ public interface IVisualStyle : IFontFamilyProvider
         Widget widget,
         GeometryHelper geometry,
         LayoutRect scrollBarArea,
-        float scrollOffset,
-        float scrollViewHeight
+        int scrollOffset,
+        int scrollViewHeight
     );
 
     void DrawToggle(

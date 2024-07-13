@@ -10,12 +10,12 @@ public sealed class ScrollView :
     IMouseScrollHandler,
     IGainFocusHandler
 {
-    private float spacing;
-    private float innerSize;
-    private float pageOffset;
+    private int spacing;
+    private int innerSize;
+    private int pageOffset;
     private bool showScrollBar;
 
-    public float Spacing
+    public int Spacing
     {
         get => spacing;
         set
@@ -31,16 +31,16 @@ public sealed class ScrollView :
         ClippingMode = ClippingMode.Clip;
     }
     
-    protected override Vector2 GetContentSize(Vector2 availableSize)
+    protected override Point GetContentSize(Point availableSize)
     {
         innerSize = spacing * (Children.Count - 1);
 
         // Figure out (roughly) how tall the inner content is, so we know if we should display a scrollbar.
         // If we do, then we will need to arrange children with that in mind (so scrollbar doesn't overlap them)
-        float minimumX = 0;
+        int minimumX = 0;
         foreach (Widget child in Children)
         {
-            var childAvailable = new Vector2(availableSize.X, 0);
+            var childAvailable = new Point(availableSize.X, 0);
             var childSize = child.GetCachedContentSize(childAvailable);
 
             innerSize += childSize.Y;
@@ -49,12 +49,12 @@ public sealed class ScrollView :
 
         showScrollBar = innerSize > availableSize.Y;
         
-        return new Vector2(MathF.Min(minimumX, availableSize.X), MathF.Min(innerSize, availableSize.Y));
+        return new Point(Math.Min(minimumX, availableSize.X), Math.Min(innerSize, availableSize.Y));
     }
 
     protected override void ArrangeChildren(IGuiContext context, LayoutRect availableSpace)
     {
-        var offset = 0f;
+        var offset = 0;
 
         if (showScrollBar)
         {
@@ -126,13 +126,13 @@ public sealed class ScrollView :
 
         if (widgetRect.Top < ContentArea.Top)
         {
-            float distance = ContentArea.Top - widgetRect.Top;
+            int distance = ContentArea.Top - widgetRect.Top;
             pageOffset = Math.Max(pageOffset - distance, 0);
             InvalidateLayout();
         }
         else if (widgetRect.Bottom > ContentArea.Bottom)
         {
-            float distance = ContentArea.Bottom - widgetRect.Bottom;
+            int distance = ContentArea.Bottom - widgetRect.Bottom;
             pageOffset = Math.Min(pageOffset + distance, innerSize - ContentArea.Height);
             InvalidateLayout();
         }

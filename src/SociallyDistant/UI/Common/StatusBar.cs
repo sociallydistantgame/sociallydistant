@@ -28,7 +28,7 @@ public class StatusBar : Widget
         
         tray = new SystemTray(trayModel);
         
-        MinimumSize = new Vector2(0, 24);
+        MinimumSize = new Point(0, 24);
         Margin = 3;
 
         flexPanel.Direction = Direction.Horizontal;

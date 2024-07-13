@@ -39,7 +39,7 @@ public sealed class Avatar : Widget
     {
     }
 
-    protected override Vector2 GetContentSize(Vector2 availableSize)
+    protected override Point GetContentSize(Point availableSize)
     {
         if (defaultAvatar == null)
             defaultAvatar = DefaultAvatarColorizer.GetEffect(Application.Instance.Context);
@@ -48,7 +48,7 @@ public sealed class Avatar : Widget
             ? defaultAvatar
             : null;
         
-        return new Vector2(avatarSize, avatarSize);
+        return new Point(avatarSize, avatarSize);
     }
 
     protected override void RebuildGeometry(GeometryHelper geometry)

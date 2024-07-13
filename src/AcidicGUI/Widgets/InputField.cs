@@ -22,7 +22,7 @@ public sealed class InputField :
 {
     private readonly StringBuilder currentValue = new();
     private readonly TextWidget display = new();
-    private readonly float displayPadding = 3;
+    private readonly int displayPadding = 3;
 
     private bool focused;
     private string placeholder = string.Empty;
@@ -55,16 +55,16 @@ public sealed class InputField :
         display.ShowMarkup = true;
     }
 
-    protected override Vector2 GetContentSize(Vector2 availableSize)
+    protected override Point GetContentSize(Point availableSize)
     {
         var baseSize = base.GetContentSize(availableSize);
 
-        Vector2 placeholderSize = display.Font.GetFont(display).Measure(placeholder);
+        Point placeholderSize = display.Font.GetFont(display).Measure(placeholder);
 
         baseSize.X = Math.Max(baseSize.X, placeholderSize.X);
         baseSize.Y = Math.Max(baseSize.Y, placeholderSize.Y);
         
-        return new Vector2(baseSize.X + (displayPadding * 2), baseSize.Y + (displayPadding * 2));
+        return new Point(baseSize.X + (displayPadding * 2), baseSize.Y + (displayPadding * 2));
     }
 
     protected override void ArrangeChildren(IGuiContext context, LayoutRect availableSpace)
@@ -82,30 +82,30 @@ public sealed class InputField :
         {
             LayoutRect caretRect = display.GetPositionOfCharacter(caretIndex);
 
-            float left = availableSpace.Left + displayPadding;
-            float top = availableSpace.Top + displayPadding;
-            float width = availableSpace.Width - (displayPadding * 2);
-            float height = availableSpace.Height - (displayPadding * 2);
+            int left = availableSpace.Left + displayPadding;
+            int top = availableSpace.Top + displayPadding;
+            int width = availableSpace.Width - (displayPadding * 2);
+            int height = availableSpace.Height - (displayPadding * 2);
 
             if (caretRect.Left < left)
             {
-                float distance = left - caretRect.Left;
+                int distance = left - caretRect.Left;
                 left -= distance;
             }
             else if (caretRect.Right > left + width)
             {
-                float distance = caretRect.Right - (left + width);
+                int distance = caretRect.Right - (left + width);
                 left -= distance;
             }
             
             if (caretRect.Top < top)
             {
-                float distance = top - caretRect.Top;
+                int distance = top - caretRect.Top;
                 top -= distance;
             }
             else if (caretRect.Bottom > top + height)
             {
-                float distance = caretRect.Bottom - (top + height);
+                int distance = caretRect.Bottom - (top + height);
                 top -= distance;
             }
 

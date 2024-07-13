@@ -11,7 +11,7 @@ public sealed class CanvasPanel : ContainerWidget
         LayoutRoot = this;
     }
 
-    protected override Vector2 GetContentSize(Vector2 availableSize)
+    protected override Point GetContentSize(Point availableSize)
     {
         // Canvases do not change their size based on content. It's up to the parent to give
         // us our size.
@@ -25,7 +25,7 @@ public sealed class CanvasPanel : ContainerWidget
             var anchors = child.GetCustomProperties<CanvasAnchors>();
             var childSize = child.GetCachedContentSize(availableSpace.Size);
 
-            var pivotOffset = childSize * anchors.Pivot;
+            var pivotOffset = new Point((int)(childSize.X * anchors.Pivot.X), (int)(childSize.Y * anchors.Pivot.Y));
             var pivotedPosition = anchors.AnchoredPosition - pivotOffset;
             
             // TODO:  Anchors within the canvas bounds.

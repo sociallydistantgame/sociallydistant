@@ -31,7 +31,7 @@ public class SystemSettingsController :
         this.game = game;
 
         this.window.CanClose = true;
-        this.window.GetCustomProperties<WindowSettings>().Size = new Vector2(690, 480);
+        this.window.GetCustomProperties<WindowSettings>().Size = new Point(690, 480);
         
         Children.Add(root);
         root.Direction = Direction.Horizontal;
@@ -40,8 +40,8 @@ public class SystemSettingsController :
         root.ChildWidgets.Add(categoriesList);
         root.ChildWidgets.Add(viewArea);
 
-        categoriesList.MaximumSize = new Vector2(180, 0);
-        categoriesList.MinimumSize = new Vector2(180, 0);
+        categoriesList.MaximumSize = new Point(180, 0);
+        categoriesList.MinimumSize = new Point(180, 0);
         
         viewArea.GetCustomProperties<FlexPanelProperties>().Mode = FlexMode.Proportional;
 

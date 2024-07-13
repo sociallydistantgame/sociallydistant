@@ -5,10 +5,10 @@ namespace AcidicGUI.Widgets;
 
 public sealed class StackPanel : ContainerWidget
 {
-    private float spacing;
+    private int spacing;
     private Direction direction;
 
-    public float Spacing
+    public int Spacing
     {
         get => spacing;
         set
@@ -30,20 +30,22 @@ public sealed class StackPanel : ContainerWidget
     
     public IOrderedCollection<Widget> ChildWidgets => Children;
 
-    protected override Vector2 GetContentSize(Vector2 availableSize)
+    protected override Point GetContentSize(Point availableSize)
     {
-        Vector2 result = Vector2.Zero;
+        Point result = Point.Zero;
 
         switch (direction)
         {
             case Direction.Horizontal:
             {
                 result.X = spacing * Children.Count;
+                availableSize.X = Math.Max(0, availableSize.X - result.X);
                 break;
             }
             case Direction.Vertical:
             {
                 result.Y = spacing * Children.Count;
+                availableSize.Y = Math.Max(0, availableSize.Y - result.Y);
                 break;
             }
         }
@@ -57,13 +59,15 @@ public sealed class StackPanel : ContainerWidget
                 case Direction.Horizontal:
                 {
                     result.X += childSize.X;
-                    result.Y = MathF.Max(result.Y, childSize.Y);
+                    result.Y = Math.Max(result.Y, childSize.Y);
+                    availableSize.Y = Math.Max(0, availableSize.X - childSize.X);
                     break;
                 }
                 case Direction.Vertical:
                 {
                     result.Y += childSize.Y;
-                    result.X = MathF.Max(result.X, childSize.X);
+                    result.X = Math.Max(result.X, childSize.X);
+                    availableSize.Y = Math.Max(0, availableSize.Y - childSize.Y);
                     break;
                 }
             }
@@ -74,11 +78,11 @@ public sealed class StackPanel : ContainerWidget
 
     protected override void ArrangeChildren(IGuiContext context, LayoutRect availableSpace)
     {
-        float stride = 0;
+        int stride = 0;
 
         foreach (Widget child in Children)
         {
-            Vector2 childSize = child.GetCachedContentSize(availableSpace.Size);
+            Point childSize = child.GetCachedContentSize(availableSpace.Size);
 
             switch (direction)
             {

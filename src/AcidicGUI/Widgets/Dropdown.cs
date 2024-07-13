@@ -53,12 +53,12 @@ public abstract class Dropdown<TItemType, TView> : Widget,
         itemCollection = new DropdownCollection(this);
     }
 
-    protected override Vector2 GetContentSize(Vector2 availableSize)
+    protected override Point GetContentSize(Point availableSize)
     {
         Padding buttonPadding = GetVisualStyle().DropdownButtonPadding;
-        Vector2 buttonSize = buttonBox.GetCachedContentSize(availableSize);
+        Point buttonSize = buttonBox.GetCachedContentSize(availableSize);
 
-        return new Vector2(buttonSize.X + buttonPadding.Horizontal, buttonSize.Y + buttonPadding.Vertical);
+        return new Point(buttonSize.X + buttonPadding.Horizontal, buttonSize.Y + buttonPadding.Vertical);
     }
 
     protected override void ArrangeChildren(IGuiContext context, LayoutRect availableSpace)
@@ -66,16 +66,16 @@ public abstract class Dropdown<TItemType, TView> : Widget,
         Padding buttonPadding = GetVisualStyle().DropdownButtonPadding;
         buttonBox.UpdateLayout(context, new LayoutRect(availableSpace.Left + buttonPadding.Left, availableSpace.Top + buttonPadding.Top, availableSpace.Width - buttonPadding.Horizontal, availableSpace.Height - buttonPadding.Vertical));
 
-        Vector2 screen = new Vector2(context.PhysicalScreenWidget, context.PhysicalScreenHeight);
-        Vector2 scrollViewSize = dropdownBox.GetCachedContentSize(screen);
+        Point screen = new Point(context.PhysicalScreenWidth, context.PhysicalScreenHeight);
+        Point scrollViewSize = dropdownBox.GetCachedContentSize(screen);
 
         scrollViewSize.X = Math.Max(scrollViewSize.X, availableSpace.Width);
 
-        Vector2 origin = new Vector2(availableSpace.Left, availableSpace.Bottom);
+        Point origin = new Point(availableSpace.Left, availableSpace.Bottom);
 
         if (origin.Y + scrollViewSize.Y > screen.Y)
         {
-            float distance = (origin.Y + scrollViewSize.Y) - screen.Y;
+            int distance = (origin.Y + scrollViewSize.Y) - screen.Y;
             origin.Y -= distance;
         }
 
@@ -394,7 +394,7 @@ public abstract class Dropdown<TItemType, TView> : Widget,
             this.dropdown = dropdown;
         }
 
-        protected override Vector2 GetContentSize(Vector2 availableSize)
+        protected override Point GetContentSize(Point availableSize)
         {
             return availableSize;
         }

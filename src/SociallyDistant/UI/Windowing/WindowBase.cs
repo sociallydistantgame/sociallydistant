@@ -11,8 +11,12 @@ public abstract class WindowBase :
 {
     private readonly INotifyCloseWorkspace workspace;
     private readonly WindowDecoration decoration;
-    
-    public bool CanClose { get; set; }
+
+    public bool CanClose
+    {
+        get => decoration.CanClose;
+        set => decoration.CanClose = value;
+    }
 
     protected WindowDecoration Decorations => decoration;
     protected WindowTabList Tabs => decoration.Tabs;
@@ -28,7 +32,7 @@ public abstract class WindowBase :
     
     public void Close()
     {
-        throw new NotImplementedException();
+        ForceClose();
     }
 
     public void ForceClose()

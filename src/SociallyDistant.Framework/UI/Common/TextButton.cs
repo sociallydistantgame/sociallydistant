@@ -50,11 +50,6 @@ public class TextButton : Widget,
         ClickCallback?.Invoke();
     }
 
-    protected override Vector2 GetContentSize(Vector2 availableSize)
-    {
-        return base.GetContentSize(availableSize);
-    }
-
     public void OnMouseEnter(MouseMoveEvent e)
     {
         isHovered = true;

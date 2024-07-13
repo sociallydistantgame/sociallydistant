@@ -18,8 +18,10 @@ public class WindowDecoration : Widget
     private readonly Box                 clientBox = new();
     private readonly WindowBase          window;
     private readonly WindowDragSurface   dragSurface;
-    private readonly CompositeIconWidget titleIcon = new();
-    private readonly WindowTabList       tabList   = new();
+    private readonly CompositeIconWidget titleIcon   = new();
+    private readonly WindowTabList       tabList     = new();
+    private readonly Button              closeButton = new();
+    private readonly Icon                closeIcon   = new();
     
     private WindowHints hints;
 
@@ -37,6 +39,15 @@ public class WindowDecoration : Widget
     {
         get => titleIcon.Icon;
         set => titleIcon.Icon = value;
+    }
+
+    public bool CanClose
+    {
+        get => closeButton.Visibility == Visibility.Visible;
+        set =>
+            closeButton.Visibility = value
+                ? Visibility.Visible
+                : Visibility.Collapsed;
     }
     
     public Widget? Client
@@ -59,6 +70,7 @@ public class WindowDecoration : Widget
     
     public WindowDecoration(WindowBase window)
     {
+        closeButton.Visibility = Visibility.Collapsed;
         this.window = window;
         this.dragSurface = new WindowDragSurface((window));
 
@@ -77,7 +89,12 @@ public class WindowDecoration : Widget
 
         titleBar.ChildWidgets.Add(titleIcon);
         titleBar.ChildWidgets.Add(tabList);
+        titleBar.ChildWidgets.Add(closeButton);
 
+        closeIcon.IconSize = 16;
+        closeButton.Content = closeIcon;
+        closeIcon.IconString = MaterialIcons.Close;
+        
         tabList.GetCustomProperties<FlexPanelProperties>().Mode = FlexMode.Proportional;
         
         borderBox.Margin = 1;
@@ -91,6 +108,8 @@ public class WindowDecoration : Widget
 
         tabList.VerticalAlignment = VerticalAlignment.Bottom;
 
+        closeButton.Clicked += window.Close;
+        
         ApplyHints();
     }
 

@@ -48,7 +48,7 @@ public sealed class Toggle : Widget,
     public bool IsHovered => hovered;
     public bool IsPressed => pressed;
 
-    protected override Vector2 GetContentSize(Vector2 availableSize)
+    protected override Point GetContentSize(Point availableSize)
     {
         return isSwitchVariant
             ? GetVisualStyle().SwitchSize

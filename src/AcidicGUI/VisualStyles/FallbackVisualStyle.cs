@@ -9,9 +9,9 @@ namespace AcidicGUI.VisualStyles;
 
 internal sealed class FallbackVisualStyle : IVisualStyle
 {
-    public float SliderThickness => 12;
-    public Vector2 ToggleSize => new Vector2(18, 18);
-    public Vector2 SwitchSize => ToggleSize;
+    public int SliderThickness => 12;
+    public Point ToggleSize => new Point(18, 18);
+    public Point SwitchSize => ToggleSize;
     public Font? IconFont => null;
     public Padding DropdownButtonPadding { get; } = 3;
     public IFontFamily? FallbackFont { get; set; }
@@ -24,7 +24,7 @@ internal sealed class FallbackVisualStyle : IVisualStyle
         return FallbackFont;
     }
 
-    public float ScrollBarSize => 18;
+    public int ScrollBarSize => 18;
 
     public Color GetTextColor(Widget? widget = null)
     {
@@ -40,12 +40,12 @@ internal sealed class FallbackVisualStyle : IVisualStyle
         Widget widget,
         GeometryHelper geometry,
         LayoutRect scrollBarArea,
-        float scrollOffset,
-        float scrollViewHeight
+        int scrollOffset,
+        int scrollViewHeight
     )
     {
-        float barHeight = scrollBarArea.Height / scrollViewHeight * scrollBarArea.Height;
-        float barOffset = (scrollOffset / scrollViewHeight) * scrollBarArea.Height;
+        int barHeight = scrollBarArea.Height / scrollViewHeight * scrollBarArea.Height;
+        int barOffset = (scrollOffset / scrollViewHeight) * scrollBarArea.Height;
 
         geometry.AddQuad(scrollBarArea, Color.Gray);
 
@@ -130,12 +130,12 @@ internal sealed class FallbackVisualStyle : IVisualStyle
         if (isVertical)
         {
             geometry.AddQuad(new LayoutRect(widget.ContentArea.Left + ((widget.ContentArea.Width - quarterThickness) / 2), widget.ContentArea.Top,                                                            quarterThickness,         widget.ContentArea.Height), Color.Gray);
-            geometry.AddQuad(new LayoutRect(widget.ContentArea.Width,                                                      MathHelper.Lerp(widget.ContentArea.Bottom - 1, widget.ContentArea.Top + 1, value), widget.ContentArea.Width, 2),                         Color.White);
+            geometry.AddQuad(new LayoutRect(widget.ContentArea.Width,                                                      (int)MathHelper.Lerp(widget.ContentArea.Bottom - 1, widget.ContentArea.Top + 1, value), widget.ContentArea.Width, 2),                         Color.White);
         }
         else
         {
             geometry.AddQuad(new LayoutRect(widget.ContentArea.Left,                                                           widget.ContentArea.Top + ((widget.ContentArea.Height - quarterThickness) / 2), widget.ContentArea.Width, quarterThickness),          Color.Gray);
-            geometry.AddQuad(new LayoutRect(MathHelper.Lerp(widget.ContentArea.Left + 1, widget.ContentArea.Right - 1, value), widget.ContentArea.Top,                                                        2,                        widget.ContentArea.Height), Color.White);
+            geometry.AddQuad(new LayoutRect((int)MathHelper.Lerp(widget.ContentArea.Left + 1, widget.ContentArea.Right - 1, value), widget.ContentArea.Top,                                                        2,                        widget.ContentArea.Height), Color.White);
         }
     }
 }

@@ -9,8 +9,8 @@ namespace AcidicGUI;
 
 public interface IGuiContext
 {
-    float PhysicalScreenWidget { get; }
-    float PhysicalScreenHeight { get; }
+    int PhysicalScreenWidth { get; }
+    int PhysicalScreenHeight { get; }
     GraphicsDevice GraphicsDevice { get; }
 
     void Render(VertexPositionColorTexture[] vertices, int[] indices, Texture2D? texture, LayoutRect? clipRect = null);

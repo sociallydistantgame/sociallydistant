@@ -6,8 +6,8 @@ namespace AcidicGUI.Widgets;
 public sealed class WrapPanel : ContainerWidget
 {
     private Direction direction;
-    private float spacingX;
-    private float spacingY;
+    private int     spacingX;
+    private int     spacingY;
     
     public Direction Direction
     {
@@ -19,7 +19,7 @@ public sealed class WrapPanel : ContainerWidget
         }
     }
     
-    public float SpacingX
+    public int SpacingX
     {
         get => spacingX;
         set
@@ -29,7 +29,7 @@ public sealed class WrapPanel : ContainerWidget
         }
     }
     
-    public float SpacingY
+    public int SpacingY
     {
         get => spacingY;
         set
@@ -39,16 +39,16 @@ public sealed class WrapPanel : ContainerWidget
         }
     }
 
-    protected override Vector2 GetContentSize(Vector2 availableSize)
+    protected override Point GetContentSize(Point availableSize)
     {
-        Vector2 result = Vector2.Zero;
-        float lineWidth = 0;
-        float lineHeight = 0;
+        Point result = Point.Zero;
+        int lineWidth = 0;
+        int lineHeight = 0;
         
 
         foreach (Widget child in Children)
         {
-            Vector2 childSize = child.GetCachedContentSize(availableSize);
+            Point childSize = child.GetCachedContentSize(availableSize);
 
             if (direction == Direction.Horizontal)
             {
@@ -98,8 +98,8 @@ public sealed class WrapPanel : ContainerWidget
 
     protected override void ArrangeChildren(IGuiContext context, LayoutRect availableSpace)
     {
-        Vector2 offset = Vector2.Zero;
-        float lineSize = 0;
+        Point offset = Point.Zero;
+        int lineSize = 0;
 
         foreach (Widget child in Children)
         {

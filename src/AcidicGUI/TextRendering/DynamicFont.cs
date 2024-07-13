@@ -28,15 +28,16 @@ internal sealed class DynamicFont : Font
         this.fontSystem.AddFont(stream);
     }
 
-    public override Vector2 Measure(string text, int? fontSizePixels)
+    public override Point Measure(string text, int? fontSizePixels)
     {
         if (string.IsNullOrEmpty(text))
         {
-            return new Vector2(0,
+            return new Point(0,
                 fontSystem.GetFont((fontSizePixels ?? fontSize) * 1.333f).LineHeight);
         }
         
-        return fontSystem.GetFont((fontSizePixels ?? this.fontSize) * 1.333f).MeasureString(text);
+        var measurement = fontSystem.GetFont((fontSizePixels ?? this.fontSize) * 1.333f).MeasureString(text);
+        return measurement.ToPoint();
     }
 
     public override void Draw(GeometryHelper geometryHelper, Vector2 position, Color color, string text, int? fontSizePixels)
@@ -44,7 +45,7 @@ internal sealed class DynamicFont : Font
         fontSystem.GetFont((fontSizePixels ?? this.fontSize) * 1.333f).DrawText(geometryHelper, text, position, color);
     }
 
-    public override float GetLineHeight(int? fontSizePixels)
+    public override int GetLineHeight(int? fontSizePixels)
     {
         return fontSystem.GetFont((fontSizePixels ?? fontSize) * 1.333f).LineHeight;
     }

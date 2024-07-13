@@ -61,7 +61,7 @@ public class FloatingWorkspace :
         throw new NotImplementedException();
     }
 
-    protected override Vector2 GetContentSize(Vector2 availableSize)
+    protected override Point GetContentSize(Point availableSize)
     {
         return availableSize;
     }
@@ -85,7 +85,7 @@ public class FloatingWorkspace :
             else
             {
                 var positionInWorkspace = availableSpace.Center + windowSettings.Position;
-                var layoutPosition = positionInWorkspace - (childSize / 2);
+                var layoutPosition = positionInWorkspace - new Point(childSize.X / 2, childSize.Y / 2);
 
                 win.UpdateLayout(context, new LayoutRect(
                     layoutPosition.X,
@@ -112,9 +112,9 @@ public class FloatingWorkspace :
 
 public sealed class WindowSettings : CustomPropertyObject
 {
-    private Vector2 position;
-    private Vector2 size;
-    private bool    maximized;
+    private Point position;
+    private Point size;
+    private bool  maximized;
 
     public bool Maximized
     {
@@ -126,7 +126,7 @@ public sealed class WindowSettings : CustomPropertyObject
         }
     }
 
-    public Vector2 Size
+    public Point Size
     {
         get => size;
         set
@@ -136,7 +136,7 @@ public sealed class WindowSettings : CustomPropertyObject
         }
     }
     
-    public Vector2 Position
+    public Point Position
     {
         get => position;
         set

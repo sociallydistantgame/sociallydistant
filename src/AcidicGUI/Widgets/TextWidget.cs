@@ -14,7 +14,7 @@ public class TextWidget : Widget
     private readonly List<TextElement> textElements = new();
     private readonly StringBuilder stringBuilder = new();
 
-    private float         previousWrapWidth;
+    private int           previousWrapWidth;
     private Color?        color;
     private FontInfo      font;
     private string        text         = string.Empty;
@@ -121,11 +121,11 @@ public class TextWidget : Widget
         }
     }
 
-    protected override Vector2 GetContentSize(Vector2 availableSize)
+    protected override Point GetContentSize(Point availableSize)
     {
-        float wrapWidth = availableSize.X;
+        int wrapWidth = availableSize.X;
 
-        if (Math.Abs(previousWrapWidth - wrapWidth) > 0.001f)
+        if (wrapWidth != previousWrapWidth)
         {
             InvalidateMeasurements();
             previousWrapWidth = wrapWidth;
@@ -134,9 +134,9 @@ public class TextWidget : Widget
         // Measure text elements
         MeasureElements();
 
-        Vector2 result = Vector2.Zero;
-        float lineHeight = 0;
-        float lineWidth = 0;
+        Point result = Point.Zero;
+        int lineHeight = 0;
+        int lineWidth = 0;
 
         for (var i = 0; i < textElements.Count; i++)
         {
@@ -174,11 +174,11 @@ public class TextWidget : Widget
         var lines = BreakWords(availableSpace);
 
         var y = availableSpace.Top;
-        foreach ((int start, int end, float lineWidth) in lines)
+        foreach ((int start, int end, int lineWidth) in lines)
         {
-            float lineHeight = 0;
-            float offset = 0;
-            float widgetX = availableSpace.Left;
+            int lineHeight = 0;
+            int offset = 0;
+            int widgetX = availableSpace.Left;
 
             if (textAlignment == TextAlignment.Center)
             {
@@ -192,8 +192,8 @@ public class TextWidget : Widget
             for (var i = start; i < end; i++)
             {
                 lineHeight = Math.Max(lineHeight, textElements[i].MeasuredSize!.Value.Y);
-                float x = widgetX + offset;
-                textElements[i].Position = new Vector2(x, y);
+                int x = widgetX + offset;
+                textElements[i].Position = new Point(x, y);
                 offset += textElements[i].MeasuredSize!.Value.X;
             }
 
@@ -228,7 +228,7 @@ public class TextWidget : Widget
                 geometry.AddQuad(highlightRect, element.MarkupData.Highlight);
             }
 
-            family.Draw(geometry, element.Position, renderColor, element.Text, element.MarkupData.FontSize ?? this.FontSize,
+            family.Draw(geometry, element.Position.ToVector2(), renderColor, element.Text, element.MarkupData.FontSize ?? this.FontSize,
                 element.MarkupData.Weight ?? FontWeight, element.MarkupData.Italic);
 
             var strikeLine = 1;
@@ -265,12 +265,12 @@ public class TextWidget : Widget
         }
     }
 
-    private (int start, int end, float size)[] BreakWords(LayoutRect availableSpace)
+    private (int start, int end, int size)[] BreakWords(LayoutRect availableSpace)
     {
-        var lines = new List<(int, int, float)>();
+        var lines = new List<(int, int, int)>();
         int start = 0;
-        float lineHeight = 0;
-        Vector2 offset = Vector2.Zero;
+        int lineHeight = 0;
+        Point offset = Point.Zero;
 
         for (var i = 0; i < textElements.Count; i++)
         {
@@ -738,7 +738,7 @@ public class TextWidget : Widget
                 lastOverride = textElements[i].MarkupData.FontOverride;
             }
 
-            Vector2 measurement = family.Measure(textElements[i].Text, textElements[i].MarkupData.FontSize ?? FontSize, textElements[i].MarkupData.Weight ?? FontWeight, textElements[i].MarkupData.Italic);
+            Point measurement = family.Measure(textElements[i].Text, textElements[i].MarkupData.FontSize ?? FontSize, textElements[i].MarkupData.Weight ?? FontWeight, textElements[i].MarkupData.Italic);
             measurement.Y = family.GetLineHeight(textElements[i].MarkupData.FontSize ?? FontSize, textElements[i].MarkupData.Weight ?? FontWeight, textElements[i].MarkupData.Italic);
 
             textElements[i].MeasuredSize = measurement;
@@ -763,7 +763,7 @@ public class TextWidget : Widget
                 if (characterIndex == element.SourceStart)
                 {
                     string singleChar = element.Text.Substring(0, Math.Min(1, element.Text.Length));
-                    Vector2 charMeasure = fontInstance.Measure(singleChar, element.MarkupData.FontSize ?? FontSize, element.MarkupData.Weight ?? FontWeight, element.MarkupData.Italic);
+                    Point charMeasure = fontInstance.Measure(singleChar, element.MarkupData.FontSize ?? FontSize, element.MarkupData.Weight ?? FontWeight, element.MarkupData.Italic);
 
                     return new LayoutRect(
                         element.Position.X,
@@ -776,7 +776,7 @@ public class TextWidget : Widget
                 string textToMeasure =
                     element.Text.Substring(0, Math.Min(element.Text.Length, characterIndex - element.SourceStart));
                 
-                Vector2 measurement = fontInstance.Measure(textToMeasure, element.MarkupData.FontSize ?? FontSize, element.MarkupData.Weight ?? FontWeight, element.MarkupData.Italic);
+                Point measurement = fontInstance.Measure(textToMeasure, element.MarkupData.FontSize ?? FontSize, element.MarkupData.Weight ?? FontWeight, element.MarkupData.Italic);
 
                 string charAfterMeasure =
                     element.Text.Substring(textToMeasure.Length, Math.Min(1, element.Text.Length - textToMeasure.Length));
@@ -794,7 +794,7 @@ public class TextWidget : Widget
             i++;
         }
         
-        Vector2 lineMeasurement = font.GetFont(this).Measure(text);
+        Point lineMeasurement = font.GetFont(this).Measure(text);
         return new LayoutRect(
             ContentArea.Left,
             ContentArea.Top,
@@ -821,8 +821,8 @@ public class TextWidget : Widget
     private class TextElement
     {
         public string     Text;
-        public Vector2    Position;
-        public Vector2?   MeasuredSize;
+        public Point      Position;
+        public Point?     MeasuredSize;
         public bool       IsNewLine;
         public bool       IsWrapPoint;
         public int        SourceStart;

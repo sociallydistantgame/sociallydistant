@@ -4,19 +4,19 @@ namespace AcidicGUI.Layout;
 
 public struct LayoutRect
 {
-    public readonly float Left;
-    public readonly float Top;
-    public readonly float Width;
-    public readonly float Height;
+    public readonly int Left;
+    public readonly int Top;
+    public readonly int Width;
+    public readonly int Height;
 
-    public float Right => Left + Width;
-    public float Bottom => Top + Height;
+    public int Right => Left + Width;
+    public int Bottom => Top + Height;
 
-    public Vector2 TopLeft => new Vector2(Left, Top);
-    public Vector2 Size => new Vector2(Width, Height);
-    public Vector2 Center => TopLeft + (Size / 2);
+    public Point TopLeft => new Point(Left, Top);
+    public Point Size => new Point(Width,   Height);
+    public Point Center => TopLeft + new Point(Width / 2, Height / 2);
     
-    public LayoutRect(float left, float top, float width, float height)
+    public LayoutRect(int left, int top, int width, int height)
     {
         Left = left;
         Top = top;
@@ -33,7 +33,9 @@ public struct LayoutRect
     public static implicit operator Rectangle(LayoutRect rect)
         => new((int) rect.Left, (int) rect.Top, (int) rect.Width, (int) rect.Height);
 
-    public bool Contains(Vector2 vector)
+    public bool Contains(Vector2 position) => Contains(position.ToPoint());
+    
+    public bool Contains(Point vector)
     {
         if (vector.X > Right)
             return false;
@@ -53,10 +55,10 @@ public struct LayoutRect
     public static LayoutRect GetIntersection(LayoutRect a, LayoutRect b)
     {
         // thank you chatgpt, too fucking lazy to write this.
-        float x1 = Math.Max(a.Left, b.Left);
-        float y1 = Math.Max(a.Top, b.Top);
-        float x2 = Math.Min(a.Right, b.Right);
-        float y2 = Math.Min(a.Bottom, b.Bottom);
+        int x1 = Math.Max(a.Left, b.Left);
+        int y1 = Math.Max(a.Top, b.Top);
+        int x2 = Math.Min(a.Right, b.Right);
+        int y2 = Math.Min(a.Bottom, b.Bottom);
 
         if (x1 < x2 && y1 < y2)
         {

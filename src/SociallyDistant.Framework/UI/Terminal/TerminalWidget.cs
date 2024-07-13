@@ -33,8 +33,8 @@ public class TerminalWidget : Widget,
     private readonly TerminalColorPalette         defaultPalette    = TerminalColorPalette.Default;
     private          int                          clickCount;
     private          int                          mainThreadId;
-    private          float                        characterWidth;
-    private          float                        lineHeight;
+    private          int                          characterWidth;
+    private          int                          lineHeight;
     private          int                          rowCount;
     private          int                          columnCount;
     private readonly SimpleTerminal               simpleTerminal;
@@ -108,11 +108,11 @@ public class TerminalWidget : Widget,
         this.console = new SimpleTerminalSession(this.simpleTerminal, this.slave, new RepeatableCancellationToken(tokenSource));
     }
 
-    protected override Vector2 GetContentSize(Vector2 availableSize)
+    protected override Point GetContentSize(Point availableSize)
     {
         var fontFamily = this.GetFont(PresetFontFamily.Monospace);
 
-        Vector2 charSize = fontFamily.Measure("#");
+        Point charSize = fontFamily.Measure("#");
 
         this.characterWidth = charSize.X;
         this.lineHeight = fontFamily.GetLineHeight();
@@ -120,15 +120,15 @@ public class TerminalWidget : Widget,
         int availableColumns = (int)MathF.Floor(availableSize.X / characterWidth);
         int availableRows = (int)MathF.Floor(availableSize.Y / lineHeight);
 
-        float x = availableSize.X;
-        float y = availableSize.Y;
+        int x = availableSize.X;
+        int y = availableSize.Y;
 
         if (desiredColumnCount > 0)
             x = desiredColumnCount * characterWidth;
         if (desiredRowCount > 0)
             y = desiredRowCount * lineHeight;
 
-        return new Vector2(x, y);
+        return new Point(x, y);
     }
 
     protected override void ArrangeChildren(IGuiContext context, LayoutRect availableSpace)
@@ -178,8 +178,8 @@ public class TerminalWidget : Widget,
             int column = i % columnCount;
             int row = i / columnCount;
 
-            float x = ContentArea.Left + column * characterWidth;
-            float y = ContentArea.Top + row * lineHeight;
+            int x = ContentArea.Left + column * characterWidth;
+            int y = ContentArea.Top + row * lineHeight;
 
             var isSelected = simpleTerminal.Selected(column, row);
             

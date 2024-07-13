@@ -11,12 +11,12 @@ public partial class Widget
     private VerticalAlignment   verticalAlignment;
     private LayoutRect          geometryRect;
     private LayoutRect          calculatedLayoutRect;
-    private Vector2?            cachedContentSize;
+    private Point?              cachedContentSize;
     private Padding             padding;
     private Padding             margin;
-    private Vector2             minimumSize;
-    private Vector2             maximumSize;
-    private Vector2             previousAvailableSize;
+    private Point               minimumSize;
+    private Point               maximumSize;
+    private Point               previousAvailableSize;
     private Visibility          visibility;
 
     public Visibility Visibility
@@ -52,7 +52,7 @@ public partial class Widget
         }
     }
 
-    public Vector2 MinimumSize
+    public Point MinimumSize
     {
         get => minimumSize;
         set
@@ -62,7 +62,7 @@ public partial class Widget
         }
     }
     
-    public Vector2 MaximumSize
+    public Point MaximumSize
     {
         get => maximumSize;
         set
@@ -140,10 +140,10 @@ public partial class Widget
         
         var contentSize = GetCachedContentSize(availableSpace.Size);
         
-        var left = 0f;
-        var top = 0f;
-        var width = 0f;
-        var height = 0f;
+        var left = 0;
+        var top = 0;
+        var width = 0;
+        var height = 0;
 
         switch (horizontalAlignment)
         {
@@ -235,7 +235,7 @@ public partial class Widget
         clipRect = LayoutRect.GetIntersection(newClipRect.Value, ContentArea);
     }
     
-    public Vector2 GetCachedContentSize(Vector2 availableSize)
+    public Point GetCachedContentSize(Point availableSize)
     {
         if (MaximumSize.X > 0 && availableSize.X > MaximumSize.X)
             availableSize.X = MaximumSize.X;
@@ -250,11 +250,11 @@ public partial class Widget
 
         if (this.visibility == Visibility.Collapsed)
         {
-            cachedContentSize = Vector2.Zero;
+            cachedContentSize = Point.Zero;
             return cachedContentSize.Value;
         }
         
-        Vector2 contentSize = GetContentSize(availableSize);
+        Point contentSize = GetContentSize(availableSize);
         
         contentSize.X += margin.Horizontal;
         contentSize.Y += margin.Vertical;
@@ -290,16 +290,16 @@ public partial class Widget
             child.UpdateLayout(context, availableSpace);
     }
     
-    protected virtual Vector2 GetContentSize(Vector2 availableSize)
+    protected virtual Point GetContentSize(Point availableSize)
     {
-        var result = Vector2.Zero;
+        var result = Point.Zero;
         
         foreach (Widget child in children)
         {
-            Vector2 childSize = child.GetCachedContentSize(availableSize);
+            Point childSize = child.GetCachedContentSize(availableSize);
 
-            result.X = MathF.Max(result.X, childSize.X);
-            result.Y = MathF.Max(result.Y, childSize.Y);
+            result.X = Math.Max(result.X, childSize.X);
+            result.Y = Math.Max(result.Y, childSize.Y);
         }
 
         return result;

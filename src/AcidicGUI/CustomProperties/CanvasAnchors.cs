@@ -5,10 +5,10 @@ namespace AcidicGUI.CustomProperties;
 
 public sealed class CanvasAnchors : CustomPropertyObject
 {
-    private Vector2 anchoredPosition;
+    private Point   anchoredPosition;
     private Vector2 pivot;
 
-    public Vector2 AnchoredPosition
+    public Point AnchoredPosition
     {
         get => anchoredPosition;
         set

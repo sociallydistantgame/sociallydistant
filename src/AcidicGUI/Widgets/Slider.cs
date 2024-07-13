@@ -39,13 +39,13 @@ public sealed class Slider : Widget,
         }
     }
 
-    protected override Vector2 GetContentSize(Vector2 availableSize)
+    protected override Point GetContentSize(Point availableSize)
     {
-        float thickness = GetVisualStyle().SliderThickness;
+        int thickness = GetVisualStyle().SliderThickness;
 
         return direction == Direction.Horizontal
-            ? new Vector2(100,       thickness)
-            : new Vector2(thickness, 100);
+            ? new Point(100,       thickness)
+            : new Point(thickness, 100);
     }
 
     protected override void RebuildGeometry(GeometryHelper geometry)

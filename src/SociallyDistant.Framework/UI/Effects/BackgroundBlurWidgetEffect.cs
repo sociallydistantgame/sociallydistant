@@ -27,8 +27,8 @@ public sealed class BackgroundBlurWidgetEffect : IWidgetEffect,
     private readonly EffectParameter             texelSizeParameter;
     private readonly EffectParameter             curveParameter;
     private          Vector2                     texelSize = new Vector2(0, 0);
-    private          Vector2                     widgetPosition;
-    private          Vector2                     widgetSize;
+    private          Point                       widgetPosition;
+    private          Point                       widgetSize;
     private          float[]                     curve = Array.Empty<float>();
 
     private readonly BlendState blendState = new BlendState

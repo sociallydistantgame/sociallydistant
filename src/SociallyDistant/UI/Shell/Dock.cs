@@ -11,7 +11,7 @@ public sealed class Dock : Widget
 
     public Dock()
     {
-        MinimumSize = new Vector2(27, 0);
+        MinimumSize = new Point(27, 0);
         
         root.Margin = 3;
         dockItems.Spacing = 3;

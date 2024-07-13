@@ -117,8 +117,8 @@ public sealed class GuiService :
         acidicGui.Render();
     }
 
-    public float PhysicalScreenWidget => virtualScreen?.Width ?? Game.GraphicsDevice.Viewport.Width;
-    public float PhysicalScreenHeight => virtualScreen?.Height ?? Game.GraphicsDevice.Viewport.Height;
+    public int PhysicalScreenWidth => virtualScreen?.Width ?? Game.GraphicsDevice.Viewport.Width;
+    public int PhysicalScreenHeight => virtualScreen?.Height ?? Game.GraphicsDevice.Viewport.Height;
 
     private MonoGameEffect LoadDefaultEffect()
     {

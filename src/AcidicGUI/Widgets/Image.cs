@@ -19,12 +19,12 @@ public sealed class Image : Widget
         }
     }
 
-    protected override Vector2 GetContentSize(Vector2 availableSize)
+    protected override Point GetContentSize(Point availableSize)
     {
         if (texture == null)
-            return Vector2.Zero;
+            return Point.Zero;
 
-        return new Vector2(texture.Width, texture.Height);
+        return new Point(texture.Width, texture.Height);
     }
 
     protected override void RebuildGeometry(GeometryHelper geometry)

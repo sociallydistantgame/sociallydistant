@@ -8,10 +8,10 @@ public abstract class Font : IDisposable
 {
     private bool disposed = false;
 
-    public abstract Vector2 Measure(string text, int? fontSize = null);
+    public abstract Point Measure(string text, int? fontSize = null);
     public abstract void Draw(GeometryHelper geometryHelper, Vector2 position, Color color, string text, int? fontSize = null);
 
-    public abstract float GetLineHeight(int? fontSizePixels);
+    public abstract int GetLineHeight(int? fontSizePixels);
     
     public static Font FromTtfFile(string filePath, int fontSize)
     {

@@ -1,5 +1,6 @@
 using AcidicGUI.Widgets;
 using ImGuiNET;
+using Microsoft.Xna.Framework;
 using SociallyDistant.Core.UI;
 
 namespace SociallyDistant.DevTools;
@@ -7,6 +8,11 @@ namespace SociallyDistant.DevTools;
 internal static class GuiInspector
 {
     private static Widget? selected;
+
+    public static System.Numerics.Vector2 ToSystemVector2(this Point point)
+    {
+        return new System.Numerics.Vector2(point.X, point.Y);
+    }
     
     public static void DoImgui(GuiService controller)
     {
@@ -31,6 +37,11 @@ internal static class GuiInspector
         if (selected == null)
             return;
 
+        var topLeft = selected.ContentArea.TopLeft.ToSystemVector2();
+        var bottomRight = topLeft + selected.ContentArea.Size.ToSystemVector2();
+        
+        ImGui.GetBackgroundDrawList().AddRectFilled(topLeft, bottomRight, 0xff00007f);
+        
         ImGui.Begin("Widget Properties");
         
         ImGui.SeparatorText("LAYOUT");

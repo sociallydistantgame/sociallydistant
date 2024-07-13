@@ -34,7 +34,7 @@ public sealed class SettingsCategoryView : Widget
 
         recyclables.Container.Spacing = 3;
 
-        recyclables.MinimumSize = new Vector2(600, 460);
+        recyclables.MinimumSize = new Point(600, 460);
         recyclables.GetCustomProperties<FlexPanelProperties>().Mode = FlexMode.Proportional;
 
         recyclables.Padding = 6;

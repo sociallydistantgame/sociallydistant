@@ -7,7 +7,7 @@ namespace AcidicGUI.Widgets;
 public class FlexPanel : ContainerWidget
 {
     private Direction direction;
-    private float spacing;
+    private int spacing;
 
     public IOrderedCollection<Widget> ChildWidgets => Children;
 
@@ -21,7 +21,7 @@ public class FlexPanel : ContainerWidget
         }
     }
 
-    public float Spacing
+    public int Spacing
     {
         get => spacing;
         set
@@ -31,9 +31,9 @@ public class FlexPanel : ContainerWidget
         }
     }
 
-    protected override Vector2 GetContentSize(Vector2 availableSize)
+    protected override Point GetContentSize(Point availableSize)
     {
-        var result = Vector2.Zero;
+        var result = Point.Zero;
 
         var proportionals = new Widget[Children.Count];
         var proportionalCount = 0;
@@ -74,14 +74,14 @@ public class FlexPanel : ContainerWidget
                 {
                     result.X += childSize.X;
                     availableSize.X = Math.Max(0, availableSize.X - childSize.X);
-                    result.Y = MathF.Max(result.Y, childSize.Y);
+                    result.Y = Math.Max(result.Y, childSize.Y);
                     break;
                 }
                 case Direction.Vertical:
                 {
                     result.Y += childSize.Y;
                     availableSize.Y = Math.Max(0, availableSize.Y - childSize.Y);
-                    result.X = MathF.Max(result.X, childSize.X);
+                    result.X = Math.Max(result.X, childSize.X);
                     break;
                 }
             }
@@ -95,21 +95,21 @@ public class FlexPanel : ContainerWidget
 
             if (direction == Direction.Horizontal)
             {
-                float space = Math.Max(0, (availableSize.X / proportionalCount) * settings.Percentage);
-                var childSize = child.GetCachedContentSize(new Vector2(space, MathF.Max(availableSize.Y, result.Y)));
+                int space = (int) Math.Max(0, (availableSize.X / (float) proportionalCount) * settings.Percentage);
+                var childSize = child.GetCachedContentSize(new Point(space, Math.Max(availableSize.Y, result.Y)));
                 
                 result.X += childSize.X;
                 availableSize.X = Math.Max(0, availableSize.X - childSize.X);
-                result.Y = MathF.Max(result.Y, childSize.Y);
+                result.Y = Math.Max(result.Y, childSize.Y);
             }
             else if (direction == Direction.Vertical)
             {
-                float space = Math.Max(0, (availableSize.Y / proportionalCount) * settings.Percentage);
-                var childSize = child.GetCachedContentSize(new Vector2(MathF.Max(availableSize.X, result.X), space));
+                int space = (int) Math.Max(0, (availableSize.Y / (float) proportionalCount) * settings.Percentage);
+                var childSize = child.GetCachedContentSize(new Point(Math.Max(availableSize.X, result.X), space));
                 
                 result.Y += childSize.Y;
                 availableSize.Y = Math.Max(0, availableSize.Y - childSize.Y);
-                result.X = MathF.Max(result.X, childSize.X);
+                result.X = Math.Max(result.X, childSize.X);
             }
         }
         
@@ -118,8 +118,8 @@ public class FlexPanel : ContainerWidget
 
     protected override void ArrangeChildren(IGuiContext context, LayoutRect availableSpace)
     {
-        var resultSizes = new float?[Children.Count];
-        var originalSizes = new float[Children.Count];
+        var resultSizes = new int?[Children.Count];
+        var originalSizes = new int[Children.Count];
         var settingsObjects = new FlexPanelProperties[Children.Count];
 
         var availableSizeForMeasure = availableSpace.Size;
@@ -143,8 +143,8 @@ public class FlexPanel : ContainerWidget
         // Pass 1: Auto-sized elements
         foreach (Widget child in Children)
         {
-            availableSizeForMeasure.X = MathF.Max(0, availableSizeForMeasure.X);
-            availableSizeForMeasure.Y = MathF.Max(0, availableSizeForMeasure.Y);
+            availableSizeForMeasure.X = Math.Max(0, availableSizeForMeasure.X);
+            availableSizeForMeasure.Y = Math.Max(0, availableSizeForMeasure.Y);
             
             
             var childSize = child.GetCachedContentSize(availableSizeForMeasure);
@@ -189,13 +189,13 @@ public class FlexPanel : ContainerWidget
         i = 0;
         
         // Pass 2: Proportional elements and sending layout updates to children
-        float stride = 0;
+        int stride = 0;
         foreach (Widget child in Children)
         {
             if (!resultSizes[i].HasValue)
             {
-                float spaceAllowed = availableSize / proportionalCount;
-                float spaceWanted = spaceAllowed * settingsObjects[i].Percentage;
+                int spaceAllowed = availableSize / proportionalCount;
+                int spaceWanted = (int)(spaceAllowed * settingsObjects[i].Percentage);
 
                 if (spaceWanted <= 0)
                 {
@@ -208,7 +208,7 @@ public class FlexPanel : ContainerWidget
                 resultSizes[i] = spaceWanted;
             }
 
-            float spaceGiven = resultSizes[i]!.Value;
+            int spaceGiven = resultSizes[i]!.Value;
 
             switch (direction)
             {

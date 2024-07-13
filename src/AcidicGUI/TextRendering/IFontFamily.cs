@@ -5,9 +5,9 @@ namespace AcidicGUI.TextRendering;
 
 public interface IFontFamily
 {
-    float GetLineHeight(int? fontSizePixels = null, FontWeight weight = FontWeight.Normal, bool preferItalic = false);
+    int GetLineHeight(int? fontSizePixels = null, FontWeight weight = FontWeight.Normal, bool preferItalic = false);
     
-    Vector2 Measure(
+    Point Measure(
         string text,
         int? fontSize = null,
         FontWeight weight = FontWeight.Normal,

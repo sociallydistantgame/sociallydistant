@@ -4,9 +4,9 @@ namespace AcidicGUI.Events;
 
 public sealed class MouseScrollEvent : MouseEvent
 {
-    public float ScrollDelta { get; }
+    public int ScrollDelta { get; }
     
-    public MouseScrollEvent(Vector2 position, float scrollDelta) : base(position)
+    public MouseScrollEvent(Point position, int scrollDelta) : base(position)
     {
         ScrollDelta = scrollDelta;
     }

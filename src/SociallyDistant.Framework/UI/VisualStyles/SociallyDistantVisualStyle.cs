@@ -53,9 +53,9 @@ public class SociallyDistantVisualStyle : IVisualStyle
     private IFontFamily monospace   = null!;
     private Texture2D?  checkboxEmblem;
 
-    public float SliderThickness => 18;
-    public Vector2 ToggleSize => new Vector2(20, 20);
-    public Vector2 SwitchSize => new Vector2(40, 22);
+    public int SliderThickness => 18;
+    public Point ToggleSize => new Point(20, 20);
+    public Point SwitchSize => new Point(40, 22);
     public Font? IconFont => iconFont;
     public Padding DropdownButtonPadding { get; } = new Padding(1, 1, 29, 1);
 
@@ -99,14 +99,14 @@ public class SociallyDistantVisualStyle : IVisualStyle
         return family;
     }
 
-    private (float borderThickness, Color borderColor, Color backgroundColor) GetInputColor(
+    private (int borderThickness, Color borderColor, Color backgroundColor) GetInputColor(
         bool isHovered,
         bool isPressed,
         bool isFocused,
         bool isChecked
     )
     {
-        float thickness = isFocused
+        int thickness = isFocused
             ? 2
             : 1;
 
@@ -191,7 +191,7 @@ public class SociallyDistantVisualStyle : IVisualStyle
         };
     }
 
-    public float ScrollBarSize => 18;
+    public int ScrollBarSize => 18;
 
     private void DrawInputField(InputField inputField, GeometryHelper geometryHelper)
     {
@@ -203,7 +203,7 @@ public class SociallyDistantVisualStyle : IVisualStyle
         {
             case InputFieldStyle.Default:
             {
-                var thickness = 1f;
+                var thickness = 1;
                 
                 geometryHelper.AddQuad(
                     new LayoutRect(
@@ -405,11 +405,11 @@ public class SociallyDistantVisualStyle : IVisualStyle
         geometry.AddRoundedRectangle(widget.ContentArea, 3, mainBackground);
     }
     
-    public void DrawScrollBar(Widget widget, GeometryHelper geometry, LayoutRect scrollBarArea, float scrollOffset,
-        float scrollViewHeight)
+    public void DrawScrollBar(Widget widget, GeometryHelper geometry, LayoutRect scrollBarArea, int scrollOffset,
+        int scrollViewHeight)
     {
-        float barHeight = scrollBarArea.Height / scrollViewHeight * scrollBarArea.Height;
-        float barOffset = (scrollOffset / scrollViewHeight) * scrollBarArea.Height;
+        int barHeight = scrollBarArea.Height / scrollViewHeight * scrollBarArea.Height;
+        int barOffset = (scrollOffset / scrollViewHeight) * scrollBarArea.Height;
 
         geometry.AddQuad(scrollBarArea, Color.Gray);
         
@@ -456,14 +456,14 @@ public class SociallyDistantVisualStyle : IVisualStyle
         bool isChecked
     )
     {
-        (float borderThickness, Color borderColor, Color backgroundColor) = GetInputColor(isHovered, isPressed, isFocused, isChecked);
+        (int borderThickness, Color borderColor, Color backgroundColor) = GetInputColor(isHovered, isPressed, isFocused, isChecked);
 
         geometry.AddRoundedRectangle(rect, rect.Height/2, backgroundColor);
         geometry.AddRoundedRectangleOutline(rect, borderThickness, rect.Height/2, borderColor);
 
-        const float nubOffset = 4;
+        const int nubOffset = 4;
         
-        Vector2 nubSize = new Vector2(16, 16);
+        Point nubSize = new Point(16, 16);
 
         LayoutRect nubRect = new LayoutRect(!isChecked
             ? rect.Left + nubOffset
@@ -509,23 +509,23 @@ public class SociallyDistantVisualStyle : IVisualStyle
         float value
     )
     {
-        (float thickness, Color border, Color background) = GetInputColor(isHovered, isPressed, false, true);
+        (int thickness, Color border, Color background) = GetInputColor(isHovered, isPressed, false, true);
 
 
-        float halfThickness = SliderThickness / 2;
-        float eighthThickness = halfThickness / 2;
+        int halfThickness = SliderThickness / 2;
+        int eighthThickness = halfThickness / 2;
 
-        float nubOffsetX = 0;
-        float nubOffsetY = 0;
+        int nubOffsetX = 0;
+        int nubOffsetY = 0;
         
         if (isVertical)
         {
-            float left = widget.ContentArea.Top + halfThickness;
-            float right = widget.ContentArea.Bottom - halfThickness;
-            float width = right - left;
-            float nubCenter = MathHelper.Lerp(right, left, value);
-            float fillWidth = nubCenter - left;
-            float top = widget.ContentArea.Left + ((widget.ContentArea.Width - eighthThickness) / 2);
+            int left = widget.ContentArea.Top + halfThickness;
+            int right = widget.ContentArea.Bottom - halfThickness;
+            int width = right - left;
+            int nubCenter = (int) MathHelper.Lerp(right, left, value);
+            int fillWidth = nubCenter - left;
+            int top = widget.ContentArea.Left + ((widget.ContentArea.Width - eighthThickness) / 2);
             
             nubOffsetX = widget.ContentArea.Left + (widget.ContentArea.Width - SliderThickness) / 2;
             nubOffsetY = nubCenter - halfThickness;
@@ -535,12 +535,12 @@ public class SociallyDistantVisualStyle : IVisualStyle
         }
         else 
         {
-            float left = widget.ContentArea.Left + halfThickness;
-            float right = widget.ContentArea.Right - halfThickness;
-            float width = right - left;
-            float nubCenter = MathHelper.Lerp(left, right, value);
-            float fillWidth = nubCenter - left;
-            float top = widget.ContentArea.Top + ((widget.ContentArea.Height - eighthThickness) / 2);
+            int left = widget.ContentArea.Left + halfThickness;
+            int right = widget.ContentArea.Right - halfThickness;
+            int width = right - left;
+            int nubCenter = (int) MathHelper.Lerp(left, right, value);
+            int fillWidth = nubCenter - left;
+            int top = widget.ContentArea.Top + ((widget.ContentArea.Height - eighthThickness) / 2);
             
             nubOffsetX = nubCenter - halfThickness;
             nubOffsetY = widget.ContentArea.Top + (widget.ContentArea.Height - SliderThickness) / 2;
