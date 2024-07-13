@@ -13,6 +13,7 @@ internal sealed class DynamicFont : Font
     
     static DynamicFont()
     {
+        FontSystemDefaults.PremultiplyAlpha = false;
         FontSystemDefaults.KernelWidth = 2;
         FontSystemDefaults.KernelHeight = 2;
         FontSystemDefaults.FontResolutionFactor = 2;

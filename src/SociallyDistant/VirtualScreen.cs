@@ -74,4 +74,16 @@ public sealed class VirtualScreen : IVirtualScreen
         if (wasActive)
             Activate();
     }
+
+    public void SaveScreenshot(Stream destination)
+    {
+        bool wasActive = isActive;
+        if (isActive)
+            Deactivate();
+
+        this.virtualScreenTarget?.SaveAsPng(destination, virtualScreenTarget.Width, virtualScreenTarget.Height);
+        
+        if (wasActive)
+            Activate();
+    }
 }

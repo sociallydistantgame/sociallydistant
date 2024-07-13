@@ -24,13 +24,21 @@ public sealed class FontFamily : IFontFamily
     
     public Font GetFont(FontWeight weight, bool italic)
     {
+        if (weight == FontWeight.Normal && !italic)
+            return regularFont;
+        
         Font? last = null;
 
         for (var i = 0; i < weights.Length; i++)
         {
             Font? font = weights[i];
             if (font == null)
+            {
+                if (i >= (int)weight && last != null)
+                    return last;
+
                 continue;
+            }
 
             if (italic)
             {
@@ -40,8 +48,6 @@ public sealed class FontFamily : IFontFamily
             }
 
             last = font;
-            if (i >= (int)weight)
-                return last;
         }
 
         return last ?? regularFont;

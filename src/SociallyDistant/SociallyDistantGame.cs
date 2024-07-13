@@ -71,6 +71,7 @@ internal sealed class SociallyDistantGame :
 	private readonly        BackdropUpdater              backdropUpdater;
 	private readonly        GuiController                guiController;
 	private readonly        NetworkEventListener         networkEventLIstener;
+	private readonly        ScreenshotHelper             screenshotHelper;
 	private                 bool                         areModulesLoaded;
 	private                 Task                         initializeTask;
 	private                 PlayerInfo                   playerInfo = new();
@@ -171,7 +172,9 @@ internal sealed class SociallyDistantGame :
 		this.gui = new GuiService(this);
 		this.deviceCoordinator = new DeviceCoordinator(this);
 		this.networkEventLIstener = new NetworkEventListener(this);
+		screenshotHelper = new ScreenshotHelper(this, virtualScreen, GameDataPath);
 
+		Components.Add(screenshotHelper);
 		Components.Add(deviceCoordinator);
 		Components.Add(network);
 		Components.Add(networkEventLIstener);
@@ -213,6 +216,8 @@ internal sealed class SociallyDistantGame :
 	{
 		base.Initialize();
 
+		Window.Title = $"{Application.Instance.Name} {Application.Instance.Version}";
+        
 		virtualScreen = new VirtualScreen(GraphicsDevice);
 		
 		var graphicsSettings = new GraphicsSettings(settingsManager);
@@ -484,6 +489,7 @@ internal sealed class SociallyDistantGame :
 		}
 
 		base.Update(gameTime);
+		
 		devTools.Update(gameTime);
 	}
 
