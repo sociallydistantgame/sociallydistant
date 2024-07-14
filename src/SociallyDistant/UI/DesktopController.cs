@@ -1,15 +1,17 @@
 using AcidicGUI.Widgets;
 using SociallyDistant.Core.OS.Devices;
 using SociallyDistant.Player;
+using SociallyDistant.UI.InfoWidgets;
 
 namespace SociallyDistant.UI;
 
 internal sealed class DesktopController
 {
-    private readonly PlayerManager playerManager;
-    private readonly GuiController guiController;
-    private readonly ToolManager   toolManager;
-    private readonly DockModel     dockModel = new();
+    private readonly PlayerManager       playerManager;
+    private readonly GuiController       guiController;
+    private readonly ToolManager         toolManager;
+    private readonly DockModel           dockModel           = new();
+    private readonly InfoPanelController infoPanelController = new();
     
     private IUser? loginUser;
     private ISystemProcess loginProcess;
@@ -17,6 +19,8 @@ internal sealed class DesktopController
     public Widget ToolsRootWidget => toolManager.RootWidget;
 
     public DockModel DockModel => dockModel;
+
+    public InfoPanelController InfoPanelController => infoPanelController;
     
     public DesktopController(GuiController gui, PlayerManager player)
     {

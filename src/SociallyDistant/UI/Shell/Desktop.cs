@@ -1,3 +1,4 @@
+using AcidicGUI.CustomProperties;
 using AcidicGUI.Layout;
 using AcidicGUI.Widgets;
 using Microsoft.Xna.Framework;
@@ -31,6 +32,9 @@ public class Desktop :
         root.ChildWidgets.Add(infoSlot);
 
         toolsSlot.Content = desktopController.ToolsRootWidget;
+        infoSlot.Content = desktopController.InfoPanelController.InfoPanelRoot;
+
+        toolsSlot.GetCustomProperties<FlexPanelProperties>().Mode = FlexMode.Proportional;
     }
     
     public void Dispose()

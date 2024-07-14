@@ -28,7 +28,6 @@ public class GuiController : GameComponent,
 {
     private readonly IGameContext        context;
     private readonly NotificationManager notificationManager;
-    private readonly InfoPanelController infoPanel = new();
     private readonly FlexPanel           mainPanel = new();
     private readonly StatusBar           statusBar;
     private readonly OverlayWidget       workArea           = new();
@@ -130,7 +129,7 @@ public class GuiController : GameComponent,
     }
 
     public INotificationManager NotificationManager => notificationManager;
-    public IInfoPanelService InfoPanelService => infoPanel;
+    public IInfoPanelService InfoPanelService => desktopController.InfoPanelController;
 
     public Task ShowInfoDialog(string title, string message)
     {
