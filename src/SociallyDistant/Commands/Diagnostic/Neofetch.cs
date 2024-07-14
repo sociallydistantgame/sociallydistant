@@ -55,9 +55,9 @@ namespace SociallyDistant.Commands.Diagnostic
 			
 			systemInformation.Add("Game version",              $"{Application.Instance.Name} {Application.Instance.Version}");
 			systemInformation.Add("Ritchie's Toolbox version", Application.Instance.EngineVersion);
-			systemInformation.Add("Host",                      "I don't know.");
+			systemInformation.Add("Host",                      Application.Instance.OperatingSystem);
 			systemInformation.Add("Engine up-time",            CalculateEngineUptime());
-			systemInformation.Add("CPU",                       "Something based on x86_64 otherwise you wouldn't be reading this at all. Other than that,, not yet implemented.");
+			systemInformation.Add("CPU",                       Application.Instance.CpuName);
 			systemInformation.Add("GPU",                       Game.GameInstance.GraphicsDevice.Adapter.Description);
 			systemInformation.Add("Resolution",                $"{Game.GameInstance.GraphicsDevice.Viewport.Width}x{Game.GameInstance.GraphicsDevice.Viewport.Height}");
 			systemInformation.Add("FPS",                       Math.Floor(1 / Time.deltaTime).ToString());

@@ -14,7 +14,7 @@ internal sealed class GameApplication : Application,
         game = new SociallyDistantGame();
     }
 
-    public void Run()
+    protected override void Run()
     {
         game.Run();
     }

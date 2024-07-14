@@ -526,7 +526,7 @@ internal sealed class SociallyDistantGame :
 		try
 		{
 			using var game = new GameApplication();
-			game.Run();
+			game.Start();
 		}
 		finally
 		{
