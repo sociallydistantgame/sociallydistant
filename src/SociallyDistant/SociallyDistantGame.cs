@@ -463,6 +463,7 @@ internal sealed class SociallyDistantGame :
 	/// <inheritdoc />
 	protected override void Update(GameTime gameTime)
 	{
+		worldManager.UpdateWorldClock();
 		virtualScreen?.Activate();
         
 		// Run any scheduled actions

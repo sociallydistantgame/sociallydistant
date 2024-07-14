@@ -25,5 +25,7 @@ public class UiSettings : SettingsCategory
     public override void BuildSettingsUi(ISettingsUiBuilder uiBuilder)
     {
         uiBuilder.AddSection("Accessibility", out int a11y).WithSlider("Display scale factor", "Change how large elements appear on-screen", ResolutionScale, 0.5f, 2f, v => ResolutionScale = v, a11y);
+
+        uiBuilder.AddSection("Startup", out int startup).WithToggle("Skip login screen", "If turned on, Socially Distant will load the last game you were playing instead of presenting the user select screen at startup.", LoadMostRecentSave, x => LoadMostRecentSave = x, startup);
     }
 }

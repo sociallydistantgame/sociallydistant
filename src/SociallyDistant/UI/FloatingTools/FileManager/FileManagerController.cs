@@ -24,6 +24,7 @@ public sealed class FileManagerController : ProgramController
     private readonly ToolbarIcon             back        = new();
     private readonly ToolbarIcon             forward     = new();
     private readonly ToolbarIcon             refresh     = new();
+    private readonly ToolbarIcon             upOne       = new();
     private readonly TextWidget              pathDisplay = new();
     
     private FileManagerController(ProgramContext context) : base(context)
@@ -48,6 +49,7 @@ public sealed class FileManagerController : ProgramController
         toolbar.ChildWidgets.Add(back);
         toolbar.ChildWidgets.Add(forward);
         toolbar.ChildWidgets.Add(refresh);
+        toolbar.ChildWidgets.Add(upOne);
         toolbar.ChildWidgets.Add(pathDisplay);
 
         pathDisplay.GetCustomProperties<FlexPanelProperties>().Mode = FlexMode.Proportional;
@@ -56,13 +58,24 @@ public sealed class FileManagerController : ProgramController
         refresh.ClickHandler = RefreshDirectory;
         back.ClickHandler = GoBack;
         forward.ClickHandler = GoForward;
+        upOne.ClickHandler = GoUp;
 
         back.Icon = MaterialIcons.ArrowLeft;
         forward.Icon = MaterialIcons.ArrowRight;
         refresh.Icon = MaterialIcons.Refresh;
+        upOne.Icon = MaterialIcons.ArrowUpward;
         pathDisplay.VerticalAlignment = VerticalAlignment.Middle;
     }
 
+    private void GoUp()
+    {
+        future.Clear();
+        history.Push(CurrentDirectory);
+
+        CurrentDirectory = PathUtility.GetDirectoryName(CurrentDirectory);
+        RefreshDirectory();
+    }
+    
     protected override void Main()
     {
         RefreshDirectory();

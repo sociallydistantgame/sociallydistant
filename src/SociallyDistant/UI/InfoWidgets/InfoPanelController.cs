@@ -14,6 +14,12 @@ public sealed class InfoPanelController : IInfoPanelService
     public ReadOnlyObservableCollection<InfoWidgetData> WidgetsObservable { get; }
 
     public InfoPanel InfoPanelRoot => infoPanel;
+
+    public bool ShowClock
+    {
+        get => infoPanel.ShowClock;
+        set => infoPanel.ShowClock = value;
+    }
     
     internal InfoPanelController()
     {
@@ -31,6 +37,11 @@ public sealed class InfoPanelController : IInfoPanelService
         this.widgets.Clear();
     }
 
+    public void SetClock(DateTime date)
+    {
+        infoPanel.SetClock(date);
+    }
+    
     public void CloseWidget(int widgetId)
     {
         for (var i = 0; i < this.widgets.Count; i++)

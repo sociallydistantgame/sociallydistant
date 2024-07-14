@@ -107,11 +107,22 @@ public class GuiController : GameComponent,
             this.mainBox.Content = desktop;
 
             desktopController.Login();
+            desktopController.InfoPanelController.ShowClock = true;
         }
         else
         {
+            desktopController.InfoPanelController.ShowClock = false;
             desktopController.Logout();
+            mainBox.Content = null;
             desktop?.Dispose();
+        }
+    }
+
+    public override void Update(GameTime gameTime)
+    {
+        if (desktopController.InfoPanelController.ShowClock)
+        {
+            desktopController.InfoPanelController.SetClock(context.WorldManager.World.GlobalWorldState.Value.Now);
         }
     }
 

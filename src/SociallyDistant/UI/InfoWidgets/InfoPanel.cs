@@ -17,6 +17,16 @@ public sealed class InfoPanel : Widget
     private readonly ObservableCollection<InfoWidgetData> observableWidgets = new();
     private readonly InfoWidgetAdapter                    widgetAdapter     = new();
 
+    public bool ShowClock
+    {
+        get => clock.Visibility == Visibility.Visible;
+        set
+        {
+            clock.Visibility = value
+                ? Visibility.Visible
+                : Visibility.Collapsed;
+        }
+    }
     public event Action<int>? ItemClosed;
     
     public InfoPanel(ObservableCollection<InfoWidgetData> widgetsObservable)
@@ -39,6 +49,11 @@ public sealed class InfoPanel : Widget
         widgetAdapter.ItemClosed += OnItemClosed;
     }
 
+    public void SetClock(DateTime date)
+    {
+        clock.SetClock(date);
+    }
+    
     private void OnItemClosed(int itemId)
     {
         ItemClosed?.Invoke(itemId);

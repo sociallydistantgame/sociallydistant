@@ -34,6 +34,21 @@ namespace SociallyDistant.Core.Core
 		
 		public static readonly string PlayerHomeId = "player";
 
+		public static string GetDayOfWeek(DayOfWeek day)
+		{
+			return day switch
+			{
+				DayOfWeek.Sunday => "Sunday",
+				DayOfWeek.Monday => "Monday",
+				DayOfWeek.Tuesday => "Tuesday",
+				DayOfWeek.Wednesday => "Wednesday",
+				DayOfWeek.Thursday => "Thursday",
+				DayOfWeek.Friday => "Friday",
+				DayOfWeek.Saturday => "Saturday",
+				_ => "The Day Ritchie Gives Up Programming Because Now There Are More than 7 Days in a Week"
+			};
+		}
+
 		public static string GetFriendlyNetError(ConnectionResultType result)
 		{
 			return result switch
