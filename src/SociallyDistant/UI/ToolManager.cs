@@ -243,7 +243,7 @@ public sealed class ToolManager
 					activeIndex = i;
 
 				IContentPanel panel = tile.ActiveContent;
-				if (panel.Content != null)
+				if (panel == null || panel.Content != null)
 					panel = tile.CreateTab();
 
 				panel.Title = state.Title;
