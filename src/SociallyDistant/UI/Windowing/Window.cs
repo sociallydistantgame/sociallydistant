@@ -42,6 +42,13 @@ public sealed class Window :
         public ContentPanelInstance(Window window)
         {
             this.window = window;
+            window.WindowClosed += HandleClosed;
+        }
+
+        private void HandleClosed(IWindow obj)
+        {
+            window.WindowClosed -= HandleClosed;
+            Closed?.Invoke(this);
         }
 
         public bool CanClose
@@ -59,6 +66,8 @@ public sealed class Window :
             window.ForceClose();
         }
 
+        public Action<IContentPanel>? Closed { get; set; }
+        
         public IWindow Window => window;
         public string Title
         {

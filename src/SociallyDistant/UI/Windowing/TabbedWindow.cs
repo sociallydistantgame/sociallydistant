@@ -115,6 +115,7 @@ public sealed class TabbedWindow :
 
         Tabs.RemoveTab(Tabs[index]);
         panels.RemoveAt(index);
+        panel.Closed?.Invoke(panel);
 
         if (activePanel == null)
             ForceClose();
@@ -176,6 +177,7 @@ public sealed class TabbedWindow :
             window.RemoveTab(this);
         }
 
+        public Action<IContentPanel>? Closed { get; set; }
         public IWindow Window => window;
 
         public string Title

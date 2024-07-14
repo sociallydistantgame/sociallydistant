@@ -30,6 +30,13 @@ public abstract class ProgramController
     {
         this.context = context;
         WindowTitle = GetType().Name;
+        context.Window.Closed = HandleClosed;
+    }
+
+    private void HandleClosed(IContentPanel obj)
+    {
+        if (Process.IsAlive)
+            Process.Kill(0);
     }
 
     protected abstract void Main();
