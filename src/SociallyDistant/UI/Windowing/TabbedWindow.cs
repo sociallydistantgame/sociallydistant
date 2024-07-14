@@ -14,6 +14,7 @@ public sealed class TabbedWindow :
     
     internal TabbedWindow(INotifyCloseWorkspace workspace) : base(workspace)
     {
+        Tabs.TabClicked += SwitchTab;
     }
 
     public IContentPanel? ActiveContent
@@ -26,8 +27,18 @@ public sealed class TabbedWindow :
             return null;
         }
     }
-    public Action? NewTabCallback { get; set; }
-    public bool ShowNewTab { get; set; }
+
+    public Action? NewTabCallback
+    {
+        get => Tabs.NewTabCallback;
+        set => Tabs.NewTabCallback = value;
+    }
+
+    public bool ShowNewTab
+    {
+        get => Tabs.ShowNewTab;
+        set => Tabs.ShowNewTab = value;
+    }
     public void Hide()
     {
         Visibility = Visibility.Hidden;
@@ -51,7 +62,20 @@ public sealed class TabbedWindow :
 
     public void SwitchTab(int index)
     {
-        throw new NotImplementedException();
+        if (activePanel == index)
+            return;
+
+        if (index == -1)
+        {
+            activePanel = null;
+            UpdateState();
+        }
+
+        if (index < 0 || index >= panels.Count)
+            throw new ArgumentOutOfRangeException(nameof(index));
+
+        activePanel = index;
+        UpdateState();
     }
 
     public void CloseTab(int index)
@@ -74,7 +98,29 @@ public sealed class TabbedWindow :
 
     public bool RemoveTab(IContentPanel panel)
     {
-        throw new NotImplementedException();
+        int index = panels.IndexOf((WindowContent)panel);
+        if (index == -1)
+            return false;
+
+        if (activePanel != null)
+        {
+            if (activePanel > index || (activePanel == index && index == panels.Count - 1))
+            {
+                activePanel = activePanel.Value - 1;
+            }
+
+            if (activePanel == -1)
+                activePanel = null;
+        }
+
+        Tabs.RemoveTab(Tabs[index]);
+        panels.RemoveAt(index);
+
+        if (activePanel == null)
+            ForceClose();
+
+        UpdateState();
+        return true;
     }
 
     private void UpdateState()
@@ -119,12 +165,15 @@ public sealed class TabbedWindow :
         }
         public void Close()
         {
-            throw new NotImplementedException();
+            ForceClose();
         }
 
         public void ForceClose()
         {
-            throw new NotImplementedException();
+            if (tab.Active)
+                Content = null;
+
+            window.RemoveTab(this);
         }
 
         public IWindow Window => window;

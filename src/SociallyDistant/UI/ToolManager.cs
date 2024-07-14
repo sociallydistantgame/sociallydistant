@@ -10,13 +10,13 @@ namespace SociallyDistant.UI;
 
 public sealed class ToolManager
 {
-	private readonly DockGroup iconGroup = null!;
-	private readonly List<TabbedTool> tools = new List<TabbedTool>();
+	private readonly DockGroup         iconGroup = null!;
+	private readonly List<TabbedTool>  tools     = new List<TabbedTool>();
 	private readonly DesktopController desktopController;
-	private readonly FlexPanel workRoot = new();
-	private readonly Box mainToolsArea = new();
+	private readonly FlexPanel         workRoot      = new();
+	private readonly Box               mainToolsArea = new();
 	private readonly FloatingWorkspace mainWorkspace = new();
-	private readonly ITile tile;
+	private          ITile?            tile;
 
 	private TabbedTool? currentTool;
 
@@ -34,9 +34,6 @@ public sealed class ToolManager
 		mainToolsArea.GetCustomProperties<FlexPanelProperties>().Mode = FlexMode.Proportional;
 
 		mainWorkspace.MaximizeAll = true;
-		tile = mainWorkspace.CreateTabbedWindow();
-
-		tile.WindowClosed += OnTileClosed;
 	}
 
 	private void BuildDock()
@@ -57,6 +54,8 @@ public sealed class ToolManager
 				NotificationGroup = tool.Definition.NotificationGroup
 			});
 		}
+
+		this.iconGroup.RefreshDock();
 	}
     
 	public void StartFirstTool()
@@ -68,6 +67,8 @@ public sealed class ToolManager
 		if (this.tools.Count == 0)
 			return;
 
+		BuildDock();
+		
 		SwitchTools(this.tools.First());
 	}
 	
@@ -90,6 +91,8 @@ public sealed class ToolManager
 
 			iconGroup[i] = icon;
 		}
+
+		iconGroup.RefreshDock();
 	}
 	
 	private void DeactivateCurrentTool()
@@ -114,7 +117,13 @@ public sealed class ToolManager
 		if (this.currentTool == null)
 			return;
 
-		tile.Show();
+		if (tile == null)
+		{
+			tile = mainWorkspace.CreateTabbedWindow();
+			tile.WindowClosed += OnTileClosed;
+		}
+		
+		tile?.Show();
 		this.currentTool.RestoreState(this.tile);
 		this.UpdateDockActiveStates();
 	}
@@ -125,7 +134,7 @@ public sealed class ToolManager
 		{
 			DeactivateCurrentTool();
 
-			tile.Hide();
+			tile?.Hide();
 				
 			return;
 		}
@@ -171,6 +180,8 @@ public sealed class ToolManager
 	{
 		this.currentTool = null;
 		this.UpdateDockActiveStates();
+
+		this.tile = null;
 	}
 	
 	private class TabbedTool

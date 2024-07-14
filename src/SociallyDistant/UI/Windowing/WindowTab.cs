@@ -1,3 +1,4 @@
+using AcidicGUI.Events;
 using AcidicGUI.Layout;
 using AcidicGUI.TextRendering;
 using AcidicGUI.Widgets;
@@ -8,7 +9,8 @@ namespace SociallyDistant.UI.Windowing;
 
 public sealed class WindowTab : 
     Widget, 
-    IWindowTab
+    IWindowTab,
+    IMouseClickHandler
 {
     private readonly StackPanel stackPanel = new();
     private readonly TextWidget titleText = new();
@@ -17,6 +19,9 @@ public sealed class WindowTab :
 
     private bool active = false;
 
+    public int TabIndex { get; set; }
+    public Action<int>? ClickCallback { get; set; }
+    
     public string Title
     {
         get => titleText.Text;
@@ -59,5 +64,14 @@ public sealed class WindowTab :
         stackPanel.Direction = Direction.Horizontal;
         stackPanel.Spacing = 3;
         stackPanel.Margin = 3;
+    }
+
+    public void OnMouseClick(MouseButtonEvent e)
+    {
+        if (e.Button != MouseButton.Left)
+            return;
+
+        e.Handle();
+        ClickCallback?.Invoke(TabIndex);
     }
 }

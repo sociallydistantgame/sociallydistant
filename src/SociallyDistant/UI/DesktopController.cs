@@ -15,6 +15,8 @@ internal sealed class DesktopController
     private ISystemProcess loginProcess;
 
     public Widget ToolsRootWidget => toolManager.RootWidget;
+
+    public DockModel DockModel => dockModel;
     
     public DesktopController(GuiController gui, PlayerManager player)
     {

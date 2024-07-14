@@ -48,6 +48,12 @@ public abstract class ProgramController
 
         return instance;
     }
+
+    protected void CloseWindow(int exitCode = 0)
+    {
+        Process.Kill(exitCode);
+        this.context.Window.ForceClose();
+    }
     
     protected sealed class ProgramContext
     {

@@ -37,8 +37,8 @@ public abstract class WindowBase :
 
     public void ForceClose()
     {
-        workspace.OnCloseWindow(this);
         WindowClosed?.Invoke(this);
+        workspace.OnCloseWindow(this);
     }
 
     public CompositeIcon Icon

@@ -168,6 +168,7 @@ public class TextWidget : Widget
         {
             InvalidateMeasurements();
             previousWrapWidth = availableSpace.Width;
+            MeasureElements();
         }
         
         // Break words and figure out where lines start and end.
@@ -191,10 +192,10 @@ public class TextWidget : Widget
             
             for (var i = start; i < end; i++)
             {
-                lineHeight = Math.Max(lineHeight, textElements[i].MeasuredSize!.Value.Y);
+                lineHeight = Math.Max(lineHeight, textElements[i].MeasuredSize?.Y ?? 0);
                 int x = widgetX + offset;
                 textElements[i].Position = new Point(x, y);
-                offset += textElements[i].MeasuredSize!.Value.X;
+                offset += textElements[i].MeasuredSize?.X ?? 0;
             }
 
             y += lineHeight;

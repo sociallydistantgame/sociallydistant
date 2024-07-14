@@ -13,6 +13,7 @@ public interface IVisualStyle : IFontFamilyProvider
     Point SwitchSize { get; }
     Font? IconFont { get; }
     Padding DropdownButtonPadding { get; }
+    Color SelectionColor { get; }
     
     int ScrollBarSize { get; }
 

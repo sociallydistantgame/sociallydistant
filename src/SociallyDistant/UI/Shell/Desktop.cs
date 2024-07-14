@@ -9,14 +9,16 @@ public class Desktop :
     Widget,
     IDisposable
 {
-    private readonly FlexPanel root = new();
-    private readonly Dock dock = new();
-    private readonly Box toolsSlot = new();
-    private readonly Box infoSlot = new();
+    private readonly FlexPanel         root = new();
+    private readonly Dock              dock;
+    private readonly Box               toolsSlot = new();
+    private readonly Box               infoSlot  = new();
     private readonly DesktopController desktopController;
 
     internal Desktop(DesktopController desktopController)
     {
+        dock = new Dock(desktopController);
+        
         this.desktopController = desktopController;
         root.Padding = 3;
         root.Spacing = 3;
@@ -33,6 +35,8 @@ public class Desktop :
     
     public void Dispose()
     {
+        dock.Dispose();
+        
         toolsSlot.Content = null;
         infoSlot.Content = null;
     }

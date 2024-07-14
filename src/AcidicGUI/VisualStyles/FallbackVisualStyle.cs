@@ -14,6 +14,7 @@ internal sealed class FallbackVisualStyle : IVisualStyle
     public Point SwitchSize => ToggleSize;
     public Font? IconFont => null;
     public Padding DropdownButtonPadding { get; } = 3;
+    public Color SelectionColor => Color.LightBlue;
     public IFontFamily? FallbackFont { get; set; }
     
     public IFontFamily GetFont(PresetFontFamily family)

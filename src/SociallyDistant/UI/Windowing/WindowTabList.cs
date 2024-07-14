@@ -1,19 +1,45 @@
+using System.ComponentModel;
 using AcidicGUI.Layout;
 using AcidicGUI.Widgets;
 using SociallyDistant.Core.Shell;
 using SociallyDistant.Core.Shell.Windowing;
+using SociallyDistant.UI.Common;
 
 namespace SociallyDistant.UI.Windowing;
 
 public sealed class WindowTabList : Widget
 {
-    private readonly WrapPanel        wrapPanel   = new();
-    private readonly List<WindowTab>  views       = new();
-    private readonly List<Definition> definitions = new();
+    private readonly WrapPanel           wrapPanel    = new();
+    private readonly List<WindowTab>     views        = new();
+    private readonly List<Definition>    definitions  = new();
+    private readonly Button              newTabButton = new();
+    private readonly CompositeIconWidget newTabIcon   = new();
+    private          Action?             newTabCallback;
 
     private CommonColor color;
     private bool showNewTab = false;
 
+    public ITabDefinition this[int index] => definitions[index];
+
+    public Action? NewTabCallback
+    {
+        get => newTabCallback;
+        set => newTabCallback = value;
+    }
+
+    public bool ShowNewTab
+    {
+        get => newTabButton.Visibility == Visibility.Visible;
+        set
+        {
+            newTabButton.Visibility = value
+                ? Visibility.Visible
+                : Visibility.Collapsed;
+
+            this.UpdateViews();
+        }
+    }
+    
     public CommonColor Color
     {
         get => color;
@@ -23,12 +49,23 @@ public sealed class WindowTabList : Widget
             UpdateViews();
         }
     }
+
+    public event Action<int>? TabClicked;
     
     public WindowTabList()
     {
         Children.Add(wrapPanel);
 
         wrapPanel.Direction = Direction.Horizontal;
+
+        newTabButton.Content = newTabIcon;
+        newTabIcon.Icon = MaterialIcons.Add;
+        this.newTabButton.Clicked += OnNewTab; 
+    }
+
+    private void OnNewTab()
+    {
+        this.newTabCallback?.Invoke();
     }
 
     public ITabDefinition CreateTab()
@@ -53,6 +90,9 @@ public sealed class WindowTabList : Widget
     
     private void UpdateViews()
     {
+        if (newTabButton.Parent != null)
+            this.wrapPanel.ChildWidgets.Remove(newTabButton);
+        
         while (views.Count > definitions.Count)
         {
             wrapPanel.ChildWidgets.Remove(views[^1]);
@@ -75,7 +115,16 @@ public sealed class WindowTabList : Widget
             view.Title = definition.Title;
             view.Active = definition.Active;
             view.Closeable = definition.Closeable;
+            view.TabIndex = i;
+            view.ClickCallback = OnTabClicked;
         }
+
+        this.wrapPanel.ChildWidgets.Add(newTabButton);
+    }
+
+    private void OnTabClicked(int index)
+    {
+        this.TabClicked?.Invoke(index);
     }
     
     internal class Definition : ITabDefinition

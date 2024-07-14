@@ -5,6 +5,7 @@ using SociallyDistant.Core.Core.Scripting;
 using SociallyDistant.Core.Programs;
 using SociallyDistant.Core.Shell.Windowing;
 using SociallyDistant.Core.UI.Terminal;
+using SociallyDistant.UI.Windowing;
 
 namespace SociallyDistant.UI.Tools.Terminal;
 
@@ -23,13 +24,14 @@ public sealed class TerminalProgramController : ProgramController
 
     protected override async void Main()
     {
-        var context = new OperatingSystemExecutionContext(this.Process);
+        var shellProcess = Process.Fork();
+        var context = new OperatingSystemExecutionContext(shellProcess);
         var shell = new InteractiveShell(context);
         
         shell.HandleExceptionsGracefully = true;
         shell.Setup(terminalWidget.Console);
 
-        while (Process.IsAlive)
+        while (shellProcess.IsAlive)
         {
             try
             {
@@ -37,8 +39,10 @@ public sealed class TerminalProgramController : ProgramController
             }
             catch (ScriptEndException sex)
             {
-                Process.Kill(sex.ExitCode);
+                shellProcess.Kill(sex.ExitCode);
             }
         }
+
+        this.CloseWindow(shellProcess.ExitCode);
     }
 }

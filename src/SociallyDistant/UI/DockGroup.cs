@@ -6,8 +6,25 @@ namespace SociallyDistant.UI;
 public sealed class DockGroup : IList<DockGroup.IconDefinition>
 {
     private readonly List<DockGroup.IconDefinition> definitions = new();
-    private readonly DockModel model;
+    private readonly DockModel                      model;
+    private          DockSlot                       slot;
 
+    public void RefreshDock()
+    {
+        model.RefreshDock();
+    }
+    
+    public DockSlot Slot
+    {
+        get => slot;
+        set
+        {
+            slot = value;
+            this.model.RefreshDock();
+        }
+    }
+
+    
     public DockGroup(DockModel model)
     {
         this.model = model;
