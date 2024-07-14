@@ -21,6 +21,7 @@ using SociallyDistant.Core.Serialization.Binary;
 using SociallyDistant.Core.Shell;
 using SociallyDistant.Core.Shell.Common;
 using SociallyDistant.Core.Shell.InfoPanel;
+using SociallyDistant.Core.Shell.Windowing;
 using SociallyDistant.Core.Social;
 using SociallyDistant.Core.UI;
 using SociallyDistant.DevTools;
@@ -238,8 +239,26 @@ internal sealed class SociallyDistantGame :
 		base.OnExiting(sender, args);
 	}
 
+	private Task WarnAboutSteamDeck()
+	{
+		var source = new TaskCompletionSource();
+		var dialog = guiController.CreateMessageDialog("Hardware Warning");
+		dialog.Message = "Socially Distant has detected that you're running the game on a handheld device. This game is very keyboard-centric. Please plug in an external keyboard, mouse and display for better experience.";
+		dialog.MessageType = MessageBoxType.Warning;
+		dialog.Buttons.Add("OK");
+
+		dialog.DismissCallback = (result) => source.SetResult();
+        
+		return source.Task;
+	}
+
 	private async Task InitializeAsync()
 	{
+		if (Application.Instance.IsHandheld)
+		{
+			await WarnAboutSteamDeck();
+		}
+        
 		scriptSystem.RegisterHookListener(CommonScriptHooks.AfterContentReload,
 			new UpdateAvailableToolsHook(contentManager, this.AvailableTools));
 
