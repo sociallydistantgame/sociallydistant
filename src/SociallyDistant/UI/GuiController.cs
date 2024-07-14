@@ -43,6 +43,7 @@ public class GuiController : GameComponent,
     private Desktop?                  desktop;
 
     public StatusBar StatusBar => statusBar;
+    public IGameContext Context => context;
 
     public GuiController(IGameContext game, PlayerManager playerManager) : base(game.GameInstance)
     {
@@ -121,9 +122,9 @@ public class GuiController : GameComponent,
         ITextConsole console
     )
     {
-        var window = this.floatingWindowArea.CreateWindow(programToOpen.WindowTitle);
-
-        programToOpen.InstantiateIntoWindow(programProcess, window.ContentPanel, console, arguments);
+        var window = this.desktopController.CreateFloatingApplicationWindow(programToOpen.Icon, programToOpen.WindowTitle);
+        
+        programToOpen.InstantiateIntoWindow(programProcess, window, console, arguments);
 
         return true;
     }
@@ -168,6 +169,11 @@ public class GuiController : GameComponent,
         }
     }
 
+    public Window CreateFloatingWindow(string title)
+    {
+        return this.floatingWindowArea.CreateWindow(title);
+    }
+    
     public void OpenSettings()
     {
         if (systemSettings != null)

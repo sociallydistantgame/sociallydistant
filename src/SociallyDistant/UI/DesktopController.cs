@@ -1,17 +1,21 @@
 using AcidicGUI.Widgets;
 using SociallyDistant.Core.OS.Devices;
+using SociallyDistant.Core.Shell.Common;
+using SociallyDistant.Core.Shell.Windowing;
 using SociallyDistant.Player;
+using SociallyDistant.UI.Common;
 using SociallyDistant.UI.InfoWidgets;
 
 namespace SociallyDistant.UI;
 
 internal sealed class DesktopController
 {
-    private readonly PlayerManager       playerManager;
-    private readonly GuiController       guiController;
-    private readonly ToolManager         toolManager;
-    private readonly DockModel           dockModel           = new();
-    private readonly InfoPanelController infoPanelController = new();
+    private readonly PlayerManager        playerManager;
+    private readonly GuiController        guiController;
+    private readonly ToolManager          toolManager;
+    private readonly DockModel            dockModel           = new();
+    private readonly InfoPanelController  infoPanelController = new();
+    private readonly FloatingToolLauncher floatingToolLauncher;
     
     private IUser? loginUser;
     private ISystemProcess loginProcess;
@@ -28,8 +32,15 @@ internal sealed class DesktopController
         this.playerManager = player;
 
         this.toolManager = new ToolManager(this, dockModel.DefineGroup());
+
+        floatingToolLauncher = new FloatingToolLauncher(this, gui);
     }
 
+    public IContentPanel CreateFloatingApplicationWindow(CompositeIcon icon, string title)
+    {
+        return this.floatingToolLauncher.CreateWindow(icon, title);
+    }
+    
     public ISystemProcess Fork()
     {
         return loginProcess.Fork();

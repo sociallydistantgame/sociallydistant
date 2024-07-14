@@ -1,6 +1,7 @@
 using AcidicGUI.Events;
 using AcidicGUI.Widgets;
 using SociallyDistant.Core.Shell;
+using SociallyDistant.Core.UI.Common;
 using SociallyDistant.Core.UI.Shell;
 
 namespace SociallyDistant.UI.Common;

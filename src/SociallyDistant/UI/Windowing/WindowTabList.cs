@@ -3,6 +3,7 @@ using AcidicGUI.Layout;
 using AcidicGUI.Widgets;
 using SociallyDistant.Core.Shell;
 using SociallyDistant.Core.Shell.Windowing;
+using SociallyDistant.Core.UI.Common;
 using SociallyDistant.UI.Common;
 
 namespace SociallyDistant.UI.Windowing;

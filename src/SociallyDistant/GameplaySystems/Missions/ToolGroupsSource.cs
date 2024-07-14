@@ -1,6 +1,7 @@
 ﻿#nullable enable
 using SociallyDistant.Architecture;
 using SociallyDistant.Core.ContentManagement;
+using SociallyDistant.UI.FloatingTools.FileManager;
 using SociallyDistant.UI.Tools.Chat;
 using SociallyDistant.UI.Tools.Email;
 using SociallyDistant.UI.Tools.Terminal;
@@ -22,6 +23,8 @@ namespace SociallyDistant.GameplaySystems.Missions
 			builder.AddContent(webBrowser.CreateToolDefinition());
 			builder.AddContent(chat.CreateToolDefinition());
 			builder.AddContent(email.CreateToolDefinition());
+
+			builder.AddContent(new FileManagerProgram());
 			
 			foreach (MainToolGroup group in await finder.FindContentOfType<MainToolGroup>())
 			{

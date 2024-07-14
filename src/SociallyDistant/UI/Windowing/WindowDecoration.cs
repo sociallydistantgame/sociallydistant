@@ -5,6 +5,7 @@ using Microsoft.Xna.Framework;
 using SociallyDistant.Core.Shell;
 using SociallyDistant.Core.Shell.Common;
 using SociallyDistant.Core.Shell.Windowing;
+using SociallyDistant.Core.UI.Common;
 using SociallyDistant.Core.UI.VisualStyles;
 using SociallyDistant.UI.Common;
 

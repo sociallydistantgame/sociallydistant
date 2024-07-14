@@ -18,6 +18,9 @@ public sealed class Window :
         tab = Tabs.CreateTab();
         tab.Active = true;
         contentPanel=new ContentPanelInstance(this);
+
+        Tabs.ShowNewTab = false;
+        CanClose = true;
     }
 
     public string Title
@@ -38,7 +41,7 @@ public sealed class Window :
         
         public ContentPanelInstance(Window window)
         {
-            
+            this.window = window;
         }
 
         public bool CanClose

@@ -106,7 +106,7 @@ public sealed class DockGroup : IList<DockGroup.IconDefinition>
         set => definitions[index] = value;
     }
 
-    public struct IconDefinition
+    public class IconDefinition
     {
         public CompositeIcon Icon;
         public string Label;

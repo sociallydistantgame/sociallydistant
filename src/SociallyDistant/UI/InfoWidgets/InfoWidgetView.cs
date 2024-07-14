@@ -5,6 +5,7 @@ using AcidicGUI.Widgets;
 using SociallyDistant.Core.Modules;
 using SociallyDistant.Core.Shell;
 using SociallyDistant.Core.Shell.InfoPanel;
+using SociallyDistant.Core.UI.Common;
 using SociallyDistant.Core.UI.Effects;
 using SociallyDistant.Core.UI.VisualStyles;
 using SociallyDistant.UI.Common;

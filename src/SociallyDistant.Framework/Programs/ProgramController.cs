@@ -1,5 +1,6 @@
 using System.Reflection;
 using SociallyDistant.Core.OS.Devices;
+using SociallyDistant.Core.OS.FileSystems;
 using SociallyDistant.Core.Shell.Windowing;
 
 namespace SociallyDistant.Core.Programs;
@@ -8,6 +9,14 @@ public abstract class ProgramController
 {
     private readonly ProgramContext context;
 
+    public string CurrentDirectory
+    {
+        get => context.Process.WorkingDirectory;
+        set => context.Process.WorkingDirectory = value;
+    }
+
+    protected IVirtualFileSystem FileSystem => context.Process.User.Computer.GetFileSystem(context.Process.User);
+    
     public string WindowTitle
     {
         get => context.Window.Title;
@@ -20,7 +29,6 @@ public abstract class ProgramController
     protected ProgramController(ProgramContext context)
     {
         this.context = context;
-
         WindowTitle = GetType().Name;
     }
 

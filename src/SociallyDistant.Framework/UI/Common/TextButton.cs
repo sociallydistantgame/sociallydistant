@@ -2,7 +2,6 @@ using AcidicGUI.Events;
 using AcidicGUI.Layout;
 using AcidicGUI.TextRendering;
 using AcidicGUI.Widgets;
-using Microsoft.Xna.Framework;
 
 namespace SociallyDistant.Core.UI.Common;
 
