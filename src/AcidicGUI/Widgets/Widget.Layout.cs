@@ -19,6 +19,8 @@ public partial class Widget
     private Point               previousAvailableSize;
     private Visibility          visibility;
 
+    public bool IsVisible => this.Visibility == Visibility.Visible && (Parent == null || Parent.IsVisible);
+    
     public Visibility Visibility
     {
         get => visibility;

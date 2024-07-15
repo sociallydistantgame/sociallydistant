@@ -328,6 +328,9 @@ public sealed class GuiManager : IFontFamilyProvider
         
         foreach (Widget widget in CollapseChildren())
         {
+            if (!widget.IsVisible)
+                continue;
+            
             if (widget is not IMouseHandler)
                 continue;
 

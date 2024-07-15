@@ -804,7 +804,7 @@ public class TextWidget : Widget
         );
     }
 
-    private class MarkupData
+    private struct MarkupData
     {
         public int         Length;
         public Color?      ColorOverride;

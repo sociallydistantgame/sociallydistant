@@ -34,6 +34,27 @@ namespace SociallyDistant.Core.Core
 		
 		public static readonly string PlayerHomeId = "player";
 
+		public static string CreateFormattedDataMarkup(Dictionary<string, string> data)
+		{
+			var builder = new StringBuilder();
+
+			var isFirst = true;
+			foreach (string key in data.Keys)
+			{
+				if (!isFirst)
+					builder.AppendLine();
+
+				isFirst = false;
+
+				builder.Append("<color=#858585>");
+				builder.Append(key);
+				builder.Append(":</color> ");
+				builder.Append(data[key]);
+			}
+
+			return builder.ToString();
+		}
+
 		public static string GetDayOfWeek(DayOfWeek day)
 		{
 			return day switch

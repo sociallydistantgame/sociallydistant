@@ -17,6 +17,7 @@ using SociallyDistant.Core.UI;
 using SociallyDistant.Player;
 using SociallyDistant.UI.Common;
 using SociallyDistant.UI.InfoWidgets;
+using SociallyDistant.UI.MainMenu;
 using SociallyDistant.UI.Settings;
 using SociallyDistant.UI.Shell;
 using SociallyDistant.UI.Windowing;
@@ -26,7 +27,7 @@ namespace SociallyDistant.UI;
 public class GuiController : GameComponent,
     IShellContext
 {
-    private readonly IGameContext        context;
+    private readonly SociallyDistantGame context;
     private readonly NotificationManager notificationManager;
     private readonly FlexPanel           mainPanel = new();
     private readonly StatusBar           statusBar;
@@ -45,7 +46,7 @@ public class GuiController : GameComponent,
     public StatusBar StatusBar => statusBar;
     public IGameContext Context => context;
 
-    public GuiController(IGameContext game, PlayerManager playerManager) : base(game.GameInstance)
+    internal GuiController(SociallyDistantGame game, PlayerManager playerManager) : base(game.GameInstance)
     {
         this.context = game;
         
@@ -100,21 +101,33 @@ public class GuiController : GameComponent,
     private void OnGameModeChanged(GameMode gameMode)
     {
         trayModel.UpdateGameMode(gameMode);
-        
-        if (gameMode == GameMode.OnDesktop)
-        {
-            this.desktop = new Desktop(desktopController);
-            this.mainBox.Content = desktop;
+        mainBox.Content = null;
 
-            desktopController.Login();
-            desktopController.InfoPanelController.ShowClock = true;
-        }
-        else
+        if (gameMode != GameMode.OnDesktop)
         {
             desktopController.InfoPanelController.ShowClock = false;
             desktopController.Logout();
-            mainBox.Content = null;
             desktop?.Dispose();
+        }
+
+        switch (gameMode)
+        {
+            case GameMode.OnDesktop:
+            {
+                this.desktop = new Desktop(desktopController);
+                this.mainBox.Content = desktop;
+
+                desktopController.Login();
+                desktopController.InfoPanelController.ShowClock = true;
+                break;
+            }
+            case GameMode.AtLoginScreen:
+            {
+                var menu = new LoginScreen(context);
+                mainBox.Content = menu;
+                menu.Start();
+                break;
+            }
         }
     }
 
