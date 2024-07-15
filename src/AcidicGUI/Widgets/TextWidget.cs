@@ -144,9 +144,6 @@ public class TextWidget : Widget
             var measurement = textElements[i].MeasuredSize.GetValueOrDefault();
             var wrap = wordWrapping && (lineWidth + measurement.X > wrapWidth) && wrapWidth > 0;
             
-            lineWidth += measurement.X;
-            lineHeight = Math.Max(lineHeight, measurement.Y);
-            
             if (newline || wrap)
             {
                 result.X = Math.Max(result.X, lineWidth);
@@ -154,6 +151,9 @@ public class TextWidget : Widget
                 lineHeight = 0;
                 lineWidth = 0;
             }
+            
+            lineWidth += measurement.X;
+            lineHeight = Math.Max(lineHeight, measurement.Y);
         }
         
         result.Y += lineHeight;
