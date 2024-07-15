@@ -15,6 +15,7 @@ using SociallyDistant.Core.Shell.InfoPanel;
 using SociallyDistant.Core.Shell.Windowing;
 using SociallyDistant.Core.UI;
 using SociallyDistant.Player;
+using SociallyDistant.UI.CharacterCreation;
 using SociallyDistant.UI.Common;
 using SociallyDistant.UI.InfoWidgets;
 using SociallyDistant.UI.MainMenu;
@@ -124,6 +125,13 @@ public class GuiController : GameComponent,
             case GameMode.AtLoginScreen:
             {
                 var menu = new LoginScreen(context);
+                mainBox.Content = menu;
+                menu.Start();
+                break;
+            }
+            case GameMode.CharacterCreator:
+            {
+                var menu = new CharacterCreatorMenu(context);
                 mainBox.Content = menu;
                 menu.Start();
                 break;

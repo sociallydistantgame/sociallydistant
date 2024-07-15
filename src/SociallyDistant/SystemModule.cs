@@ -1,19 +1,14 @@
 ﻿#nullable enable
 using System.Diagnostics;
 using System.Net.Mime;
-using System.Reflection;
-using Serilog;
 using Serilog.Core;
 using SociallyDistant.Core.Config;
 using SociallyDistant.Core.Config.SystemConfigCategories;
-using SociallyDistant.Core.ContentManagement;
 using SociallyDistant.Core.Core;
 using SociallyDistant.Core.Core.Config;
 using SociallyDistant.Core.Core.Scripting;
 using SociallyDistant.Core.Core.Scripting.GlobalCommands;
 using SociallyDistant.Core.Modules;
-using SociallyDistant.Core.OS.Devices;
-using SociallyDistant.Core.OS.Tasks;
 using SociallyDistant.Core.Shell;
 using SociallyDistant.GamePlatform;
 using SociallyDistant.GameplaySystems.Chat;
@@ -25,74 +20,6 @@ using SociallyDistant.UI;
 
 namespace SociallyDistant
 {
-	internal sealed class CommandAsset : 
-		INamedAsset,
-		ICommandTask
-	{
-		private readonly IGameContext                     context;
-		private readonly CommandAttribute                 attribute;
-		private readonly Func<IGameContext, ICommandTask> constructor;
-
-		public string Name => attribute.Name;
-
-		public CommandAsset(IGameContext context, CommandAttribute attribute, Func<IGameContext, ICommandTask> constructor)
-		{
-			this.context = context;
-			this.attribute = attribute;
-			this.constructor = constructor;
-		}
-
-		public Task Main(ISystemProcess process, ITextConsole console, string[] arguments)
-		{
-			var task = constructor(context);
-			return task.Main(process, console, arguments);
-		}
-	}
-	
-	public sealed class CommandFinder : IContentGenerator
-	{
-		private readonly IGameContext context;
-
-		public CommandFinder(IGameContext context)
-		{
-			this.context = context;
-		}
-
-		public IEnumerable<IGameContent> CreateContent()
-		{
-			foreach (Assembly assembly in AppDomain.CurrentDomain.GetAssemblies())
-			{
-				foreach (var type in assembly.GetTypes())
-				{
-					if (!type.IsAssignableTo(typeof(ICommandTask)))
-						continue;
-
-					var constructor = type.GetConstructor(new[] { typeof(IGameContext) });
-					if (constructor == null)
-						continue;
-
-					var attribute = type.GetCustomAttributes(false).OfType<CommandAttribute>().FirstOrDefault();
-
-					if (attribute == null)
-						continue;
-
-					yield return new CommandAsset(context, attribute, (ctx) =>
-					{
-						try
-						{
-							return (ICommandTask)constructor.Invoke(new[] { ctx });
-						}
-						catch (Exception ex)
-						{
-							Log.Error(ex.ToString());
-							throw;
-						}
-					});
-				}
-			}
-		}
-	}
-	
 	/// <summary>
 	///		The system module. This is Socially Distant itself.
 	/// </summary>
@@ -133,6 +60,7 @@ namespace SociallyDistant
 			RegisterGlobalCommands();
 
 			// Game data
+			Context.ContentManager.AddContentGenerator(new LifepathGenerator());
 			Context.ContentManager.AddContentGenerator(new CommandFinder(Context));
 			Context.ContentManager.AddContentGenerator(new LocalGameDataSource());
 			Context.ContentManager.AddContentGenerator(new TrayActionGenerator(Context));

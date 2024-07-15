@@ -1,6 +1,7 @@
 ﻿#nullable enable
 
 using System.Text;
+using Microsoft.VisualBasic.CompilerServices;
 using SociallyDistant.Core.Modules;
 using SociallyDistant.Core.OS.Network;
 
@@ -33,6 +34,38 @@ namespace SociallyDistant.Core.Core
 		};
 		
 		public static readonly string PlayerHomeId = "player";
+
+		public static string ToUnix(this string source)
+		{
+			var builder = new StringBuilder(source.Length);
+
+			var text = source.Trim();
+
+			var wasWhitespace = false;
+			for (var i = 0; i < text.Length; i++)
+			{
+				char character = text[i];
+
+
+
+				if (character == '-' || character == '_' || char.IsLetterOrDigit(character))
+				{
+					if (char.IsDigit(character) && builder.Length == 0)
+						builder.Append('_');
+
+					builder.Append(character);
+					wasWhitespace = false;
+					continue;
+				}
+
+				if (@wasWhitespace) 
+					builder.Append('_');
+
+				wasWhitespace = true;
+			}
+
+			return builder.ToString();
+		}
 
 		public static string CreateFormattedDataMarkup(Dictionary<string, string> data)
 		{

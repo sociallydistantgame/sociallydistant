@@ -1,9 +1,43 @@
+using AcidicGUI.CustomProperties;
 using AcidicGUI.Events;
 using AcidicGUI.Layout;
 using AcidicGUI.TextRendering;
 using AcidicGUI.Widgets;
 
 namespace SociallyDistant.Core.UI.Common;
+
+public sealed class SimpleField : ContentWidget
+{
+    private readonly FlexPanel  root = new();
+    private readonly TextWidget text = new();
+    private readonly Box        slot = new();
+
+    public string TExt
+    {
+        get => text.Text;
+        set => text.Text = value;
+    }
+
+    public override Widget? Content
+    {
+        get => slot.Content;
+        set => slot.Content = value;
+    }
+
+    public SimpleField()
+    {
+        text.VerticalAlignment = VerticalAlignment.Middle;
+        slot.VerticalAlignment = VerticalAlignment.Middle;
+        root.Direction = Direction.Horizontal;
+        root.Spacing = 3;
+        slot.GetCustomProperties<FlexPanelProperties>().Mode = FlexMode.Proportional;
+        text.FontWeight = FontWeight.SemiBold;
+        
+        Children.Add(root);
+        root.ChildWidgets.Add(text);
+        root.ChildWidgets.Add(slot);
+    }
+}
 
 public class TextButton : Widget,
     IMouseEnterHandler,
