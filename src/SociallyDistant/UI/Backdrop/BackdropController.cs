@@ -83,8 +83,8 @@ namespace SociallyDistant.UI.Backdrop
 				white.SetData<Color>(new[] { Color.White });
 			}
 
-			int width = Game.GraphicsDevice.PresentationParameters.BackBufferWidth;
-			int height = Game.GraphicsDevice.PresentationParameters.BackBufferHeight;
+			int width = Game.GraphicsDevice.Viewport.Width;
+			int height = Game.GraphicsDevice.Viewport.Height;
 
 			Vector2 size = new Vector2(width, height);
 
