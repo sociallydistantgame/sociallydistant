@@ -21,7 +21,6 @@ namespace UI.Applications.Email
 		IProgramOpenHandler
 	{
 		
-		private InboxMode inboxMode;
 
 		
 		private TextMeshProUGUI myUserName = null!;
@@ -63,27 +62,7 @@ namespace UI.Applications.Email
 			UpdateScreen();
 		}
 
-		private void UpdateScreen()
-		{
-			if (mailManager == null)
-				return;
-			
-			IProfile user = socialService.PlayerProfile;
-
-			IEnumerable<IMailMessage> messagesToList = this.inboxMode switch
-			{
-				InboxMode.Inbox => this.mailManager.GetMessagesForUser(user),
-				InboxMode.Outbox => mailManager.GetMessagesFromUser(user),
-				InboxMode.CompletedMissions => Enumerable.Empty<IMailMessage>()
-			};
-			
-			myUserName.SetText(user.ChatName);
-			myEmailAddress.SetText(user.ChatUsername);
-			messageList.SetItems(messagesToList);
-
-			currentSubject.SetText(currentMessage?.Subject ?? string.Empty);
-			conversation.ViewMessage(this.currentMessage);
-		}
+		
 		
 		/// <inheritdoc />
 		public void OnProgramOpen(ISystemProcess process, IContentPanel window, ITextConsole console, string[] args)
@@ -95,13 +74,6 @@ namespace UI.Applications.Email
 		{
 			this.currentMessage = message;
 			this.UpdateScreen();
-		}
-		
-		private enum InboxMode
-		{
-			Inbox,
-			Outbox,
-			CompletedMissions
 		}
 	}
 }

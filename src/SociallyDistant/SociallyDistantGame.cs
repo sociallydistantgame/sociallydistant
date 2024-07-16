@@ -27,6 +27,8 @@ using SociallyDistant.Core.UI;
 using SociallyDistant.DevTools;
 using SociallyDistant.GamePlatform;
 using SociallyDistant.GamePlatform.ContentManagement;
+using SociallyDistant.GameplaySystems.Mail;
+using SociallyDistant.GameplaySystems.Missions;
 using SociallyDistant.GameplaySystems.Networld;
 using SociallyDistant.GameplaySystems.Social;
 using SociallyDistant.Modding;
@@ -73,6 +75,8 @@ internal sealed class SociallyDistantGame :
 	private readonly        GuiController                guiController;
 	private readonly        NetworkEventListener         networkEventLIstener;
 	private readonly        ScreenshotHelper             screenshotHelper;
+	private readonly        MailManager                  mailManager;
+	private readonly        MissionManager               missionManager;
 	private                 bool                         areModulesLoaded;
 	private                 Task                         initializeTask;
 	private                 PlayerInfo                   playerInfo = new();
@@ -174,11 +178,15 @@ internal sealed class SociallyDistantGame :
 		this.deviceCoordinator = new DeviceCoordinator(this);
 		this.networkEventLIstener = new NetworkEventListener(this);
 		screenshotHelper = new ScreenshotHelper(this, virtualScreen, GameDataPath);
+		mailManager = new MailManager(this);
+		missionManager = new MissionManager(this);
 
 		Components.Add(screenshotHelper);
 		Components.Add(deviceCoordinator);
 		Components.Add(network);
 		Components.Add(networkEventLIstener);
+		Components.Add(mailManager);
+		Components.Add(missionManager);
 		Components.Add(backdrop);
 		Components.Add(socialService);
 		Components.Add(backdropUpdater);

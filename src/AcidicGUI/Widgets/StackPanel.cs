@@ -32,19 +32,22 @@ public sealed class StackPanel : ContainerWidget
 
     protected override Point GetContentSize(Point availableSize)
     {
+        if (Children.Count == 0)
+            return Point.Zero;
+        
         Point result = Point.Zero;
 
         switch (direction)
         {
             case Direction.Horizontal:
             {
-                result.X = spacing * Children.Count;
+                result.X = spacing * (Children.Count - 1);
                 availableSize.X = Math.Max(0, availableSize.X - result.X);
                 break;
             }
             case Direction.Vertical:
             {
-                result.Y = spacing * Children.Count;
+                result.Y = spacing * (Children.Count - 1);
                 availableSize.Y = Math.Max(0, availableSize.Y - result.Y);
                 break;
             }

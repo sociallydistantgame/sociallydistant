@@ -1,5 +1,6 @@
 ﻿#nullable enable
 using System.Diagnostics;
+using Microsoft.Xna.Framework;
 using Serilog;
 using SociallyDistant.Core;
 using SociallyDistant.Core.Core;
@@ -14,63 +15,61 @@ using SociallyDistant.GameplaySystems.Social;
 
 namespace SociallyDistant.GameplaySystems.Missions
 {
-	public sealed class MissionManager
+	public sealed class MissionManager : GameComponent
 	{
-		private static readonly Singleton<MissionManager> singleton = new();
-
-		private ISocialService socialService;
-		private SociallyDistantGame gameManager = null!;
-		private StartMissionCommand startMissionCommand;
-		private MissionMailerHook missionMailerHook;
-		private CancellationTokenSource? missionAnandonSource;
-		private IMission? currentMission;
-		private Task? currentMissionTask;
-		private IMissionController missionController;
-		private WorldManager worldManager = null!;
+		private static readonly Singleton<MissionManager> singleton   = new();
+		private readonly        SociallyDistantGame       gameManager = null!;
+		private readonly        StartMissionCommand       startMissionCommand;
+		private readonly        MissionMailerHook         missionMailerHook;
+		private readonly        IMissionController        missionController;
+		private                 CancellationTokenSource?  missionAnandonSource;
+		private                 IMission?                 currentMission;
+		private                 Task?                     currentMissionTask;
+		
+		private WorldManager WorldManager => WorldManager.Instance;
+		private ISocialService SocialService => gameManager.SocialService;
 
 		public IMission? CurrentMission => currentMission;
 
 		public bool CAnAbandonMissions => CurrentMission != null && missionController.CanAbandonMission;
 		public bool CanStartMissions => gameManager.CurrentGameMode == GameMode.OnDesktop
 		                                && (this.currentMission == null || missionController.CanAbandonMission);
-		
-		private void Awake()
+
+		internal MissionManager(SociallyDistantGame game) : base(game)
 		{
 			singleton.SetInstance(this);
-			gameManager = SociallyDistantGame.Instance;
-			worldManager = WorldManager.Instance;
-			socialService = gameManager.SocialService;
 			
+			this.gameManager = game;
 			this.startMissionCommand = new StartMissionCommand(this);
 			this.missionMailerHook = new MissionMailerHook(this);
-			this.missionController = new MissionController(this, this.worldManager, this.gameManager);
+			this.missionController = new MissionController(this, this.WorldManager, this.gameManager);
 		}
-
-		private void OnEnable()
+		
+		public override void Initialize()
 		{
+			base.Initialize();
+			
 			gameManager.UriManager.RegisterSchema("mission", new MissionUriSchemeHandler(this));
-		}
-
-		private void OnDisable()
-		{
-			gameManager.UriManager.UnregisterSchema("mission");
-		}
-
-		private void Start()
-		{
 			gameManager.ScriptSystem.RegisterGlobalCommand("start_mission", startMissionCommand);
 			gameManager.ScriptSystem.RegisterHookListener(CommonScriptHooks.AfterWorldStateUpdate, missionMailerHook);
 		}
 
-		private void OnDestroy()
+		protected override void Dispose(bool disposing)
 		{
+			base.Dispose(disposing);
+
+			if (!disposing)
+				return;
+			
+			gameManager.UriManager.UnregisterSchema("mission");
 			gameManager.ScriptSystem.UnregisterHookListener(CommonScriptHooks.AfterWorldStateUpdate, missionMailerHook);
 			gameManager.ScriptSystem.UnregisterGlobalCommand("start_mission");
 			singleton.SetInstance(null);
 		}
 
-		private void Update()
+		public override void Update(GameTime gameTime)
 		{
+			base.Update(gameTime);
 			if (currentMissionTask != null)
 			{
 				if (currentMissionTask.Exception != null)
@@ -90,14 +89,14 @@ namespace SociallyDistant.GameplaySystems.Missions
 			if (this.currentMission == null)
 				return;
 
-			ProtectedWorldState protectedState = worldManager.World.ProtectedWorldData.Value;
+			ProtectedWorldState protectedState = WorldManager.World.ProtectedWorldData.Value;
 			var missionList = new List<string>();
 			missionList.AddRange(protectedState.CompletedMissions);
 			missionList.Add(this.currentMission.Id);
 
 			protectedState.CompletedMissions = missionList;
 
-			worldManager.World.ProtectedWorldData.Value = protectedState;
+			WorldManager.World.ProtectedWorldData.Value = protectedState;
 
 			this.currentMission = null;
 			this.currentMissionTask = null;
@@ -118,10 +117,10 @@ namespace SociallyDistant.GameplaySystems.Missions
 		
 		public bool StartMission(IMission mission)
 		{
-			if (mission.IsCompleted(worldManager.World))
+			if (mission.IsCompleted(WorldManager.World))
 				return false;
 			
-			if (!mission.IsAvailable(worldManager.World))
+			if (!mission.IsAvailable(WorldManager.World))
 				return false;
 			
 			if (this.currentMission != null)
@@ -146,13 +145,13 @@ namespace SociallyDistant.GameplaySystems.Missions
 
 		private IProfile ResolveGiver(string giverId)
 		{
-			return socialService.GetNarrativeProfile(giverId);
+			return SocialService.GetNarrativeProfile(giverId);
 		}
 		
 		private async Task MailMission(IMission mission)
 		{
 			IProfile giver = ResolveGiver(mission.GiverId);
-			IProfile player = socialService.PlayerProfile;
+			IProfile player = SocialService.PlayerProfile;
 			
 			switch (mission.StartCondition)
 			{
@@ -162,12 +161,12 @@ namespace SociallyDistant.GameplaySystems.Missions
 					// If we find it, then we'll update it with the mission's new briefing info. If we don't find
 					// a matching mail object then we'll send a new one to the player.
 					var isNewMail = false;
-					WorldMailData mail = worldManager.World.Emails.GetNarrativeObject(mission.Id);
+					WorldMailData mail = WorldManager.World.Emails.GetNarrativeObject(mission.Id);
 
-					mail.ThreadId = worldManager.GetNextObjectId();
+					mail.ThreadId = WorldManager.GetNextObjectId();
 					mail.TypeFlags = MailTypeFlags.Briefing;
 
-					if (mission.IsCompleted(worldManager.World))
+					if (mission.IsCompleted(WorldManager.World))
 					{
 						mail.TypeFlags |= MailTypeFlags.CompletedMission;
 					}
@@ -189,7 +188,7 @@ namespace SociallyDistant.GameplaySystems.Missions
 							Data = x
 						}).ToList();
 
-					worldManager.World.Emails.Modify(mail);
+					WorldManager.World.Emails.Modify(mail);
 					break;
 			}
 			}
@@ -199,7 +198,7 @@ namespace SociallyDistant.GameplaySystems.Missions
 		{
 			foreach (IMission mission in gameManager.ContentManager.GetContentOfType<IMission>())
 			{
-				if (!mission.IsAvailable(worldManager.World))
+				if (!mission.IsAvailable(WorldManager.World))
 					continue;
 
 

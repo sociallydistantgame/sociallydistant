@@ -1,6 +1,7 @@
 ﻿#nullable enable
 
 using System.Net.Mime;
+using Microsoft.Xna.Framework;
 using SociallyDistant.Core;
 using SociallyDistant.Core.Core;
 using SociallyDistant.Core.Core.Scripting;
@@ -12,54 +13,55 @@ using SociallyDistant.GameplaySystems.Social;
 
 namespace SociallyDistant.GameplaySystems.Mail
 {
-	public class MailManager : IHookListener
+	public class MailManager : GameComponent
 	{
-		private MarkupAsset changelogMarkupAsset = null!;
+		private readonly SociallyDistantGame gameManager;
+		private          MarkupAsset         changelogMarkupAsset = null!;
 
 		private static readonly Singleton<MailManager> singleton = new();
 		
 		private readonly Dictionary<ObjectId, MailThread> threads = new Dictionary<ObjectId, MailThread>();
 		private readonly Dictionary<ObjectId, MailMessage> messages = new Dictionary<ObjectId, MailMessage>();
 		
-		private ISocialService socialService;
-		private SociallyDistantGame gameManager = null!;
-		private WorldManager worldManager = null!;
+		private ISocialService SocialService => gameManager.SocialService;
+		private WorldManager WorldManager => WorldManager.Instance!;
 		
-		private void Awake()
+		internal MailManager(SociallyDistantGame game) : base(game)
 		{
-			gameManager = SociallyDistantGame.Instance;
-			worldManager = WorldManager.Instance;
-			socialService = gameManager.SocialService;
 			singleton.SetInstance(this);
+			this.gameManager = game;
 		}
 
-		private void Start()
+		public override void Initialize()
 		{
-			gameManager.ScriptSystem.RegisterHookListener(CommonScriptHooks.AfterWorldStateUpdate, this);
-			
+			base.Initialize();
 			InstallEvents();
 		}
 
-		private void OnDestroy()
+		protected override void Dispose(bool disposing)
 		{
+			base.Dispose(disposing);
+
+			if (!disposing)
+				return;
+			
 			UninstallEvents();
 			
-			gameManager.ScriptSystem.UnregisterHookListener(CommonScriptHooks.AfterWorldStateUpdate, this);
 			singleton.SetInstance(null);
 		}
 
 		private void InstallEvents()
 		{
-			worldManager.Callbacks.AddCreateCallback<WorldMailData>(OnCreateMail);
-			worldManager.Callbacks.AddModifyCallback<WorldMailData>(OnModifyMail);
-			worldManager.Callbacks.AddDeleteCallback<WorldMailData>(OnDeleteMail);
+			WorldManager.Callbacks.AddCreateCallback<WorldMailData>(OnCreateMail);
+			WorldManager.Callbacks.AddModifyCallback<WorldMailData>(OnModifyMail);
+			WorldManager.Callbacks.AddDeleteCallback<WorldMailData>(OnDeleteMail);
 		}
 
 		private void UninstallEvents()
 		{
-			worldManager.Callbacks.RemoveCreateCallback<WorldMailData>(OnCreateMail);
-			worldManager.Callbacks.RemoveModifyCallback<WorldMailData>(OnModifyMail);
-			worldManager.Callbacks.RemoveDeleteCallback<WorldMailData>(OnDeleteMail);
+			WorldManager.Callbacks.RemoveCreateCallback<WorldMailData>(OnCreateMail);
+			WorldManager.Callbacks.RemoveModifyCallback<WorldMailData>(OnModifyMail);
+			WorldManager.Callbacks.RemoveDeleteCallback<WorldMailData>(OnDeleteMail);
 		}
 
 		public IEnumerable<IMailMessage> GetMessagesForUser(IProfile profile)
@@ -201,8 +203,8 @@ namespace SociallyDistant.GameplaySystems.Mail
 			
 			public void UpdateMessage(WorldMailData mailData)
 			{
-				this.From = this.mailManager.socialService.GetProfileById(mailData.From);
-				this.To = this.mailManager.socialService.GetProfileById(mailData.To);
+				this.From = this.mailManager.SocialService.GetProfileById(mailData.From);
+				this.To = this.mailManager.SocialService.GetProfileById(mailData.To);
 
 				this.MessageType = mailData.TypeFlags;
 				this.NarrativeId = mailData.NarrativeId;
@@ -220,69 +222,6 @@ namespace SociallyDistant.GameplaySystems.Mail
 				this.Subject = mailData.Subject;
 				this.Body = mailData.Document?.ToArray() ?? Array.Empty<DocumentElement>();
 			}
-		}
-
-		/// <inheritdoc />
-		public Task ReceiveHookAsync(IGameContext game)
-		{
-			string gameVersion = "monogame";
-			string saveGameVersion = this.worldManager.World.GameVersion;
-			var mustSendChangelog = false;
-			
-			if (String.CompareOrdinal(gameVersion, saveGameVersion) != 0)
-			{
-				ProtectedWorldState state = worldManager.World.ProtectedWorldData.Value;
-				state.GameVersion = gameVersion;
-				worldManager.World.ProtectedWorldData.Value = state;
-				mustSendChangelog = true;
-			}
-
-			if (mustSendChangelog)
-			{
-				WorldProfileData metaProfile = worldManager.World.Profiles.FirstOrDefault(x => x.NarrativeId == "meta");
-
-				if (metaProfile.NarrativeId != "meta")
-				{
-					metaProfile.InstanceId = worldManager.GetNextObjectId();
-					metaProfile.NarrativeId = "meta";
-					metaProfile.Gender = Gender.Unknown;
-					metaProfile.IsSocialPrivate = true;
-					metaProfile.ChatName = "sociallydistant";
-					metaProfile.ChatName = "Socially Distant";
-					worldManager.World.Profiles.Add(metaProfile);
-				}
-
-				var message = new WorldMailData()
-				{
-					InstanceId = worldManager.GetNextObjectId(),
-					From = metaProfile.InstanceId,
-					To = socialService.PlayerProfile.ProfileId,
-					Subject = "Socially Distant Update",
-					ThreadId = worldManager.GetNextObjectId(),
-					Document = new[]
-					{
-						new DocumentElement
-						{
-							ElementType = DocumentElementType.Text,
-							Data = "A new version of Socially Distant has been installed since you last played."
-						},
-						new DocumentElement
-						{
-							ElementType = DocumentElementType.Text,
-							Data = $"You are now on Socially Distant {gameVersion}. Here's what's changed."
-						},
-						new DocumentElement
-						{
-							ElementType = DocumentElementType.Text,
-							Data = changelogMarkupAsset.Markup
-						},
-					}
-				};
-				
-				worldManager.World.Emails.Add(message);
-			}
-			
-			return Task.CompletedTask;
 		}
 
 		public static MailManager? Instance => singleton.Instance;

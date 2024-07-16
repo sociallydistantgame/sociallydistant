@@ -17,6 +17,12 @@ public sealed class InfoBox : Widget
     private readonly TextWidget      title           = new();
     private readonly Box             contentBox      = new();
 
+    public bool UseOpaqueBlock
+    {
+        get => decorativeBlock.Opaque;
+        set => decorativeBlock.Opaque = value;
+    }
+    
     public CommonColor Color
     {
         get => decorativeBlock.GetCustomProperty<CommonColor>();

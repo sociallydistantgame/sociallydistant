@@ -4,44 +4,8 @@ using SociallyDistant.Core.Core.Scripting.Instructions;
 using SociallyDistant.Core.Modules;
 using SociallyDistant.Core.OS.Devices;
 using SociallyDistant.GameplaySystems.Chat;
-using SociallyDistant.GameplaySystems.Hacking.Assets;
-using SociallyDistant.GameplaySystems.Social;
 
 namespace SociallyDistant.ScriptImpoers;
-
-[Shebang("hook")]
-public sealed class HookScriptImporter : ShellScriptImporter
-{
-    public override ShellScriptAsset? Import(IGameContext game, string[] shebangArgs, string scriptText)
-    {
-        string hookId = shebangArgs[0];
-
-        var hook = new HookScript(hookId, scriptText);
-        return hook;
-    }
-}
-
-[Shebang("network")]
-public sealed class NetworkImporter : ShellScriptImporter
-{
-    public override ShellScriptAsset? Import(IGameContext game, string[] shebangArgs, string scriptText)
-    {
-        string narrativeId = string.Join(" ", shebangArgs).Trim();
-        var asset = new NetworkAsset(narrativeId, scriptText);
-        return asset;
-    }
-}
-
-[Shebang("npc")]
-public sealed class NpcGeneratorImporter : ShellScriptImporter
-{
-    public override ShellScriptAsset? Import(IGameContext game, string[] shebangArgs, string scriptText)
-    {
-        var narrativeId = string.Join(" ", shebangArgs).Trim();
-        var asset = new NpcGeneratorScript(narrativeId, scriptText);
-        return asset;
-    }
-}
 
 [Shebang("chat")]
 public class ChatScriptImporter : ShellScriptImporter

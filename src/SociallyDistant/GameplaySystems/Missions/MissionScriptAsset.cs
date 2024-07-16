@@ -1,21 +1,27 @@
 ﻿#nullable enable
+using System.Diagnostics;
+using System.Text;
+using Serilog;
 using SociallyDistant.Architecture;
 using SociallyDistant.Core.Core;
 using SociallyDistant.Core.Core.Scripting;
 using SociallyDistant.Core.Core.Scripting.Instructions;
 using SociallyDistant.Core.Core.Scripting.Parsing;
 using SociallyDistant.Core.Missions;
+using SociallyDistant.Core.OS.Devices;
 using SociallyDistant.Core.Social;
 using SociallyDistant.GamePlatform;
 
 namespace SociallyDistant.GameplaySystems.Missions
 {
-	public class MissionScriptAsset : 
+	public class MissionScriptAsset : ShellScriptAsset,
 		IMission,
 		ICachedScript
 	{
+		private readonly string missionId;
+		private readonly string scriptText;
 		
-		private string missionName = string.Empty;
+		private          string missionName = string.Empty;
 
 		
 		private string narrativeIdOfGiver = string.Empty;
@@ -34,21 +40,21 @@ namespace SociallyDistant.GameplaySystems.Missions
 
 
 		private Dictionary<string, string> defaultVariables = new();
-		private string scriptText = string.Empty;
 
 		[NonSerialized]
 		private ShellInstruction? startTree;
 
 		[NonSerialized]
 		private ShellInstruction? emailTree;
-		
-		#if UNITY_EDITOR
-		public void SetScriptText(string text)
-		{
-			this.scriptText = text;
-		}
 
-		public void ImportMetadata()
+		internal MissionScriptAsset(string missionId, string scriptText)
+		{
+			this.missionId = missionId;
+			this.scriptText = scriptText;
+		}
+		
+		
+		private async Task ImportMetadata()
 		{
 			defaultVariables.Clear();
 			
@@ -59,8 +65,8 @@ namespace SociallyDistant.GameplaySystems.Missions
 			scriptBuilder.AppendLine(this.scriptText);
 			scriptBuilder.AppendLine("metadata");
 
-			shell.Setup(new UnityTextConsole());
-			shell.RunScript(scriptBuilder.ToString()).Wait();
+			shell.Setup(new NullConsole());
+			await shell.RunScript(scriptBuilder.ToString());
 		}
 
 		private class MissionScriptImportContext : IScriptExecutionContext
@@ -167,7 +173,7 @@ namespace SociallyDistant.GameplaySystems.Missions
 			public ITextConsole OpenFileConsole(ITextConsole realConsole, string filePath, FileRedirectionType mode)
 			{
 				if (mode != FileRedirectionType.None)
-					Debug.LogWarning("File redirection used while importing a mission script. This is not supported.");
+					Log.Warning("File redirection used while importing a mission script. This is not supported.");
 
 				return realConsole;
 			}
@@ -185,7 +191,6 @@ namespace SociallyDistant.GameplaySystems.Missions
 			}
 		}
 		
-		#endif
 		/// <inheritdoc />
 		public string Id => "unknown";
 
@@ -269,6 +274,8 @@ namespace SociallyDistant.GameplaySystems.Missions
 
 			this.startTree = CreateStartTree(primaryTree, "start");
 			this.emailTree = CreateStartTree(primaryTree, "email");
+
+			await ImportMetadata();
 		}
 
 		private ShellInstruction CreateStartTree(ShellInstruction primaryTree, string entrypoint)
