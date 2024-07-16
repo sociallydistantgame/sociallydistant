@@ -469,8 +469,11 @@ public class TerminalWidget : Widget,
 
     public void OnDrag(MouseButtonEvent e)
     {
-        float x = MathHelper.Clamp(e.Position.X, ContentArea.Left, ContentArea.Right);
-        float y = MathHelper.Clamp(e.Position.Y, ContentArea.Top,  ContentArea.Bottom);
+        int x = MathHelper.Clamp(e.Position.X, ContentArea.Left, ContentArea.Right);
+        int y = MathHelper.Clamp(e.Position.Y, ContentArea.Top,  ContentArea.Bottom);
+
+        x = Math.Clamp(x, ContentArea.Left,   ContentArea.Right);
+        y = Math.Clamp(y, ContentArea.Top, ContentArea.Bottom);
         
         simpleTerminal.MouseMove(x, y);
     }

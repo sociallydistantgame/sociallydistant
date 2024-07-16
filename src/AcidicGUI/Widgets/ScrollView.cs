@@ -93,6 +93,12 @@ public sealed class ScrollView :
         }
     }
 
+    public void ScrollToEnd()
+    {
+        pageOffset = Math.Max(0, innerSize - ContentArea.Height);
+        InvalidateLayout();
+    }
+    
     protected override void RebuildGeometry(GeometryHelper geometry)
     {
         base.RebuildGeometry(geometry);

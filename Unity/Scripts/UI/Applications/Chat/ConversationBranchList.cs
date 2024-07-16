@@ -12,27 +12,6 @@ namespace UI.Applications.Chat
 {
 	public sealed class ConversationBranchList : MonoBehaviour
 	{
-		
-		private RectTransform fewItemsList = null!;
-		
-		
-		private ConversationBranchItemView itemPrefab = null!;
-		
-		private readonly List<IBranchDefinition> currentList = new();
-		private readonly List<ConversationBranchItemView> views = new();
-		private readonly int maxViewsUntilScroll = 3;
-
-		private int minimumScore = 50;
-		private string filterQuery = string.Empty;
-		private CanvasGroup canvasGroup = null!;
-		private LTDescr? hideTween;
-		private LTDescr? showTween;
-		private readonly List<int> filteredItems = new();
-
-		private int selected = -1;
-		
-		public bool IsEmpty => currentList.Count == 0;
-		
 		private void Awake()
 		{
 			this.AssertAllFieldsAreSerialized(typeof(ConversationBranchList));
@@ -40,15 +19,6 @@ namespace UI.Applications.Chat
 
 			canvasGroup.alpha = 0;
 			AfterHide();
-		}
-
-		public bool PickSelectedIfAny()
-		{
-			if (selected == -1)
-				return false;
-
-			this.PickBranch(currentList[filteredItems[selected]]);
-			return true;
 		}
 		
 		public void UpdateList(BranchDefinitionList list)
@@ -59,34 +29,7 @@ namespace UI.Applications.Chat
 
 			this.UpdateLIstUI();
 		}
-
-		private void FilterItems()
-		{
-			filteredItems.Clear();
-
-			if (string.IsNullOrWhiteSpace(filterQuery))
-			{
-				// No filter query, so order alphabetically by character name then by message.
-				
-				var i = 0;
-				foreach (IBranchDefinition branch in currentList.OrderBy(x => x.Target.ChatName).ThenBy(x => x.Message))
-				{
-					filteredItems.Add(i);
-					i++;
-				}
-
-				return;
-			}
-
-			foreach (ExtractedResult<string>? uwu in FuzzySharp.Process.ExtractSorted(filterQuery, this.currentList.Select(x => x.Message)))
-			{
-				if (uwu.Score < minimumScore)
-					continue;
-				
-				this.filteredItems.Add(uwu.Index);
-			}
-		}
-
+		
 		private IEnumerable<(int rank, int index)> RankDistances(out int lowest)
 		{
 			var ranks = new (int, int)[currentList.Count];
@@ -153,66 +96,6 @@ namespace UI.Applications.Chat
 					views.Clear();
 				}
 			}
-		}
-
-		private void PickBranch(IBranchDefinition branch)
-		{
-			// We do this so the player can actually fucking SEE what they're about to send.
-			currentList.Clear();
-			this.UpdateLIstUI();
-			
-			branch.Pick();
-		}
-
-		public void Show()
-		{
-			if (hideTween != null)
-				LeanTween.cancel(hideTween.id);
-			
-			hideTween = null;
-
-			if (showTween != null)
-				return;
-			
-			showTween = LeanTween.alphaCanvas(canvasGroup, 1, 0.2f)
-				.setOnComplete(AfterShow);
-		}
-
-		private void AfterShow()
-		{
-			showTween = null;
-			canvasGroup.interactable = true;
-			canvasGroup.blocksRaycasts = true;
-		}
-		
-		public void Hide()
-		{
-			if (showTween != null)
-				LeanTween.cancel(showTween.id);
-			
-			showTween = null;
-
-			if (hideTween != null)
-				return;
-			
-			hideTween = LeanTween.alphaCanvas(canvasGroup, 0, 0.2f)
-				.setOnComplete(AfterHide);
-		}
-
-		public void UpdateQuery(string newQuery)
-		{
-			this.filterQuery = newQuery;
-			this.UpdateLIstUI();
-
-			if (this.filteredItems.Count != 0)
-				Show();
-		}
-		
-		private void AfterHide()
-		{
-			hideTween = null;
-			canvasGroup.interactable = false;
-			canvasGroup.blocksRaycasts = false;
 		}
 		
 		/// <summary>

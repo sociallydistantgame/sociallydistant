@@ -7,10 +7,21 @@ namespace AcidicGUI.Widgets;
 public class FlexPanel : ContainerWidget
 {
     private Direction direction;
-    private int spacing;
+    private int       spacing;
+    private bool      reversed;
 
     public IOrderedCollection<Widget> ChildWidgets => Children;
 
+    public bool Reversed
+    {
+        get => reversed;
+        set
+        {
+            reversed = value;
+            InvalidateLayout();
+        }
+    }
+    
     public Direction Direction
     {
         get => direction;
@@ -210,23 +221,45 @@ public class FlexPanel : ContainerWidget
 
             int spaceGiven = resultSizes[i]!.Value;
 
-            switch (direction)
+            if (reversed)
             {
-                case Direction.Horizontal:
+                stride -= spaceGiven;
+
+                switch (direction)
                 {
-                    child.UpdateLayout(context, new LayoutRect(availableSpace.Left + stride, availableSpace.Top, spaceGiven, availableSpace.Height));
-                    break;
+                    case Direction.Horizontal:
+                    {
+                        child.UpdateLayout(context, new LayoutRect(availableSpace.Right + stride, availableSpace.Top, spaceGiven, availableSpace.Height));
+                        break;
+                    }
+                    case Direction.Vertical:
+                    {
+                        child.UpdateLayout(context, new LayoutRect(availableSpace.Left, availableSpace.Bottom + stride, availableSpace.Width, spaceGiven));
+                        break;
+                    }
                 }
-                case Direction.Vertical:
-                {
-                    child.UpdateLayout(context,
-                        new LayoutRect(availableSpace.Left, availableSpace.Top + stride, availableSpace.Width,
-                            spaceGiven));
-                    break;
-                }
+                
+                stride -= spacing;
             }
-            
-            stride += spaceGiven + spacing;
+            else
+            {
+                switch (direction)
+                {
+                    case Direction.Horizontal:
+                    {
+                        child.UpdateLayout(context, new LayoutRect(availableSpace.Left + stride, availableSpace.Top, spaceGiven, availableSpace.Height));
+                        break;
+                    }
+                    case Direction.Vertical:
+                    {
+                        child.UpdateLayout(context, new LayoutRect(availableSpace.Left, availableSpace.Top + stride, availableSpace.Width, spaceGiven));
+                        break;
+                    }
+                }
+                
+                stride += spaceGiven + spacing;
+            }
+
             i++;
         }
     }

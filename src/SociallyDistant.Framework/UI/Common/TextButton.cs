@@ -3,8 +3,42 @@ using AcidicGUI.Events;
 using AcidicGUI.Layout;
 using AcidicGUI.TextRendering;
 using AcidicGUI.Widgets;
+using SociallyDistant.Core.Shell;
+using SociallyDistant.Core.UI.VisualStyles;
 
 namespace SociallyDistant.Core.UI.Common;
+
+public sealed class Emblem : Widget
+{
+    private readonly TextWidget text = new();
+
+    public string Text
+    {
+        get => text.Text;
+        set => text.Text = value;
+    }
+
+    public CommonColor Color
+    {
+        get => GetCustomProperty<CommonColor>();
+        set
+        {
+            SetCustomProperty(value);
+            text.SetCustomProperty(value);
+        }
+    }
+    
+    public Emblem()
+    {
+        Color = CommonColor.Yellow;
+        
+        text.Margin = new Padding(3, 0);
+        text.FontSize = 12;
+        text.FontWeight = FontWeight.Medium;
+        Children.Add(text);
+        text.SetCustomProperty(WidgetForegrounds.Common);
+    }
+}
 
 public sealed class SimpleField : ContentWidget
 {

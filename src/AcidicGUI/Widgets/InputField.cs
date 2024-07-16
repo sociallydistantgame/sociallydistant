@@ -35,6 +35,16 @@ public sealed class InputField :
         set => SetValueInternal(value);
     }
 
+    public string Placeholder
+    {
+        get => placeholder;
+        set
+        {
+            placeholder = value;
+            InvalidateLayout();
+        }
+    }
+    
     public bool WordWrapped
     {
         get => display.WordWrapping;
@@ -205,6 +215,7 @@ public sealed class InputField :
     private void UpdateDisplay()
     {
         this.display.Text = currentValue.ToString();
+        InvalidateLayout();
     }
     
     public void OnMouseClick(MouseButtonEvent e)

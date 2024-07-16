@@ -164,6 +164,9 @@ public class SimpleTerminal
     {
         screen.ScreenPointToCell(this, x, y, out int col, out int row);
 
+        col = Math.Clamp(col, 0, term.col - 1);
+        row = Math.Clamp(row, 0, term.row - 1);
+        
         var seltype = SelectionType.SEL_REGULAR;
         bool done = !this.isSelecting;
 

@@ -5,6 +5,7 @@ using AcidicGUI.VisualStyles;
 using AcidicGUI.Widgets;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
+using Microsoft.Xna.Framework.Graphics.PackedVector;
 using Serilog;
 using SociallyDistant.Core.Core;
 using SociallyDistant.Core.Modules;
@@ -47,6 +48,7 @@ public class SociallyDistantVisualStyle : IVisualStyle
     private readonly Color buttonHoveredBackground         = new Color(0x0F, 0x73, 0xA9);
     private readonly Color buttonPressedBackground         = new Color(0x08, 0x53, 0x7B);
     private readonly Color selectionColor                  = new(0x08, 0x53, 0x7B);
+    private readonly Color playerBubbleBackground          = new Color(0x08, 0x53, 0x7B);
 
     private Font        iconFont;
     private IFontFamily defaultFont = null!;
@@ -65,6 +67,16 @@ public class SociallyDistantVisualStyle : IVisualStyle
         this.game = game;
     }
 
+    private (Color, Color) GetChatBubbleColor(ChatBubbleColor color)
+    {
+        return color switch
+        {
+            ChatBubbleColor.Player => (playerBubbleBackground, accentPrimary),
+            ChatBubbleColor.Npc => (fieldBackground, fieldStroke),
+            _ => (default, default)
+        };
+    }
+    
     internal void LoadContent()
     {
         checkboxEmblem = game.GameInstance.Content.Load<Texture2D>("/Core/UI/Textures/checkbox_emblem");
@@ -353,6 +365,12 @@ public class SociallyDistantVisualStyle : IVisualStyle
             geometry.AddRoundedRectangle(listItem.ContentArea, 3, color * 0.5f);
         }
     }
+
+    private void DrawEmblem(Emblem emblem, GeometryHelper geometry)
+    {
+        geometry.AddRoundedRectangle(emblem.ContentArea, 3, mainBackground);
+        geometry.AddRoundedRectangleOutline(emblem.ContentArea, 1, 3, GetCommonColor(emblem.Color));
+    }
     
     public void DrawWidgetBackground(Widget widget, GeometryHelper geometryHelper)
     {
@@ -366,6 +384,8 @@ public class SociallyDistantVisualStyle : IVisualStyle
             DrawWindowTab(widget, tab, geometryHelper);
         else if (widget is DecorativeBlock box)
             DrawDecorativeBlock(box, geometryHelper);
+        else if (widget is Emblem emblem)
+            DrawEmblem(emblem, geometryHelper);
         else
         {
             WidgetBackgrounds background = widget.GetCustomProperty<WidgetBackgrounds>();
@@ -392,6 +412,21 @@ public class SociallyDistantVisualStyle : IVisualStyle
                     geometryHelper.AddRoundedRectangle(widget.ContentArea, 3, fieldBackground);
                     geometryHelper.AddRoundedRectangleOutline(widget.ContentArea, 1, 3, fieldStroke);
                     break;
+                case WidgetBackgrounds.ChatBubble:
+                {
+                    (Color bg, Color stroke) = GetChatBubbleColor(widget.GetCustomProperty<ChatBubbleColor>());
+
+                    geometryHelper.AddRoundedRectangle(widget.ContentArea, 12, bg);
+                    geometryHelper.AddRoundedRectangleOutline(widget.ContentArea, 2, 12, stroke);
+                    break;
+                }
+                case WidgetBackgrounds.CompletionList:
+                {
+                    geometryHelper.AddRoundedRectangle(widget.ContentArea, 3, mainBackground);
+                    geometryHelper.AddRoundedRectangleOutline(widget.ContentArea, 1, 3, fieldStroke);
+                    
+                    break;
+                }
             }
         }
     }
@@ -571,7 +606,16 @@ public enum WidgetBackgrounds
     Dock,
     WindowClient,
     WindowBorder,
-    FormField
+    FormField,
+    ChatBubble,
+    CompletionList
+}
+
+public enum ChatBubbleColor
+{
+    None,
+    Player,
+    Npc
 }
 
 public enum WidgetForegrounds
