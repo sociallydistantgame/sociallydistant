@@ -16,7 +16,10 @@ public class DocumentAdapter<TContainerWidget> : Widget
     where TContainerWidget : ContainerWidget, new()
 {
     private readonly RecyclableWidgetList<TContainerWidget> recyclables = new();
+    private readonly List<DocumentElement>                  elements    = new();
 
+    public TContainerWidget Container => recyclables.Container;
+    
     public DocumentAdapter()
     {
         Children.Add(recyclables);
@@ -24,11 +27,18 @@ public class DocumentAdapter<TContainerWidget> : Widget
 
     public void ShowDocument(IEnumerable<DocumentElement> document)
     {
+        elements.Clear();
+        elements.AddRange(document);
+        RefreshDocument();
+    }
+    
+    private void RefreshDocument()
+    {
         var builder = new WidgetBuilder();
 
         builder.Begin();
 
-        foreach (DocumentElement element in document)
+        foreach (DocumentElement element in elements)
         {
             switch (element.ElementType)
             {
@@ -53,10 +63,13 @@ public class DocumentAdapter<TContainerWidget> : Widget
                             color = CommonColor.Cyan;
                             title = $"{title} - Complete";
                         }
-
-                        if (missionManager.CurrentMission == mission && missionManager.CAnAbandonMissions)
+                        else if (missionManager.CurrentMission == mission && missionManager.CAnAbandonMissions)
                         {
-                            buttons.Add("Abandon Mission", missionManager.AbandonMission);
+                            buttons.Add("Abandon Mission", () =>
+                            {
+                                MissionManager.Instance?.AbandonMission();
+                                RefreshDocument();
+                            });
                         }
                         else if (missionManager.CanStartMissions && mission.IsAvailable(WorldManager.Instance.World))
                         {
@@ -64,13 +77,11 @@ public class DocumentAdapter<TContainerWidget> : Widget
                             buttons.Add("Start Mission", () =>
                             {
                                 MissionManager.Instance?.StartMission(m);
+                                RefreshDocument();
                             });
                         }
 
-                        builder.AddWidget(new Embed { Title = title, Color = color, Buttons = buttons, Fields = new Dictionary<string, string>
-                        {
-                            { "Danger", mission.DangerLevel.ToString() }
-                        } });
+                        builder.AddWidget(new Embed { Title = title, Color = color, Buttons = buttons, Fields = new Dictionary<string, string> { { "Danger", mission.DangerLevel.ToString() } } });
                     }
                     break;
                 default:

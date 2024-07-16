@@ -21,6 +21,8 @@ public sealed class MailConversationItem : Widget
         root.UseOpaqueBlock = true;
         metadata.UseMarkup = true;
         metadata.WordWrapping = true;
+
+        document.Container.Spacing = 6;
         
         Children.Add(root);
         root.Content = messageArea;

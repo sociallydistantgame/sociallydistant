@@ -62,11 +62,11 @@ public sealed class InfoBox : Widget
         title.FontWeight = FontWeight.Bold;
         title.SetCustomProperty(WidgetForegrounds.Common);
         
-        root.Padding = 3;
-        root.Spacing = 3;
+        root.Padding = 6;
+        root.Spacing = 6;
         root.Direction = Direction.Horizontal;
 
-        contentStack.Spacing = 3;
+        contentStack.Spacing = 6;
         contentStack.Padding = new Padding(0, 3);
         contentStack.Direction = Direction.Vertical;
 
