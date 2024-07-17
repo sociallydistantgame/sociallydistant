@@ -63,16 +63,6 @@ namespace UI.Websites.SocialMedia
 			}
 		}
 
-		private SocialPostModel ConvertPost(IUserMessage message)
-		{
-			return new SocialPostModel
-			{
-				Document = message.GetDocumentData(),
-				Name = message.Author.ChatName,
-				Handle = message.Author.SocialHandle
-			};
-		}
-
 		private void OnPostCountChanged(int count)
 		{
 			listView.SetItems(uiPosts);

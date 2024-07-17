@@ -87,7 +87,7 @@ namespace SociallyDistant
 			settingsObservable = Context.SettingsManager.ObserveChanges(OnSettingsUpdated);
 			
 			// Websites
-			Context.ContentManager.AddContentSource(websites);
+			Context.ContentManager.AddContentGenerator(websites);
 
 			// chats
 			Context.ContentManager.AddContentSource(conversations);
@@ -121,7 +121,7 @@ namespace SociallyDistant
 			Context.ContentManager.RemoveContentSource(toolGroupsSource);
 			Context.ContentManager.RemoveContentSource(missionScriptLocator);
 			Context.ContentManager.RemoveContentSource(conversations);
-			Context.ContentManager.RemoveContentSource(websites);
+			Context.ContentManager.RemoveContentGenerator(websites);
 			
 			if (graphicsSettings != null)
 				Context.SettingsManager.UnregisterSettingsCategory(graphicsSettings);

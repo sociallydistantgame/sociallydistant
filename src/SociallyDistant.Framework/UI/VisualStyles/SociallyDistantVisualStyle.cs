@@ -395,6 +395,9 @@ public class SociallyDistantVisualStyle : IVisualStyle
                 case WidgetBackgrounds.StatusBar:
                     DrawStatusBar(widget, geometryHelper);
                     break;
+                case WidgetBackgrounds.Common:
+                    geometryHelper.AddQuad(widget.ContentArea, GetCommonColor(widget.GetCustomProperty<CommonColor>()));
+                    break;
                 case WidgetBackgrounds.Overlay:
                     geometryHelper.AddQuad(widget.ContentArea, mainBackground * 0.67f);
                     break;

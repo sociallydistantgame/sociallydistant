@@ -1,19 +1,32 @@
 ﻿#nullable enable
 
+using System.Collections.Immutable;
+using System.Reflection;
 using SociallyDistant.Core.ContentManagement;
 
 namespace SociallyDistant.GameplaySystems.WebPages
 {
-	public class WebSiteContentManager : IGameContentSource
+	public class WebSiteContentManager : IContentGenerator
 	{
-		/// <inheritdoc />
-		public async Task LoadAllContent(ContentCollectionBuilder builder, IContentFinder finder)
+		public IEnumerable<IGameContent> CreateContent()
 		{
-			foreach (WebPageAsset website in await finder.FindContentOfType<WebPageAsset>())
+			foreach (Assembly assembly in AppDomain.CurrentDomain.GetAssemblies())
 			{
-				builder.AddContent(website);
+				foreach (Type type in assembly.GetTypes())
+				{
+					if (!type.IsAssignableTo(typeof(WebSite)))
+						continue;
+
+					if (type.GetConstructor(Type.EmptyTypes) == null)
+						continue;
+
+					var attribute = type.GetCustomAttributes(false).OfType<WebSiteAttribute>().FirstOrDefault();
+					if (attribute == null)
+						continue;
+
+					yield return new WebPageAsset(type, attribute.HostName);
+				}
 			}
-			
 		}
 	}
 }

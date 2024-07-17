@@ -1,9 +1,21 @@
 ﻿using System.Reactive.Subjects;
 using System.Reflection;
+using AcidicGUI.Widgets;
 
 namespace SociallyDistant.GameplaySystems.WebPages
 {
-	public abstract class WebSite
+	[AttributeUsage(AttributeTargets.Class, AllowMultiple = false)]
+	public sealed class WebSiteAttribute : Attribute
+	{
+		public string HostName { get; }
+
+		public WebSiteAttribute(string hostname)
+		{
+			this.HostName = hostname;
+		}
+	}
+	
+	public abstract class WebSite : Widget
 	{
 		private readonly Stack<SavedState> history = new Stack<SavedState>();
 		private readonly Stack<SavedState> future = new Stack<SavedState>();
