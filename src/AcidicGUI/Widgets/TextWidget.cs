@@ -760,6 +760,7 @@ public class TextWidget : Widget
             if (i == textElements.Count - 1 || characterIndex <= element.SourceEnd)
             {
                 var fontInstance = (element.MarkupData.FontOverride ?? font).GetFont(this);
+                var lineHeight = fontInstance.GetLineHeight(element.MarkupData.FontSize ?? FontSize, element.MarkupData.Weight ?? FontWeight, element.MarkupData.Italic);
                 
                 if (characterIndex == element.SourceStart)
                 {
@@ -770,7 +771,7 @@ public class TextWidget : Widget
                         element.Position.X,
                         element.Position.Y,
                         charMeasure.X,
-                        charMeasure.Y
+                        lineHeight
                     );
                 }
 
@@ -788,7 +789,7 @@ public class TextWidget : Widget
                     element.Position.X + measurement.X,
                     element.Position.Y,
                     singleCharMeasure.X,
-                    singleCharMeasure.Y
+                    lineHeight
                 );
             }
             
