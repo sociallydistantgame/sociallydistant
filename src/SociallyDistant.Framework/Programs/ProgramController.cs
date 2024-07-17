@@ -7,6 +7,8 @@ namespace SociallyDistant.Core.Programs;
 
 public abstract class ProgramController
 {
+    private static readonly List<ProgramController> runningPrograms = new();
+    
     private readonly ProgramContext context;
 
     public string CurrentDirectory
@@ -31,12 +33,16 @@ public abstract class ProgramController
         this.context = context;
         WindowTitle = GetType().Name;
         context.Window.Closed = HandleClosed;
+        
+        runningPrograms.Add(this);
     }
 
     private void HandleClosed(IContentPanel obj)
     {
         if (Process.IsAlive)
             Process.Kill(0);
+
+        runningPrograms.Remove(this);
     }
 
     protected abstract void Main();
@@ -89,5 +95,11 @@ public abstract class ProgramController
             this.console = console;
             this.args = args;
         }
+    }
+
+    public static T Find<T>()
+        where T : ProgramController
+    {
+        return runningPrograms.OfType<T>().Last();
     }
 }

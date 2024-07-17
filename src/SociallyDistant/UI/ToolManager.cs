@@ -2,8 +2,10 @@ using AcidicGUI.CustomProperties;
 using AcidicGUI.Layout;
 using AcidicGUI.Widgets;
 using SociallyDistant.Core.OS.Devices;
+using SociallyDistant.Core.Programs;
 using SociallyDistant.Core.Shell;
 using SociallyDistant.Core.Shell.Windowing;
+using SociallyDistant.UI.Tools.WebBrowser;
 using SociallyDistant.UI.Windowing;
 
 namespace SociallyDistant.UI;
@@ -70,6 +72,21 @@ public sealed class ToolManager
 		BuildDock();
 		
 		SwitchTools(this.tools.First());
+	}
+
+	public async Task OpenWebBrowser(Uri uri)
+	{
+		var tool = tools.FirstOrDefault(x => x.Definition is WebBrowserTool);
+		if (tool == null)
+			throw new InvalidOperationException("The Web Browser could not be found in the primary tool list.");
+		
+		// Brings the window into focus
+		SwitchTools(tool);
+
+		
+		// Actually does the navigation in the web browser.
+		var controller = ProgramController.Find<WebBrowserController>();
+		controller.Navigate(uri);
 	}
 	
 	private void UpdateDockActiveStates()

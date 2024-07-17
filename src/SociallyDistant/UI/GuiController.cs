@@ -106,9 +106,12 @@ public class GuiController : GameComponent,
 
         if (gameMode != GameMode.OnDesktop)
         {
-            desktopController.InfoPanelController.ShowClock = false;
-            desktopController.Logout();
-            desktop?.Dispose();
+            if (desktop != null)
+            {
+                desktopController.InfoPanelController.ShowClock = false;
+                desktopController.Logout();
+                desktop?.Dispose();
+            }
         }
 
         switch (gameMode)
