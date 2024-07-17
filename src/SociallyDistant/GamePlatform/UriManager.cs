@@ -30,7 +30,7 @@ namespace SociallyDistant.GamePlatform
 			if (IsSchemeRegistered(schemaName))
 				throw new InvalidOperationException($"A schema handler for the {schemaName} schema has already been registered.");
 
-			registeredSchemas[schemaName] = handler;
+			registeredSchemas.Add(schemaName, handler);
 		}
 
 		/// <inheritdoc />

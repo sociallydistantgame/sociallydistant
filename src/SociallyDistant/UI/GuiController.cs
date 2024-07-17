@@ -111,6 +111,7 @@ public class GuiController : GameComponent,
                 desktopController.InfoPanelController.ShowClock = false;
                 desktopController.Logout();
                 desktop?.Dispose();
+                desktop = null;
             }
         }
 
