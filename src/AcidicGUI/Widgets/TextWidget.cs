@@ -757,7 +757,7 @@ public class TextWidget : Widget
             if (characterIndex < element.SourceStart)
                 break;
 
-            if (i == textElements.Count - 1 || characterIndex <= element.SourceEnd)
+            if (i == textElements.Count - 1 || characterIndex < element.SourceEnd)
             {
                 var fontInstance = (element.MarkupData.FontOverride ?? font).GetFont(this);
                 var lineHeight = fontInstance.GetLineHeight(element.MarkupData.FontSize ?? FontSize, element.MarkupData.Weight ?? FontWeight, element.MarkupData.Italic);
