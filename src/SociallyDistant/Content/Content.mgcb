@@ -92,6 +92,18 @@
 /processorParam:TextureFormat=color
 /build:Textures/DefaultAvatarMap.png
 
+#begin Textures/SociallyDistantFull.png
+/importer:TextureImporter
+/processor:TextureProcessor
+/processorParam:ColorKeyColor=255,0,255,255
+/processorParam:ColorKeyEnabled=false
+/processorParam:GenerateMipmaps=false
+/processorParam:PremultiplyAlpha=false
+/processorParam:ResizeToPowerOfTwo=false
+/processorParam:MakeSquare=false
+/processorParam:TextureFormat=color
+/build:Textures/SociallyDistantFull.png
+
 #begin UI/Textures/checkbox_emblem.png
 /importer:TextureImporter
 /processor:TextureProcessor
