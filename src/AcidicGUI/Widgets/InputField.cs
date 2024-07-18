@@ -30,7 +30,14 @@ public sealed class InputField :
     private bool   multiline;
     private int    selectionOffset;
     private bool   selectAllOnFocus = true;
+    private bool   submitOnEnter;
 
+    public bool SubmitOnEnter
+    {
+        get => submitOnEnter;
+        set => submitOnEnter = value;
+    }
+    
     public bool SelectAllOnFocus
     {
         get => selectAllOnFocus;
@@ -64,6 +71,8 @@ public sealed class InputField :
         get => multiline;
         set => multiline = value;
     }
+
+    public event Action<string>? OnSubmit;
     
     public InputField()
     {
@@ -170,13 +179,15 @@ public sealed class InputField :
         }
     }
 
-    private void HandleEnter()
+    private void HandleEnter(bool shiftPressed)
     {
-        if (multiline)
+        if (multiline && (!submitOnEnter || shiftPressed))
         {
             InsertText('\n');
             return;
         }
+        
+        OnSubmit?.Invoke(currentValue.ToString());
     }
     
     private void SetValueInternal(string value)
@@ -491,7 +502,7 @@ public sealed class InputField :
         
         if (e.Key == Keys.Enter)
         {
-            HandleEnter();
+            HandleEnter(e.Modifiers.HasFlag(ModifierKeys.Shift));
             return;
         }
 

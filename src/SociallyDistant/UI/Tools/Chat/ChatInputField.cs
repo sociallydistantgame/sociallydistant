@@ -15,6 +15,12 @@ public sealed class ChatInputField : Widget,
     private readonly InputField             inputField = new();
     private readonly ConversationBranchList branchList = new();
     
+    public event Action<string>? OnSubmit
+    {
+        add => inputField.OnSubmit += value;
+        remove => inputField.OnSubmit -= value;
+    }
+    
     public ChatInputField()
     {
         inputField.Placeholder = "Send message...";
@@ -60,5 +66,10 @@ public sealed class ChatInputField : Widget,
     public void SetTextWithoutNotify(string text)
     {
         this.inputField.Value = text;
+    }
+
+    public bool PickSelectedBranchIfAny()
+    {
+        return branchList.PickSelectedIfAny();
     }
 }

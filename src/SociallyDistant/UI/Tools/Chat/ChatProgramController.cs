@@ -83,6 +83,8 @@ public sealed class ChatProgramController : ProgramController
         guildsPanel.ChildWidgets.Add(homeButton);
         guildsPanel.ChildWidgets.Add(guildList);
         channelsPanel.ChildWidgets.Add(channelsList);
+
+        messageInput.OnSubmit += OnMessageSubmit;
     }
 
     protected override void Main()
@@ -354,9 +356,9 @@ public sealed class ChatProgramController : ProgramController
     
     private void OnMessageSubmit(string text)
     {
-        /*if (this.branchList.PickSelectedIfAny())
+        if (this.messageInput.PickSelectedBranchIfAny())
         {
-            this.messageInputField.SetTextWithoutNotify(string.Empty);
+            this.messageInput.SetTextWithoutNotify(string.Empty);
             return;
         }
 			
@@ -384,9 +386,7 @@ public sealed class ChatProgramController : ProgramController
 			
         worldManager.World.Messages.Add(message);
 			
-        this.messageInputField.SetTextWithoutNotify(string.Empty);
-
-        messageInputField.ActivateInputField();*/
+        this.messageInput.SetTextWithoutNotify(string.Empty);
     }
     
     private void OnGuildLeave(IGuild guild)
