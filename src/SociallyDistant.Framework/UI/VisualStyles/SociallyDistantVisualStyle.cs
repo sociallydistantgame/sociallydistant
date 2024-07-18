@@ -61,6 +61,8 @@ public class SociallyDistantVisualStyle : IVisualStyle
     public Font? IconFont => iconFont;
     public Padding DropdownButtonPadding { get; } = new Padding(1, 1, 29, 1);
     public Color SelectionColor => selectionColor;
+    public Color TextSelectionBackground => selectionColor;
+    public Color TextSelectionForeground => Color.White;
 
     public SociallyDistantVisualStyle(IGameContext game)
     {

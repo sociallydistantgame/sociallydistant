@@ -13,11 +13,18 @@ namespace AcidicGUI;
 
 public sealed class GuiManager : IFontFamilyProvider
 {
-    private readonly IGuiContext context;
+    private readonly IGuiContext               context;
     private readonly Widget.TopLevelCollection topLevels;
-    private readonly GuiRenderer renderer;
-    private readonly Queue<Widget> widgetsNeedingLayoutUpdate = new();
-    private readonly FallbackVisualStyle fallbackVisualStyle = new FallbackVisualStyle();
+    private readonly GuiRenderer               renderer;
+    private readonly Queue<Widget>             widgetsNeedingLayoutUpdate = new();
+    private readonly FallbackVisualStyle       fallbackVisualStyle        = new FallbackVisualStyle();
+    private          ButtonState               leftControl;
+    private          ButtonState               rightControl;
+    private          ButtonState               leftShift;
+    private          ButtonState               rightShift;
+    private          ButtonState               leftAlt;
+    private          ButtonState               rightAlt;
+    
     
     private IVisualStyle? visualStyleOverride;
     private int screenWidth;
@@ -68,7 +75,7 @@ public sealed class GuiManager : IFontFamilyProvider
     
     public void SendCharacter(Keys key, char character)
     {
-        var e = new KeyCharEvent(key, character);
+        var e = new KeyCharEvent(key, GetKeyModifiers(), character);
 
         if (hoveredWidget != null)
         {
@@ -80,10 +87,48 @@ public sealed class GuiManager : IFontFamilyProvider
             Bubble<IKeyCharHandler, KeyCharEvent>(keyboardFocus, e, x => x.OnKeyChar);
         }
     }
+
+    private ModifierKeys GetKeyModifiers()
+    {
+        var result = ModifierKeys.None;
+
+        if (leftControl == ButtonState.Pressed || rightControl == ButtonState.Pressed)
+            result |= ModifierKeys.Control;
+        
+        if (leftShift == ButtonState.Pressed || rightShift == ButtonState.Pressed)
+            result |= ModifierKeys.Shift;
+        
+        if (leftAlt == ButtonState.Pressed || leftAlt == ButtonState.Pressed)
+            result |= ModifierKeys.Alt;
+        
+        return result;
+    }
     
     public void SendKey(Keys key, ButtonState state)
     {
-        var e = new KeyEvent(key);
+        switch (key)
+        {
+            case Keys.LeftControl:
+                leftControl = state;
+                break;
+            case Keys.RightControl:
+                rightControl = state;
+                break;
+            case Keys.LeftShift:
+                leftShift = state;
+                break;
+            case Keys.RightShift:
+                rightShift = state;
+                break;
+            case Keys.LeftAlt:
+                leftAlt = state;
+                break;
+            case Keys.RightAlt:
+                rightAlt = state;
+                break;
+        }
+        
+        var e = new KeyEvent(key, GetKeyModifiers());
         
         if (hoveredWidget != null)
         {

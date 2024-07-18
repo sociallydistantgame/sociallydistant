@@ -24,6 +24,8 @@ public class TextWidget : Widget
     private TextAlignment textAlignment;
     private int?          fontSize;
     private FontWeight    fontWeight = FontWeight.Normal;
+    private int           selectionStart;
+    private int           selectionLength;
 
     public FontWeight FontWeight
     {
@@ -36,6 +38,8 @@ public class TextWidget : Widget
         }
     }
 
+    public bool HasSelection => selectionStart >= 0 && selectionStart + selectionLength <= text.Length;
+    
     public Color? TextColor
     {
         get => color;
@@ -104,6 +108,8 @@ public class TextWidget : Widget
         get => text;
         set
         {
+            selectionStart = -1;
+            selectionLength = 0;
             text = value;
             RebuildText();
             InvalidateLayout();
@@ -202,6 +208,45 @@ public class TextWidget : Widget
         }
     }
 
+    public void SelectAll()
+    {
+        selectionStart = 0;
+        selectionLength = text.Length;
+        RebuildText();
+        InvalidateLayout();
+    }
+
+    public void SelectNone()
+    {
+        selectionStart = -1;
+        selectionLength = 0;
+        RebuildText();
+        InvalidateLayout();
+    }
+
+    public void SetSelection(int start, int count)
+    {
+        if (count == 0 && start==-1)
+        {
+            SelectNone();
+            return;
+        }
+
+        if (start < 0)
+            throw new ArgumentOutOfRangeException(nameof(start));
+        
+        if (count < 0)
+            throw new ArgumentOutOfRangeException(nameof(count));
+        
+        if (start + count > text.Length)
+            throw new ArgumentOutOfRangeException(nameof(count));
+
+        selectionStart = start;
+        selectionLength = count;
+        RebuildText();
+        InvalidateLayout();
+    }
+    
     protected override void RebuildGeometry(GeometryHelper geometry)
     {
         FontInfo? lastOverride = null;
@@ -214,11 +259,17 @@ public class TextWidget : Widget
                 family = (element.MarkupData.FontOverride ?? this.font).GetFont(this);
                 lastOverride = element.MarkupData.FontOverride;
             }
-            
-            var renderColor = (element.MarkupData.ColorOverride ?? TextColor) ?? GetVisualStyle().GetTextColor(this);
 
-            if (element.MeasuredSize.HasValue && element.MarkupData.Highlight.A > 0)
+            var renderColor = element.MarkupData.IsSelected
+                ? GetVisualStyle().TextSelectionForeground
+                : (element.MarkupData.ColorOverride ?? TextColor) ?? GetVisualStyle().GetTextColor(this);
+
+            if (element.MeasuredSize.HasValue && element.MarkupData.Highlight.A > 0 || element.MarkupData.IsSelected)
             {
+                var highlight = element.MarkupData.IsSelected
+                    ? GetVisualStyle().TextSelectionBackground
+                    : element.MarkupData.Highlight;
+                
                 var highlightRect = new LayoutRect(
                     element.Position.X,
                     element.Position.Y,
@@ -226,7 +277,7 @@ public class TextWidget : Widget
                     element.MeasuredSize.Value.Y
                 );
 
-                geometry.AddQuad(highlightRect, element.MarkupData.Highlight);
+                geometry.AddQuad(highlightRect, highlight);
             }
 
             family.Draw(geometry, element.Position.ToVector2(), renderColor, element.Text, element.MarkupData.FontSize ?? this.FontSize,
@@ -474,12 +525,6 @@ public class TextWidget : Widget
             case "/s":
                 markupData.Strikethrough = false;
                 return true;
-            case "selected":
-                markupData.Selected = true;
-                return true;
-            case "/selected":
-                markupData.Selected = false;
-                return true;
             case "link":
             {
                 if (string.IsNullOrWhiteSpace(afterEquals))
@@ -531,6 +576,22 @@ public class TextWidget : Widget
                 break;
             }
 
+            if (i == selectionStart || i == selectionStart + selectionLength)
+            {
+                textElements.Add(new TextElement
+                {
+                    Text = stringBuilder.ToString(),
+                    SourceStart = sourceStart,
+                    SourceEnd = i,
+                    MarkupData = markupData
+                });
+
+                markupData.IsSelected = !markupData.IsSelected;
+                
+                stringBuilder.Length = 0;
+                sourceStart = i;
+            }
+            
             switch (character.Value)
             {
                 case '<' when this.useMarkup:
@@ -816,8 +877,8 @@ public class TextWidget : Widget
         public bool        Italic;
         public bool        Underline;
         public bool        Strikethrough;
-        public bool        Selected;
         public string?     Link;
+        public bool        IsSelected;
     }
     
     private class TextElement

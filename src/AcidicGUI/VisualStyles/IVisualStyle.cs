@@ -14,6 +14,8 @@ public interface IVisualStyle : IFontFamilyProvider
     Font? IconFont { get; }
     Padding DropdownButtonPadding { get; }
     Color SelectionColor { get; }
+    Color TextSelectionBackground { get; }
+    Color TextSelectionForeground { get; }
     
     int ScrollBarSize { get; }
 
