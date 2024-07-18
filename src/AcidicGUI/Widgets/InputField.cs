@@ -73,6 +73,7 @@ public sealed class InputField :
     }
 
     public event Action<string>? OnSubmit;
+    public event Action<string>? OnValueChanged;
     
     public InputField()
     {
@@ -197,6 +198,7 @@ public sealed class InputField :
         caretIndex = Math.Clamp(caretIndex, 0, currentValue.Length);
 
         UpdateDisplay();
+        OnValueChanged?.Invoke(currentValue.ToString());
     }
 
     private void Delete(int index, int count)
@@ -226,6 +228,8 @@ public sealed class InputField :
         }
 
         UpdateDisplay();
+        
+        OnValueChanged?.Invoke(currentValue.ToString());
     }
     
     private void InsertText(char character)
@@ -237,6 +241,8 @@ public sealed class InputField :
         else currentValue.Insert(caretIndex, character);
         caretIndex++;
         UpdateDisplay();
+        
+        OnValueChanged?.Invoke(currentValue.ToString());
     }
     
     private void UpdateDisplay()
@@ -445,6 +451,8 @@ public sealed class InputField :
         currentValue.Remove(selectionStart, selectionCount);
         selectionOffset = 0;
         UpdateDisplay();
+        
+        OnValueChanged?.Invoke(currentValue.ToString());
     }
     
     public void OnKeyDown(KeyEvent e)

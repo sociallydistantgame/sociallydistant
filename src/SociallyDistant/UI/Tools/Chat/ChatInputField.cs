@@ -27,6 +27,13 @@ public sealed class ChatInputField : Widget,
         inputField.WordWrapped = true;
         Children.Add(inputField);
         Children.Add(branchList);
+        
+        inputField.OnValueChanged += OnQueryChanged;
+    }
+
+    private void OnQueryChanged(string query)
+    {
+        branchList.Filter = query;
     }
 
     protected override Point GetContentSize(Point availableSize)
