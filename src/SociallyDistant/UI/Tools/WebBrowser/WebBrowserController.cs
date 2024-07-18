@@ -62,6 +62,8 @@ public sealed class WebBrowserController : ProgramController
         toolbar.ChildWidgets.Add(home);
         toolbar.ChildWidgets.Add(addressBar);
         toolbar.ChildWidgets.Add(go);
+
+        addressBar.OnSubmit += NavigateTo;
     }
 
     public void Navigate(Uri uri)
