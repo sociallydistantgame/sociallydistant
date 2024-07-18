@@ -196,6 +196,8 @@ public sealed class InputField :
         this.currentValue.Length = 0;
         this.currentValue.Append(value);
         caretIndex = Math.Clamp(caretIndex, 0, currentValue.Length);
+        caretIndex = currentValue.Length;
+        selectionOffset = 0;
 
         UpdateDisplay();
         OnValueChanged?.Invoke(currentValue.ToString());
@@ -507,6 +509,15 @@ public sealed class InputField :
     public void OnKeyChar(KeyCharEvent e)
     {
         e.Handle();
+
+        if (e.Key == Keys.Escape)
+        {
+            DeselectAll();
+            caretIndex = 0;
+            GuiManager?.SetFocusedWidget(this.Parent);
+            e.Handle();
+            return;
+        }
         
         if (e.Key == Keys.Enter)
         {
