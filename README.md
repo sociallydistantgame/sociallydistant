@@ -1,3 +1,6 @@
+> [!WARNING]
+> Socially Distant's development is being moved to [GitLab](https://gitlab.acidiclight.dev/sociallydistant/sociallydistant). I will be archiving this repository and will no longer accept pull requests or issues here. Please direct any contributions to GitLab. :) 
+
 # Socially Distant
 Socially Distant is an up-coming hacking game following the story of a global ransomware attack disrupting a society forced into cyberspace by the spread of a deadly biological threat to humanity.
 
